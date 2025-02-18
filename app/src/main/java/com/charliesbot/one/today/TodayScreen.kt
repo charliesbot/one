@@ -13,6 +13,12 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,13 +27,28 @@ import com.charliesbot.one.core.components.FastingTimeAction
 import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
+import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 
 @Composable
-fun TodayScreen() {
+fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val screenPadding = 32.dp
-    val isFasting = false
+    val isFasting by viewModel.isFasting.collectAsState()
+    val starTimeInMillis by viewModel.startTimeInMillis.collectAsState()
+    var elapsedTime by remember { mutableLongStateOf(0L) }
     val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
+
+    LaunchedEffect(isFasting) {
+        if (isFasting) {
+            while (true) {
+                elapsedTime = System.currentTimeMillis() - starTimeInMillis
+                delay(1000L) // refresh timer every second
+            }
+        } else {
+            elapsedTime = 0L
+        }
+    }
 
     Scaffold() { innerPadding ->
         Column(
@@ -56,7 +77,7 @@ fun TodayScreen() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    CurrentFastingProgress()
+                    CurrentFastingProgress(isFasting = isFasting, elapsedTime = elapsedTime)
                     if (isFasting) {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -71,12 +92,11 @@ fun TodayScreen() {
                         }
                     }
                     FilledTonalButton(
-                        onClick = {},
+                        onClick = if (isFasting) viewModel::onStopFasting else viewModel::onStartFasting,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-//                        Text("Start Fasting")
                         Text(text = fastButtonLabel)
                     }
                 }

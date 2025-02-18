@@ -14,15 +14,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.charliesbot.one.core.components.FastingProgressBar
+import com.charliesbot.one.core.utils.calculateProgressFraction
+import com.charliesbot.one.core.utils.calculateProgressPercentage
+import com.charliesbot.one.core.utils.formatTimestamp
 import com.charliesbot.one.ui.theme.OneTheme
 
 @Composable
 fun FastingStatusIndicator(
     isFasting: Boolean,
-    elapsedTimeText: String = "00:00:00",
+    elapsedTime: Long
 ) {
-    val headerLabel = if (isFasting) "Remaining (82%)" else "UPCOMING FAST"
-    val timeLabel = if (isFasting) elapsedTimeText else "16 hours"
+    val headerLabel = if (isFasting) {
+        val progress = calculateProgressPercentage(elapsedTime)
+        "Remaining (${progress}%)"
+    } else {
+        "UPCOMING FAST"
+    }
+    val timeLabel = if (isFasting) {
+        formatTimestamp(elapsedTime)
+    } else {
+        "16 hours"
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -39,17 +51,18 @@ fun FastingStatusIndicator(
 
 @Composable
 fun CurrentFastingProgress(
-    elapsedTimeText: String = "00:00:00",
+    elapsedTime: Long,
     isFasting: Boolean = false
 ) {
+    val progress = calculateProgressFraction(elapsedTime)
     FastingProgressBar(
-        progress = 0.8f,
+        progress = progress,
         strokeWidth = 30.dp,
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = 400.dp),
         innerContent = {
-            FastingStatusIndicator(isFasting, elapsedTimeText)
+            FastingStatusIndicator(isFasting, elapsedTime)
         }
     )
 }
@@ -59,8 +72,8 @@ fun CurrentFastingProgress(
 fun CurrentFastingProgressPreview() {
     OneTheme {
         Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
-            CurrentFastingProgress(isFasting = false)
-            CurrentFastingProgress(isFasting = true)
+            CurrentFastingProgress(isFasting = false, elapsedTime = 0L)
+            CurrentFastingProgress(isFasting = true, elapsedTime = 7 * 1000 * 60 * 60)
         }
     }
 }

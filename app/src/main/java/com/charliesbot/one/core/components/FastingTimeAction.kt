@@ -11,15 +11,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.charliesbot.one.core.utils.formatDate
 import com.charliesbot.one.ui.theme.OneTheme
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-fun formatDate(date: LocalDateTime): String {
-    val formatter = DateTimeFormatter.ofPattern("EEE, h:mm a", Locale.ENGLISH)
-    return date.format(formatter)
-}
 
 @Composable
 fun FastingTimeAction(title: String, date: LocalDateTime, onClick: (() -> Unit)? = null) {
