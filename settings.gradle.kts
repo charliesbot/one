@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "One"
 include(":app")
+include(":onewearos")
+include(":shared")

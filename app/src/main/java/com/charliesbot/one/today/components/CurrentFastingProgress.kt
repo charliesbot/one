@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.charliesbot.one.core.components.FastingProgressBar
 import com.charliesbot.one.core.utils.calculateProgressFraction
 import com.charliesbot.one.core.utils.calculateProgressPercentage
-import com.charliesbot.one.core.utils.formatTimestamp
+import com.charliesbot.shared.core.utils.formatTimestamp
 import com.charliesbot.one.ui.theme.OneTheme
 
 @Composable

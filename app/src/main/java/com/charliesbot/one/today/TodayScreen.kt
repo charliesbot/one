@@ -1,8 +1,15 @@
 package com.charliesbot.one.today
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,7 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -23,19 +29,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.charliesbot.one.core.components.FastingTimeAction
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.charliesbot.one.core.components.TimePickerDialog
 import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.core.components.TimeInfoDisplay
+import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import java.time.LocalDateTime
 
 @Composable
 fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val screenPadding = 32.dp
-    val isFasting by viewModel.isFasting.collectAsState()
-    val starTimeInMillis by viewModel.startTimeInMillis.collectAsState()
+    val isTimePickerDialogOpen by viewModel.isTimePickerDialogOpen.collectAsStateWithLifecycle()
+    val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
+    val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
+    val startTimeInLocalDateTime =
+        convertMillisToLocalDateTime(starTimeInMillis)
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
 
@@ -51,6 +62,18 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     }
 
     Scaffold() { innerPadding ->
+        if (isTimePickerDialogOpen) {
+            TimePickerDialog(
+                starTimeInMillis,
+                onConfirm = { updatedStartTime ->
+                    viewModel.updateStartTime(updatedStartTime)
+                    viewModel.closeTimePickerDialog()
+                },
+                onDismiss = {
+                    viewModel.closeTimePickerDialog()
+                },
+            )
+        }
         Column(
             modifier = Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -75,19 +98,35 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                         .padding(all = 32.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     CurrentFastingProgress(isFasting = isFasting, elapsedTime = elapsedTime)
-                    if (isFasting) {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    AnimatedVisibility(
+                        visible = isFasting,
+                        enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
+                                expandVertically(animationSpec = tween(durationMillis = 350)),
+                        exit =
+                        fadeOut(animationSpec = tween(durationMillis = 150)) +
+                                shrinkVertically(animationSpec = tween(durationMillis = 350))
+                    ) {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier
                                 .fillMaxWidth()
+                                // I need this padding to push the content below the timers.
+                                // Otherwise, after the animation, there's a subtle jump.
+                                .padding(bottom = 20.dp)
                         ) {
-                            FastingTimeAction(title = "Started", date = LocalDateTime.now())
-                            FastingTimeAction(
+                            TimeInfoDisplay(
+                                title = "Started",
+                                date = startTimeInLocalDateTime,
+                                onClick = {
+                                    viewModel.openTimePickerDialog()
+                                }
+                            )
+                            TimeInfoDisplay(
                                 title = "Goal",
-                                date = LocalDateTime.now().plusHours(16)
+                                date = startTimeInLocalDateTime.plusHours(16)
                             )
                         }
                     }
