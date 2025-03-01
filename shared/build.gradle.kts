@@ -37,9 +37,16 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.core.coroutines)
+    implementation(libs.koin.androidx.workmanager)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.annotations)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.runtime.android)

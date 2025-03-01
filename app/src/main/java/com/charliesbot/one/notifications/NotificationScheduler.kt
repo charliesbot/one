@@ -1,7 +1,6 @@
 package com.charliesbot.one.notifications
 
 import android.content.Context
-import android.util.Log
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
