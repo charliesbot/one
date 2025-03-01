@@ -1,4 +1,4 @@
-package com.charliesbot.one.core.components
+package com.charliesbot.shared.core.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.charliesbot.one.ui.theme.OneTheme
 
 @Composable
 fun FastingProgressBar(
@@ -60,8 +59,6 @@ fun FastingProgressBar(
 
 @Preview(showBackground = true)
 @Composable
-fun FastingProgressBarPreview() {
-    OneTheme {
-        FastingProgressBar(0.8f, modifier = Modifier.size(200.dp))
-    }
+private fun FastingProgressBarPreview() {
+    FastingProgressBar(0.8f, modifier = Modifier.size(200.dp))
 }

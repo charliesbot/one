@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
+import androidx.wear.compose.material.MaterialTheme as WearMaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,22 +20,17 @@ import java.time.LocalDateTime
 
 @Composable
 fun TimeInfoDisplay(
-    title: String,
-    date: LocalDateTime,
-    onClick: (() -> Unit)? = null,
-    isForWear: Boolean = false
+    title: String, date: LocalDateTime, onClick: (() -> Unit)? = null, isForWear: Boolean = false
 ) {
     val verticalSpace = if (isForWear) 2.dp else (-5).dp
     val textColor =
-        if (isForWear) Color.White else MaterialTheme.colorScheme.onSurface
+        if (isForWear) WearMaterialTheme.colors.onBackground else MaterialTheme.colorScheme.onSurface
     val dateFormat = if (isForWear) TimeFormat.TIME else TimeFormat.DATE_TIME
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(verticalSpace),
-        modifier = Modifier.clickable(
-            enabled = onClick != null,
-            onClick = onClick ?: {})
+        modifier = Modifier.clickable(enabled = onClick != null, onClick = onClick ?: {})
     ) {
         Text(
             text = title.uppercase(),
@@ -45,7 +40,7 @@ fun TimeInfoDisplay(
         )
         Text(
             text = formatDate(date, dateFormat),
-            fontSize = 14.sp,
+            fontSize = if (isForWear) 12.sp else 14.sp,
             fontWeight = FontWeight.Bold,
             color = textColor
         )
@@ -59,9 +54,5 @@ fun TimeInfoDisplay(
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
 private fun TimeInfoDisplayPreview() {
-    TimeInfoDisplay(
-        title = "Started",
-        date = LocalDateTime.now(),
-        onClick = {}
-    )
+    TimeInfoDisplay(title = "Started", date = LocalDateTime.now(), onClick = {})
 }

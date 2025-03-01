@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.charliesbot.one.core.components.FastingProgressBar
+import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.one.core.utils.calculateProgressFraction
 import com.charliesbot.one.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.formatTimestamp
