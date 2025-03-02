@@ -22,10 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.ToggleButton
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.components.TimeInfoDisplay
@@ -101,8 +101,11 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
                     }
                 }
                 Spacer(Modifier.height(15.dp))
-                Button(
-                    onClick = if (isFasting) viewModel::onStopFasting else viewModel::onStartFasting,
+                ToggleButton(
+                    checked = !isFasting,
+                    onCheckedChange = {
+                        if (isFasting) viewModel.onStopFasting() else viewModel.onStartFasting()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
