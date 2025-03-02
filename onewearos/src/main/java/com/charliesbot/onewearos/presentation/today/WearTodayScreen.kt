@@ -38,10 +38,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
-    val startTimeInLocalDateTime =
-        convertMillisToLocalDateTime(System.currentTimeMillis())
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
+    val startTimeInLocalDateTime =
+        convertMillisToLocalDateTime(startTimeInMillis)
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
 

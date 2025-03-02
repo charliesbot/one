@@ -104,15 +104,14 @@ class FastingDataClient(context: Context) {
         val startTime = dataMap.getLong(START_TIME_KEY, 0L)
         val updateTimestamp = dataMap.getLong(UPDATE_TIMESTAMP_KEY, 0L)
 
-        // If we are trying to update the state with an outdated timestamp, ignore it
         if (fetchType == FetchType.FROM_DATA_LAYER && updateTimestamp <= lastUpdateTimestamp) {
             logBasedOnStateData(FetchType.IGNORED, isFasting, startTime, updateTimestamp)
             return
         }
 
+        lastUpdateTimestamp = updateTimestamp
         _isFasting.value = isFasting
         _startTimeInMillis.value = startTime
-        lastUpdateTimestamp = updateTimestamp
 
         logBasedOnStateData(fetchType, isFasting, startTime, updateTimestamp)
     }
@@ -122,12 +121,24 @@ class FastingDataClient(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val dataItems = dataClient.dataItems.await()
+                var newestItem: DataMap? = null
+                var newestTimestamp = 0L
+
+                // Data Layer can have multiple entries for the same path.
+                // We need to find the most recent one, otherwise we might overwrite state
+                // before it's committed.
                 dataItems.forEach { dataItem ->
                     if (dataItem.uri.path == FASTING_PATH) {
                         val dataMap = DataMapItem.fromDataItem(dataItem).dataMap
-                        updateLocalState(dataMap, FetchType.INITIAL)
-                        return@forEach // Exit after first relevant data item is found
+                        val timestamp = dataMap.getLong(UPDATE_TIMESTAMP_KEY, 0L)
+                        if (timestamp > newestTimestamp) {
+                            newestTimestamp = timestamp
+                            newestItem = dataMap
+                        }
                     }
+                }
+                newestItem?.let {
+                    updateLocalState(it, FetchType.INITIAL)
                 }
                 dataItems.release()
             } catch (e: Exception) {
