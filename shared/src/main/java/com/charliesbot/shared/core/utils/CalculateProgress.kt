@@ -1,4 +1,4 @@
-package com.charliesbot.one.core.utils
+package com.charliesbot.shared.core.utils
 
 const val TOTAL_FASTING_TIME_MILLIS = 16 * 60 * 60 * 1000L
 

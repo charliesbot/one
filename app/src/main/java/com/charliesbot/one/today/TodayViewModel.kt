@@ -1,24 +1,26 @@
 package com.charliesbot.one.today
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.charliesbot.one.notifications.NotificationScheduler
+import com.charliesbot.shared.core.datalayer.FastingDataClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class TodayViewModel(
-    private val sharedPreferences: SharedPreferences,
+    private val fastingDataClient: FastingDataClient,
     private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
-    private val _startTimeInMillis = MutableStateFlow(sharedPreferences.getLong("start_time", 0L))
-    val startTimeInMillis: StateFlow<Long> = _startTimeInMillis
-
-    private val _isFasting = MutableStateFlow(sharedPreferences.getBoolean("is_fasting", false))
-    val isFasting: StateFlow<Boolean> = _isFasting
-
+    val startTimeInMillis: StateFlow<Long> = fastingDataClient.startTimeInMillis
+    val isFasting: StateFlow<Boolean> = fastingDataClient.isFasting
     private val _isTimePickerDialogOpen = MutableStateFlow(false)
     val isTimePickerDialogOpen: StateFlow<Boolean> = _isTimePickerDialogOpen
+
+    override fun onCleared() {
+        super.onCleared()
+        fastingDataClient.cleanup()
+    }
 
     fun openTimePickerDialog() {
         _isTimePickerDialogOpen.value = true
@@ -29,30 +31,23 @@ class TodayViewModel(
     }
 
     fun onStopFasting() {
-        _startTimeInMillis.value = 0L
-        _isFasting.value = false
-        updateSharedPreferences()
-        notificationScheduler.cancelAllNotifications()
+        viewModelScope.launch {
+            fastingDataClient.stopFasting()
+            notificationScheduler.cancelAllNotifications()
+        }
     }
 
     fun onStartFasting() {
-        _startTimeInMillis.value = System.currentTimeMillis()
-        _isFasting.value = true
-        updateSharedPreferences()
-        notificationScheduler.scheduleNotifications(_startTimeInMillis.value)
+        viewModelScope.launch {
+            fastingDataClient.startFasting()
+            notificationScheduler.scheduleNotifications(fastingDataClient.startTimeInMillis.value)
+        }
     }
 
     fun updateStartTime(timeInMillis: Long) {
-        _startTimeInMillis.value = timeInMillis
-        updateSharedPreferences()
-        notificationScheduler.scheduleNotifications(_startTimeInMillis.value)
-    }
-
-    private fun updateSharedPreferences() {
-        sharedPreferences.edit {
-            putLong("start_time", _startTimeInMillis.value)
-            putBoolean("is_fasting", _isFasting.value)
-            apply()
+        viewModelScope.launch {
+            fastingDataClient.updateStartTime(timeInMillis)
+            notificationScheduler.scheduleNotifications(startTimeInMillis.value)
         }
     }
 }

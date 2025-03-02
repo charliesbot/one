@@ -1,7 +1,7 @@
 package com.charliesbot.onewearos.presentation.today
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
@@ -28,19 +29,22 @@ import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.components.TimeInfoDisplay
+import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
 import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun WearTodayScreen() {
+fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(System.currentTimeMillis())
-//    var elapsedTime = formatTimestamp(58210000L)
-    val startTimeInMillis = 1740649020000L
     var elapsedTime by remember { mutableLongStateOf(0L) }
-    val isFasting = true
+    val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
+    val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
+    val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
+
     val timeLabel = if (isFasting) {
         formatTimestamp(elapsedTime)
     } else {
@@ -58,7 +62,7 @@ fun WearTodayScreen() {
     }
     Scaffold {
         FastingProgressBar(
-            progress = 0.8f,
+            progress = calculateProgressFraction(elapsedTime),
             strokeWidth = 8.dp,
             indicatorColor = MaterialTheme.colors.primary,
             trackColor = MaterialTheme.colors.onBackground,
@@ -77,28 +81,32 @@ fun WearTodayScreen() {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(15.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                AnimatedVisibility(
+                    visible = isFasting
                 ) {
-                    TimeInfoDisplay(
-                        title = "Started",
-                        date = startTimeInLocalDateTime,
-                        isForWear = true
-                    )
-                    TimeInfoDisplay(
-                        title = "Goal",
-                        date = startTimeInLocalDateTime.plusHours(16),
-                        isForWear = true
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TimeInfoDisplay(
+                            title = "Started",
+                            date = startTimeInLocalDateTime,
+                            isForWear = true
+                        )
+                        TimeInfoDisplay(
+                            title = "Goal",
+                            date = startTimeInLocalDateTime.plusHours(16),
+                            isForWear = true
+                        )
+                    }
                 }
                 Spacer(Modifier.height(15.dp))
                 Button(
-                    onClick = {},
+                    onClick = if (isFasting) viewModel::onStopFasting else viewModel::onStartFasting,
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    Text("End Fast")
+                    Text(fastButtonLabel)
                 }
             }
         }
