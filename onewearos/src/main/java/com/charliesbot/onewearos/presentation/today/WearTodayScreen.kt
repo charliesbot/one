@@ -29,6 +29,7 @@ import androidx.wear.compose.material.ToggleButton
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.components.TimeInfoDisplay
+import com.charliesbot.shared.core.models.CommandStatus
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
@@ -43,6 +44,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(startTimeInMillis)
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
+    val commandStatus by viewModel.commandStatus.collectAsStateWithLifecycle()
     val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
 
     val timeLabel = if (isFasting) {
@@ -102,6 +104,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
                 }
                 Spacer(Modifier.height(15.dp))
                 ToggleButton(
+                    enabled = commandStatus == CommandStatus.Idle,
                     checked = !isFasting,
                     onCheckedChange = {
                         if (isFasting) viewModel.onStopFasting() else viewModel.onStartFasting()
