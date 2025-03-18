@@ -32,9 +32,9 @@ class NotificationScheduler(private val context: Context) {
     fun scheduleNotifications(startMillis: Long) {
         cancelAllNotifications()
         val almostCompleteFastNotificationDelay =
-            (startMillis + TimeUnit.SECONDS.toMillis(10)) - System.currentTimeMillis()
+            (startMillis + TimeUnit.HOURS.toMillis(15)) - System.currentTimeMillis()
         val completeFastNotificationDelay =
-            (startMillis + TimeUnit.SECONDS.toMillis(30)) - System.currentTimeMillis()
+            (startMillis + TimeUnit.HOURS.toMillis(16)) - System.currentTimeMillis()
         scheduleNotification(
             almostCompleteFastNotificationDelay.coerceAtLeast(0),
             NotificationType.ONE_HOUR_BEFORE
