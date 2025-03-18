@@ -22,6 +22,7 @@ import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.onewearos.presentation.today.WearTodayScreen
 import org.koin.androidx.compose.KoinAndroidContext
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

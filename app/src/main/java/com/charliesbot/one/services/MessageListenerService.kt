@@ -2,15 +2,13 @@ package com.charliesbot.one.services
 
 import android.util.Log
 import com.charliesbot.one.notifications.NotificationScheduler
+import com.charliesbot.shared.core.extensions.long.toLong
 import com.charliesbot.shared.core.models.FastingCommand
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import org.koin.core.component.KoinComponent
 import org.koin.android.ext.android.inject
-import java.nio.ByteBuffer
 
-fun ByteArray.toLong() =
-    ByteBuffer.wrap(this).long
 
 class MessageListenerService : WearableListenerService(), KoinComponent {
     private val notificationScheduler: NotificationScheduler by inject()

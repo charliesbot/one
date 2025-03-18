@@ -2,9 +2,10 @@ package com.charliesbot.onewearos.presentation.today
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.onewearos.presentation.data.repositories.WearMessageRepository
+import com.charliesbot.shared.core.data.repositories.WearableMessageRepository
 import com.charliesbot.shared.core.datalayer.FastingDataClient
 import com.charliesbot.shared.core.models.CommandStatus
+import com.charliesbot.shared.core.models.DeviceType
 import com.charliesbot.shared.core.models.FastingCommand
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class WearTodayViewModel(
     private val fastingDataClient: FastingDataClient,
-    private val messageRepository: WearMessageRepository
+    private val messageRepository: WearableMessageRepository
 ) : ViewModel() {
     val isFasting = fastingDataClient.isFasting
     val startTimeInMillis = fastingDataClient.startTimeInMillis
@@ -39,7 +40,11 @@ class WearTodayViewModel(
         viewModelScope.launch {
             _commandStatus.value = CommandStatus.Sending
             fastingDataClient.startFasting(System.currentTimeMillis())
-            updateCommandStatus(messageRepository.sendCommandToMobile(FastingCommand.START_FASTING))
+            updateCommandStatus(
+                messageRepository.sendCommandToMobile(
+                    FastingCommand.START_FASTING
+                )
+            )
         }
     }
 
@@ -47,7 +52,11 @@ class WearTodayViewModel(
         viewModelScope.launch {
             _commandStatus.value = CommandStatus.Sending
             fastingDataClient.stopFasting()
-            updateCommandStatus(messageRepository.sendCommandToMobile(FastingCommand.STOP_FASTING))
+            updateCommandStatus(
+                messageRepository.sendCommandToMobile(
+                    FastingCommand.STOP_FASTING
+                )
+            )
         }
     }
 }

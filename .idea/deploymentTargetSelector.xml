@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-03-17T02:35:13.470986Z">
+        <DropdownSelection timestamp="2025-03-17T03:55:25.134419Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=RFAY10ZF7TM" />
@@ -15,7 +15,7 @@
       </SelectionState>
       <SelectionState runConfigName="onewearos">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-03-15T05:39:50.445556Z">
+        <DropdownSelection timestamp="2025-03-17T03:55:31.184386Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=RFAY10ZF7TM" />

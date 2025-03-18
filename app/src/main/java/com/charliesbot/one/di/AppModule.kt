@@ -3,10 +3,12 @@ package com.charliesbot.one.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.charliesbot.one.notifications.NotificationScheduler
+import com.charliesbot.shared.core.data.repositories.WearableMessageRepository
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import com.charliesbot.one.today.TodayViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 
 val appModule = module {
@@ -18,4 +20,5 @@ val appModule = module {
     }
     singleOf(::NotificationScheduler)
     viewModelOf(::TodayViewModel)
+    factoryOf(::WearableMessageRepository)
 }

@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -14,6 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.charliesbot.one.MainActivity
 import com.charliesbot.one.R
+import com.charliesbot.one.receivers.OpenWatchAppReceiver
 
 class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters) {
@@ -35,24 +35,23 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
     }
 
     private fun createWatchNotificationAction(): NotificationCompat.Action {
-        // Create an intent that will be recognized by the watch
-        val openWatchIntent = Intent(Intent.ACTION_VIEW)
-            .addCategory(Intent.CATEGORY_DEFAULT)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            // This will match the activity in the watch's AndroidManifest.xml
-            .setPackage("com.charliesbot.one")
+        // Create an intent for the BroadcastReceiver
+        val actionIntent = Intent(applicationContext, OpenWatchAppReceiver::class.java).apply {
+            action = OpenWatchAppReceiver.ACTION_OPEN_WEAR_APP
+            putExtra(NOTIFICATION_TYPE_KEY, inputData.getString(NOTIFICATION_TYPE_KEY))
+        }
 
-        val openWatchPendingIntent = PendingIntent.getActivity(
+        val actionPendingIntent = PendingIntent.getBroadcast(
             applicationContext,
             0,
-            openWatchIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            actionIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         return NotificationCompat.Action.Builder(
-            android.R.drawable.ic_dialog_info,
-            "Open on watch",
-            openWatchPendingIntent
+            R.drawable.ic_launcher_foreground,
+            "Open on Watch",
+            actionPendingIntent
         ).build()
     }
 
