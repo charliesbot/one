@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
-import androidx.wear.compose.material.MaterialTheme as WearMaterialTheme
+import androidx.wear.compose.material3.MaterialTheme as WearMaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -24,7 +24,7 @@ fun TimeInfoDisplay(
 ) {
     val verticalSpace = if (isForWear) 2.dp else (-5).dp
     val textColor =
-        if (isForWear) WearMaterialTheme.colors.onBackground else MaterialTheme.colorScheme.onSurface
+        if (isForWear) WearMaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface
     val dateFormat = if (isForWear) TimeFormat.TIME else TimeFormat.DATE_TIME
 
     Column(

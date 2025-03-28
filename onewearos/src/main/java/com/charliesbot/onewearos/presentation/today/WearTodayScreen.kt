@@ -22,10 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.Scaffold
-import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.ToggleButton
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TextToggleButton
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.components.TimeInfoDisplay
@@ -62,12 +62,12 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
             elapsedTime = 0L
         }
     }
-    Scaffold {
+    ScreenScaffold {
         FastingProgressBar(
             progress = calculateProgressFraction(elapsedTime),
             strokeWidth = 8.dp,
-            indicatorColor = MaterialTheme.colors.primary,
-            trackColor = MaterialTheme.colors.onBackground,
+            indicatorColor = MaterialTheme.colorScheme.primaryDim,
+            trackColor = MaterialTheme.colorScheme.onBackground,
         ) {
             Column(
                 modifier = Modifier
@@ -78,7 +78,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
             ) {
                 Text(
                     text = timeLabel,
-                    color = MaterialTheme.colors.onBackground,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -103,7 +103,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
                     }
                 }
                 Spacer(Modifier.height(15.dp))
-                ToggleButton(
+                TextToggleButton(
                     enabled = commandStatus == CommandStatus.Idle,
                     checked = !isFasting,
                     onCheckedChange = {
