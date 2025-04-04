@@ -2,14 +2,12 @@ package com.charliesbot.one.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.charliesbot.one.notifications.NotificationScheduler
-import com.charliesbot.shared.core.data.repositories.WearableMessageRepository
+import com.charliesbot.one.notifications.NotificationWorker
+import com.charliesbot.shared.core.notifications.NotificationScheduler
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import com.charliesbot.one.today.TodayViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.factoryOf
-import org.koin.core.module.dsl.singleOf
 
 val appModule = module {
     single<SharedPreferences> {
@@ -18,7 +16,11 @@ val appModule = module {
             Context.MODE_PRIVATE
         )
     }
-    singleOf(::NotificationScheduler)
+    single<NotificationScheduler> {
+        NotificationScheduler(
+            context = androidContext(),
+            workerClass = NotificationWorker::class.java,
+        )
+    }
     viewModelOf(::TodayViewModel)
-    factoryOf(::WearableMessageRepository)
 }

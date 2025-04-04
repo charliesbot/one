@@ -1,6 +1,5 @@
 package com.charliesbot.one.core.components
 
-import android.content.pm.PackageManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.AlertDialog

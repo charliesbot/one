@@ -28,13 +28,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".receivers.OpenWatchAppReceiver" />
         <service
-            android:name=".services.MessageListenerService"
+            android:name=".services.FastingStateListenerService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+
                 <data
                     android:host="*"
                     android:pathPrefix="/"

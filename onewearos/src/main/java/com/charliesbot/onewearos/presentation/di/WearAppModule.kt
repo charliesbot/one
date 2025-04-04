@@ -1,12 +1,19 @@
 package com.charliesbot.onewearos.presentation.di
 
+import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
 import com.charliesbot.onewearos.presentation.today.WearTodayViewModel
-import com.charliesbot.shared.core.data.repositories.WearableMessageRepository
+import com.charliesbot.shared.core.notifications.NotificationScheduler
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val wearAppModule = module {
     viewModelOf(::WearTodayViewModel)
-    factoryOf(::WearableMessageRepository)
+    single<NotificationScheduler> {
+        NotificationScheduler(
+            context = androidContext(),
+            workerClass = NotificationWorker::class.java,
+        )
+    }
 }

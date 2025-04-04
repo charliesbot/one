@@ -2,61 +2,40 @@ package com.charliesbot.onewearos.presentation.today
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.shared.core.data.repositories.WearableMessageRepository
-import com.charliesbot.shared.core.datalayer.FastingDataClient
-import com.charliesbot.shared.core.models.CommandStatus
-import com.charliesbot.shared.core.models.DeviceType
-import com.charliesbot.shared.core.models.FastingCommand
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.notifications.NotificationScheduler
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class WearTodayViewModel(
-    private val fastingDataClient: FastingDataClient,
-    private val messageRepository: WearableMessageRepository
+    private val notificationScheduler: NotificationScheduler,
+    private val fastingDataRepository: FastingDataRepository
 ) : ViewModel() {
-    val isFasting = fastingDataClient.isFasting
-    val startTimeInMillis = fastingDataClient.startTimeInMillis
-
-    private val _commandStatus =
-        MutableStateFlow<CommandStatus>(CommandStatus.Idle)
-    val commandStatus: StateFlow<CommandStatus> = _commandStatus
-
-    override fun onCleared() {
-        super.onCleared()
-        fastingDataClient.cleanup()
-    }
-
-    private fun updateCommandStatus(newCommandStatus: CommandStatus) {
-        viewModelScope.launch {
-            _commandStatus.value = newCommandStatus
-            delay(3000)
-            _commandStatus.value = CommandStatus.Idle
-        }
-    }
+    val isFasting: StateFlow<Boolean> = fastingDataRepository.isFasting.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = false
+    )
+    val startTimeInMillis: StateFlow<Long> = fastingDataRepository.startTimeInMillis.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = -1
+    )
 
     fun onStartFasting() {
+        val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
-            _commandStatus.value = CommandStatus.Sending
-            fastingDataClient.startFasting(System.currentTimeMillis())
-            updateCommandStatus(
-                messageRepository.sendCommandToMobile(
-                    FastingCommand.START_FASTING
-                )
-            )
+            fastingDataRepository.startFasting(startTimeMillis)
+            notificationScheduler.scheduleNotifications(startTimeInMillis.value)
         }
     }
 
     fun onStopFasting() {
         viewModelScope.launch {
-            _commandStatus.value = CommandStatus.Sending
-            fastingDataClient.stopFasting()
-            updateCommandStatus(
-                messageRepository.sendCommandToMobile(
-                    FastingCommand.STOP_FASTING
-                )
-            )
+            fastingDataRepository.stopFasting()
+            notificationScheduler.cancelAllNotifications()
         }
     }
 }

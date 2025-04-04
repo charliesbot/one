@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.2"
+datastorePreferences = "1.1.4"
 koinBom = "4.0.2"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -9,12 +10,12 @@ espressoCore = "3.6.1"
 kotlinxCoroutinesPlayServices = "1.8.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2025.03.00"
+composeBom = "2025.03.01"
 ksp = "2.0.21-1.0.28"
 koin-annotations = "2.0.0-RC1"
 playServicesWearable = "19.0.0"
-wearComposeMaterial = "1.0.0-alpha34"
-wearCompose = "1.5.0-alpha11"
+wearComposeMaterial = "1.0.0-alpha35"
+wearCompose = "1.5.0-alpha12"
 wearToolingPreview = "1.0.0"
 coreSplashscreen = "1.0.1"
 tiles = "1.4.1"
@@ -28,9 +29,11 @@ appcompat = "1.7.0"
 composeMaterial = "1.12.0"
 runtimeAndroid = "1.7.8"
 uiTooling = "1.7.8"
+wearPhoneInteractions = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -43,6 +46,8 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
@@ -68,6 +73,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "composeMaterial" }
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+androidx-wear-phone-interactions = { group = "androidx.wear", name = "wear-phone-interactions", version.ref = "wearPhoneInteractions" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

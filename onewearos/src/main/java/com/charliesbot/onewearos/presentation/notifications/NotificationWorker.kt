@@ -1,4 +1,4 @@
-package com.charliesbot.one.notifications
+package com.charliesbot.onewearos.presentation.notifications
 
 import android.Manifest
 import android.app.Notification
@@ -11,11 +11,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.charliesbot.one.MainActivity
-import com.charliesbot.one.R
-import com.charliesbot.shared.core.notifications.NotificationUtil
+import com.charliesbot.onewearos.R
+import com.charliesbot.onewearos.presentation.MainActivity
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_ID
 import com.charliesbot.shared.core.models.NotificationWorkerInput
+import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.shared.core.utils.generateDismissalId
 import com.charliesbot.shared.core.utils.getNotificationText
 import com.charliesbot.shared.core.utils.parseWorkerInput
@@ -41,17 +41,16 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
     ): Notification {
         val notificationContent = getNotificationText(notificationWorkerInput.notificationType)
 
-        val mobileIntent = Intent(applicationContext, MainActivity::class.java).apply {
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 
-        val mobilePendingIntent =
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                mobileIntent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
+        val watchPendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val wearableExtender = NotificationCompat.WearableExtender()
             .setHintContentIntentLaunchesActivity(true)
@@ -64,10 +63,9 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
 
         return NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setAutoCancel(true)
             .setContentTitle(notificationContent.title)
             .setContentText(notificationContent.message)
-            .setContentIntent(mobilePendingIntent)
+            .setContentIntent(watchPendingIntent)
             .extend(wearableExtender)
             .build()
     }

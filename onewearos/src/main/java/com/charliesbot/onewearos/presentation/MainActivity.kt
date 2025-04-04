@@ -5,25 +5,41 @@
 
 package com.charliesbot.onewearos.presentation
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.tooling.preview.devices.WearDevices
+import com.charliesbot.onewearos.core.components.NotificationPermissionDialog
 import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.onewearos.presentation.today.WearTodayScreen
+import com.charliesbot.shared.core.notifications.NotificationUtil
 import org.koin.androidx.compose.KoinAndroidContext
 
 
 class MainActivity : ComponentActivity() {
+    private val requestNotificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                NotificationUtil.createNotificationChannel(this)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -32,30 +48,46 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            WearApp()
-        }
-    }
-}
+            var showNotificationPermission by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    NotificationUtil.createNotificationChannel(this@MainActivity)
+                    return@LaunchedEffect
+                }
 
-@Composable
-fun WearApp() {
-    OneTheme {
-        KoinAndroidContext {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colors.background),
-                contentAlignment = Alignment.Center
-            ) {
-                WearTodayScreen()
+                if (ContextCompat.checkSelfPermission(
+                        this@MainActivity,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    showNotificationPermission = true
+                }
+            }
+
+            OneTheme {
+                KoinAndroidContext {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colors.background),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        WearTodayScreen()
+
+                        NotificationPermissionDialog(
+                            isVisible = showNotificationPermission,
+                            onDismiss = { showNotificationPermission = false },
+                            onConfirm = {
+                                showNotificationPermission = false
+                                requestNotificationPermission.launch(
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                )
+                            }
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-
-@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
-@Composable
-fun DefaultPreview() {
-    WearApp()
-}

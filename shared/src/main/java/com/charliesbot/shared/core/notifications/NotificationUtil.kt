@@ -1,4 +1,4 @@
-package com.charliesbot.one.notifications
+package com.charliesbot.shared.core.notifications
 
 import android.app.Notification
 import android.app.NotificationChannel

@@ -3,9 +3,7 @@ package com.charliesbot.one
 import android.os.Build
 import android.os.Bundle
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,8 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.charliesbot.one.core.components.NotificationPermissionDialog
-import com.charliesbot.one.notifications.NotificationUtil
-import com.charliesbot.one.services.MessageListenerService
+import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.one.today.TodayScreen
 import com.charliesbot.one.ui.theme.OneTheme
 import org.koin.androidx.compose.KoinAndroidContext
@@ -40,9 +37,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        Intent(this, MessageListenerService::class.java).also { intent ->
-            startService(intent)
-        }
         setContent {
             var showNotificationPermission by remember { mutableStateOf(false) }
 
