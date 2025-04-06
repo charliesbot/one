@@ -14,6 +14,7 @@ composeBom = "2025.03.01"
 ksp = "2.0.21-1.0.28"
 koin-annotations = "2.0.0-RC1"
 playServicesWearable = "19.0.0"
+startupRuntime = "1.2.0"
 wearComposeMaterial = "1.0.0-alpha35"
 wearCompose = "1.5.0-alpha12"
 wearToolingPreview = "1.0.0"
@@ -30,10 +31,13 @@ composeMaterial = "1.12.0"
 runtimeAndroid = "1.7.8"
 uiTooling = "1.7.8"
 wearPhoneInteractions = "1.1.0"
+workRuntimeKtx = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

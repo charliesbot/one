@@ -4,14 +4,14 @@ import android.app.Application
 import android.util.Log
 import androidx.wear.phone.interactions.notifications.BridgingConfig
 import androidx.wear.phone.interactions.notifications.BridgingManager
+import androidx.work.Configuration
 import com.charliesbot.onewearos.presentation.di.wearAppModule
 import com.charliesbot.shared.core.di.sharedModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 
-
-class MainApplication : Application() {
+class MainApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
@@ -35,4 +35,8 @@ class MainApplication : Application() {
             Log.e("WatchApplication", "Failed to disable notification bridging", e)
         }
     }
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
+
 }
