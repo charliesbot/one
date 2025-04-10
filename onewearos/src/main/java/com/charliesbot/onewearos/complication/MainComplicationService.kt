@@ -6,12 +6,14 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import java.util.Calendar
 
 /**
  * Skeleton for complication data source that returns short text.
  */
-class MainComplicationService : SuspendingComplicationDataSourceService() {
+class MainComplicationService(private val fastingDataRepository: FastingDataRepository) :
+    SuspendingComplicationDataSourceService() {
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         if (type != ComplicationType.SHORT_TEXT) {

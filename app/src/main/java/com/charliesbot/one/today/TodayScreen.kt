@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
@@ -49,6 +52,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
         convertMillisToLocalDateTime(starTimeInMillis)
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(isFasting) {
         if (isFasting) {
@@ -61,7 +65,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
         }
     }
 
-    Scaffold() { innerPadding ->
+    Scaffold { innerPadding ->
         if (isTimePickerDialogOpen) {
             TimePickerDialog(
                 starTimeInMillis,
@@ -75,7 +79,10 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
             )
         }
         Column(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             WeeklyProgress(
@@ -106,8 +113,8 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                         enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
                                 expandVertically(animationSpec = tween(durationMillis = 350)),
                         exit =
-                        fadeOut(animationSpec = tween(durationMillis = 150)) +
-                                shrinkVertically(animationSpec = tween(durationMillis = 350))
+                            fadeOut(animationSpec = tween(durationMillis = 150)) +
+                                    shrinkVertically(animationSpec = tween(durationMillis = 350))
                     ) {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
