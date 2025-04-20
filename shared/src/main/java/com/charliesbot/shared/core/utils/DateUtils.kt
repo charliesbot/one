@@ -17,10 +17,14 @@ fun formatDate(date: LocalDateTime, format: TimeFormat = TimeFormat.DATE_TIME): 
     return date.format(formatter)
 }
 
+fun getHours(millis: Long): Long {
+    return millis / (1000 * 60 * 60)
+}
+
 fun formatTimestamp(millis: Long): String {
     val seconds = (millis / 1000) % 60
     val minutes = (millis / (1000 * 60)) % 60
-    val hours = millis / (1000 * 60 * 60)
+    val hours = getHours(millis)
     return String.format(
         Locale.US,
         "%02d:%02d:%02d", hours, minutes, seconds

@@ -18,6 +18,7 @@
         <service
             android:name=".complication.MainComplicationService"
             android:exported="true"
+            android:icon="@drawable/ic_notification_status"
             android:label="@string/complication_label"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
             <intent-filter>
@@ -26,24 +27,14 @@
 
             <meta-data
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="SHORT_TEXT" />
+                android:value="GOAL_PROGRESS" />
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
-                android:value="0" />
+                android:value="600" />
+            <meta-data
+                android:name="android.support.wearable.complications.PROVIDER_ICON"
+                android:resource="@drawable/ic_notification_status" />
         </service>
-        <!--        <service-->
-        <!--            android:name=".tile.MainTileService"-->
-        <!--            android:exported="true"-->
-        <!--            android:label="@string/tile_label"-->
-        <!--            android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">-->
-        <!--            <intent-filter>-->
-        <!--                <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />-->
-        <!--            </intent-filter>-->
-
-        <!--            <meta-data-->
-        <!--                android:name="androidx.wear.tiles.PREVIEW"-->
-        <!--                android:resource="@drawable/tile_preview" />-->
-        <!--        </service>-->
 
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -1,43 +1,124 @@
 package com.charliesbot.onewearos.complication
 
+import android.app.PendingIntent
+import android.content.Intent
+import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.GoalProgressComplicationData
+import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
-import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.charliesbot.onewearos.R
+import com.charliesbot.onewearos.presentation.MainActivity
+import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
-import java.util.Calendar
+import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.utils.calculateProgressPercentage
+import com.charliesbot.shared.core.utils.getHours
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-/**
- * Skeleton for complication data source that returns short text.
- */
-class MainComplicationService(private val fastingDataRepository: FastingDataRepository) :
-    SuspendingComplicationDataSourceService() {
+private const val TARGET_DURATION_TEXT = "16h"
+private const val TARGET_HOURS = 16f
+
+class MainComplicationService() :
+    SuspendingComplicationDataSourceService(), KoinComponent {
+
+    private val repository: FastingDataRepository by inject()
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
-        if (type != ComplicationType.SHORT_TEXT) {
+        if (type != ComplicationType.GOAL_PROGRESS) {
             return null
         }
-        return createComplicationData("Mon", "Monday")
+        return GoalProgressComplicationData.Builder(
+            value = TARGET_HOURS / 2f, // Example: 8 hours towards 16h goal
+            targetValue = TARGET_HOURS,
+            contentDescription = PlainComplicationText.Builder("Fasting progress preview").build()
+        )
+            .setMonochromaticImage(
+                MonochromaticImage.Builder(
+                    Icon.createWithResource(
+                        this,
+                        R.drawable.ic_notification_status
+                    )
+                ).build()
+            )
+            .setTitle(PlainComplicationText.Builder("8h").build()) // Example elapsed time
+            .build()
     }
 
-    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-            Calendar.SUNDAY -> createComplicationData("Sun", "Sunday")
-            Calendar.MONDAY -> createComplicationData("Mon", "Monday")
-            Calendar.TUESDAY -> createComplicationData("Tue", "Tuesday")
-            Calendar.WEDNESDAY -> createComplicationData("Wed", "Wednesday")
-            Calendar.THURSDAY -> createComplicationData("Thu", "Thursday")
-            Calendar.FRIDAY -> createComplicationData("Fri!", "Friday!")
-            Calendar.SATURDAY -> createComplicationData("Sat", "Saturday")
-            else -> throw IllegalArgumentException("too many days")
+
+    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
+        val fastingData: FastingDataItem = try {
+            repository.getCurrentFasting()!!
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error fetching fasting data", e)
+            return null
         }
+        Log.e(LOG_TAG, "fastingData: $fastingData")
+        val tapAction = createTapIntent()
+        if (!fastingData.isFasting) {
+            return GoalProgressComplicationData.Builder(
+                value = 0f,
+                targetValue = 0f,
+                contentDescription = PlainComplicationText.Builder(
+                    "Not Fasting. Tap to start."
+                ).build()
+            )
+                .setMonochromaticImage(
+                    MonochromaticImage.Builder(
+                        Icon.createWithResource(
+                            this,
+                            R.drawable.ic_notification_status
+                        )
+                    ).build()
+                )
+                .setTapAction(tapAction)
+                .build()
+        }
+
+        return createIsFastingComplicationData(fastingData, tapAction)
     }
 
-    private fun createComplicationData(text: String, contentDescription: String) =
-        ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(text).build(),
-            contentDescription = PlainComplicationText.Builder(contentDescription).build()
-        ).build()
+    private fun createIsFastingComplicationData(
+        fastingData: FastingDataItem,
+        tapAction: PendingIntent?
+    ): ComplicationData {
+        val currentTime = System.currentTimeMillis()
+        val elapsedMillis = (currentTime - fastingData.startTimeInMillis).coerceAtLeast(0L)
+        val percentage = calculateProgressPercentage(elapsedMillis)
+        val elapsedHours = getHours(elapsedMillis)
+
+        return GoalProgressComplicationData.Builder(
+            value = elapsedHours.toFloat().coerceAtMost(TARGET_HOURS),
+            targetValue = TARGET_HOURS,
+            contentDescription = PlainComplicationText.Builder(
+                "Fasting: ${percentage}% ($elapsedHours of $TARGET_DURATION_TEXT)"
+            ).build()
+        )
+            .setMonochromaticImage(
+                MonochromaticImage.Builder(
+                    Icon.createWithResource(this, R.drawable.ic_notification_status)
+                ).build()
+            )
+            .setTitle(PlainComplicationText.Builder("${elapsedHours.toInt()}H").build())
+            .setTapAction(tapAction)
+            .build()
+
+    }
+
+    private fun createTapIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        return PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 }
