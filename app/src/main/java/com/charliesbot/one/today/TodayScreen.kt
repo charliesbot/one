@@ -1,5 +1,6 @@
 package com.charliesbot.one.today
 
+import com.charliesbot.one.BuildConfig
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -85,12 +86,16 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            WeeklyProgress(
-                modifier = Modifier
-                    .widthIn(max = 500.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = screenPadding + 24.dp)
-            )
+            if (BuildConfig.DEBUG) {
+                WeeklyProgress(
+                    modifier = Modifier
+                        .widthIn(max = 500.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = screenPadding + 24.dp)
+                )
+            } else {
+                Spacer(modifier = Modifier.height(40.dp))
+            }
             ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
