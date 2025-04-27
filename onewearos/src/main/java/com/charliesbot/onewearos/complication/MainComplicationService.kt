@@ -1,6 +1,7 @@
 package com.charliesbot.onewearos.complication
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.util.Log
@@ -21,7 +22,6 @@ import com.charliesbot.shared.core.utils.getHours
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-private const val TARGET_DURATION_TEXT = "16h"
 private const val TARGET_HOURS = 16f
 
 class MainComplicationService() :
@@ -36,7 +36,7 @@ class MainComplicationService() :
         return GoalProgressComplicationData.Builder(
             value = TARGET_HOURS / 2f, // Example: 8 hours towards 16h goal
             targetValue = TARGET_HOURS,
-            contentDescription = PlainComplicationText.Builder("Fasting progress preview").build()
+            contentDescription = PlainComplicationText.Builder(getString(R.string.cd_fasting_preview)).build()
         )
             .setMonochromaticImage(
                 MonochromaticImage.Builder(
@@ -46,7 +46,7 @@ class MainComplicationService() :
                     )
                 ).build()
             )
-            .setTitle(PlainComplicationText.Builder("8h").build()) // Example elapsed time
+            .setTitle(PlainComplicationText.Builder(getString(R.string.complication_title_hours_format, 8)).build()) // Example elapsed time
             .build()
     }
 
@@ -65,7 +65,7 @@ class MainComplicationService() :
                 value = 0f,
                 targetValue = 0f,
                 contentDescription = PlainComplicationText.Builder(
-                    "Not Fasting. Tap to start."
+                    getString(R.string.complication_text_not_fasting)
                 ).build()
             )
                 .setMonochromaticImage(
@@ -96,7 +96,7 @@ class MainComplicationService() :
             value = elapsedHours.toFloat().coerceAtMost(TARGET_HOURS),
             targetValue = TARGET_HOURS,
             contentDescription = PlainComplicationText.Builder(
-                "Fasting: ${percentage}% ($elapsedHours of $TARGET_DURATION_TEXT)"
+                getString(R.string.complication_text_fasting_format, percentage.toInt(), elapsedHours.toInt(), getString(R.string.target_duration_short))
             ).build()
         )
             .setMonochromaticImage(
@@ -104,7 +104,7 @@ class MainComplicationService() :
                     Icon.createWithResource(this, R.drawable.ic_notification_status)
                 ).build()
             )
-            .setTitle(PlainComplicationText.Builder("${elapsedHours.toInt()}H").build())
+            .setTitle(PlainComplicationText.Builder(getString(R.string.complication_title_hours_format, elapsedHours.toInt())).build())
             .setTapAction(tapAction)
             .build()
 

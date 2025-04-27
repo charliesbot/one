@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TextToggleButton
 import androidx.wear.tooling.preview.devices.WearDevices
+import com.charliesbot.onewearos.R
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.components.TimeInfoDisplay
 import com.charliesbot.shared.core.utils.calculateProgressFraction
@@ -43,12 +45,12 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(startTimeInMillis)
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
-    val fastButtonLabel = if (isFasting) "End Fast" else "Start Fasting"
+    val fastButtonLabel = if (isFasting) stringResource(R.string.end_fast) else stringResource(R.string.start_fasting)
 
     val timeLabel = if (isFasting) {
         formatTimestamp(elapsedTime)
     } else {
-        "16 hours"
+        stringResource(R.string.target_duration_hours)
     }
     LaunchedEffect(isFasting) {
         if (isFasting) {
@@ -89,12 +91,12 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         TimeInfoDisplay(
-                            title = "Started",
+                            title = stringResource(R.string.label_started),
                             date = startTimeInLocalDateTime,
                             isForWear = true
                         )
                         TimeInfoDisplay(
-                            title = "Goal",
+                            title = stringResource(R.string.label_goal),
                             date = startTimeInLocalDateTime.plusHours(16),
                             isForWear = true
                         )

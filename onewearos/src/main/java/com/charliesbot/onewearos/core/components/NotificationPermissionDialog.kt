@@ -1,8 +1,10 @@
 package com.charliesbot.onewearos.core.components
 
 import androidx.compose.material.icons.Icons
+import com.charliesbot.onewearos.R
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material3.AlertDialog
@@ -27,10 +29,10 @@ fun NotificationPermissionDialog(
                 contentDescription = "Notification Permission"
             )
         },
-        title = { Text("Enable Notifications") },
+        title = { Text(stringResource(R.string.dialog_title_enable_notifications)) },
         text = {
             Text(
-                "Allow notifications for fasting alerts?",
+                text = stringResource(R.string.dialog_message_enable_notifications),
                 textAlign = TextAlign.Center
             )
         },
