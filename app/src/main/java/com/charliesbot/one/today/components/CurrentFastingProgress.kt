@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -17,6 +18,7 @@ import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.formatTimestamp
+import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 
 @Composable
@@ -26,14 +28,14 @@ fun FastingStatusIndicator(
 ) {
     val headerLabel = if (isFasting) {
         val progress = calculateProgressPercentage(elapsedTime)
-        "Remaining (${progress}%)"
+        stringResource(R.string.remaining_percentage, progress)
     } else {
-        "UPCOMING FAST"
+        stringResource(R.string.upcoming_fast).uppercase()
     }
     val timeLabel = if (isFasting) {
         formatTimestamp(elapsedTime)
     } else {
-        "16 hours"
+        stringResource(R.string.fasting_duration_hours)
     }
 
     Column(

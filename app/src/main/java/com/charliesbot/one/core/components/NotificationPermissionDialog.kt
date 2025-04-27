@@ -7,7 +7,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 
 
@@ -15,27 +17,24 @@ import com.charliesbot.one.ui.theme.OneTheme
 fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Enable Notifications") },
+        title = { Text(stringResource(R.string.notification_permission_title)) },
         icon = {
             Icon(
                 Icons.Rounded.Notifications,
-                contentDescription = "Notification Permission"
+                contentDescription = stringResource(R.string.notification_permission_icon_desc)
             )
         },
         text = {
-            Text(
-                "To keep track of your fasting progress, we'll need to send you notifications. " +
-                        "\n\nWould you like to enable notifications?"
-            )
+            Text(stringResource(R.string.notification_permission_text))
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Enable")
+                Text(stringResource(R.string.notification_permission_enable))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Not Now")
+                Text(stringResource(R.string.notification_permission_not_now))
             }
         }
     )

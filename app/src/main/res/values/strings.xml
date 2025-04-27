@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">One</string>
+    <string name="end_fast">End Fast</string>
+    <string name="start_fasting">Start Fasting</string>
+    <string name="started">Started</string>
+    <string name="goal">Goal</string>
+    <string name="remaining_percentage">Remaining (%1$d%%)</string>
+    <string name="upcoming_fast">Upcoming fast</string>
+    <string name="fasting_duration_hours">16 hours</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_permission_title">Enable Notifications</string>
+    <string name="notification_permission_icon_desc">Notification Permission</string>
+    <string name="notification_permission_text">To keep track of your fasting progress, we\'ll need
+        to send you notifications.\n\nWould you like to enable notifications?</string>
+    <string name="notification_permission_enable">Enable</string>
+    <string name="notification_permission_not_now">Not Now</string>
+
+    <!-- Time Picker Dialog -->
+    <string name="time_picker_select_time">Select Time</string>
+    <string name="time_picker_cancel">Cancel</string>
+    <string name="time_picker_save">Save</string>
 </resources>

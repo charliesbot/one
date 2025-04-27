@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">One</string>
+    <string name="end_fast">Terminar Ayuno</string>
+    <string name="start_fasting">Empezar Ayuno</string>
+    <string name="started">Empezó</string>
+    <string name="goal">Meta</string>
+    <string name="remaining_percentage">Restante (%1$d%%)</string>
+    <string name="upcoming_fast">Próximo ayuno</string>
+    <string name="fasting_duration_hours">16 horas</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_permission_title">Activar Notificaciones</string>
+    <string name="notification_permission_icon_desc">Permiso de Notificación</string>
+    <string name="notification_permission_text">Para seguir tu progreso de ayuno, necesitaremos
+        enviarte notificaciones.\n\n¿Te gustaría activar las notificaciones?</string>
+    <string name="notification_permission_enable">Activar</string>
+    <string name="notification_permission_not_now">Ahora No</string>
+
+    <!-- Time Picker Dialog -->
+    <string name="time_picker_select_time">Seleccionar Hora</string>
+    <string name="time_picker_cancel">Cancelar</string>
+    <string name="time_picker_save">Guardar</string>
+</resources>
