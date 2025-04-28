@@ -19,9 +19,14 @@ import com.charliesbot.shared.core.models.NotificationWorkerInput
 import com.charliesbot.shared.core.utils.generateDismissalId
 import com.charliesbot.shared.core.utils.getNotificationText
 import com.charliesbot.shared.core.utils.parseWorkerInput
+import com.charliesbot.shared.core.abstraction.StringProvider
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
-    CoroutineWorker(context, workerParameters) {
+    CoroutineWorker(context, workerParameters), KoinComponent {
+
+    private val stringProvider: StringProvider by inject()
 
     override suspend fun doWork(): Result {
         if (ActivityCompat.checkSelfPermission(
@@ -39,7 +44,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
     private fun createNotification(
         notificationWorkerInput: NotificationWorkerInput
     ): Notification {
-        val notificationContent = getNotificationText(notificationWorkerInput.notificationType)
+        val notificationContent = getNotificationText(notificationWorkerInput.notificationType, stringProvider)
 
         val mobileIntent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

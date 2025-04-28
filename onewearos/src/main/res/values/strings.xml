@@ -22,4 +22,10 @@
     <string name="complication_text_fasting_format">Fasting: %1$d%% (%2$s of %3$s)</string>
     <string name="complication_title_hours_format">%1$dH</string>
 
+    <!-- Notification Strings -->
+    <string name="notification_one_hour_title">1 Hour Remaining!</string>
+    <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
+    <string name="notification_completion_title">Fasting Completed!</string>
+    <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
+
 </resources>
