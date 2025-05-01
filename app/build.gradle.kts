@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -46,6 +48,7 @@ ksp {
 }
 
 dependencies {
+    implementation(platform(libs.firebase.bom))
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.core.coroutines)
@@ -62,6 +65,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.play.services.wearable)
     implementation(project(":shared"))
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

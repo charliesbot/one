@@ -50,11 +50,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             var showNotificationPermission by remember { mutableStateOf(false) }
             LaunchedEffect(Unit) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    NotificationUtil.createNotificationChannel(this@MainActivity)
-                    return@LaunchedEffect
-                }
-
                 if (ContextCompat.checkSelfPermission(
                         this@MainActivity,
                         Manifest.permission.POST_NOTIFICATIONS

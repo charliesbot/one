@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "188540055176",
+    "project_id": "one-fast-tracker",
+    "storage_bucket": "one-fast-tracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188540055176:android:0453736482b0e8b5eb393d",
+        "android_client_info": {
+          "package_name": "com.charliesbot.one"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcnlwIJtdiPZN96fyl8jbaMJM-Y5Yvr3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
