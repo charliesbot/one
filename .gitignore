@@ -15,3 +15,6 @@
 local.properties
 app/release/
 onewearos/release/
+keystore.properties
+.idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetSelector.xml

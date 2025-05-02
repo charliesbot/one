@@ -14,14 +14,17 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 33
         targetSdk = 35
-        versionCode = 5
+        versionCode = 7
         versionName = "1.0"
 
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
+        }
+        release {
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -37,6 +40,10 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    firebaseCrashlytics {
+        nativeSymbolUploadEnabled = true
     }
 }
 
