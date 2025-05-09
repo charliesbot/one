@@ -25,7 +25,7 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 33
         targetSdk = 35
-        versionCode = 7
+        versionCode = 10
         versionName = "1.0"
 
     }
@@ -54,6 +54,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
     compileOptions {
