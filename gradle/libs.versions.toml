@@ -1,7 +1,8 @@
 [versions]
 agp = "8.8.2"
-datastorePreferences = "1.1.4"
+datastorePreferences = "1.1.6"
 firebaseBom = "33.13.0"
+glanceAppwidget = "1.1.1"
 koinBom = "4.0.2"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -40,6 +41,11 @@ googleFirebaseCrashlytics = "3.0.3"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-glance = { module = "androidx.glance:glance", version.ref = "glanceAppwidget" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glanceAppwidget" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glanceAppwidget" }
+androidx-glance-preview = { module = "androidx.glance:glance-preview", version.ref = "glanceAppwidget" }
+androidx-glance-appwidget-preview = { module = "androidx.glance:glance-appwidget-preview", version.ref = "glanceAppwidget" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

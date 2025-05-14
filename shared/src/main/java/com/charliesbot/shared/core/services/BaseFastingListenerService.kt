@@ -38,6 +38,20 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         }
     }
 
+    /**
+     * Called after the local fasting data has been successfully updated
+     * with new information received from a wearable device.
+     * Subclasses can override this to perform platform-specific actions,
+     * such as updating UI elements (e.g., widgets on the phone).
+     */
+    protected open suspend fun onFastingStateSynced() {
+        // Default implementation does nothing.
+        Log.d(
+            LOG_TAG,
+            "${this::class.java.simpleName} - Base onFastingStateSynced called (no-op by default)"
+        )
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
@@ -72,6 +86,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                         isFasting = newestRemoteItem.isFasting,
                         lastUpdateTimestamp = newestRemoteItem.updateTimestamp
                     )
+                    onFastingStateSynced()
                 }
 
                 if (newestRemoteItem.isFasting) {

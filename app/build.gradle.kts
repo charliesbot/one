@@ -82,6 +82,9 @@ ksp {
 }
 
 dependencies {
+    implementation(libs.androidx.glance)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     implementation(platform(libs.firebase.bom))
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
@@ -95,7 +98,6 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.play.services.wearable)
     implementation(project(":shared"))
@@ -107,5 +109,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.glance.preview)
+    debugImplementation(libs.androidx.glance.appwidget.preview)
     ksp(libs.koin.ksp)
 }

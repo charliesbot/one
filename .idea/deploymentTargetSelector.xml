@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="One.onewearos">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-07T03:48:34.633888Z">
+        <DropdownSelection timestamp="2025-05-09T02:51:43.717988Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Wear_OS_Large_Round.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Resizable_Experimental.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="One.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-02T03:15:30.593078Z">
+        <DropdownSelection timestamp="2025-05-09T02:51:48.854861Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Wear_OS_Large_Round.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Resizable_Experimental.avd" />
             </handle>
           </Target>
         </DropdownSelection>

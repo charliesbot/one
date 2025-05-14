@@ -1,7 +1,10 @@
 package com.charliesbot.one.today
 
+import android.content.Context
+import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charliesbot.one.widgets.OneWidget
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TodayViewModel(
+    private val context: Context,
     private val notificationScheduler: NotificationScheduler,
     private val fastingDataRepository: FastingDataRepository
 ) : ViewModel() {
@@ -38,6 +42,7 @@ class TodayViewModel(
     fun onStopFasting() {
         viewModelScope.launch {
             fastingDataRepository.stopFasting()
+            OneWidget().updateAll(context)
             notificationScheduler.cancelAllNotifications()
         }
     }
@@ -46,6 +51,7 @@ class TodayViewModel(
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
             fastingDataRepository.startFasting(startTimeMillis)
+            OneWidget().updateAll(context)
             notificationScheduler.scheduleNotifications(startTimeMillis)
         }
     }
