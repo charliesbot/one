@@ -1,7 +1,8 @@
 package com.charliesbot.one.today
 
-import android.content.Context
+import android.app.Application
 import androidx.glance.appwidget.updateAll
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.one.widgets.OneWidget
@@ -14,10 +15,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TodayViewModel(
-    private val context: Context,
+    application: Application,
     private val notificationScheduler: NotificationScheduler,
     private val fastingDataRepository: FastingDataRepository
-) : ViewModel() {
+) : AndroidViewModel(application) {
     val isFasting: StateFlow<Boolean> = fastingDataRepository.isFasting.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),
@@ -39,10 +40,14 @@ class TodayViewModel(
         _isTimePickerDialogOpen.value = false
     }
 
+    suspend fun updateWidget() {
+        OneWidget().updateAll(getApplication<Application>().applicationContext)
+    }
+
     fun onStopFasting() {
         viewModelScope.launch {
             fastingDataRepository.stopFasting()
-            OneWidget().updateAll(context)
+            updateWidget()
             notificationScheduler.cancelAllNotifications()
         }
     }
@@ -51,7 +56,7 @@ class TodayViewModel(
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
             fastingDataRepository.startFasting(startTimeMillis)
-            OneWidget().updateAll(context)
+            updateWidget()
             notificationScheduler.scheduleNotifications(startTimeMillis)
         }
     }

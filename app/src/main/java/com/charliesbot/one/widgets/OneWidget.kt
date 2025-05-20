@@ -5,9 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,8 +47,10 @@ import androidx.glance.layout.height
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import com.charliesbot.one.MainActivity
+import com.charliesbot.one.R
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.utils.calculateProgressFraction
+import com.charliesbot.shared.core.utils.getFormattedRelativeTime
 import com.charliesbot.shared.core.utils.getHours
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -57,7 +61,7 @@ object ProgressBitmap {
         sizePx: Int,
         strokePx: Float,
         indicator: Int = 0xFFFF6A4E.toInt(),
-        track: Int = 0xFF2B2B2B.toInt()
+        track: Int = 0xFF2B2B2B.toInt(),
     ): Bitmap = createBitmap(sizePx, sizePx, Bitmap.Config.RGBA_F16).apply {
         val c = Canvas(this)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -82,45 +86,81 @@ object ProgressBitmap {
 }
 
 class OneWidget : GlanceAppWidget(), KoinComponent {
-    private val ringDp: Dp = 70.dp
+    private val ringDp: Dp = 75.dp
     private val strokeDp: Dp = 10.dp
     private val fastingDataRepository: FastingDataRepository by inject()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val fastingData = fastingDataRepository.getCurrentFasting()!!
         val currentTime = System.currentTimeMillis()
-        val elapsedMillis = (currentTime - fastingData.startTimeInMillis).coerceAtLeast(0)
+        val startTimeInMillis = fastingData.startTimeInMillis
+        val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
+        val hours = 16 - getHours(elapsedMillis)
+        val isGoalMet = fastingData.isFasting && hours <= 0
 
         provideContent {
             Scaffold(
-                modifier = GlanceModifier.clickable(
-                    actionStartActivity<MainActivity>()
-                )
+                modifier = GlanceModifier
+                    .background(GlanceTheme.colors.widgetBackground)
+                    .clickable(
+                        actionStartActivity<MainActivity>()
+                    )
             ) {
                 Column(
                     modifier = GlanceModifier
                         .padding(vertical = 24.dp)
-                        .fillMaxSize()
-                        .background(GlanceTheme.colors.widgetBackground),
+                        .fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     WidgetProgressBar(
                         isFasting = fastingData.isFasting,
-                        elapsedTime = elapsedMillis
+                        elapsedTime = elapsedMillis,
+                        isGoalMet = isGoalMet
                     )
                     Spacer(modifier = GlanceModifier.defaultWeight())
-                    WidgetFooter(isFasting = fastingData.isFasting, elapsedMillis = elapsedMillis)
+                    WidgetFooter(
+                        isFasting = fastingData.isFasting,
+                        hours = hours,
+                        startTimeInMillis = startTimeInMillis,
+                        context = context,
+                    )
                 }
             }
         }
     }
 
     @Composable
-    fun WidgetFooter(isFasting: Boolean, elapsedMillis: Long) {
-        if (isFasting) {
-            Column() {
+    fun WidgetFooter(
+        context: Context,
+        startTimeInMillis: Long,
+        isFasting: Boolean, hours: Long
+    ) {
+        val actualHours = hours.coerceAtLeast(0)
+        if (isFasting && actualHours <= 0) {
+            return Row {
                 Text(
-                    text = (16 - getHours(elapsedMillis)).coerceAtLeast(0).toString(),
+                    text = context.getString(R.string.widget_goal_met_part_1),
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onPrimaryContainer,
+                        fontSize = 30.sp,
+                    )
+                )
+                Spacer(modifier = GlanceModifier.width(6.dp))
+                Text(
+                    text = context.getString(R.string.widget_goal_met_part_2),
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onTertiaryContainer,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        }
+
+        if (isFasting) {
+            return Column() {
+                Text(
+                    text = actualHours.toString(),
                     style = TextStyle(
                         color = GlanceTheme.colors.primary,
                         fontSize = 60.sp,
@@ -128,7 +168,10 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
                     )
                 )
                 Text(
-                    text = "hours left!",
+                    text = context.resources.getQuantityString(
+                        R.plurals.widget_hours_left_plural,
+                        actualHours.toInt()
+                    ),
                     style = TextStyle(
                         color = GlanceTheme.colors.secondary,
                         fontSize = 20.sp,
@@ -136,42 +179,40 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
                     )
                 )
             }
-        } else {
+        }
+
+        return Column {
             Text(
-                text = "Time Since Last Fast",
+                text = context.getString(R.string.widget_not_fasting),
                 style = TextStyle(
-                    color = GlanceTheme.colors.onSurface, fontSize = 16.sp,
+                    color = GlanceTheme.colors.onSurface, fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
             )
-            Spacer(modifier = GlanceModifier.height(4.dp))
-            Text(
-                text = "2 months, 15 days",
-                style = TextStyle(
-                    color = GlanceTheme.colors.secondary,
-                    fontSize = 12.sp,
-                )
-            )
         }
-
     }
 
     @Composable
     fun WidgetProgressBar(
         isFasting: Boolean,
-        elapsedTime: Long
+        elapsedTime: Long,
+        isGoalMet: Boolean,
     ) {
         val context = LocalContext.current
         val displayMetrics = context.resources.displayMetrics
         val progress = calculateProgressFraction(elapsedTime)
 
-        // Resolve GlanceTheme colors *inside* the @Composable function
         val trackComposeColor =
             GlanceTheme.colors.surfaceVariant.getColor(context)
         // If it is fasting, instead of hiding the progress
         // we can play a trick and just paint two circles with the same color
-        val indicatorComposeColor =
-            if (isFasting) GlanceTheme.colors.primary.getColor(context) else trackComposeColor
+        val indicatorComposeColor = if (isGoalMet) {
+            GlanceTheme.colors.tertiary.getColor(context)
+        } else if (isFasting) {
+            GlanceTheme.colors.primary.getColor(context)
+        } else {
+            trackComposeColor
+        }
 
         // Use produceState to generate the bitmap on a background thread
         // It will re-run if 'progress', 'ringDp', 'strokeDp', 'indicatorComposeColor', or 'trackComposeColor' changes.

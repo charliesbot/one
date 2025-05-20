@@ -20,4 +20,21 @@
     <string name="time_picker_select_time">Seleccionar Hora</string>
     <string name="time_picker_cancel">Cancelar</string>
     <string name="time_picker_save">Guardar</string>
+
+    <!-- Notification Strings -->
+    <string name="notification_one_hour_title">¡Queda 1 hora!</string>
+    <string name="notification_one_hour_message">¡Lo estás haciendo muy bien! Solo queda una hora para completar tu ayuno.</string>
+    <string name="notification_completion_title">¡Ayuno completado!</string>
+    <string name="notification_completion_message">¡Felicidades! Has completado tu ayuno.</string>
+
+    <!-- Widget Strings -->
+    <string name="widget_goal_met_part_1">Meta</string>
+    <string name="widget_goal_met_part_2">Lograda!</string>
+    <string name="widget_time_since_last_fast">Último ayuno</string>
+    <string name="widget_not_fasting">Sin ayunar</string>
+    <plurals name="widget_hours_left_plural">
+        <item quantity="one">hora restante!</item>
+        <item quantity="many">horas restantes!</item>
+        <item quantity="other">horas restantes!</item>
+    </plurals>
 </resources>

@@ -26,4 +26,16 @@
     <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
     <string name="notification_completion_title">Fasting Completed!</string>
     <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
+
+    <!-- Widget Strings -->
+    <string name="widget_goal_met_part_1">Goal</string>
+    <string name="widget_goal_met_part_2">Met!</string>
+    <string name="widget_not_fasting">Not fasting</string>
+    <string name="widget_time_since_last_fast">Last Fast</string>
+    <plurals name="widget_hours_left_plural">
+        <item quantity="one">hour left!</item>
+        <item quantity="other">hours left!</item>
+    </plurals>
+
+
 </resources>

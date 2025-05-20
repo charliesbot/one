@@ -1,5 +1,6 @@
 package com.charliesbot.shared.core.utils
 
+import android.text.format.DateUtils
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -38,4 +39,22 @@ fun formatTimestamp(millis: Long, format: TimeFormat = TimeFormat.DURATION): Str
 
 fun convertMillisToLocalDateTime(millis: Long): LocalDateTime {
     return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
+}
+
+
+fun getFormattedRelativeTime(
+    startTimeMillis: Long
+): String {
+    val nowMillis = System.currentTimeMillis()
+    val minResolution = DateUtils.MINUTE_IN_MILLIS
+
+    // Use DateUtils.FORMAT_ABBREV_RELATIVE for shorter text like "5 min. ago" or "Yesterday".
+    val flags = DateUtils.FORMAT_ABBREV_RELATIVE // Or pass 0 for non-abbreviated
+
+    return DateUtils.getRelativeTimeSpanString(
+        startTimeMillis,
+        nowMillis,
+        minResolution,
+        flags
+    ).toString()
 }
