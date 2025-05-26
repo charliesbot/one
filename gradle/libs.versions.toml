@@ -12,7 +12,7 @@ espressoCore = "3.6.1"
 kotlinxCoroutinesPlayServices = "1.8.1"
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2025.05.00"
+composeBom = "2025.05.01"
 ksp = "2.0.21-1.0.28"
 koin-annotations = "2.0.0-RC1"
 playServicesWearable = "19.0.0"
@@ -30,8 +30,8 @@ horologistTiles = "0.6.17"
 watchfaceComplicationsDataSourceKtx = "1.2.1"
 appcompat = "1.7.0"
 composeMaterial = "1.12.0"
-runtimeAndroid = "1.8.1"
-uiTooling = "1.8.1"
+runtimeAndroid = "1.8.2"
+uiTooling = "1.8.2"
 wearPhoneInteractions = "1.1.0"
 workRuntimeKtx = "2.10.1"
 firebaseCrashlytics = "19.4.3"
@@ -63,6 +63,9 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+# Delete the hardcoded version once Material 3 expressive is stable.
+# I am hardcoding the version to force getting the alpha, but usually it comes from the BOM.
+# So android-material3 shouldn't have a version property explicitly defined.
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }

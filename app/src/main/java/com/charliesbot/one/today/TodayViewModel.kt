@@ -31,6 +31,7 @@ class TodayViewModel(
     )
     val _isTimePickerDialogOpen = MutableStateFlow(false)
     val isTimePickerDialogOpen: StateFlow<Boolean> = _isTimePickerDialogOpen
+    val endTimeMillis: Long = 60 * 60 * 16000 // 16 hours
 
     fun openTimePickerDialog() {
         _isTimePickerDialogOpen.value = true
@@ -55,16 +56,16 @@ class TodayViewModel(
     fun onStartFasting() {
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
-            fastingDataRepository.startFasting(startTimeMillis)
+            fastingDataRepository.startFasting(startTimeMillis, endTimeMillis)
             updateWidget()
-            notificationScheduler.scheduleNotifications(startTimeMillis)
+            notificationScheduler.scheduleNotifications(startTimeMillis, endTimeMillis)
         }
     }
 
     fun updateStartTime(timeInMillis: Long) {
         viewModelScope.launch {
-            fastingDataRepository.updateStartTime(timeInMillis)
-            notificationScheduler.scheduleNotifications(timeInMillis)
+            fastingDataRepository.updateFastingSchedule(timeInMillis, endTimeMillis)
+            notificationScheduler.scheduleNotifications(timeInMillis, endTimeMillis)
         }
     }
 }

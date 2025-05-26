@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.R
+import com.charliesbot.one.core.components.TimeDisplay
 import com.charliesbot.one.core.components.TimePickerDialog
 import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
@@ -54,7 +55,8 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(starTimeInMillis)
     var elapsedTime by remember { mutableLongStateOf(0L) }
-    val fastButtonLabel = stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
+    val fastButtonLabel =
+        stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
     val scrollState = rememberScrollState()
 
     LaunchedEffect(isFasting) {
@@ -131,14 +133,14 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                 // Otherwise, after the animation, there's a subtle jump.
                                 .padding(bottom = 20.dp)
                         ) {
-                            TimeInfoDisplay(
+                            TimeDisplay(
                                 title = stringResource(R.string.started),
                                 date = startTimeInLocalDateTime,
                                 onClick = {
                                     viewModel.openTimePickerDialog()
                                 }
                             )
-                            TimeInfoDisplay(
+                            TimeDisplay(
                                 title = stringResource(R.string.goal),
                                 date = startTimeInLocalDateTime.plusHours(16)
                             )

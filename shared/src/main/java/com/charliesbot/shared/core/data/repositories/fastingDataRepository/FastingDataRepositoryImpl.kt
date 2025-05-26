@@ -38,6 +38,11 @@ class FastingDataRepositoryImpl(
         .map {
             it[PrefKeys.START_TIME] ?: -1
         }
+    override val endTimeInMillis: Flow<Long> = dataStore.data
+        .catch { exception -> handleDataStoreError(exception, "endTimeInMillis") }
+        .map {
+            it[PrefKeys.END_TIME] ?: -1
+        }
     override val lastUpdateTimestamp: Flow<Long> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "lastUpdateTimestamp") }
         .map { it[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1 }
@@ -55,10 +60,11 @@ class FastingDataRepositoryImpl(
         }
     }
 
-    override suspend fun startFasting(startTimeInMillis: Long) {
+    override suspend fun startFasting(startTimeInMillis: Long, endTimeInMillis: Long) {
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
+            endTimeInMillis = endTimeInMillis,
         )
     }
 
@@ -66,24 +72,28 @@ class FastingDataRepositoryImpl(
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = -1, // -1 indicates not set
+            endTimeInMillis = -1, // -1 indicates not set
         )
     }
 
-    override suspend fun updateStartTime(startTimeInMillis: Long) {
+    override suspend fun updateFastingSchedule(startTimeInMillis: Long, endTimeInMillis: Long) {
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
+            endTimeInMillis = endTimeInMillis
         )
     }
 
     override suspend fun updateFastingStatusFromRemote(
         startTimeInMillis: Long,
+        endTimeInMillis: Long,
         isFasting: Boolean,
         lastUpdateTimestamp: Long
     ) {
         updateLocalStore(
             isFasting = isFasting,
             startTimeInMillis = startTimeInMillis,
+            endTimeInMillis = endTimeInMillis,
             lastUpdateTimestamp = lastUpdateTimestamp
         )
     }
@@ -91,21 +101,24 @@ class FastingDataRepositoryImpl(
     private suspend fun updateLocalAndRemoteStore(
         isFasting: Boolean,
         startTimeInMillis: Long,
+        endTimeInMillis: Long,
     ) {
         val lastUpdateTimestamp = System.currentTimeMillis()
-        updateLocalStore(isFasting, startTimeInMillis, lastUpdateTimestamp)
-        updateRemoteStore(isFasting, startTimeInMillis, lastUpdateTimestamp)
+        updateLocalStore(isFasting, startTimeInMillis, endTimeInMillis, lastUpdateTimestamp)
+        updateRemoteStore(isFasting, startTimeInMillis, endTimeInMillis, lastUpdateTimestamp)
     }
 
     private suspend fun updateLocalStore(
         isFasting: Boolean,
         startTimeInMillis: Long,
+        endTimeInMillis: Long,
         lastUpdateTimestamp: Long
     ) {
         try {
             dataStore.edit { prefs ->
                 prefs[PrefKeys.IS_FASTING] = isFasting
                 prefs[PrefKeys.START_TIME] = startTimeInMillis
+                prefs[PrefKeys.END_TIME] = endTimeInMillis
                 prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] = lastUpdateTimestamp
             }
             Log.d(LOG_TAG, "Repo: DataStore updated successfully")
@@ -119,12 +132,14 @@ class FastingDataRepositoryImpl(
     private suspend fun updateRemoteStore(
         isFasting: Boolean,
         startTimeInMillis: Long,
+        endTimeInMillis: Long,
         lastUpdateTimestamp: Long
     ) {
         val request: PutDataRequest =
             PutDataMapRequest.create(DataStoreConstants.FASTING_PATH_KEY).apply {
                 dataMap.putBoolean(DataStoreConstants.IS_FASTING_KEY, isFasting)
                 dataMap.putLong(DataStoreConstants.START_TIME_KEY, startTimeInMillis)
+                dataMap.putLong(DataStoreConstants.END_TIME_KEY, endTimeInMillis)
                 dataMap.putLong(DataStoreConstants.UPDATE_TIMESTAMP_KEY, lastUpdateTimestamp)
             }.asPutDataRequest().setUrgent()
 
@@ -132,7 +147,7 @@ class FastingDataRepositoryImpl(
             dataClient.putDataItem(request).await()
             Log.d(
                 LOG_TAG,
-                "State updated in Data Layer: isFasting=$isFasting, startTime=$startTimeInMillis"
+                "State updated in Data Layer: isFasting=$isFasting, startTime=$startTimeInMillis, endTime=$endTimeInMillis"
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error updating fasting state in Data Layer", e)
@@ -162,6 +177,7 @@ class FastingDataRepositoryImpl(
     private object PrefKeys {
         val IS_FASTING = booleanPreferencesKey(DataStoreConstants.IS_FASTING_KEY)
         val START_TIME = longPreferencesKey(DataStoreConstants.START_TIME_KEY)
+        val END_TIME = longPreferencesKey(DataStoreConstants.END_TIME_KEY)
         val LAST_UPDATED_TIMESTAMP = longPreferencesKey(DataStoreConstants.UPDATE_TIMESTAMP_KEY)
     }
 }

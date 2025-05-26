@@ -83,6 +83,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                 serviceScope.launch {
                     fastingRepository.updateFastingStatusFromRemote(
                         startTimeInMillis = newestRemoteItem.startTimeInMillis,
+                        endTimeInMillis = newestRemoteItem.endTimeInMillis,
                         isFasting = newestRemoteItem.isFasting,
                         lastUpdateTimestamp = newestRemoteItem.updateTimestamp
                     )
@@ -92,9 +93,12 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                 if (newestRemoteItem.isFasting) {
                     Log.d(
                         LOG_TAG,
-                        "Service: Scheduling notifications for start: ${newestRemoteItem.startTimeInMillis}"
+                        "Service: Scheduling notifications for start: ${newestRemoteItem.startTimeInMillis} and end: ${newestRemoteItem.endTimeInMillis}"
                     )
-                    notificationScheduler.scheduleNotifications(newestRemoteItem.startTimeInMillis)
+                    notificationScheduler.scheduleNotifications(
+                        newestRemoteItem.startTimeInMillis,
+                        newestRemoteItem.endTimeInMillis
+                    )
                 } else {
                     Log.d(LOG_TAG, "Cancelling notifications")
                     notificationScheduler.cancelAllNotifications()

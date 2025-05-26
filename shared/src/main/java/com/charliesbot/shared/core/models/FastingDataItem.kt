@@ -4,4 +4,5 @@ data class FastingDataItem(
     val isFasting: Boolean = false,
     val startTimeInMillis: Long = 0L,
     val updateTimestamp: Long = 0L,
+    val endTimeInMillis: Long = 0L,
 )

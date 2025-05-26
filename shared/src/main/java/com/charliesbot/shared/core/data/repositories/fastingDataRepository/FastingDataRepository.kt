@@ -6,14 +6,16 @@ import kotlinx.coroutines.flow.Flow
 interface FastingDataRepository {
     val isFasting: Flow<Boolean>
     val startTimeInMillis: Flow<Long>
+    val endTimeInMillis: Flow<Long>
     val lastUpdateTimestamp: Flow<Long>
 
     suspend fun getCurrentFasting(): FastingDataItem?
-    suspend fun startFasting(startTimeInMillis: Long)
-    suspend fun updateStartTime(startTimeInMillis: Long)
+    suspend fun startFasting(startTimeInMillis: Long, endTimeInMillis: Long)
+    suspend fun updateFastingSchedule(startTimeInMillis: Long, endTimeInMillis: Long)
     suspend fun stopFasting()
     suspend fun updateFastingStatusFromRemote(
         startTimeInMillis: Long,
+        endTimeInMillis: Long,
         isFasting: Boolean,
         lastUpdateTimestamp: Long
     )
