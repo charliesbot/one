@@ -1,5 +1,6 @@
 package com.charliesbot.one.today
 
+import android.provider.CalendarContract
 import com.charliesbot.one.BuildConfig
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -7,6 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,10 +44,17 @@ import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.components.TimeInfoDisplay
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val screenPadding = 32.dp
@@ -116,7 +125,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CurrentFastingProgress(isFasting = isFasting, elapsedTime = elapsedTime)
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                     AnimatedVisibility(
                         visible = isFasting,
                         enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
@@ -125,27 +134,41 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                             fadeOut(animationSpec = tween(durationMillis = 150)) +
                                     shrinkVertically(animationSpec = tween(durationMillis = 350))
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ButtonGroup(
+                            overflowIndicator = {},
+                            expandedRatio = 0f,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                // I need this padding to push the content below the timers.
-                                // Otherwise, after the animation, there's a subtle jump.
-                                .padding(bottom = 20.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                         ) {
-                            TimeDisplay(
-                                title = stringResource(R.string.started),
-                                date = startTimeInLocalDateTime,
-                                onClick = {
-                                    viewModel.openTimePickerDialog()
-                                }
+                            customItem(
+                                buttonGroupContent = {
+                                    TimeDisplay(
+                                        title = stringResource(R.string.started),
+                                        date = startTimeInLocalDateTime,
+                                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                                        onClick = {
+                                            viewModel.openTimePickerDialog()
+                                        },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                },
+                                menuContent = {}
                             )
-                            TimeDisplay(
-                                title = stringResource(R.string.goal),
-                                date = startTimeInLocalDateTime.plusHours(16)
+                            customItem(
+                                buttonGroupContent = {
+                                    TimeDisplay(
+                                        title = stringResource(R.string.goal),
+                                        date = startTimeInLocalDateTime.plusHours(16),
+                                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                },
+                                menuContent = {}
                             )
                         }
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
                     FilledTonalButton(
                         onClick = if (isFasting) viewModel::onStopFasting else viewModel::onStartFasting,
                         modifier = Modifier

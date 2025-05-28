@@ -85,7 +85,7 @@ dependencies {
     implementation(libs.koin.annotations)
     implementation(libs.play.services.wearable)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.material.icons.core)
+    implementation(libs.compose.material.icons.core)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

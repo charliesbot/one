@@ -91,6 +91,8 @@ dependencies {
     implementation(libs.koin.core.coroutines)
     implementation(libs.koin.androidx.workmanager)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.koin.annotations)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

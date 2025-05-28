@@ -18,6 +18,7 @@ koin-annotations = "2.0.0-RC1"
 playServicesWearable = "19.0.0"
 startupRuntime = "1.2.0"
 wearComposeMaterial = "1.0.0-alpha37"
+compose-icon-ext = "1.7.8"
 wearCompose = "1.5.0-beta01"
 wearToolingPreview = "1.0.0"
 coreSplashscreen = "1.0.1"
@@ -61,12 +62,14 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+# TODO - charliesbot
 # Delete the hardcoded version once Material 3 expressive is stable.
 # I am hardcoding the version to force getting the alpha, but usually it comes from the BOM.
 # So android-material3 shouldn't have a version property explicitly defined.
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "compose-icon-ext" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose-icon-ext" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.4.0-alpha15" }
+# End TODO
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
