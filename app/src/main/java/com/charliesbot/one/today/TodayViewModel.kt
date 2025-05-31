@@ -3,7 +3,6 @@ package com.charliesbot.one.today
 import android.app.Application
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.one.widgets.OneWidget
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
@@ -29,8 +28,12 @@ class TodayViewModel(
         started = SharingStarted.WhileSubscribed(5000L),
         initialValue = -1
     )
-    val _isTimePickerDialogOpen = MutableStateFlow(false)
+    private val _isTimePickerDialogOpen = MutableStateFlow(false)
     val isTimePickerDialogOpen: StateFlow<Boolean> = _isTimePickerDialogOpen
+
+    private val _isGoalBottomSheetOpen = MutableStateFlow(false)
+    val isGoalBottomSheetOpen: StateFlow<Boolean> = _isGoalBottomSheetOpen
+
     val endTimeMillis: Long = 60 * 60 * 16000 // 16 hours
 
     fun openTimePickerDialog() {
@@ -39,6 +42,14 @@ class TodayViewModel(
 
     fun closeTimePickerDialog() {
         _isTimePickerDialogOpen.value = false
+    }
+
+    fun openGoalBottomSheet() {
+        _isGoalBottomSheetOpen.value = true
+    }
+
+    fun closeGoalBottomSheet() {
+        _isGoalBottomSheetOpen.value = false
     }
 
     suspend fun updateWidget() {

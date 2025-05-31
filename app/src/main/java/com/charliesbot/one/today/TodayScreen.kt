@@ -1,17 +1,13 @@
 package com.charliesbot.one.today
 
-import android.provider.CalendarContract
-import com.charliesbot.one.BuildConfig
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,19 +36,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.charliesbot.one.BuildConfig
 import com.charliesbot.one.R
+import com.charliesbot.one.core.components.GoalBottomSheet
 import com.charliesbot.one.core.components.TimeDisplay
 import com.charliesbot.one.core.components.TimePickerDialog
 import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
-import com.charliesbot.shared.core.components.TimeInfoDisplay
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -59,6 +53,7 @@ import org.koin.androidx.compose.koinViewModel
 fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val screenPadding = 32.dp
     val isTimePickerDialogOpen by viewModel.isTimePickerDialogOpen.collectAsStateWithLifecycle()
+    val isGoalBottomSheetOpen by viewModel.isGoalBottomSheetOpen.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val startTimeInLocalDateTime =
@@ -91,6 +86,9 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                     viewModel.closeTimePickerDialog()
                 },
             )
+        }
+        if (isGoalBottomSheetOpen) {
+            GoalBottomSheet(onDismiss = viewModel::closeGoalBottomSheet)
         }
         Column(
             modifier = Modifier
@@ -161,6 +159,9 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                         title = stringResource(R.string.goal),
                                         date = startTimeInLocalDateTime.plusHours(16),
                                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                                        onClick = {
+                                            viewModel.openGoalBottomSheet()
+                                        },
                                         modifier = Modifier.weight(1f)
                                     )
                                 },
