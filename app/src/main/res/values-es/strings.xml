@@ -37,4 +37,21 @@
         <item quantity="many">horas restantes!</item>
         <item quantity="other">horas restantes!</item>
     </plurals>
+
+    <!-- Goal Bottom Sheet -->
+    <string name="select_goal">Seleccionar una Meta</string>
+    <string name="hours">horas</string>
+    <string name="save">Guardar</string>
+
+    <!-- Weekly Progress -->
+    <string name="monday">Lun</string>
+    <string name="tuesday">Mar</string>
+    <string name="wednesday">Mié</string>
+    <string name="thursday">Jue</string>
+    <string name="friday">Vie</string>
+    <string name="saturday">Sáb</string>
+    <string name="sunday">Dom</string>
+
+    <!-- Widget -->
+    <string name="progress_ring_desc">Anillo de Progreso</string>
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fasting Goals -->
+    <string name="fasting_goal_circadian">Ritmo\nCircadiano TRF</string>
+    <string name="fasting_goal_16_8">16:8\nTRF</string>
+    <string name="fasting_goal_18_6">18:6\nTRF</string>
+    <string name="fasting_goal_20_4">20:4\nTRF</string>
+    <string name="fasting_goal_36_hour">Ayuno de\n36 Horas</string>
+</resources> 

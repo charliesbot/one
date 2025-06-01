@@ -37,5 +37,20 @@
         <item quantity="other">hours left!</item>
     </plurals>
 
+    <!-- Goal Bottom Sheet -->
+    <string name="select_goal">Select a Goal</string>
+    <string name="hours">hours</string>
+    <string name="save">Save</string>
 
+    <!-- Weekly Progress -->
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
+
+    <!-- Widget -->
+    <string name="progress_ring_desc">Progress Ring</string>
 </resources>

@@ -1,15 +1,19 @@
 package com.charliesbot.shared.core.constants
 
 import androidx.compose.ui.graphics.Color
-
+import com.charliesbot.shared.R
 
 data class FastGoal(
     val id: String,
-    val title: String,
+    val titleResId: Int,
     val durationDisplay: String, // e.g., "13", "16" (for display in UI)
     val color: Color,
     val durationMillis: Long, // The actual duration in milliseconds for calculations
-)
+) {
+    fun getTitle(context: android.content.Context): String {
+        return context.getString(titleResId)
+    }
+}
 
 object PredefinedFastingGoals {
 
@@ -18,7 +22,7 @@ object PredefinedFastingGoals {
 
     val CIRCADIAN = FastGoal(
         id = "circadian",
-        title = "Circadian\nRhythm TRF",
+        titleResId = R.string.fasting_goal_circadian,
         durationDisplay = "13",
         color = Color(0xFF6096BA), // Dusty Blue / Muted Teal
         durationMillis = hoursToMillis(13)
@@ -26,7 +30,7 @@ object PredefinedFastingGoals {
 
     val SIXTEEN_EIGHT = FastGoal(
         id = "16:8",
-        title = "16:8\nTRF",
+        titleResId = R.string.fasting_goal_16_8,
         durationDisplay = "16",
         color = Color(0xFF82B387), // Muted Sage Green
         durationMillis = hoursToMillis(16),
@@ -34,7 +38,7 @@ object PredefinedFastingGoals {
 
     val EIGHTEEN_SIX = FastGoal(
         id = "18:6",
-        title = "18:6\nTRF",
+        titleResId = R.string.fasting_goal_18_6,
         durationDisplay = "18",
         color = Color(0xFFE5A98C), // Muted Peach / Terracotta
         durationMillis = hoursToMillis(18)
@@ -42,7 +46,7 @@ object PredefinedFastingGoals {
 
     val TWENTY_FOUR = FastGoal(
         id = "20:4",
-        title = "20:4\nTRF",
+        titleResId = R.string.fasting_goal_20_4,
         durationDisplay = "20",
         color = Color(0xFFC9AB6A), // Muted Gold / Ochre
         durationMillis = hoursToMillis(20)
@@ -50,7 +54,7 @@ object PredefinedFastingGoals {
 
     val THIRTY_SIX_HOUR = FastGoal(
         id = "36hour",
-        title = "36-Hour\nFast",
+        titleResId = R.string.fasting_goal_36_hour,
         durationDisplay = "36",
         color = Color(0xFF9787BE), // Dusty Lavender / Muted Plum
         durationMillis = hoursToMillis(36)

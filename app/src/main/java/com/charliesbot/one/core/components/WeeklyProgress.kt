@@ -12,24 +12,37 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.components.FastingProgressBar
 
-
 @Composable
 fun WeeklyProgress(modifier: Modifier = Modifier) {
-    val daysOfWeek: List<String> = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val daysOfWeek: List<Int> = listOf(
+        R.string.monday,
+        R.string.tuesday,
+        R.string.wednesday,
+        R.string.thursday,
+        R.string.friday,
+        R.string.saturday,
+        R.string.sunday
+    )
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
     ) {
-        daysOfWeek.forEach { day ->
+        daysOfWeek.forEach { dayResId ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = day.uppercase(), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = stringResource(dayResId).uppercase(),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Spacer(modifier = Modifier.size(4.dp))
                 FastingProgressBar(
                     progress = 0.1f,

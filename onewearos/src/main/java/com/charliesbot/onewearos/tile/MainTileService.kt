@@ -14,6 +14,7 @@ import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.tooling.preview.Preview
 import androidx.wear.tiles.tooling.preview.TilePreviewData
 import androidx.wear.tooling.preview.devices.WearDevices
+import com.charliesbot.one.R
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.tiles.SuspendingTileService
 
@@ -71,7 +72,7 @@ private fun tileLayout(
     return PrimaryLayout.Builder(requestParams.deviceConfiguration)
         .setResponsiveContentInsetEnabled(true)
         .setContent(
-            Text.Builder(context, "Hello World!")
+            Text.Builder(context, context.getString(R.string.hello_world))
                 .setColor(argb(Colors.DEFAULT.onSurface))
                 .setTypography(Typography.TYPOGRAPHY_CAPTION1)
                 .build()

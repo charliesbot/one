@@ -241,7 +241,7 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
             ) {
                 Image(
                     provider = ImageProvider(it),
-                    contentDescription = "Progress Ring", // TODO: More descriptive
+                    contentDescription = context.getString(R.string.progress_ring_desc),
                     modifier = GlanceModifier.size(ringDp) // Use the Dp value for Glance size
                 )
             }
