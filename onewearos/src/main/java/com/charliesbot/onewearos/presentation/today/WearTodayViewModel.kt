@@ -2,6 +2,7 @@ package com.charliesbot.onewearos.presentation.today
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,11 +25,20 @@ class WearTodayViewModel(
         initialValue = -1
     )
 
+    val fastingGoalId: StateFlow<String> = fastingDataRepository.fastingGoalId.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
+    )
+
     fun onStartFasting() {
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
             fastingDataRepository.startFasting(startTimeMillis)
-            notificationScheduler.scheduleNotifications(startTimeInMillis.value)
+            notificationScheduler.scheduleNotifications(
+                startTimeInMillis.value,
+                fastingGoalId.value
+            )
         }
     }
 

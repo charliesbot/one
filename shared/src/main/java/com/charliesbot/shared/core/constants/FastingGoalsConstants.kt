@@ -1,5 +1,6 @@
 package com.charliesbot.shared.core.constants
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.charliesbot.shared.R
 
@@ -70,5 +71,12 @@ object PredefinedFastingGoals {
 
     val goalsById: Map<String, FastGoal> = allGoals.associateBy { it.id }
 
-    val getGoalById = { id: String -> goalsById[id]!! }
+    val getGoalById: (String) -> FastGoal = { id: String ->
+        if (!goalsById.containsKey(id)) {
+            Log.e(AppConstants.LOG_TAG, "Invalid goal id: $id")
+            goalsById["16:8"]!!
+        } else {
+            goalsById[id]!!
+        }
+    }
 }

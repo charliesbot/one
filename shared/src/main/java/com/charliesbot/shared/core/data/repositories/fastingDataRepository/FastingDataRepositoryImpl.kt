@@ -33,16 +33,19 @@ class FastingDataRepositoryImpl(
     override val isFasting: Flow<Boolean> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "isFasting") }
         .map {
+            Log.e(LOG_TAG, "IsFasting INIT ${it[PrefKeys.IS_FASTING]}")
             it[PrefKeys.IS_FASTING] == true
         }
     override val startTimeInMillis: Flow<Long> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "startTimeInMillis") }
         .map {
+            Log.e(LOG_TAG, "StartTime INIT ${it[PrefKeys.START_TIME]}")
             it[PrefKeys.START_TIME] ?: -1
         }
     override val fastingGoalId: Flow<String> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "fastingGoalId") }
         .map {
+            Log.e(LOG_TAG, "fastingGoalId INIT ${it[PrefKeys.FASTING_GOAL_ID]}")
             it[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
         }
     override val lastUpdateTimestamp: Flow<Long> = dataStore.data
@@ -65,7 +68,7 @@ class FastingDataRepositoryImpl(
     }
 
     override suspend fun startFasting(startTimeInMillis: Long) {
-        Log.e(LOG_TAG, "fasting Goald id ${this.fastingGoalId.first()}")
+        Log.e(LOG_TAG, "fasting Goald id START ${this.fastingGoalId.first()}")
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
@@ -74,6 +77,7 @@ class FastingDataRepositoryImpl(
     }
 
     override suspend fun stopFasting() {
+        Log.e(LOG_TAG, "fasting Goald id STOP ${this.fastingGoalId.first()}")
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = -1, // -1 indicates not set
