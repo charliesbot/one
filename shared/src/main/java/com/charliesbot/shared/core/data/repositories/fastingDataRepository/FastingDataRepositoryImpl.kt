@@ -8,8 +8,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataStoreConstants
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -38,10 +40,10 @@ class FastingDataRepositoryImpl(
         .map {
             it[PrefKeys.START_TIME] ?: -1
         }
-    override val endTimeInMillis: Flow<Long> = dataStore.data
-        .catch { exception -> handleDataStoreError(exception, "endTimeInMillis") }
+    override val fastingGoalId: Flow<String> = dataStore.data
+        .catch { exception -> handleDataStoreError(exception, "fastingGoalId") }
         .map {
-            it[PrefKeys.END_TIME] ?: -1
+            it[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
         }
     override val lastUpdateTimestamp: Flow<Long> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "lastUpdateTimestamp") }
@@ -53,18 +55,21 @@ class FastingDataRepositoryImpl(
             val isFasting = prefs[PrefKeys.IS_FASTING] == true
             val startTime = prefs[PrefKeys.START_TIME] ?: -1
             val timestamp = prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1
-            FastingDataItem(isFasting, startTime, timestamp)
+            val fastingGoalId =
+                prefs[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
+            FastingDataItem(isFasting, startTime, timestamp, fastingGoalId)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Repo: Error reading current state snapshot", e)
             FastingDataItem() // Return default on error
         }
     }
 
-    override suspend fun startFasting(startTimeInMillis: Long, endTimeInMillis: Long) {
+    override suspend fun startFasting(startTimeInMillis: Long) {
+        Log.e(LOG_TAG, "fasting Goald id ${this.fastingGoalId.first()}")
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
-            endTimeInMillis = endTimeInMillis,
+            fastingGoalId = this.fastingGoalId.first()
         )
     }
 
@@ -72,28 +77,36 @@ class FastingDataRepositoryImpl(
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = -1, // -1 indicates not set
-            endTimeInMillis = -1, // -1 indicates not set
+            fastingGoalId = fastingGoalId.first()
         )
     }
 
-    override suspend fun updateFastingSchedule(startTimeInMillis: Long, endTimeInMillis: Long) {
+    override suspend fun updateFastingSchedule(startTimeInMillis: Long) {
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
-            endTimeInMillis = endTimeInMillis
+            fastingGoalId = this.fastingGoalId.first()
+        )
+    }
+
+    override suspend fun updateFastingGoalId(fastingGoalId: String) {
+        updateLocalAndRemoteStore(
+            isFasting = true,
+            startTimeInMillis = this.startTimeInMillis.first(),
+            fastingGoalId = fastingGoalId,
         )
     }
 
     override suspend fun updateFastingStatusFromRemote(
         startTimeInMillis: Long,
-        endTimeInMillis: Long,
+        fastingGoalId: String,
         isFasting: Boolean,
         lastUpdateTimestamp: Long
     ) {
         updateLocalStore(
             isFasting = isFasting,
             startTimeInMillis = startTimeInMillis,
-            endTimeInMillis = endTimeInMillis,
+            fastingGoalId = fastingGoalId,
             lastUpdateTimestamp = lastUpdateTimestamp
         )
     }
@@ -101,24 +114,26 @@ class FastingDataRepositoryImpl(
     private suspend fun updateLocalAndRemoteStore(
         isFasting: Boolean,
         startTimeInMillis: Long,
-        endTimeInMillis: Long,
+        fastingGoalId: String?,
     ) {
+        val prefs = dataStore.data.first()
         val lastUpdateTimestamp = System.currentTimeMillis()
-        updateLocalStore(isFasting, startTimeInMillis, endTimeInMillis, lastUpdateTimestamp)
-        updateRemoteStore(isFasting, startTimeInMillis, endTimeInMillis, lastUpdateTimestamp)
+        val validFastingGoalId: String = fastingGoalId ?: prefs[PrefKeys.FASTING_GOAL_ID]!!
+        updateLocalStore(isFasting, startTimeInMillis, validFastingGoalId, lastUpdateTimestamp)
+        updateRemoteStore(isFasting, startTimeInMillis, validFastingGoalId, lastUpdateTimestamp)
     }
 
     private suspend fun updateLocalStore(
         isFasting: Boolean,
         startTimeInMillis: Long,
-        endTimeInMillis: Long,
+        fastingGoalId: String,
         lastUpdateTimestamp: Long
     ) {
         try {
             dataStore.edit { prefs ->
                 prefs[PrefKeys.IS_FASTING] = isFasting
                 prefs[PrefKeys.START_TIME] = startTimeInMillis
-                prefs[PrefKeys.END_TIME] = endTimeInMillis
+                prefs[PrefKeys.FASTING_GOAL_ID] = fastingGoalId
                 prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] = lastUpdateTimestamp
             }
             Log.d(LOG_TAG, "Repo: DataStore updated successfully")
@@ -132,14 +147,14 @@ class FastingDataRepositoryImpl(
     private suspend fun updateRemoteStore(
         isFasting: Boolean,
         startTimeInMillis: Long,
-        endTimeInMillis: Long,
+        fastingGoalId: String,
         lastUpdateTimestamp: Long
     ) {
         val request: PutDataRequest =
             PutDataMapRequest.create(DataStoreConstants.FASTING_PATH_KEY).apply {
                 dataMap.putBoolean(DataStoreConstants.IS_FASTING_KEY, isFasting)
                 dataMap.putLong(DataStoreConstants.START_TIME_KEY, startTimeInMillis)
-                dataMap.putLong(DataStoreConstants.END_TIME_KEY, endTimeInMillis)
+                dataMap.putString(DataStoreConstants.FASTING_GOAL_KEY, fastingGoalId)
                 dataMap.putLong(DataStoreConstants.UPDATE_TIMESTAMP_KEY, lastUpdateTimestamp)
             }.asPutDataRequest().setUrgent()
 
@@ -147,7 +162,7 @@ class FastingDataRepositoryImpl(
             dataClient.putDataItem(request).await()
             Log.d(
                 LOG_TAG,
-                "State updated in Data Layer: isFasting=$isFasting, startTime=$startTimeInMillis, endTime=$endTimeInMillis"
+                "State updated in Data Layer: isFasting=$isFasting, startTime=$startTimeInMillis, fastingGoalId=$fastingGoalId, timestamp=$lastUpdateTimestamp"
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error updating fasting state in Data Layer", e)
@@ -177,7 +192,7 @@ class FastingDataRepositoryImpl(
     private object PrefKeys {
         val IS_FASTING = booleanPreferencesKey(DataStoreConstants.IS_FASTING_KEY)
         val START_TIME = longPreferencesKey(DataStoreConstants.START_TIME_KEY)
-        val END_TIME = longPreferencesKey(DataStoreConstants.END_TIME_KEY)
+        val FASTING_GOAL_ID = stringPreferencesKey(DataStoreConstants.FASTING_GOAL_KEY)
         val LAST_UPDATED_TIMESTAMP = longPreferencesKey(DataStoreConstants.UPDATE_TIMESTAMP_KEY)
     }
 }

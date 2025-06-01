@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.NotificationType
 import java.util.concurrent.TimeUnit
 
@@ -39,8 +40,9 @@ class NotificationScheduler(
         )
     }
 
-    fun scheduleNotifications(startMillis: Long, endMillis: Long) {
+    fun scheduleNotifications(startMillis: Long, fastingGoalId: String) {
         cancelAllNotifications()
+        val endMillis = PredefinedFastingGoals.getGoalById(fastingGoalId).durationMillis
         val completeFastNotificationDelay =
             startMillis + endMillis - System.currentTimeMillis()
         // We show a notification 1 hour before the goal

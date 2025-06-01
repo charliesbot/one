@@ -56,6 +56,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val isGoalBottomSheetOpen by viewModel.isGoalBottomSheetOpen.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
+    val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(starTimeInMillis)
     var elapsedTime by remember { mutableLongStateOf(0L) }
@@ -88,7 +89,14 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
             )
         }
         if (isGoalBottomSheetOpen) {
-            GoalBottomSheet(onDismiss = viewModel::closeGoalBottomSheet)
+            GoalBottomSheet(
+                onDismiss = viewModel::closeGoalBottomSheet,
+                onSave = { id ->
+                    viewModel.updateFastingGoal(id)
+                    viewModel.closeGoalBottomSheet()
+                },
+                initialSelectedGoalId = fastingGoalId
+            )
         }
         Column(
             modifier = Modifier
