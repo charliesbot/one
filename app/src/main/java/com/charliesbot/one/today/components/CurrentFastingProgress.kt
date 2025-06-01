@@ -20,22 +20,27 @@ import com.charliesbot.shared.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.formatTimestamp
 import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 
 @Composable
 fun FastingStatusIndicator(
     isFasting: Boolean,
-    elapsedTime: Long
+    elapsedTime: Long,
+    fastingGoalId: String,
 ) {
     val headerLabel = if (isFasting) {
         val progress = calculateProgressPercentage(elapsedTime)
-        stringResource(R.string.remaining_percentage, progress)
+        stringResource(R.string.elapsed_percentage, progress)
     } else {
         stringResource(R.string.upcoming_fast).uppercase()
     }
     val timeLabel = if (isFasting) {
         formatTimestamp(elapsedTime)
     } else {
-        stringResource(R.string.fasting_duration_hours)
+        stringResource(
+            R.string.fasting_duration_hours,
+            PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay
+        )
     }
 
     Column(
@@ -54,6 +59,7 @@ fun FastingStatusIndicator(
 @Composable
 fun CurrentFastingProgress(
     elapsedTime: Long,
+    fastingGoalId: String,
     isFasting: Boolean = false
 ) {
     val progress = calculateProgressFraction(elapsedTime)
@@ -64,7 +70,7 @@ fun CurrentFastingProgress(
             .fillMaxWidth()
             .heightIn(max = 400.dp),
         innerContent = {
-            FastingStatusIndicator(isFasting, elapsedTime)
+            FastingStatusIndicator(isFasting, elapsedTime, fastingGoalId)
         }
     )
 }
@@ -74,8 +80,12 @@ fun CurrentFastingProgress(
 fun CurrentFastingProgressPreview() {
     OneTheme {
         Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
-            CurrentFastingProgress(isFasting = false, elapsedTime = 0L)
-            CurrentFastingProgress(isFasting = true, elapsedTime = 7 * 1000 * 60 * 60)
+            CurrentFastingProgress(isFasting = false, elapsedTime = 0L, fastingGoalId = "circadian")
+            CurrentFastingProgress(
+                isFasting = true,
+                elapsedTime = 7 * 1000 * 60 * 60,
+                fastingGoalId = "circadian"
+            )
         }
     }
 }

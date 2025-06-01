@@ -44,6 +44,7 @@ import com.charliesbot.one.core.components.TimePickerDialog
 import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -130,7 +131,11 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CurrentFastingProgress(isFasting = isFasting, elapsedTime = elapsedTime)
+                    CurrentFastingProgress(
+                        isFasting = isFasting,
+                        elapsedTime = elapsedTime,
+                        fastingGoalId = fastingGoalId
+                    )
                     Spacer(modifier = Modifier.height(40.dp))
                     AnimatedVisibility(
                         visible = isFasting,
@@ -164,7 +169,10 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                             customItem(
                                 buttonGroupContent = {
                                     TimeDisplay(
-                                        title = stringResource(R.string.goal),
+                                        title = stringResource(
+                                            R.string.goal_with_duration,
+                                            "${PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay}H"
+                                        ),
                                         date = startTimeInLocalDateTime.plusHours(16),
                                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                                         onClick = {
