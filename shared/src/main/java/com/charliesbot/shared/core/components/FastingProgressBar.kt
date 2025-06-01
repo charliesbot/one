@@ -49,7 +49,7 @@ fun FastingProgressBar(
                 useCenter = false,
                 topLeft = Offset(center.x - radius, center.y - radius),
                 size = Size(radius * 2, radius * 2),
-                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
             )
         }
 

@@ -39,6 +39,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.charliesbot.one.MainActivity
 import com.charliesbot.one.R
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.getHours
@@ -87,7 +88,8 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
         val currentTime = System.currentTimeMillis()
         val startTimeInMillis = fastingData.startTimeInMillis
         val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
-        val hours = 16 - getHours(elapsedMillis)
+        val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
+        val hours = getHours(selectedGoal.durationMillis) - getHours(elapsedMillis)
         val isGoalMet = fastingData.isFasting && hours <= 0
 
         provideContent {

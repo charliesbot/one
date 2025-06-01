@@ -65,7 +65,7 @@ fun CurrentFastingProgress(
     val progress = calculateProgressFraction(elapsedTime)
     FastingProgressBar(
         progress = progress,
-        strokeWidth = 30.dp,
+        strokeWidth = 35.dp,
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = 400.dp),

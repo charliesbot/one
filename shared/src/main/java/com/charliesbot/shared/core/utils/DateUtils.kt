@@ -27,7 +27,7 @@ fun formatTimestamp(millis: Long): String {
     val minutes = (millis / (1000 * 60)) % 60
     val hours = getHours(millis)
     return String.format(
-        Locale.US,
+        Locale.getDefault(),
         "%02d:%02d:%02d", hours, minutes, seconds
     )
 }
