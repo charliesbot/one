@@ -88,11 +88,14 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         Log.d(
             AppConstants.LOG_TAG,
-            "OneWidget.provideGlance called for id: $id (triggered by service?)"
+            "OneWidget: provideGlance INVOKED for id $id. CurrentTimeMillis: ${System.currentTimeMillis()}"
         )
         val fastingData =
             fastingDataRepository.getCurrentFasting()!! // This calls the modified getCurrentFasting
-        Log.d(AppConstants.LOG_TAG, "OneWidget.provideGlance - fastingData fetched: $fastingData")
+        Log.d(
+            AppConstants.LOG_TAG,
+            "OneWidget: provideGlance - fastingData fetched for UI for id $id: $fastingData"
+        )
         val currentTime = System.currentTimeMillis()
         val startTimeInMillis = fastingData.startTimeInMillis
         val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)

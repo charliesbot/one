@@ -14,7 +14,10 @@ class OneWidgetReceiver : GlanceAppWidgetReceiver() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        Log.d(
+            LOG_TAG,
+            "OneWidgetReceiver: onUpdate CALLED by system. AppWidgetIds: ${appWidgetIds.joinToString()}"
+        )
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        Log.d(LOG_TAG, "On Update Triggered")
     }
 }

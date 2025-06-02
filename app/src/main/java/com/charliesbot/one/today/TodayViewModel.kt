@@ -1,10 +1,12 @@
 package com.charliesbot.one.today
 
 import android.app.Application
+import android.util.Log
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.one.widgets.OneWidget
+import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationScheduler
@@ -57,6 +59,24 @@ class TodayViewModel(
     }
 
     suspend fun updateWidget() {
+        val uniqueCallId = System.nanoTime() // Simple unique ID for this call
+        Log.d(
+            AppConstants.LOG_TAG,
+            "TodayViewModel: updateWidget CALLED (Call ID: $uniqueCallId). Triggering OneWidget.updateAll()"
+        )
+        try {
+            OneWidget().updateAll(getApplication<Application>().applicationContext)
+            Log.d(
+                AppConstants.LOG_TAG,
+                "TodayViewModel: OneWidget.updateAll() trigger COMPLETED (Call ID: $uniqueCallId)"
+            )
+        } catch (e: Exception) {
+            Log.e(
+                AppConstants.LOG_TAG,
+                "TodayViewModel: Error in updateAll() (Call ID: $uniqueCallId)",
+                e
+            )
+        }
         OneWidget().updateAll(getApplication<Application>().applicationContext)
     }
 
