@@ -18,7 +18,8 @@ fun formatDate(date: LocalDateTime, format: TimeFormat = TimeFormat.DATE_TIME): 
     return date.format(formatter)
 }
 
-fun getHours(millis: Long): Long {
+fun getHours(millis: Long?): Long {
+    if (millis == null) return 0
     return millis / (1000 * 60 * 60)
 }
 

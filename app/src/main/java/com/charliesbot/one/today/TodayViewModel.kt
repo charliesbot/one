@@ -62,7 +62,7 @@ class TodayViewModel(
 
     fun onStopFasting() {
         viewModelScope.launch {
-            fastingDataRepository.stopFasting()
+            fastingDataRepository.stopFasting(fastingGoalId.value)
             updateWidget()
             notificationScheduler.cancelAllNotifications()
         }
@@ -71,7 +71,7 @@ class TodayViewModel(
     fun onStartFasting() {
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
-            fastingDataRepository.startFasting(startTimeMillis)
+            fastingDataRepository.startFasting(startTimeMillis, fastingGoalId.value)
             updateWidget()
             notificationScheduler.scheduleNotifications(startTimeMillis, fastingGoalId.value)
         }

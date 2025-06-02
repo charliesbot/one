@@ -2,30 +2,29 @@ package com.charliesbot.shared.core.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
-import androidx.wear.compose.material3.MaterialTheme as WearMaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.charliesbot.shared.core.utils.TimeFormat
 import com.charliesbot.shared.core.utils.formatDate
 import java.time.LocalDateTime
+import androidx.wear.compose.material3.MaterialTheme as WearMaterialTheme
 
 @Composable
 fun TimeInfoDisplay(
-    title: String, date: LocalDateTime, onClick: (() -> Unit)? = null, isForWear: Boolean = false
+    title: String, date: LocalDateTime, onClick: (() -> Unit)? = null
 ) {
-    val verticalSpace = if (isForWear) 2.dp else (-5).dp
+    val verticalSpace = 2.dp
     val textColor =
-        if (isForWear) WearMaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface
-    val dateFormat = if (isForWear) TimeFormat.TIME else TimeFormat.DATE_TIME
+        WearMaterialTheme.colorScheme.onSurface
+    val dateFormat = TimeFormat.TIME
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -40,7 +39,7 @@ fun TimeInfoDisplay(
         )
         Text(
             text = formatDate(date, dateFormat),
-            fontSize = if (isForWear) 12.sp else 14.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = textColor
         )

@@ -33,19 +33,16 @@ class FastingDataRepositoryImpl(
     override val isFasting: Flow<Boolean> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "isFasting") }
         .map {
-            Log.e(LOG_TAG, "IsFasting INIT ${it[PrefKeys.IS_FASTING]}")
             it[PrefKeys.IS_FASTING] == true
         }
     override val startTimeInMillis: Flow<Long> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "startTimeInMillis") }
         .map {
-            Log.e(LOG_TAG, "StartTime INIT ${it[PrefKeys.START_TIME]}")
             it[PrefKeys.START_TIME] ?: -1
         }
     override val fastingGoalId: Flow<String> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "fastingGoalId") }
         .map {
-            Log.e(LOG_TAG, "fastingGoalId INIT ${it[PrefKeys.FASTING_GOAL_ID]}")
             it[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
         }
     override val lastUpdateTimestamp: Flow<Long> = dataStore.data
@@ -67,36 +64,36 @@ class FastingDataRepositoryImpl(
         }
     }
 
-    override suspend fun startFasting(startTimeInMillis: Long) {
-        Log.e(LOG_TAG, "fasting Goald id START ${this.fastingGoalId.first()}")
+    override suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String) {
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
-            fastingGoalId = this.fastingGoalId.first()
+            fastingGoalId = fastingGoalId
         )
     }
 
-    override suspend fun stopFasting() {
-        Log.e(LOG_TAG, "fasting Goald id STOP ${this.fastingGoalId.first()}")
+    override suspend fun stopFasting(fastingGoalId: String) {
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = -1, // -1 indicates not set
-            fastingGoalId = fastingGoalId.first()
+            fastingGoalId = fastingGoalId
         )
     }
 
     override suspend fun updateFastingSchedule(startTimeInMillis: Long) {
+        val currentGoalId = this.fastingGoalId.first()
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
-            fastingGoalId = this.fastingGoalId.first()
+            fastingGoalId = currentGoalId
         )
     }
 
     override suspend fun updateFastingGoalId(fastingGoalId: String) {
+        val currentData = getCurrentFasting()
         updateLocalAndRemoteStore(
-            isFasting = true,
-            startTimeInMillis = this.startTimeInMillis.first(),
+            isFasting = currentData.isFasting,
+            startTimeInMillis = currentData.startTimeInMillis,
             fastingGoalId = fastingGoalId,
         )
     }

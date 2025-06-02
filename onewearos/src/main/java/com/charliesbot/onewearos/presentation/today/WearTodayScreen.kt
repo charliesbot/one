@@ -35,9 +35,11 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.R
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.components.TimeInfoDisplay
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
+import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -58,13 +60,15 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(startTimeInMillis)
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
+    val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
     val fastButtonLabel =
         if (isFasting) stringResource(R.string.end_fast) else stringResource(R.string.start_fasting)
+    val currentGoal = PredefinedFastingGoals.goalsById[fastingGoalId]
 
     val timeLabel = if (isFasting) {
         formatTimestamp(elapsedTime)
     } else {
-        stringResource(R.string.target_duration_hours)
+        stringResource(R.string.target_duration_hours, currentGoal?.durationDisplay.toString())
     }
     LaunchedEffect(isFasting) {
         if (isFasting) {
@@ -107,12 +111,10 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
                         TimeInfoDisplay(
                             title = stringResource(R.string.label_started),
                             date = startTimeInLocalDateTime,
-                            isForWear = true
                         )
                         TimeInfoDisplay(
                             title = stringResource(R.string.label_goal),
-                            date = startTimeInLocalDateTime.plusHours(16),
-                            isForWear = true
+                            date = startTimeInLocalDateTime.plusHours(getHours(currentGoal?.durationMillis)),
                         )
                     }
                 }

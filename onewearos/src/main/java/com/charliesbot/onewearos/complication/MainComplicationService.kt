@@ -15,6 +15,7 @@ import androidx.wear.watchface.complications.datasource.SuspendingComplicationDa
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.MainActivity
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.calculateProgressPercentage
@@ -36,7 +37,8 @@ class MainComplicationService() :
         return GoalProgressComplicationData.Builder(
             value = TARGET_HOURS / 2f, // Example: 8 hours towards 16h goal
             targetValue = TARGET_HOURS,
-            contentDescription = PlainComplicationText.Builder(getString(R.string.cd_fasting_preview)).build()
+            contentDescription = PlainComplicationText.Builder(getString(R.string.cd_fasting_preview))
+                .build()
         )
             .setMonochromaticImage(
                 MonochromaticImage.Builder(
@@ -46,7 +48,14 @@ class MainComplicationService() :
                     )
                 ).build()
             )
-            .setTitle(PlainComplicationText.Builder(getString(R.string.complication_title_hours_format, 8)).build()) // Example elapsed time
+            .setTitle(
+                PlainComplicationText.Builder(
+                    getString(
+                        R.string.complication_title_hours_format,
+                        8
+                    )
+                ).build()
+            ) // Example elapsed time
             .build()
     }
 
@@ -91,12 +100,21 @@ class MainComplicationService() :
         val elapsedMillis = (currentTime - fastingData.startTimeInMillis).coerceAtLeast(0L)
         val percentage = calculateProgressPercentage(elapsedMillis)
         val elapsedHours = getHours(elapsedMillis)
+        val currentFastingGoal = PredefinedFastingGoals.goalsById[fastingData.fastingGoalId]
 
         return GoalProgressComplicationData.Builder(
             value = elapsedHours.toFloat().coerceAtMost(TARGET_HOURS),
             targetValue = TARGET_HOURS,
             contentDescription = PlainComplicationText.Builder(
-                getString(R.string.complication_text_fasting_format, percentage.toInt(), elapsedHours.toInt(), getString(R.string.target_duration_short))
+                getString(
+                    R.string.complication_text_fasting_format,
+                    percentage.toInt(),
+                    elapsedHours.toInt(),
+                    getString(
+                        R.string.target_duration_short,
+                        currentFastingGoal?.durationDisplay
+                    )
+                )
             ).build()
         )
             .setMonochromaticImage(
@@ -104,7 +122,14 @@ class MainComplicationService() :
                     Icon.createWithResource(this, R.drawable.ic_notification_status)
                 ).build()
             )
-            .setTitle(PlainComplicationText.Builder(getString(R.string.complication_title_hours_format, elapsedHours.toInt())).build())
+            .setTitle(
+                PlainComplicationText.Builder(
+                    getString(
+                        R.string.complication_title_hours_format,
+                        elapsedHours.toInt()
+                    )
+                ).build()
+            )
             .setTapAction(tapAction)
             .build()
 

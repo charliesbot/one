@@ -5,4 +5,5 @@ object DataLayerConstants {
     const val IS_FASTING_KEY = "is_fasting"
     const val START_TIME_KEY = "start_time"
     const val UPDATE_TIMESTAMP_KEY = "update_timestamp"
+    const val FASTING_GOAL_KEY = "fasting_goal"
 }

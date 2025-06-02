@@ -46,6 +46,7 @@ import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
+import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -64,6 +65,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val fastButtonLabel =
         stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
     val scrollState = rememberScrollState()
+    val currentGoal = PredefinedFastingGoals.goalsById[fastingGoalId]
 
     LaunchedEffect(isFasting) {
         if (isFasting) {
@@ -171,9 +173,13 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                     TimeDisplay(
                                         title = stringResource(
                                             R.string.goal_with_duration,
-                                            "${PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay}H"
+                                            "${currentGoal?.durationDisplay}H"
                                         ),
-                                        date = startTimeInLocalDateTime.plusHours(16),
+                                        date = startTimeInLocalDateTime.plusHours(
+                                            getHours(
+                                                currentGoal?.durationMillis
+                                            )
+                                        ),
                                         shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
                                         onClick = {
                                             viewModel.openGoalBottomSheet()

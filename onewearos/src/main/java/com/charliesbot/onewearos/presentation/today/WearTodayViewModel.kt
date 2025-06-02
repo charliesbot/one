@@ -34,7 +34,7 @@ class WearTodayViewModel(
     fun onStartFasting() {
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
-            fastingDataRepository.startFasting(startTimeMillis)
+            fastingDataRepository.startFasting(startTimeMillis, fastingGoalId.value)
             notificationScheduler.scheduleNotifications(
                 startTimeInMillis.value,
                 fastingGoalId.value
@@ -44,7 +44,7 @@ class WearTodayViewModel(
 
     fun onStopFasting() {
         viewModelScope.launch {
-            fastingDataRepository.stopFasting()
+            fastingDataRepository.stopFasting(fastingGoalId.value)
             notificationScheduler.cancelAllNotifications()
         }
     }

@@ -10,13 +10,13 @@
     <!-- Strings extracted from code -->
     <string name="end_fast">End Fast</string>
     <string name="start_fasting">Start Fasting</string>
-    <string name="target_duration_hours">16 hours</string>
+    <string name="target_duration_hours">%1$s hours</string>
     <string name="label_started">Started</string>
     <string name="label_goal">Goal</string>
     <string name="cd_notification_permission">Notification Permission</string>
     <string name="dialog_title_enable_notifications">Enable Notifications</string>
     <string name="dialog_message_enable_notifications">Allow notifications for fasting alerts?</string>
-    <string name="target_duration_short">16h</string>
+    <string name="target_duration_short">%1$sh</string>
     <string name="cd_fasting_preview">Fasting progress preview</string>
     <string name="complication_text_not_fasting">Not Fasting. Tap to start.</string>
     <string name="complication_text_fasting_format">Fasting: %1$d%% (%2$s of %3$s)</string>
