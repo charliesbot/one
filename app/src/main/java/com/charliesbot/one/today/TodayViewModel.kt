@@ -80,6 +80,7 @@ class TodayViewModel(
     fun updateStartTime(timeInMillis: Long) {
         viewModelScope.launch {
             fastingDataRepository.updateFastingSchedule(timeInMillis)
+            updateWidget()
             notificationScheduler.scheduleNotifications(timeInMillis, fastingGoalId.value)
         }
     }
@@ -87,6 +88,7 @@ class TodayViewModel(
     fun updateFastingGoal(fastingGoalId: String) {
         viewModelScope.launch {
             fastingDataRepository.updateFastingGoalId(fastingGoalId)
+            updateWidget()
             notificationScheduler.scheduleNotifications(startTimeInMillis.value, fastingGoalId)
         }
     }

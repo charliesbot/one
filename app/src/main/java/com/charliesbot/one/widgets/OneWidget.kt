@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -39,6 +40,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.charliesbot.one.MainActivity
 import com.charliesbot.one.R
+import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.utils.calculateProgressFraction
@@ -84,7 +86,13 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
     private val fastingDataRepository: FastingDataRepository by inject()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val fastingData = fastingDataRepository.getCurrentFasting()!!
+        Log.d(
+            AppConstants.LOG_TAG,
+            "OneWidget.provideGlance called for id: $id (triggered by service?)"
+        )
+        val fastingData =
+            fastingDataRepository.getCurrentFasting()!! // This calls the modified getCurrentFasting
+        Log.d(AppConstants.LOG_TAG, "OneWidget.provideGlance - fastingData fetched: $fastingData")
         val currentTime = System.currentTimeMillis()
         val startTimeInMillis = fastingData.startTimeInMillis
         val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)

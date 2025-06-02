@@ -33,6 +33,10 @@ class FastingDataRepositoryImpl(
     override val isFasting: Flow<Boolean> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "isFasting") }
         .map {
+            Log.e(
+                LOG_TAG,
+                "IsFasting Flow: read from DataStore key ${PrefKeys.IS_FASTING}: ${it[PrefKeys.IS_FASTING]}"
+            )
             it[PrefKeys.IS_FASTING] == true
         }
     override val startTimeInMillis: Flow<Long> = dataStore.data
@@ -43,7 +47,12 @@ class FastingDataRepositoryImpl(
     override val fastingGoalId: Flow<String> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "fastingGoalId") }
         .map {
-            it[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
+            val currentGoalId = it[PrefKeys.FASTING_GOAL_ID]
+            Log.e(
+                LOG_TAG,
+                "FastingGoalId Flow: read from DataStore key ${PrefKeys.FASTING_GOAL_ID}: $currentGoalId"
+            )
+            currentGoalId ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
         }
     override val lastUpdateTimestamp: Flow<Long> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "lastUpdateTimestamp") }
@@ -51,13 +60,22 @@ class FastingDataRepositoryImpl(
 
     override suspend fun getCurrentFasting(): FastingDataItem {
         return try {
+            Log.d(
+                LOG_TAG,
+                "getCurrentFasting (widget path): Attempting to read DataStore.data.first()"
+            )
             val prefs = dataStore.data.first()
             val isFasting = prefs[PrefKeys.IS_FASTING] == true
             val startTime = prefs[PrefKeys.START_TIME] ?: -1
             val timestamp = prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1
             val fastingGoalId =
                 prefs[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
-            FastingDataItem(isFasting, startTime, timestamp, fastingGoalId)
+            val item = FastingDataItem(isFasting, startTime, timestamp, fastingGoalId)
+            Log.d(
+                LOG_TAG,
+                "getCurrentFasting (widget path): Read item: $item, fastingGoalId from prefs: ${prefs[PrefKeys.FASTING_GOAL_ID]}"
+            )
+            item
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Repo: Error reading current state snapshot", e)
             FastingDataItem() // Return default on error
