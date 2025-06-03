@@ -28,6 +28,7 @@ object NotificationUtil {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             enableVibration(true)
             setSound(ringtoneManager, audioAttributes)
+            setShowBadge(false)
         }
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
