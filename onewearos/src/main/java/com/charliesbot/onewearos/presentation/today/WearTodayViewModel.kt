@@ -2,6 +2,7 @@ package com.charliesbot.onewearos.presentation.today
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charliesbot.onewearos.complication.ComplicationUpdateManager
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationScheduler
@@ -12,7 +13,8 @@ import kotlinx.coroutines.launch
 
 class WearTodayViewModel(
     private val notificationScheduler: NotificationScheduler,
-    private val fastingDataRepository: FastingDataRepository
+    private val fastingDataRepository: FastingDataRepository,
+    private val complicationUpdateManager: ComplicationUpdateManager
 ) : ViewModel() {
     val isFasting: StateFlow<Boolean> = fastingDataRepository.isFasting.stateIn(
         scope = viewModelScope,
@@ -31,6 +33,10 @@ class WearTodayViewModel(
         initialValue = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
     )
 
+    fun updateComplication() {
+        complicationUpdateManager.requestUpdate()
+    }
+
     fun onStartFasting() {
         val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
@@ -39,6 +45,7 @@ class WearTodayViewModel(
                 startTimeInMillis.value,
                 fastingGoalId.value
             )
+            updateComplication()
         }
     }
 
@@ -46,6 +53,7 @@ class WearTodayViewModel(
         viewModelScope.launch {
             fastingDataRepository.stopFasting(fastingGoalId.value)
             notificationScheduler.cancelAllNotifications()
+            updateComplication()
         }
     }
 }

@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="One.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-02T02:36:09.494647Z">
+        <DropdownSelection timestamp="2025-06-03T01:35:56.125942Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Pixel_9_Pro_XL_Emulator.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Wear_OS_Large_Round.avd" />
             </handle>
           </Target>
         </DropdownSelection>

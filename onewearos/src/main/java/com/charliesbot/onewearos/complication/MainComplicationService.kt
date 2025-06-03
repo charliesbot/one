@@ -20,6 +20,7 @@ import com.charliesbot.shared.core.data.repositories.fastingDataRepository.Fasti
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.getHours
+import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -62,12 +63,7 @@ class MainComplicationService() :
 
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
-        val fastingData: FastingDataItem = try {
-            repository.getCurrentFasting()!!
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Error fetching fasting data", e)
-            return null
-        }
+        val fastingData = repository.fastingDataItem.first()
         Log.e(LOG_TAG, "fastingData: $fastingData")
         val tapAction = createTapIntent()
         if (!fastingData.isFasting) {

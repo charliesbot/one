@@ -1,5 +1,6 @@
 package com.charliesbot.onewearos.presentation.di
 
+import com.charliesbot.onewearos.complication.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.data.WearStringProvider
 import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
 import com.charliesbot.onewearos.presentation.today.WearTodayViewModel
@@ -19,5 +20,8 @@ val wearAppModule = module {
     }
     single<StringProvider> {
         WearStringProvider(androidContext())
+    }
+    single<ComplicationUpdateManager> {
+        ComplicationUpdateManager(androidContext())
     }
 }
