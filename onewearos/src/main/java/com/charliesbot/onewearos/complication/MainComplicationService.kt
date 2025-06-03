@@ -23,7 +23,8 @@ import com.charliesbot.shared.core.utils.getHours
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-private const val TARGET_HOURS = 16f
+
+const val MOCKED_TARGET_HOURS = 16f
 
 class MainComplicationService() :
     SuspendingComplicationDataSourceService(), KoinComponent {
@@ -35,8 +36,8 @@ class MainComplicationService() :
             return null
         }
         return GoalProgressComplicationData.Builder(
-            value = TARGET_HOURS / 2f, // Example: 8 hours towards 16h goal
-            targetValue = TARGET_HOURS,
+            value = MOCKED_TARGET_HOURS / 2f, // Example: 8 hours towards 16h goal
+            targetValue = MOCKED_TARGET_HOURS,
             contentDescription = PlainComplicationText.Builder(getString(R.string.cd_fasting_preview))
                 .build()
         )
@@ -101,11 +102,11 @@ class MainComplicationService() :
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
         val percentage = calculateProgressPercentage(elapsedMillis, fastingGoal.durationMillis)
         val elapsedHours = getHours(elapsedMillis)
-        val currentFastingGoal = PredefinedFastingGoals.goalsById[fastingData.fastingGoalId]
+        val targetHours = getHours(fastingGoal.durationMillis).toFloat()
 
         return GoalProgressComplicationData.Builder(
-            value = elapsedHours.toFloat().coerceAtMost(TARGET_HOURS),
-            targetValue = TARGET_HOURS,
+            value = elapsedHours.toFloat().coerceAtMost(targetHours),
+            targetValue = targetHours,
             contentDescription = PlainComplicationText.Builder(
                 getString(
                     R.string.complication_text_fasting_format,
@@ -113,7 +114,7 @@ class MainComplicationService() :
                     elapsedHours.toInt(),
                     getString(
                         R.string.target_duration_short,
-                        currentFastingGoal?.durationDisplay
+                        fastingGoal.durationDisplay
                     )
                 )
             ).build()
