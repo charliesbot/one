@@ -98,7 +98,8 @@ class MainComplicationService() :
     ): ComplicationData {
         val currentTime = System.currentTimeMillis()
         val elapsedMillis = (currentTime - fastingData.startTimeInMillis).coerceAtLeast(0L)
-        val percentage = calculateProgressPercentage(elapsedMillis)
+        val fastingGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
+        val percentage = calculateProgressPercentage(elapsedMillis, fastingGoal.durationMillis)
         val elapsedHours = getHours(elapsedMillis)
         val currentFastingGoal = PredefinedFastingGoals.goalsById[fastingData.fastingGoalId]
 

@@ -8,6 +8,7 @@ interface FastingDataRepository {
     val startTimeInMillis: Flow<Long>
     val fastingGoalId: Flow<String>
     val lastUpdateTimestamp: Flow<Long>
+    val fastingDataItem: Flow<FastingDataItem>
 
     suspend fun getCurrentFasting(): FastingDataItem?
     suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String)

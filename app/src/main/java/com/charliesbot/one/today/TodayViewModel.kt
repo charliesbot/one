@@ -6,6 +6,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.one.widgets.OneWidget
+import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 class TodayViewModel(
     application: Application,
     private val notificationScheduler: NotificationScheduler,
-    private val fastingDataRepository: FastingDataRepository
+    private val fastingDataRepository: FastingDataRepository,
+    private val widgetUpdateManager: WidgetUpdateManager
 ) : AndroidViewModel(application) {
     val isFasting: StateFlow<Boolean> = fastingDataRepository.isFasting.stateIn(
         scope = viewModelScope,
@@ -58,26 +60,8 @@ class TodayViewModel(
         _isGoalBottomSheetOpen.value = false
     }
 
-    suspend fun updateWidget() {
-        val uniqueCallId = System.nanoTime() // Simple unique ID for this call
-        Log.d(
-            AppConstants.LOG_TAG,
-            "TodayViewModel: updateWidget CALLED (Call ID: $uniqueCallId). Triggering OneWidget.updateAll()"
-        )
-        try {
-            OneWidget().updateAll(getApplication<Application>().applicationContext)
-            Log.d(
-                AppConstants.LOG_TAG,
-                "TodayViewModel: OneWidget.updateAll() trigger COMPLETED (Call ID: $uniqueCallId)"
-            )
-        } catch (e: Exception) {
-            Log.e(
-                AppConstants.LOG_TAG,
-                "TodayViewModel: Error in updateAll() (Call ID: $uniqueCallId)",
-                e
-            )
-        }
-        OneWidget().updateAll(getApplication<Application>().applicationContext)
+    fun updateWidget() {
+        widgetUpdateManager.requestUpdate()
     }
 
     fun onStopFasting() {

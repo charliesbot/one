@@ -28,8 +28,9 @@ fun FastingStatusIndicator(
     elapsedTime: Long,
     fastingGoalId: String,
 ) {
+    val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
     val headerLabel = if (isFasting) {
-        val progress = calculateProgressPercentage(elapsedTime)
+        val progress = calculateProgressPercentage(elapsedTime, fastingGoal.durationMillis)
         stringResource(R.string.elapsed_percentage, progress)
     } else {
         stringResource(R.string.upcoming_fast).uppercase()
@@ -62,7 +63,8 @@ fun CurrentFastingProgress(
     fastingGoalId: String,
     isFasting: Boolean = false
 ) {
-    val progress = calculateProgressFraction(elapsedTime)
+    val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
+    val progress = calculateProgressFraction(elapsedTime, fastingGoal.durationMillis)
     FastingProgressBar(
         progress = progress,
         strokeWidth = 35.dp,

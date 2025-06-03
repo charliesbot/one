@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.graphics.toArgb
@@ -43,6 +44,7 @@ import com.charliesbot.one.R
 import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +59,7 @@ object ProgressBitmap {
         strokePx: Float,
         indicator: Int = 0xFFFF6A4E.toInt(),
         track: Int = 0xFF2B2B2B.toInt(),
-    ): Bitmap = createBitmap(sizePx, sizePx, Bitmap.Config.RGBA_F16).apply {
+    ): Bitmap = createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888).apply {
         val c = Canvas(this)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
@@ -86,24 +88,26 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
     private val fastingDataRepository: FastingDataRepository by inject()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        Log.d(
-            AppConstants.LOG_TAG,
-            "OneWidget: provideGlance INVOKED for id $id. CurrentTimeMillis: ${System.currentTimeMillis()}"
-        )
-        val fastingData =
-            fastingDataRepository.getCurrentFasting()!! // This calls the modified getCurrentFasting
-        Log.d(
-            AppConstants.LOG_TAG,
-            "OneWidget: provideGlance - fastingData fetched for UI for id $id: $fastingData"
-        )
-        val currentTime = System.currentTimeMillis()
-        val startTimeInMillis = fastingData.startTimeInMillis
-        val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
-        val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
-        val hours = getHours(selectedGoal.durationMillis) - getHours(elapsedMillis)
-        val isGoalMet = fastingData.isFasting && hours <= 0
-
         provideContent {
+            val initialFastingData = FastingDataItem(
+                fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id
+            )
+            val fastingData by fastingDataRepository.fastingDataItem.collectAsState(initial = initialFastingData)
+            val currentTime = System.currentTimeMillis()
+            val startTimeInMillis = fastingData.startTimeInMillis
+            val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
+            val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
+            val hours = getHours(selectedGoal.durationMillis) - getHours(elapsedMillis)
+            val isGoalMet = fastingData.isFasting && hours <= 0
+            Log.d(
+                AppConstants.LOG_TAG,
+                "OneWidget: provideGlance INVOKED for id $id. CurrentTimeMillis: ${System.currentTimeMillis()}"
+            )
+            Log.d(
+                AppConstants.LOG_TAG,
+                "OneWidget: provideGlance - fastingData fetched for UI for id $id: $fastingData"
+            )
+
             Scaffold(
                 modifier = GlanceModifier
                     .background(GlanceTheme.colors.widgetBackground)
@@ -120,6 +124,7 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
                     WidgetProgressBar(
                         isFasting = fastingData.isFasting,
                         elapsedTime = elapsedMillis,
+                        fastingGoalMillis = selectedGoal.durationMillis,
                         isGoalMet = isGoalMet
                     )
                     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -201,11 +206,12 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
     fun WidgetProgressBar(
         isFasting: Boolean,
         elapsedTime: Long,
+        fastingGoalMillis: Long,
         isGoalMet: Boolean,
     ) {
         val context = LocalContext.current
         val displayMetrics = context.resources.displayMetrics
-        val progress = calculateProgressFraction(elapsedTime)
+        val progress = calculateProgressFraction(elapsedTime, fastingGoalMillis)
 
         val trackComposeColor =
             GlanceTheme.colors.surfaceVariant.getColor(context)

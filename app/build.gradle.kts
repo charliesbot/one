@@ -26,7 +26,7 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 30
         targetSdk = 35
-        versionCode = 12
+        versionCode = 17
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -82,6 +82,9 @@ ksp {
 }
 
 dependencies {
+    implementation(platform(libs.kotlinx.coroutines.bom))
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)

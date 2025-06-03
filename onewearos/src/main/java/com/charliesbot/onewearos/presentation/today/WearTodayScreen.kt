@@ -82,7 +82,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     }
     ScreenScaffold {
         FastingProgressBar(
-            progress = calculateProgressFraction(elapsedTime),
+            progress = calculateProgressFraction(elapsedTime, currentGoal?.durationMillis),
             strokeWidth = 8.dp,
             indicatorColor = MaterialTheme.colorScheme.primaryDim,
             trackColor = MaterialTheme.colorScheme.onBackground,

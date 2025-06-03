@@ -19,6 +19,7 @@ import com.google.android.gms.wearable.PutDataRequest
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -57,6 +58,27 @@ class FastingDataRepositoryImpl(
     override val lastUpdateTimestamp: Flow<Long> = dataStore.data
         .catch { exception -> handleDataStoreError(exception, "lastUpdateTimestamp") }
         .map { it[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1 }
+    override val fastingDataItem: Flow<FastingDataItem> = combine(
+        isFasting,
+        startTimeInMillis,
+        fastingGoalId,
+        lastUpdateTimestamp
+    ) { isFastingValue, startTimeValue, goalIdValue, timestampValue ->
+        Log.d(
+            LOG_TAG,
+            "Repo: fastingDataItemFlow emitted: isFasting=$isFastingValue, goal=$goalIdValue, startTime=$startTimeValue, timestamp=$timestampValue"
+        )
+        FastingDataItem(
+            isFasting = isFastingValue,
+            startTimeInMillis = startTimeValue,
+            fastingGoalId = goalIdValue,
+            updateTimestamp = timestampValue
+        )
+    }.catch { exception ->
+        Log.e(LOG_TAG, "Repo: Error in fastingDataItemFlow", exception)
+        emit(FastingDataItem())
+    }
+
 
     override suspend fun getCurrentFasting(): FastingDataItem {
         return try {
