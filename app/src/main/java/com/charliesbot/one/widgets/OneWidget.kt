@@ -89,10 +89,12 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            val initialFastingData = FastingDataItem(
-                fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id
+            val fastingData by fastingDataRepository.fastingDataItem.collectAsState(
+                initial =
+                    FastingDataItem(
+                        fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id
+                    )
             )
-            val fastingData by fastingDataRepository.fastingDataItem.collectAsState(initial = initialFastingData)
             val currentTime = System.currentTimeMillis()
             val startTimeInMillis = fastingData.startTimeInMillis
             val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
