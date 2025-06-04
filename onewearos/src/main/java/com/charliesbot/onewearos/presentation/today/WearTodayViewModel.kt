@@ -42,7 +42,7 @@ class WearTodayViewModel(
         viewModelScope.launch {
             fastingDataRepository.startFasting(startTimeMillis, fastingGoalId.value)
             notificationScheduler.scheduleNotifications(
-                startTimeInMillis.value,
+                startTimeMillis,
                 fastingGoalId.value
             )
             updateComplication()
