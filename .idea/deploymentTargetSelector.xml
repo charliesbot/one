@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="One.onewearos">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-03T02:45:10.529282Z">
+        <DropdownSelection timestamp="2025-06-06T02:25:58.144260Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Wear_OS_Small_Round.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/charliesbot/.android/avd/Pixel_9_Pro_XL_Emulator.avd" />
             </handle>
           </Target>
         </DropdownSelection>

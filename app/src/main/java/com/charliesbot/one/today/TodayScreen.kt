@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
@@ -159,7 +160,9 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                     TimeDisplay(
                                         title = stringResource(R.string.started),
                                         date = startTimeInLocalDateTime,
-                                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(
+                                            pressedShape = RoundedCornerShape(60.dp),
+                                        ),
                                         onClick = {
                                             viewModel.openTimePickerDialog()
                                         },
@@ -180,7 +183,9 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                                 currentGoal?.durationMillis
                                             )
                                         ),
-                                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
+                                            pressedShape = RoundedCornerShape(60.dp),
+                                        ),
                                         onClick = {
                                             viewModel.openGoalBottomSheet()
                                         },
