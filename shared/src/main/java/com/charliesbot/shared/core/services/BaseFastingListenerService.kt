@@ -22,6 +22,13 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
     protected val fastingRepository: FastingDataRepository by inject()
     private var currentLastTimestamp = 0L
 
+    protected open suspend fun onFastIsMarkedAsDone(fastingDataItem: FastingDataItem) {
+        Log.d(
+            LOG_TAG,
+            "${this::class.java.simpleName}: onFastingComplete called, but no implementation."
+        )
+    }
+
     override fun onCreate() {
         super.onCreate()
         Log.d(
@@ -79,6 +86,20 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                     LOG_TAG,
                     "Processing NEW event (Timestamp: ${newestRemoteItem.updateTimestamp} > $currentLastTimestamp)"
                 )
+
+                // FASTING IS DONE - CALL A HOOK
+                // PHONE WILL STORE THE FASTING TO THE DATABASE
+                // WATCH WILL NOOP THIS CALL
+                if (!newestRemoteItem.isFasting) {
+                    Log.d(
+                        LOG_TAG,
+                        "BaseListener: Detected fast completion from remote. Calling onFastIsMar."
+                    )
+                    serviceScope.launch {
+                        onFastIsMarkedAsDone(newestRemoteItem)
+                    }
+                }
+
                 currentLastTimestamp = newestRemoteItem.updateTimestamp
                 serviceScope.launch {
                     fastingRepository.updateFastingStatusFromRemote(

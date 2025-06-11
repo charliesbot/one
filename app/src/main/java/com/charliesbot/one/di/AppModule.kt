@@ -3,6 +3,7 @@ package com.charliesbot.one.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.charliesbot.one.data.AndroidStringProvider
+import com.charliesbot.one.data.FastingHistoryRepositoryImpl
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import org.koin.core.module.dsl.viewModelOf
@@ -10,6 +11,7 @@ import org.koin.dsl.module
 import com.charliesbot.one.today.TodayViewModel
 import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
+import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import org.koin.android.ext.koin.androidContext
 
 val appModule = module {
@@ -29,6 +31,10 @@ val appModule = module {
             context = androidContext(),
             workerClass = NotificationWorker::class.java,
         )
+    }
+
+    single<FastingHistoryRepository> {
+        FastingHistoryRepositoryImpl(fastingRecordDao = get())
     }
 
     single<StringProvider> {

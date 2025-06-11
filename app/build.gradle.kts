@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.glance.preview)
     implementation(libs.androidx.glance.appwidget.preview)
+    ksp(libs.androidx.room.compiler)
     implementation(project(":shared"))
     implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)

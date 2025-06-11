@@ -112,10 +112,13 @@ class FastingDataRepositoryImpl(
         )
     }
 
+    // When stopping fasting, we need to send the startTime to the database.
+    // The device storage will keep the startTime as well, but it is safe to ignore
+    // as the fasting state is false.
     override suspend fun stopFasting(fastingGoalId: String) {
         updateLocalAndRemoteStore(
             isFasting = false,
-            startTimeInMillis = -1, // -1 indicates not set
+            startTimeInMillis = startTimeInMillis.first(),
             fastingGoalId = fastingGoalId
         )
     }
@@ -168,7 +171,7 @@ class FastingDataRepositoryImpl(
         isFasting: Boolean,
         startTimeInMillis: Long,
         fastingGoalId: String,
-        lastUpdateTimestamp: Long
+        lastUpdateTimestamp: Long = System.currentTimeMillis()
     ) {
         try {
             dataStore.edit { prefs ->
@@ -189,7 +192,7 @@ class FastingDataRepositoryImpl(
         isFasting: Boolean,
         startTimeInMillis: Long,
         fastingGoalId: String,
-        lastUpdateTimestamp: Long
+        lastUpdateTimestamp: Long = System.currentTimeMillis()
     ) {
         val request: PutDataRequest =
             PutDataMapRequest.create(DataStoreConstants.FASTING_PATH_KEY).apply {

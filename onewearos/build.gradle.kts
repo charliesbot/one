@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
 }
@@ -75,6 +76,10 @@ android {
     }
 }
 
+ksp {
+    arg("KOIN_CONFIG_CHECK", "true")
+}
+
 dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(platform(libs.koin.bom))
@@ -105,6 +110,7 @@ dependencies {
     implementation(libs.androidx.wear.phone.interactions)
     implementation(libs.androidx.startup.runtime)
     implementation(project(":shared"))
+    ksp(libs.androidx.room.compiler)
     implementation(libs.firebase.crashlytics)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)

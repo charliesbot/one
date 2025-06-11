@@ -6,10 +6,26 @@ import com.charliesbot.one.widgets.OneWidget
 import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.services.BaseFastingListenerService
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.data.db.FastingRecord
+import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
+import com.charliesbot.shared.core.models.FastingDataItem
 import org.koin.core.component.inject
 
 class FastingStateListenerService : BaseFastingListenerService() {
     private val widgetUpdateManager: WidgetUpdateManager by inject()
+    private val fastingHistoryRepository: FastingHistoryRepository by inject()
+
+    override suspend fun onFastIsMarkedAsDone(fastingDataItem: FastingDataItem) {
+        super.onFastIsMarkedAsDone(fastingDataItem)
+        fastingHistoryRepository.saveFastingRecord(
+            FastingRecord(
+                startTimeEpochMillis = fastingDataItem.startTimeInMillis,
+                endTimeEpochMillis = fastingDataItem.updateTimestamp,
+                fastingGoalId = fastingDataItem.fastingGoalId,
+            )
+        )
+
+    }
 
     override suspend fun onFastingStateSynced() {
         super.onFastingStateSynced()
