@@ -20,12 +20,12 @@ if (keystorePropertiesFile.isFile) {
 
 android {
     namespace = "com.charliesbot.one"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.charliesbot.one"
         minSdk = 30
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 18
         versionName = "1.0"
 

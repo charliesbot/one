@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.2"
+agp = "8.10.1"
 datastorePreferences = "1.1.6"
 firebaseBom = "33.13.0"
 glanceAppwidget = "1.1.1"
@@ -84,6 +84,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
 koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations" }
+androidx-wear-ongoing = { group = "androidx.wear", name = "wear-ongoing", version = "1.1.0" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "wearComposeMaterial" }
 androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "wearCompose" }

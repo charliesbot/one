@@ -20,13 +20,13 @@ if (keystorePropertiesFile.isFile) {
 
 android {
     namespace = "com.charliesbot.onewearos"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.charliesbot.one"
         minSdk = 33
         targetSdk = 35
-        versionCode = 19
+        versionCode = 20
         versionName = "1.0"
 
     }
@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.horologist.tiles)
     implementation(libs.androidx.watchface.complications.data.source.ktx)
     implementation(libs.androidx.wear.phone.interactions)
+    implementation(libs.androidx.wear.ongoing)
     implementation(libs.androidx.startup.runtime)
     implementation(project(":shared"))
     ksp(libs.androidx.room.compiler)
