@@ -1,8 +1,6 @@
 package com.charliesbot.one.services
 
 import android.util.Log
-import androidx.glance.appwidget.updateAll
-import com.charliesbot.one.widgets.OneWidget
 import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.services.BaseFastingListenerService
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
