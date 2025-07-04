@@ -9,17 +9,19 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.wear.ongoing.OngoingActivity
+import androidx.wear.ongoing.Status
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.MainActivity
+import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_ID
 import com.charliesbot.shared.core.models.NotificationWorkerInput
 import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.shared.core.utils.generateDismissalId
 import com.charliesbot.shared.core.utils.getNotificationText
 import com.charliesbot.shared.core.utils.parseWorkerInput
-import com.charliesbot.shared.core.abstraction.StringProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -44,7 +46,8 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
     private fun createNotification(
         notificationWorkerInput: NotificationWorkerInput
     ): Notification {
-        val notificationContent = getNotificationText(notificationWorkerInput.notificationType, stringProvider)
+        val notificationContent =
+            getNotificationText(notificationWorkerInput.notificationType, stringProvider)
 
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -66,12 +69,29 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
                 )
             )
 
-        return NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_status)
-            .setContentTitle(notificationContent.title)
-            .setContentText(notificationContent.message)
-            .setContentIntent(watchPendingIntent)
-            .extend(wearableExtender)
+        val notificationBuilder =
+            NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification_status)
+                .setContentTitle(notificationContent.title)
+                .setContentText(notificationContent.message)
+                .setContentIntent(watchPendingIntent)
+                .extend(wearableExtender)
+                .setOngoing(true)
+                .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
+
+        val ongoingActivityStatus = Status.Builder()
+            .addTemplate(notificationContent.title)
             .build()
+
+        val ongoingActivity =
+            OngoingActivity.Builder(applicationContext, NOTIFICATION_ID, notificationBuilder)
+                .setStaticIcon(R.drawable.ic_notification_status)
+                .setTouchIntent(watchPendingIntent)
+                .setStatus(ongoingActivityStatus)
+                .build()
+
+        ongoingActivity.apply(applicationContext)
+
+        return notificationBuilder.build()
     }
 }
