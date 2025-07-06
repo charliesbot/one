@@ -25,7 +25,7 @@ class TodayViewModel(
     private val fastingDataRepository: FastingDataRepository,
     private val fastingUseCase: FastingUseCase,
 ) : AndroidViewModel(application) {
-    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFasting()
+    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -73,24 +73,20 @@ class TodayViewModel(
     }
 
     fun onStartFasting() {
-        val startTimeMillis = System.currentTimeMillis()
         viewModelScope.launch {
-            fastingDataRepository.startFasting(startTimeMillis, fastingGoalId.value)
-            updateWidget()
+            fastingUseCase.startFasting(fastingGoalId.value)
         }
     }
 
     fun updateStartTime(timeInMillis: Long) {
         viewModelScope.launch {
-            fastingDataRepository.updateFastingSchedule(timeInMillis)
-            updateWidget()
+            fastingUseCase.updateFastingConfig(startTimeMillis = timeInMillis)
         }
     }
 
     fun updateFastingGoal(fastingGoalId: String) {
         viewModelScope.launch {
-            fastingDataRepository.updateFastingGoalId(fastingGoalId)
-            updateWidget()
+            fastingUseCase.updateFastingConfig(goalId = fastingGoalId)
         }
     }
 }

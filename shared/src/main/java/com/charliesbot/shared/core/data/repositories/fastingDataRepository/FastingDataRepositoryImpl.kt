@@ -143,22 +143,15 @@ class FastingDataRepositoryImpl(
         return fastingDataItem.first()
     }
 
-    override suspend fun updateFastingSchedule(startTimeInMillis: Long): FastingDataItem {
-        val currentGoalId = this.fastingGoalId.first()
-        updateLocalAndRemoteStore(
-            isFasting = true,
-            startTimeInMillis = startTimeInMillis,
-            fastingGoalId = currentGoalId
-        )
-        return fastingDataItem.first()
-    }
-
-    override suspend fun updateFastingGoalId(fastingGoalId: String): FastingDataItem {
+    override suspend fun updateFastingConfig(
+        startTimeInMillis: Long?,
+        fastingGoalId: String?
+    ): FastingDataItem {
         val currentData = getCurrentFasting()
         updateLocalAndRemoteStore(
             isFasting = currentData.isFasting,
-            startTimeInMillis = currentData.startTimeInMillis,
-            fastingGoalId = fastingGoalId,
+            startTimeInMillis = startTimeInMillis ?: currentData.startTimeInMillis,
+            fastingGoalId = fastingGoalId ?: currentData.fastingGoalId,
         )
         return fastingDataItem.first()
     }

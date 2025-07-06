@@ -15,7 +15,7 @@ class FastingUseCase(
     private val localCallbacks: FastingEventCallbacks
 ) {
 
-    fun getCurrentFasting(): Flow<FastingDataItem> {
+    fun getCurrentFastingFlow(): Flow<FastingDataItem?> {
         return fastingRepository.fastingDataItem
     }
 
@@ -29,19 +29,16 @@ class FastingUseCase(
     suspend fun startFasting(goalId: String) {
         Log.d(LOG_TAG, "FastingUseCase: Starting fasting locally with goal: $goalId")
         try {
-            val currentFasting = getCurrentFasting().first()
-            if (currentFasting.isFasting) {
+            val previousItem = getCurrentFastingFlow().first()
+            if (previousItem?.isFasting == true) {
                 throw IllegalStateException("Cannot start fasting: there's already an active session")
             }
-            val startTime = System.currentTimeMillis()
-            // 1. Update local repository + sync to other device (repository handles both)
-            // 2. Get the updated item for event processing (using flow for latest data)
-            val fastingItem = fastingRepository.startFasting(startTime, goalId)
-            // 3. Process local event using centralized manager
-            // This ensures same business logic (notifications, validation) as remote events
-            eventManager.processStateChange(fastingItem, localCallbacks)
-            Log.d(LOG_TAG, "FastingUseCase: Processed local start event via EventManager")
 
+            val startTime = System.currentTimeMillis()
+            val currentItem = fastingRepository.startFasting(startTime, goalId)
+
+            eventManager.processStateChange(previousItem, currentItem, localCallbacks)
+            Log.d(LOG_TAG, "FastingUseCase: Processed local start event via EventManager")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "FastingUseCase: Failed to start fasting locally", e)
             // Re-throw to let the calling ViewModel handle user-facing error messaging
@@ -58,12 +55,12 @@ class FastingUseCase(
     suspend fun stopFasting() {
         Log.d(LOG_TAG, "FastingUseCase: Stopping fasting locally")
         try {
-            val currentFasting = getCurrentFasting().first()
-            if (!currentFasting.isFasting) {
+            val previousItem = getCurrentFastingFlow().first()
+            if (previousItem?.isFasting != true) {
                 throw IllegalStateException("No active fasting session to stop")
             }
-            val completedItem = fastingRepository.stopFasting(currentFasting.fastingGoalId)
-            eventManager.processStateChange(completedItem, localCallbacks)
+            val currentItem = fastingRepository.stopFasting(previousItem.fastingGoalId)
+            eventManager.processStateChange(previousItem, currentItem, localCallbacks)
             Log.d(LOG_TAG, "FastingUseCase: Processed local stop event via EventManager")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "FastingUseCase: Failed to stop fasting locally", e)
@@ -72,20 +69,17 @@ class FastingUseCase(
     }
 
     suspend fun updateFastingConfig(startTimeMillis: Long? = null, goalId: String? = null) {
-        Log.d(LOG_TAG, "FastingUseCase: Updating Fasting Start Time locally")
+        Log.d(LOG_TAG, "FastingUseCase: Updating Fasting config locally")
         try {
-            val currentFasting = getCurrentFasting().first()
-            if (!currentFasting.isFasting) {
-                throw IllegalStateException("No active fasting session to update")
+            val previousItem = getCurrentFastingFlow().first()
+
+            if (startTimeMillis == null && goalId == null) {
+                throw IllegalStateException("No valid update config provided")
             }
-            if (startTimeMillis != null) {
-                fastingRepository.updateFastingSchedule(startTimeMillis)
-            }
-            if (goalId != null) {
-                fastingRepository.updateFastingGoalId(goalId)
-            }
-            val updatedItem = getCurrentFasting().first()
-            eventManager.processStateChange(updatedItem, localCallbacks)
+
+            val currentItem = fastingRepository.updateFastingConfig(startTimeMillis, goalId)
+
+            eventManager.processStateChange(previousItem, currentItem, localCallbacks)
             Log.d(LOG_TAG, "FastingUseCase: Processed local update event via EventManager")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "FastingUseCase: Failed to update fasting locally", e)
@@ -102,14 +96,13 @@ class FastingUseCase(
         Log.d(LOG_TAG, "FastingUseCase: Manually syncing current state")
 
         try {
-            val currentFasting = getCurrentFasting().first()
-            if (currentFasting != null) {
-                // Use updateFastingGoalId to trigger a sync without changing the goal
-                fastingRepository.updateFastingGoalId(currentFasting.fastingGoalId)
-                Log.d(LOG_TAG, "FastingUseCase: Successfully synced current state")
-            } else {
-                Log.d(LOG_TAG, "FastingUseCase: No current fasting state to sync")
-            }
+            val currentFasting = getCurrentFastingFlow().first()
+            // Use updateFastingGoalId to trigger a sync without changing the goal
+            fastingRepository.updateFastingConfig(
+                currentFasting?.startTimeInMillis,
+                currentFasting?.fastingGoalId
+            )
+            Log.d(LOG_TAG, "FastingUseCase: Successfully synced current state")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "FastingUseCase: Failed to sync current state", e)
             throw e

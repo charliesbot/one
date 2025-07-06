@@ -15,7 +15,7 @@ class WearTodayViewModel(
     private val fastingUseCase: FastingUseCase,
 ) : ViewModel() {
 
-    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFasting()
+    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),

@@ -12,8 +12,11 @@ interface FastingDataRepository {
 
     suspend fun getCurrentFasting(): FastingDataItem?
     suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String): FastingDataItem
-    suspend fun updateFastingSchedule(startTimeInMillis: Long): FastingDataItem
-    suspend fun updateFastingGoalId(fastingGoalId: String): FastingDataItem
+    suspend fun updateFastingConfig(
+        startTimeInMillis: Long?,
+        fastingGoalId: String?
+    ): FastingDataItem
+
     suspend fun stopFasting(fastingGoalId: String): FastingDataItem
     suspend fun updateFastingStatusFromRemote(
         startTimeInMillis: Long,

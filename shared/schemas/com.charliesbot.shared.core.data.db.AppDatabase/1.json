@@ -1,0 +1,43 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "730f7a144d0ded65bc9254bdbc6cd5ba",
+    "entities": [
+      {
+        "tableName": "fasting_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`startTimeEpochMillis` INTEGER NOT NULL, `endTimeEpochMillis` INTEGER NOT NULL, `fastingGoalId` TEXT NOT NULL, PRIMARY KEY(`startTimeEpochMillis`))",
+        "fields": [
+          {
+            "fieldPath": "startTimeEpochMillis",
+            "columnName": "startTimeEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endTimeEpochMillis",
+            "columnName": "endTimeEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fastingGoalId",
+            "columnName": "fastingGoalId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "startTimeEpochMillis"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '730f7a144d0ded65bc9254bdbc6cd5ba')"
+    ]
+  }
+}

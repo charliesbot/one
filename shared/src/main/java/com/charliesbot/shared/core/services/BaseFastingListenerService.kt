@@ -61,6 +61,13 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         )
     }
 
+    protected open suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
+        Log.d(
+            LOG_TAG,
+            "${this::class.java.simpleName}: onPlatformFastingUpdated called, but no implementation."
+        )
+    }
+
     /**
      * Called after the local fasting data has been successfully updated
      * with new information received from a wearable device.
@@ -83,6 +90,9 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         onPlatformFastingCompleted(fastingDataItem)
     }
 
+    override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
+        onPlatformFastingUpdated(fastingDataItem)
+    }
 
     private suspend fun getLocalNodeId(): String? {
         return try {
@@ -152,7 +162,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
             "${this::class.java.simpleName} onDataChanged from REMOTE device. Comparing against lastTimestamp: $currentLastTimestamp"
         )
 
-        var newestRemoteItem: FastingDataItem? = null
+        var newestRemoteItem: FastingDataItem?
         try {
             newestRemoteItem =
                 getLatestFastingState(dataEvents)
@@ -161,8 +171,9 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                 return
             }
 
-            // if most recent remote item is newer than local item, update local item
+            // if most recent remote item is older than local item, update local item
             if (newestRemoteItem.updateTimestamp > currentLastTimestamp) {
+
                 Log.i(
                     LOG_TAG,
                     "Processing REMOTE event (Timestamp: ${newestRemoteItem.updateTimestamp} > $currentLastTimestamp)"
@@ -172,6 +183,8 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
 
                 // Update local repository from remote source
                 serviceScope.launch {
+                    val previousItem = fastingRepository.getCurrentFasting()
+
                     try {
                         fastingRepository.updateFastingStatusFromRemote(
                             startTimeInMillis = newestRemoteItem.startTimeInMillis,
@@ -180,25 +193,14 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                             lastUpdateTimestamp = newestRemoteItem.updateTimestamp
                         )
                         onPlatformFastingStateSynced()
+                        eventManager.processStateChange(
+                            previousItem = previousItem,
+                            currentItem = newestRemoteItem,
+                            callbacks = this@BaseFastingListenerService
+                        )
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "Failed to update repository from remote", e)
                         throw e
-                    }
-                }
-
-                // Delegate all state change logic to the central manager
-                serviceScope.launch {
-                    try {
-                        eventManager.processStateChange(
-                            newestRemoteItem,
-                            this@BaseFastingListenerService
-                        )
-                        Log.d(
-                            LOG_TAG,
-                            "Successfully processed remote state change via EventManager"
-                        )
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Failed to process remote state change via EventManager", e)
                     }
                 }
             } else {
