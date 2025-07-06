@@ -11,10 +11,10 @@ interface FastingDataRepository {
     val fastingDataItem: Flow<FastingDataItem>
 
     suspend fun getCurrentFasting(): FastingDataItem?
-    suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String)
-    suspend fun updateFastingSchedule(startTimeInMillis: Long)
-    suspend fun updateFastingGoalId(fastingGoalId: String)
-    suspend fun stopFasting(fastingGoalId: String)
+    suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String): FastingDataItem
+    suspend fun updateFastingSchedule(startTimeInMillis: Long): FastingDataItem
+    suspend fun updateFastingGoalId(fastingGoalId: String): FastingDataItem
+    suspend fun stopFasting(fastingGoalId: String): FastingDataItem
     suspend fun updateFastingStatusFromRemote(
         startTimeInMillis: Long,
         fastingGoalId: String,

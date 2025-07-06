@@ -6,14 +6,16 @@ import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.one.widgets.OneWidget
-import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -21,23 +23,27 @@ class TodayViewModel(
     application: Application,
     private val notificationScheduler: NotificationScheduler,
     private val fastingDataRepository: FastingDataRepository,
-    private val widgetUpdateManager: WidgetUpdateManager
+    private val fastingUseCase: FastingUseCase,
 ) : AndroidViewModel(application) {
-    val isFasting: StateFlow<Boolean> = fastingDataRepository.isFasting.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = false
-    )
-    val startTimeInMillis: StateFlow<Long> = fastingDataRepository.startTimeInMillis.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = -1
-    )
-    val fastingGoalId: StateFlow<String> = fastingDataRepository.fastingGoalId.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
-    )
+    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFasting()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+    val isFasting: StateFlow<Boolean> = currentFasting
+        .map { it?.isFasting ?: false }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+    val startTimeInMillis: StateFlow<Long> = currentFasting
+        .map { it?.startTimeInMillis ?: -1L }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), -1L)
+    val fastingGoalId: StateFlow<String> = currentFasting
+        .map { it?.fastingGoalId ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            PredefinedFastingGoals.SIXTEEN_EIGHT.id
+        )
     private val _isTimePickerDialogOpen = MutableStateFlow(false)
     val isTimePickerDialogOpen: StateFlow<Boolean> = _isTimePickerDialogOpen
 
@@ -60,15 +66,9 @@ class TodayViewModel(
         _isGoalBottomSheetOpen.value = false
     }
 
-    fun updateWidget() {
-        widgetUpdateManager.requestUpdate()
-    }
-
     fun onStopFasting() {
         viewModelScope.launch {
-            fastingDataRepository.stopFasting(fastingGoalId.value)
-            updateWidget()
-            notificationScheduler.cancelAllNotifications()
+            fastingUseCase.stopFasting()
         }
     }
 
@@ -77,7 +77,6 @@ class TodayViewModel(
         viewModelScope.launch {
             fastingDataRepository.startFasting(startTimeMillis, fastingGoalId.value)
             updateWidget()
-            notificationScheduler.scheduleNotifications(startTimeMillis, fastingGoalId.value)
         }
     }
 
@@ -85,7 +84,6 @@ class TodayViewModel(
         viewModelScope.launch {
             fastingDataRepository.updateFastingSchedule(timeInMillis)
             updateWidget()
-            notificationScheduler.scheduleNotifications(timeInMillis, fastingGoalId.value)
         }
     }
 
@@ -93,7 +91,6 @@ class TodayViewModel(
         viewModelScope.launch {
             fastingDataRepository.updateFastingGoalId(fastingGoalId)
             updateWidget()
-            notificationScheduler.scheduleNotifications(startTimeInMillis.value, fastingGoalId)
         }
     }
 }

@@ -9,8 +9,6 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.wear.ongoing.OngoingActivity
-import androidx.wear.ongoing.Status
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.charliesbot.onewearos.R
@@ -76,21 +74,6 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
                 .setContentText(notificationContent.message)
                 .setContentIntent(watchPendingIntent)
                 .extend(wearableExtender)
-                .setOngoing(true)
-                .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
-
-        val ongoingActivityStatus = Status.Builder()
-            .addTemplate(notificationContent.title)
-            .build()
-
-        val ongoingActivity =
-            OngoingActivity.Builder(applicationContext, NOTIFICATION_ID, notificationBuilder)
-                .setStaticIcon(R.drawable.ic_notification_status)
-                .setTouchIntent(watchPendingIntent)
-                .setStatus(ongoingActivityStatus)
-                .build()
-
-        ongoingActivity.apply(applicationContext)
 
         return notificationBuilder.build()
     }

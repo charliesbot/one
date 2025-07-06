@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.Preferences
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepositoryImpl
 import com.charliesbot.shared.core.datastore.fastingDataStore
+import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.services.FastingEventManager
 
 val sharedModule = module {
     single<DataStore<Preferences>> { androidContext().fastingDataStore }
@@ -16,4 +18,6 @@ val sharedModule = module {
             dataStore = get()
         )
     }
+    single<FastingEventManager> { FastingEventManager() }
+    single { FastingUseCase(get(), get(), get()) }
 }

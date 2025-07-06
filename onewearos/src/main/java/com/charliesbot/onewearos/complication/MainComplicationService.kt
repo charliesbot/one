@@ -18,6 +18,7 @@ import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.utils.FastingProgressUtil
 import com.charliesbot.shared.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.flow.first
@@ -93,21 +94,22 @@ class MainComplicationService() :
         fastingData: FastingDataItem,
         tapAction: PendingIntent?
     ): ComplicationData {
-        val currentTime = System.currentTimeMillis()
-        val elapsedMillis = (currentTime - fastingData.startTimeInMillis).coerceAtLeast(0L)
+        val fastingProgress = FastingProgressUtil.calculateFastingProgress(
+            startTimeMillis = fastingData.startTimeInMillis,
+            fastingGoalId = fastingData.fastingGoalId,
+            currentTimeMillis = System.currentTimeMillis()
+        )
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
-        val percentage = calculateProgressPercentage(elapsedMillis, fastingGoal.durationMillis)
-        val elapsedHours = getHours(elapsedMillis)
-        val targetHours = getHours(fastingGoal.durationMillis).toFloat()
 
         return GoalProgressComplicationData.Builder(
-            value = elapsedHours.toFloat().coerceAtMost(targetHours),
-            targetValue = targetHours,
+            value = fastingProgress.elapsedHours.toFloat()
+                .coerceAtMost(fastingProgress.targetHours.toFloat()),
+            targetValue = fastingProgress.targetHours.toFloat(),
             contentDescription = PlainComplicationText.Builder(
                 getString(
                     R.string.complication_text_fasting_format,
-                    percentage.toInt(),
-                    elapsedHours.toInt(),
+                    fastingProgress.progressPercentage,
+                    fastingProgress.elapsedHours.toInt(),
                     getString(
                         R.string.target_duration_short,
                         fastingGoal.durationDisplay
@@ -124,7 +126,7 @@ class MainComplicationService() :
                 PlainComplicationText.Builder(
                     getString(
                         R.string.complication_title_hours_format,
-                        elapsedHours.toInt()
+                        fastingProgress.elapsedHours.toInt()
                     )
                 ).build()
             )

@@ -24,6 +24,21 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
+/**
+ * The concrete implementation of the [FastingDataRepository] interface, serving as the
+ * primary source of truth for all fasting-related data.
+ *
+ * This class is responsible for two main functions:
+ * 1.  **Local Persistence:** It uses Jetpack DataStore to save and retrieve the fasting state
+ * on the local device.
+ * 2.  **Remote Synchronization:** It uses the Wearable Data Layer API (`DataClient`) to sync
+ * state changes to connected devices, ensuring consistency across the network.
+ *
+ * It exposes the current fasting state reactively via Kotlin Flows for UI layers to observe.
+ *
+ * @property context The application context, needed to initialize the Wearable DataClient.
+ * @property dataStore The Jetpack DataStore instance used for storing fasting preferences.
+ */
 class FastingDataRepositoryImpl(
     context: Context,
     private val dataStore: DataStore<Preferences>
@@ -104,41 +119,48 @@ class FastingDataRepositoryImpl(
         }
     }
 
-    override suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String) {
+    override suspend fun startFasting(
+        startTimeInMillis: Long,
+        fastingGoalId: String
+    ): FastingDataItem {
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
             fastingGoalId = fastingGoalId
         )
+        return fastingDataItem.first()
     }
 
     // When stopping fasting, we need to send the startTime to the database.
     // The device storage will keep the startTime as well, but it is safe to ignore
     // as the fasting state is false.
-    override suspend fun stopFasting(fastingGoalId: String) {
+    override suspend fun stopFasting(fastingGoalId: String): FastingDataItem {
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = startTimeInMillis.first(),
             fastingGoalId = fastingGoalId
         )
+        return fastingDataItem.first()
     }
 
-    override suspend fun updateFastingSchedule(startTimeInMillis: Long) {
+    override suspend fun updateFastingSchedule(startTimeInMillis: Long): FastingDataItem {
         val currentGoalId = this.fastingGoalId.first()
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
             fastingGoalId = currentGoalId
         )
+        return fastingDataItem.first()
     }
 
-    override suspend fun updateFastingGoalId(fastingGoalId: String) {
+    override suspend fun updateFastingGoalId(fastingGoalId: String): FastingDataItem {
         val currentData = getCurrentFasting()
         updateLocalAndRemoteStore(
             isFasting = currentData.isFasting,
             startTimeInMillis = currentData.startTimeInMillis,
             fastingGoalId = fastingGoalId,
         )
+        return fastingDataItem.first()
     }
 
     override suspend fun updateFastingStatusFromRemote(

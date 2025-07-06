@@ -13,8 +13,8 @@ class FastingStateListenerService : BaseFastingListenerService() {
     private val widgetUpdateManager: WidgetUpdateManager by inject()
     private val fastingHistoryRepository: FastingHistoryRepository by inject()
 
-    override suspend fun onFastIsMarkedAsDone(fastingDataItem: FastingDataItem) {
-        super.onFastIsMarkedAsDone(fastingDataItem)
+    override suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
+        super.onPlatformFastingCompleted(fastingDataItem)
         fastingHistoryRepository.saveFastingRecord(
             FastingRecord(
                 startTimeEpochMillis = fastingDataItem.startTimeInMillis,
@@ -22,16 +22,19 @@ class FastingStateListenerService : BaseFastingListenerService() {
                 fastingGoalId = fastingDataItem.fastingGoalId,
             )
         )
-
     }
 
-    override suspend fun onFastingStateSynced() {
-        super.onFastingStateSynced()
+    override suspend fun onPlatformFastingStateSynced() {
+        super.onPlatformFastingStateSynced()
         val uniqueCallId = System.nanoTime()
         Log.d(
             LOG_TAG,
             "${this::class.java.simpleName} - onFastingStateSynced: PRE-updateAll (Call ID: $uniqueCallId)"
         )
         widgetUpdateManager.requestUpdate()
+    }
+
+    override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
+        TODO("Not yet implemented")
     }
 }

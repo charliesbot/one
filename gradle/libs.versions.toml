@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.1"
+agp = "8.11.0"
 datastorePreferences = "1.1.6"
 firebaseBom = "33.13.0"
 glanceAppwidget = "1.1.1"
