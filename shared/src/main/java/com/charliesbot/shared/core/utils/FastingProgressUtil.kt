@@ -1,6 +1,7 @@
 package com.charliesbot.shared.core.utils
 
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.models.FastingDataItem
 
 data class FastingProgress(
     val elapsedTimeMillis: Long,
@@ -14,12 +15,12 @@ data class FastingProgress(
 
 object FastingProgressUtil {
     fun calculateFastingProgress(
-        startTimeMillis: Long,
-        fastingGoalId: String,
+        fastingDataItem: FastingDataItem,
         currentTimeMillis: Long = System.currentTimeMillis()
     ): FastingProgress {
-        val goal = PredefinedFastingGoals.getGoalById(fastingGoalId)
-        val elapsedTimeMillis = (currentTimeMillis - startTimeMillis).coerceAtLeast(0L)
+        val goal = PredefinedFastingGoals.getGoalById(fastingDataItem.fastingGoalId)
+        val elapsedTimeMillis =
+            (currentTimeMillis - fastingDataItem.startTimeInMillis).coerceAtLeast(0L)
         val elapsedHours = getHours(elapsedTimeMillis)
         val targetHours = getHours(goal.durationMillis)
 

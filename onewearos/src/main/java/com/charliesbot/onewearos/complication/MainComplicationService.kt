@@ -95,8 +95,7 @@ class MainComplicationService() :
         tapAction: PendingIntent?
     ): ComplicationData {
         val fastingProgress = FastingProgressUtil.calculateFastingProgress(
-            startTimeMillis = fastingData.startTimeInMillis,
-            fastingGoalId = fastingData.fastingGoalId,
+            fastingData,
             currentTimeMillis = System.currentTimeMillis()
         )
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)

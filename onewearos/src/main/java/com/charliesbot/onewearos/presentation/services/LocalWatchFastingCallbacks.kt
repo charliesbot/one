@@ -23,8 +23,7 @@ class LocalWatchFastingCallbacks(
 
         try {
             ongoingActivityManager.startOngoingActivity(
-                fastingDataItem.startTimeInMillis,
-                fastingDataItem.fastingGoalId
+                fastingDataItem
             )
             complicationUpdateManager.requestUpdate()
             Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
@@ -38,6 +37,8 @@ class LocalWatchFastingCallbacks(
         Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
 
         try {
+            // OngoingActivity will be handled by OngoingActivityUpdateController
+            // which observes repository changes, so we only need to update complications
             ongoingActivityManager.stopOngoingActivity()
             complicationUpdateManager.requestUpdate()
             Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
@@ -47,7 +48,19 @@ class LocalWatchFastingCallbacks(
         }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
         Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
+
+        try {
+            // OngoingActivity will be handled by OngoingActivityUpdateController
+            // which observes repository changes, so we only need to update complications
+            ongoingActivityManager.updateOngoingActivity(fastingDataItem)
+            complicationUpdateManager.requestUpdate()
+            Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "LocalWatch: Failed to handle local fasting update", e)
+            throw e
+        }
     }
 }
