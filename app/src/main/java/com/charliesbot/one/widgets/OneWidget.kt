@@ -9,7 +9,9 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -21,9 +23,11 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -36,6 +40,8 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.preview.ExperimentalGlancePreviewApi
+import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -48,6 +54,7 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -82,33 +89,55 @@ object ProgressBitmap {
     }
 }
 
-class OneWidget : GlanceAppWidget(), KoinComponent {
+class OneWidget(private val isPreview: Boolean = false) : GlanceAppWidget(), KoinComponent {
     private val ringDp: Dp = 75.dp
     private val strokeDp: Dp = 10.dp
     private val fastingDataRepository: FastingDataRepository by inject()
 
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        sizes = setOf(
+            OneWidgetSize.COMPACT,
+            OneWidgetSize.MEDIUM,
+            OneWidgetSize.EXPANDED
+        )
+    )
+
+    private val fakeFastingData = FastingDataItem(
+        fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
+        isFasting = true,
+        startTimeInMillis = System.currentTimeMillis() - (12 * 60 * 60 * 1000L) // 12 hours ago
+    )
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            val fastingData by fastingDataRepository.fastingDataItem.collectAsState(
-                initial =
-                    FastingDataItem(
+            val fastingData by if (isPreview) {
+                remember { mutableStateOf(fakeFastingData) }
+            } else {
+                fastingDataRepository.fastingDataItem.collectAsState(
+                    initial = FastingDataItem(
                         fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id
                     )
-            )
+                )
+            }
             val currentTime = System.currentTimeMillis()
             val startTimeInMillis = fastingData.startTimeInMillis
             val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
             val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
             val hours = getHours(selectedGoal.durationMillis) - getHours(elapsedMillis)
             val isGoalMet = fastingData.isFasting && hours <= 0
-            Log.d(
-                AppConstants.LOG_TAG,
-                "OneWidget: provideGlance INVOKED for id $id. CurrentTimeMillis: ${System.currentTimeMillis()}"
-            )
-            Log.d(
-                AppConstants.LOG_TAG,
-                "OneWidget: provideGlance - fastingData fetched for UI for id $id: $fastingData"
-            )
+
+            if (!isPreview) {
+                Log.d(
+                    AppConstants.LOG_TAG,
+                    "OneWidget: provideGlance INVOKED for id $id. CurrentTimeMillis: ${System.currentTimeMillis()}"
+                )
+                Log.d(
+                    AppConstants.LOG_TAG,
+                    "OneWidget: provideGlance - fastingData fetched for UI for id $id: $fastingData"
+                )
+            }
+
+            Log.e("TEST TEST", "LocalSize: ${LocalSize.current} isPreview: $isPreview")
 
             Scaffold(
                 modifier = GlanceModifier
@@ -127,7 +156,8 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
                         isFasting = fastingData.isFasting,
                         elapsedTime = elapsedMillis,
                         fastingGoalMillis = selectedGoal.durationMillis,
-                        isGoalMet = isGoalMet
+                        isGoalMet = isGoalMet,
+                        isPreview = isPreview
                     )
                     Spacer(modifier = GlanceModifier.defaultWeight())
                     WidgetFooter(
@@ -210,6 +240,7 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
         elapsedTime: Long,
         fastingGoalMillis: Long,
         isGoalMet: Boolean,
+        isPreview: Boolean = false
     ) {
         val context = LocalContext.current
         val displayMetrics = context.resources.displayMetrics
@@ -229,56 +260,51 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
 
         // Use produceState to generate the bitmap on a background thread
         // It will re-run if 'progress', 'ringDp', 'strokeDp', 'indicatorComposeColor', or 'trackComposeColor' changes.
-        val ringBitmap by produceState<Bitmap?>(
-            initialValue = null, // Initial value while bitmap is loading
-            keys = arrayOf(
-                progress,
-                ringDp,
-                strokeDp,
-                indicatorComposeColor,
-                trackComposeColor
-            ) // Keys for recomposition
-        ) {
-            // Convert Dp to Px for drawing (can be done here or inside withContext)
-            val sizePx = (ringDp.value * displayMetrics.density).toInt()
-            val strokePx = (strokeDp.value * displayMetrics.density)
-
-            // Generate bitmap in the background
-            value = withContext(Dispatchers.Default) {
-                ProgressBitmap.draw(
-                    progress = progress,
-                    sizePx = sizePx,
-                    strokePx = strokePx,
-                    indicator = indicatorComposeColor.toArgb(), // Convert Compose Color to Int ARGB
-                    track = trackComposeColor.toArgb()         // Convert Compose Color to Int ARGB
-                )
-            }
-        }
-
-        ringBitmap?.let {
-            Row(
-                horizontalAlignment = Alignment.End,
-                modifier = GlanceModifier.fillMaxWidth()
+        val ringBitmap = if (isPreview) {
+            return
+        } else {
+            val ringBitmap by produceState<Bitmap?>(
+                initialValue = null,
+                keys = arrayOf(progress, ringDp, strokeDp, indicatorComposeColor, trackComposeColor)
             ) {
-                Image(
-                    provider = ImageProvider(it),
-                    contentDescription = context.getString(R.string.progress_ring_desc),
-                    modifier = GlanceModifier.size(ringDp) // Use the Dp value for Glance size
-                )
+                val sizePx = (ringDp.value * displayMetrics.density).toInt()
+                val strokePx = (strokeDp.value * displayMetrics.density)
+
+                value = withContext(Dispatchers.Default) {
+                    ProgressBitmap.draw(
+                        progress = progress,
+                        sizePx = sizePx,
+                        strokePx = strokePx,
+                        indicator = indicatorComposeColor.toArgb(),
+                        track = trackComposeColor.toArgb()
+                    )
+                }
             }
+            ringBitmap
+        } ?: return
+
+        Row(
+            horizontalAlignment = Alignment.End,
+            modifier = GlanceModifier.fillMaxWidth()
+        ) {
+            Image(
+                provider = ImageProvider(ringBitmap),
+                contentDescription = context.getString(R.string.progress_ring_desc),
+                modifier = GlanceModifier.size(ringDp) // Use the Dp value for Glance size
+            )
         }
     }
 
-//    @OptIn(ExperimentalGlancePreviewApi::class)
-//    @Preview(widthDp = 56, heightDp = 56) // Min resize size
+    @OptIn(ExperimentalGlancePreviewApi::class)
+    @Preview(widthDp = 300, heightDp = 200)
 //    @Preview(widthDp = 120, heightDp = 115) // Min drop size
 //    @Preview(widthDp = 140, heightDp = 140) // all buttons; center button transparent bg
 //    @Preview(widthDp = 624, heightDp = 200) // Max size
-//    @Composable
-//    fun OneWidgetPreview() {
-//        GlanceTheme {
-//            MyContent()
-//        }
-//    }
-}
+    @Composable
+    fun OneWidgetPreview() {
+        GlanceTheme {
+            MyContent()
+        }
+    }
+
 
