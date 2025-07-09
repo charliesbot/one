@@ -294,17 +294,18 @@ class OneWidget(private val isPreview: Boolean = false) : GlanceAppWidget(), Koi
             )
         }
     }
+}
 
-    @OptIn(ExperimentalGlancePreviewApi::class)
-    @Preview(widthDp = 300, heightDp = 200)
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 300, heightDp = 200)
 //    @Preview(widthDp = 120, heightDp = 115) // Min drop size
 //    @Preview(widthDp = 140, heightDp = 140) // all buttons; center button transparent bg
 //    @Preview(widthDp = 624, heightDp = 200) // Max size
-    @Composable
-    fun OneWidgetPreview() {
-        GlanceTheme {
-            MyContent()
-        }
+@Composable
+fun OneWidgetPreview() {
+    GlanceTheme {
+//        MyContent()
     }
+}
 
 

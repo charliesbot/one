@@ -16,15 +16,18 @@ import com.charliesbot.onewearos.R
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.NotificationConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.shared.core.utils.FastingProgress
 import com.charliesbot.shared.core.utils.FastingProgressUtil
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 
 class OngoingActivityManager(
-    private val context: Context
+    private val context: Context,
+    private val fastingDataRepository: FastingDataRepository // Add this dependency
 ) {
     private val TAG = "OngoingActivityManager"
     private var updateJob: Job? = null
@@ -127,7 +130,7 @@ class OngoingActivityManager(
         createOngoingActivity(fastingDataItem)
 
         // Start periodic updates
-        startPeriodicUpdates(fastingDataItem)
+        startPeriodicUpdates()
 
         isActive = true
     }
@@ -155,7 +158,7 @@ class OngoingActivityManager(
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private fun startPeriodicUpdates(originalFastingDataItem: FastingDataItem) {
+    private fun startPeriodicUpdates() {
         Log.d(TAG, "Starting periodic updates every $UPDATE_INTERVAL_MINUTES minute(s)")
 
         updateJob = updateScope.launch {
@@ -166,14 +169,29 @@ class OngoingActivityManager(
                     if (isActive && currentCoroutineContext().isActive) {
                         Log.d(TAG, "Performing periodic update")
 
-                        // Create fresh FastingDataItem with current timestamp for accurate progress calculation
-                        val freshFastingDataItem = originalFastingDataItem.copy(
-                            updateTimestamp = System.currentTimeMillis()
-                        )
+                        try {
+                            // Get the current fasting data from the repository
+                            val currentFastingData = fastingDataRepository.fastingDataItem.first()
 
-                        // Recreate the ongoing activity with fresh progress
-                        withContext(Dispatchers.Main) {
-                            createOngoingActivity(freshFastingDataItem)
+                            // Only update if we're still fasting
+                            if (currentFastingData.isFasting) {
+                                // Create a fresh item with current timestamp for accurate progress calculation
+                                val freshFastingDataItem = currentFastingData.copy(
+                                    updateTimestamp = System.currentTimeMillis()
+                                )
+
+                                // Recreate the ongoing activity with fresh progress
+                                withContext(Dispatchers.Main) {
+                                    createOngoingActivity(freshFastingDataItem)
+                                }
+                            } else {
+                                // If no longer fasting, stop the activity
+                                Log.d(TAG, "Fasting stopped, stopping ongoing activity")
+                                stopOngoingActivity()
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error getting current fasting data for periodic update", e)
+                            // Continue the loop even if one update fails
                         }
                     }
                 }

@@ -30,6 +30,7 @@ val wearAppModule = module {
     single<OngoingActivityManager> {
         OngoingActivityManager(
             context = androidContext(),
+            fastingDataRepository = get()
         )
     }
     single { LocalWatchFastingCallbacks(get(), get()) }
