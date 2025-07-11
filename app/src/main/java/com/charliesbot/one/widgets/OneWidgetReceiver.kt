@@ -8,7 +8,6 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 
 class OneWidgetReceiver : GlanceAppWidgetReceiver() {
-    val preview: GlanceAppWidget = OneWidget(isPreview = true)
     override val glanceAppWidget: GlanceAppWidget
         get() = OneWidget()
 

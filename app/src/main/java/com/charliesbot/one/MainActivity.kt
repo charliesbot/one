@@ -24,6 +24,7 @@ import com.charliesbot.one.core.components.NotificationPermissionDialog
 import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.one.today.TodayScreen
 import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.one.widgets.updateWidgetPreview
 import org.koin.androidx.compose.KoinAndroidContext
 
 class MainActivity : ComponentActivity() {
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        updateWidgetPreview(this)
         setContent {
             var showNotificationPermission by remember { mutableStateOf(false) }
 
