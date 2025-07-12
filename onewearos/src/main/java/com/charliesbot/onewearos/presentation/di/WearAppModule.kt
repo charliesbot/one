@@ -9,12 +9,18 @@ import com.charliesbot.onewearos.presentation.today.WearTodayViewModel
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventCallbacks
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val wearAppModule = module {
     viewModelOf(::WearTodayViewModel)
+    single<CoroutineScope> {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
     single<NotificationScheduler> {
         NotificationScheduler(
             context = androidContext(),
@@ -30,7 +36,8 @@ val wearAppModule = module {
     single<OngoingActivityManager> {
         OngoingActivityManager(
             context = androidContext(),
-            fastingDataRepository = get()
+            fastingDataRepository = get(),
+            updateScope = get(),
         )
     }
     single { LocalWatchFastingCallbacks(get(), get()) }

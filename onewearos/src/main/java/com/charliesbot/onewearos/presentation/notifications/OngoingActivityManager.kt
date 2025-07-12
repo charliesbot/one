@@ -27,16 +27,12 @@ import java.util.concurrent.TimeUnit
 
 class OngoingActivityManager(
     private val context: Context,
-    private val fastingDataRepository: FastingDataRepository // Add this dependency
+    private val fastingDataRepository: FastingDataRepository,
+    private val updateScope: CoroutineScope
 ) {
     private val TAG = "OngoingActivityManager"
     private var updateJob: Job? = null
     private var isActive = false
-
-    // Use Application scope to survive service restarts
-    private val updateScope = CoroutineScope(
-        SupervisorJob() + Dispatchers.IO + CoroutineName("OngoingActivityUpdater")
-    )
 
     companion object {
         private const val ONGOING_ACTIVITY_LOCUS_ID = "ongoing_fasting_activity"
@@ -159,48 +155,64 @@ class OngoingActivityManager(
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun startPeriodicUpdates() {
-        Log.d(TAG, "Starting periodic updates every $UPDATE_INTERVAL_MINUTES minute(s)")
+        Log.d(
+            TAG,
+            "Starting periodic updates every $UPDATE_INTERVAL_MINUTES second(s)"
+        ) // Changed to seconds for testing
 
         updateJob = updateScope.launch {
             try {
                 while (isActive && currentCoroutineContext().isActive) {
-                    delay(TimeUnit.MINUTES.toMillis(UPDATE_INTERVAL_MINUTES))
+                    delay(TimeUnit.SECONDS.toMillis(UPDATE_INTERVAL_MINUTES)) // Using SECONDS for testing
 
                     if (isActive && currentCoroutineContext().isActive) {
-                        Log.d(TAG, "Performing periodic update")
+                        Log.d(TAG, "------------------ PERIODIC UPDATE RUN ------------------")
+                        Log.d(TAG, "DEBUG: Coroutine is active, attempting to fetch data...")
 
                         try {
                             // Get the current fasting data from the repository
                             val currentFastingData = fastingDataRepository.fastingDataItem.first()
+                            Log.d(TAG, "DEBUG: Successfully fetched data: $currentFastingData")
+
 
                             // Only update if we're still fasting
                             if (currentFastingData.isFasting) {
-                                // Create a fresh item with current timestamp for accurate progress calculation
                                 val freshFastingDataItem = currentFastingData.copy(
                                     updateTimestamp = System.currentTimeMillis()
                                 )
+                                Log.d(TAG, "DEBUG: Created fresh data item: $freshFastingDataItem")
 
-                                // Recreate the ongoing activity with fresh progress
+                                // Manually calculate progress here for logging
+                                val fastingGoal =
+                                    PredefinedFastingGoals.getGoalById(freshFastingDataItem.fastingGoalId)
+                                val progress = FastingProgressUtil.calculateFastingProgress(
+                                    freshFastingDataItem
+                                )
+                                Log.d(TAG, "DEBUG: Calculated progress: $progress")
+
+
                                 withContext(Dispatchers.Main) {
+                                    Log.d(
+                                        TAG,
+                                        "DEBUG: Applying update to Ongoing Activity on Main thread..."
+                                    )
                                     createOngoingActivity(freshFastingDataItem)
+                                    Log.d(TAG, "DEBUG: Update applied.")
                                 }
                             } else {
-                                // If no longer fasting, stop the activity
                                 Log.d(TAG, "Fasting stopped, stopping ongoing activity")
                                 stopOngoingActivity()
                             }
                         } catch (e: Exception) {
                             Log.e(TAG, "Error getting current fasting data for periodic update", e)
-                            // Continue the loop even if one update fails
                         }
                     }
                 }
             } catch (e: CancellationException) {
                 Log.d(TAG, "Periodic updates cancelled (this is normal when stopping)")
-                throw e // Re-throw to properly handle cancellation
+                throw e
             } catch (e: Exception) {
                 Log.e(TAG, "Error in periodic updates", e)
-                // Don't re-throw other exceptions, just log them
             }
         }
     }
