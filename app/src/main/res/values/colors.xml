@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="widget_primary">#FFD0BCFF</color>           <!-- Purple for the "16" text -->
+    <color name="widget_secondary">#FFCCC2DC</color>         <!-- Light purple for "hours left!" -->
+    <color name="widget_surface">#FF2B2D42</color>          <!-- Dark blue-gray background -->
+    <color name="widget_surface_variant">#FF6B7280</color>   <!-- Gray for progress ring track -->
+    <color name="widget_progress_indicator">#FFD0BCFF</color>
 </resources>

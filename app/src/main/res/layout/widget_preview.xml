@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/widget_surface"
+    android:padding="20dp">
+
+    <!-- Hours Remaining - positioned at bottom-left -->
+    <TextView
+        android:id="@+id/hours_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="24dp"
+        android:text="@string/widget_preview_hours"
+        android:textSize="80sp"
+        android:textStyle="bold"
+        android:textColor="@color/widget_primary" />
+
+    <!-- Hours Left Text - positioned right below the number -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/widget_preview_hours_left"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/widget_secondary" />
+
+</RelativeLayout>

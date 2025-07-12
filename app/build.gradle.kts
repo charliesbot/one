@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId = "com.charliesbot.one"
-        minSdk = 30
+        minSdk = 31
         targetSdk = 36
         versionCode = 18
         versionName = "1.0"

@@ -54,4 +54,8 @@
 
     <!-- Widget -->
     <string name="progress_ring_desc">Anillo de Progreso</string>
+
+    <!-- Widget preview strings -->
+    <string name="widget_preview_hours">16</string>
+    <string name="widget_preview_hours_left">horas restantes!</string>
 </resources>
