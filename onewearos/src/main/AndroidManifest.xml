@@ -63,6 +63,7 @@
             </intent-filter>
 
         </activity>
+
         <service
             android:name=".presentation.services.WatchFastingStateListenerService"
             android:enabled="true"
@@ -77,6 +78,11 @@
                     android:host="*" />
             </intent-filter>
         </service>
+        <service
+            android:name=".presentation.services.OngoingActivityService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>
