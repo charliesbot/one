@@ -14,9 +14,6 @@ import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.NotificationConstants
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -24,7 +21,6 @@ class OngoingActivityService : Service(), KoinComponent {
 
     private val fastingDataRepository: FastingDataRepository by inject()
     private lateinit var ongoingActivityManager: OngoingActivityManager
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val serviceTag = this::class.java.simpleName
 
     override fun onCreate() {
