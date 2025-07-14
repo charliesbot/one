@@ -26,7 +26,7 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 31
         targetSdk = 36
-        versionCode = 18
+        versionCode = 22
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

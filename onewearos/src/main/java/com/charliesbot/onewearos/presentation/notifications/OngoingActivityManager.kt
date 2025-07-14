@@ -34,7 +34,6 @@ class OngoingActivityManager(
     private val context: Context,
     private val fastingDataRepository: FastingDataRepository
 ) {
-    private val ongoingActivityStatus: Status.Builder = Status.Builder()
     private var periodicUpdateJob: Job? = null
     private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -80,6 +79,9 @@ class OngoingActivityManager(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val notificationBuilder = buildNotification(data, progress, pendingIntent)
+        val status = Status.Builder()
+            .addTemplate(createStatusText(data, progress))
+            .build()
 
         val ongoingActivity = OngoingActivity.Builder(
             context,
@@ -90,7 +92,7 @@ class OngoingActivityManager(
             .setAnimatedIcon(R.drawable.ic_notification_status)
             .setStaticIcon(R.drawable.ic_notification_status)
             .setTouchIntent(pendingIntent)
-            .setStatus(ongoingActivityStatus.addTemplate(createStatusText(data, progress)).build())
+            .setStatus(status)
             .setLocusId(LocusIdCompat(ONGOING_ACTIVITY_LOCUS_ID))
             .build()
 
@@ -107,17 +109,25 @@ class OngoingActivityManager(
         return if (fastingProgress.isComplete) {
             context.getString(R.string.notification_completion_title)
         } else {
-            context.getString(
-                R.string.complication_text_fasting_format,
-                fastingProgress.progressPercentage,
-                fastingProgress.elapsedHours.toInt(),
+            val a =
                 context.getString(
-                    R.string.target_duration_short,
-                    fastingGoal.durationDisplay
+                    R.string.complication_text_fasting_format,
+                    fastingProgress.progressPercentage,
+                    fastingProgress.elapsedHours.toString(),
+                    context.getString(
+                        R.string.target_duration_short,
+                        fastingGoal.durationDisplay
+                    )
                 )
+            Log.d(LOG_TAG, "createStatusText: $a")
+            Log.d(
+                LOG_TAG,
+                "${fastingProgress.progressPercentage} and ${fastingProgress.elapsedHours} and ${fastingGoal.durationDisplay}"
             )
+            a
         }
     }
+
 
     private fun buildNotification(
         fastDataItem: FastingDataItem,
