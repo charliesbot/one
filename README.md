@@ -39,13 +39,23 @@ git clone https://github.com/charliesbot/one.git
 cd one
 ```
 
-2. Create `google-services.json` files:
-   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
-   - Add two Android apps (one for phone, one for wear)
-   - Download `google-services.json` for each
-   - Place them in `app/` and `onewearos/` directories
+2. Open the project in Android Studio
 
-3. (Optional) For release builds, create `keystore.properties` in the root:
+3. Build and run on your device or emulator
+
+<details>
+<summary><strong>Advanced Setup (Optional)</strong></summary>
+
+#### Firebase Setup
+To enable crash reporting and analytics:
+
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
+2. Add two Android apps (one for phone, one for wear)
+3. Download `google-services.json` for each
+4. Place them in `app/` and `onewearos/` directories
+
+#### Release Builds
+For release builds, create `keystore.properties` in the root:
 ```properties
 storeFile=/path/to/your/keystore.jks
 storePassword=your_store_password
@@ -53,16 +63,12 @@ keyAlias=your_key_alias
 keyPassword=your_key_password
 ```
 
-4. Build and install:
+Then build:
 ```bash
-# Debug build
-./gradlew app:installDebug
-./gradlew onewearos:installDebug
-
-# Release build (requires keystore)
 ./gradlew app:installRelease
 ./gradlew onewearos:installRelease
 ```
+</details>
 
 ## Architecture
 
