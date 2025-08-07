@@ -54,14 +54,49 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
-    val screenPadding = 32.dp
     val isTimePickerDialogOpen by viewModel.isTimePickerDialogOpen.collectAsStateWithLifecycle()
     val isGoalBottomSheetOpen by viewModel.isGoalBottomSheetOpen.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
+    
+    TodayScreenContent(
+        isTimePickerDialogOpen = isTimePickerDialogOpen,
+        isGoalBottomSheetOpen = isGoalBottomSheetOpen,
+        isFasting = isFasting,
+        startTimeInMillis = starTimeInMillis,
+        fastingGoalId = fastingGoalId,
+        onStartFasting = viewModel::onStartFasting,
+        onStopFasting = viewModel::onStopFasting,
+        onOpenTimePickerDialog = viewModel::openTimePickerDialog,
+        onCloseTimePickerDialog = viewModel::closeTimePickerDialog,
+        onUpdateStartTime = viewModel::updateStartTime,
+        onOpenGoalBottomSheet = viewModel::openGoalBottomSheet,
+        onCloseGoalBottomSheet = viewModel::closeGoalBottomSheet,
+        onUpdateFastingGoal = viewModel::updateFastingGoal
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun TodayScreenContent(
+    isTimePickerDialogOpen: Boolean,
+    isGoalBottomSheetOpen: Boolean,
+    isFasting: Boolean,
+    startTimeInMillis: Long,
+    fastingGoalId: String,
+    onStartFasting: () -> Unit,
+    onStopFasting: () -> Unit,
+    onOpenTimePickerDialog: () -> Unit,
+    onCloseTimePickerDialog: () -> Unit,
+    onUpdateStartTime: (Long) -> Unit,
+    onOpenGoalBottomSheet: () -> Unit,
+    onCloseGoalBottomSheet: () -> Unit,
+    onUpdateFastingGoal: (String) -> Unit
+) {
+    val screenPadding = 32.dp
     val startTimeInLocalDateTime =
-        convertMillisToLocalDateTime(starTimeInMillis)
+        convertMillisToLocalDateTime(startTimeInMillis)
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val fastButtonLabel =
         stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
@@ -71,7 +106,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     LaunchedEffect(isFasting) {
         if (isFasting) {
             while (true) {
-                elapsedTime = System.currentTimeMillis() - starTimeInMillis
+                elapsedTime = System.currentTimeMillis() - startTimeInMillis
                 delay(1000L) // refresh timer every second
             }
         } else {
@@ -82,22 +117,22 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     Scaffold { innerPadding ->
         if (isTimePickerDialogOpen) {
             TimePickerDialog(
-                starTimeInMillis,
+                startTimeInMillis,
                 onConfirm = { updatedStartTime ->
-                    viewModel.updateStartTime(updatedStartTime)
-                    viewModel.closeTimePickerDialog()
+                    onUpdateStartTime(updatedStartTime)
+                    onCloseTimePickerDialog()
                 },
                 onDismiss = {
-                    viewModel.closeTimePickerDialog()
+                    onCloseTimePickerDialog()
                 },
             )
         }
         if (isGoalBottomSheetOpen) {
             GoalBottomSheet(
-                onDismiss = viewModel::closeGoalBottomSheet,
+                onDismiss = onCloseGoalBottomSheet,
                 onSave = { id ->
-                    viewModel.updateFastingGoal(id)
-                    viewModel.closeGoalBottomSheet()
+                    onUpdateFastingGoal(id)
+                    onCloseGoalBottomSheet()
                 },
                 initialSelectedGoalId = fastingGoalId
             )
@@ -164,7 +199,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                             pressedShape = RoundedCornerShape(60.dp),
                                         ),
                                         onClick = {
-                                            viewModel.openTimePickerDialog()
+                                            onOpenTimePickerDialog()
                                         },
                                         modifier = Modifier.weight(1f)
                                     )
@@ -187,7 +222,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                                             pressedShape = RoundedCornerShape(60.dp),
                                         ),
                                         onClick = {
-                                            viewModel.openGoalBottomSheet()
+                                            onOpenGoalBottomSheet()
                                         },
                                         modifier = Modifier.weight(1f)
                                     )
@@ -198,7 +233,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
                     }
                     Spacer(modifier = Modifier.height(10.dp))
                     FilledTonalButton(
-                        onClick = if (isFasting) viewModel::onStopFasting else viewModel::onStartFasting,
+                        onClick = if (isFasting) onStopFasting else onStartFasting,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
@@ -215,6 +250,20 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
 @Composable
 fun PreviewTodayScreen() {
     OneTheme {
-        TodayScreen()
+        TodayScreenContent(
+            isTimePickerDialogOpen = false,
+            isGoalBottomSheetOpen = false,
+            isFasting = true,
+            startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
+            fastingGoalId = "16:8",
+            onStartFasting = {},
+            onStopFasting = {},
+            onOpenTimePickerDialog = {},
+            onCloseTimePickerDialog = {},
+            onUpdateStartTime = {},
+            onOpenGoalBottomSheet = {},
+            onCloseGoalBottomSheet = {},
+            onUpdateFastingGoal = {}
+        )
     }
 }
