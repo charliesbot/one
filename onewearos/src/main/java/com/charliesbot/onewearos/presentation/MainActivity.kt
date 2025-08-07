@@ -60,26 +60,24 @@ class MainActivity : ComponentActivity() {
             }
 
             OneTheme {
-                KoinAndroidContext {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colors.background),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        WearTodayScreen()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background),
+                    contentAlignment = Alignment.Center
+                ) {
+                    WearTodayScreen()
 
-                        NotificationPermissionDialog(
-                            isVisible = showNotificationPermission,
-                            onDismiss = { showNotificationPermission = false },
-                            onConfirm = {
-                                showNotificationPermission = false
-                                requestNotificationPermission.launch(
-                                    Manifest.permission.POST_NOTIFICATIONS
-                                )
-                            }
-                        )
-                    }
+                    NotificationPermissionDialog(
+                        isVisible = showNotificationPermission,
+                        onDismiss = { showNotificationPermission = false },
+                        onConfirm = {
+                            showNotificationPermission = false
+                            requestNotificationPermission.launch(
+                                Manifest.permission.POST_NOTIFICATIONS
+                            )
+                        }
+                    )
                 }
             }
         }

@@ -59,25 +59,23 @@ class MainActivity : ComponentActivity() {
             }
 
             OneTheme {
-                KoinAndroidContext {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        containerColor = MaterialTheme.colorScheme.background
-                    ) { innerPadding ->
-                        Box(modifier = Modifier.padding(innerPadding)) {
-                            TodayScreen()
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.background
+                ) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        TodayScreen()
 
-                            if (showNotificationPermission) {
-                                NotificationPermissionDialog(
-                                    onDismiss = { showNotificationPermission = false },
-                                    onConfirm = {
-                                        showNotificationPermission = false
-                                        requestNotificationPermission.launch(
-                                            Manifest.permission.POST_NOTIFICATIONS
-                                        )
-                                    }
-                                )
-                            }
+                        if (showNotificationPermission) {
+                            NotificationPermissionDialog(
+                                onDismiss = { showNotificationPermission = false },
+                                onConfirm = {
+                                    showNotificationPermission = false
+                                    requestNotificationPermission.launch(
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    )
+                                }
+                            )
                         }
                     }
                 }
