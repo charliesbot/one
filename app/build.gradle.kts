@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -110,6 +111,18 @@ dependencies {
     implementation(libs.androidx.glance.appwidget.preview)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+
+    implementation(libs.nav3.runtime)
+    implementation(libs.nav3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.nav3)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(libs.androidx.material3.adaptive)
+
     ksp(libs.androidx.room.compiler)
     implementation(project(":shared"))
     implementation(libs.firebase.crashlytics)
