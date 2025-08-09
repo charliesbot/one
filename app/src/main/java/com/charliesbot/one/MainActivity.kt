@@ -1,9 +1,9 @@
 package com.charliesbot.one
 
-import android.os.Build
-import android.os.Bundle
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,11 +21,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.charliesbot.one.core.components.NotificationPermissionDialog
-import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.one.today.TodayScreen
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.one.widgets.updateWidgetPreview
-import org.koin.androidx.compose.KoinAndroidContext
+import com.charliesbot.shared.core.notifications.NotificationUtil
 
 class MainActivity : ComponentActivity() {
     private val requestNotificationPermission =

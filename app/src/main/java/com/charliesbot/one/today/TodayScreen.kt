@@ -107,7 +107,7 @@ private fun TodayScreenContent(
     val scrollState = rememberScrollState()
     val currentGoal = PredefinedFastingGoals.goalsById[fastingGoalId]
 
-    LaunchedEffect(isFasting) {
+    LaunchedEffect(isFasting, startTimeInMillis) {
         if (isFasting) {
             while (true) {
                 elapsedTime = System.currentTimeMillis() - startTimeInMillis
