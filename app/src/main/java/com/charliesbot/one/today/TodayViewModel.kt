@@ -1,17 +1,15 @@
 package com.charliesbot.one.today
 
 import android.app.Application
-import android.util.Log
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.one.widgets.OneWidget
-import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.data.db.FastingRecord
+import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.notifications.NotificationScheduler
+import com.charliesbot.shared.core.models.TimePeriodProgress
+import com.charliesbot.shared.core.utils.FastingProgressCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +19,7 @@ import kotlinx.coroutines.launch
 
 class TodayViewModel(
     application: Application,
-    private val notificationScheduler: NotificationScheduler,
-    private val fastingDataRepository: FastingDataRepository,
+    private val fastingHistoryRepository: FastingHistoryRepository,
     private val fastingUseCase: FastingUseCase,
 ) : AndroidViewModel(application) {
     private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
@@ -44,6 +41,15 @@ class TodayViewModel(
             SharingStarted.WhileSubscribed(5000L),
             PredefinedFastingGoals.SIXTEEN_EIGHT.id
         )
+    val weeklyProgress: StateFlow<List<TimePeriodProgress>> =
+        fastingHistoryRepository.getCurrentWeekHistory()
+            .map { records -> FastingProgressCalculator.calculateWeeklyProgress(records) }
+            .stateIn(
+                scope = viewModelScope,
+                SharingStarted.WhileSubscribed(5000L),
+                emptyList()
+            )
+
     private val _isTimePickerDialogOpen = MutableStateFlow(false)
     val isTimePickerDialogOpen: StateFlow<Boolean> = _isTimePickerDialogOpen
 

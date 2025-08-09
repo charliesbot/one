@@ -20,9 +20,11 @@ import androidx.compose.ui.unit.sp
 import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.components.FastingProgressBar
+import com.charliesbot.shared.core.models.TimePeriodProgress
+import com.charliesbot.shared.core.testing.MockDataUtils
 
 @Composable
-fun WeeklyProgress(modifier: Modifier = Modifier) {
+fun WeeklyProgress(modifier: Modifier = Modifier, weeklyProgress: List<TimePeriodProgress>) {
     val daysOfWeek: List<Int> = listOf(
         R.string.monday,
         R.string.tuesday,
@@ -36,7 +38,7 @@ fun WeeklyProgress(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
     ) {
-        daysOfWeek.forEach { dayResId ->
+        daysOfWeek.forEachIndexed { index, dayResId ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(dayResId).uppercase(),
@@ -45,7 +47,7 @@ fun WeeklyProgress(modifier: Modifier = Modifier) {
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 FastingProgressBar(
-                    progress = 0.1f,
+                    progress = weeklyProgress.getOrNull(index)?.progress ?: 0f,
                     modifier = Modifier.size(25.dp),
                     strokeWidth = 5.dp
                 )
@@ -59,7 +61,10 @@ fun WeeklyProgress(modifier: Modifier = Modifier) {
 fun WeeklyProgressPreview() {
     OneTheme {
         Box(modifier = Modifier.width(300.dp)) {
-            WeeklyProgress(modifier = Modifier.fillMaxWidth())
+            WeeklyProgress(
+                modifier = Modifier.fillMaxWidth(),
+                weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+            )
         }
     }
 }

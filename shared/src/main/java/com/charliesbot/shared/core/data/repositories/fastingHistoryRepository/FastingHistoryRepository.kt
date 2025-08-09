@@ -5,7 +5,8 @@ import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
 import kotlinx.coroutines.flow.Flow
 
 interface FastingHistoryRepository {
-    suspend fun getHistoryByTimePeriod(period: FastingHistoryTimePeriod): Flow<List<FastingRecord>>
-    suspend fun getAllHistory(): Flow<List<FastingRecord>>
+    fun getCurrentWeekHistory(): Flow<List<FastingRecord>>
+    fun getHistoryByTimePeriod(period: FastingHistoryTimePeriod): Flow<List<FastingRecord>>
+    fun getAllHistory(): Flow<List<FastingRecord>>
     suspend fun saveFastingRecord(record: FastingRecord)
 }

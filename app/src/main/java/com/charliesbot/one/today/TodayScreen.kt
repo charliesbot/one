@@ -37,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.charliesbot.one.BuildConfig
 import com.charliesbot.one.R
 import com.charliesbot.one.core.components.GoalBottomSheet
 import com.charliesbot.one.core.components.TimeDisplay
@@ -46,6 +45,8 @@ import com.charliesbot.one.core.components.WeeklyProgress
 import com.charliesbot.one.today.components.CurrentFastingProgress
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.models.TimePeriodProgress
+import com.charliesbot.shared.core.testing.MockDataUtils
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.delay
@@ -59,13 +60,15 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
-    
+    val weeklyProgress by viewModel.weeklyProgress.collectAsStateWithLifecycle()
+
     TodayScreenContent(
         isTimePickerDialogOpen = isTimePickerDialogOpen,
         isGoalBottomSheetOpen = isGoalBottomSheetOpen,
         isFasting = isFasting,
         startTimeInMillis = starTimeInMillis,
         fastingGoalId = fastingGoalId,
+        weeklyProgress = weeklyProgress,
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
         onOpenTimePickerDialog = viewModel::openTimePickerDialog,
@@ -85,6 +88,7 @@ private fun TodayScreenContent(
     isFasting: Boolean,
     startTimeInMillis: Long,
     fastingGoalId: String,
+    weeklyProgress: List<TimePeriodProgress>,
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
     onOpenTimePickerDialog: () -> Unit,
@@ -144,16 +148,13 @@ private fun TodayScreenContent(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (BuildConfig.DEBUG) {
-                WeeklyProgress(
-                    modifier = Modifier
-                        .widthIn(max = 500.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = screenPadding + 24.dp)
-                )
-            } else {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
+            WeeklyProgress(
+                weeklyProgress = weeklyProgress,
+                modifier = Modifier
+                    .widthIn(max = 500.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = screenPadding + 24.dp)
+            )
             ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -256,6 +257,7 @@ fun PreviewTodayScreen() {
             isFasting = true,
             startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
             fastingGoalId = "16:8",
+            weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
             onStartFasting = {},
             onStopFasting = {},
             onOpenTimePickerDialog = {},
@@ -267,3 +269,4 @@ fun PreviewTodayScreen() {
         )
     }
 }
+
