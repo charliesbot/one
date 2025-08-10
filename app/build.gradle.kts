@@ -49,10 +49,13 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            resValue("string", "app_name", "One Dev")
         }
         release {
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("release")
+            resValue("string", "app_name", "One")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
