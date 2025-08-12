@@ -14,7 +14,7 @@ interface FastingRecordDao {
     @Query("SELECT * FROM fasting_history ORDER BY endTimeEpochMillis DESC")
     fun getAllFastings(): Flow<List<FastingRecord>>
 
-    @Query("SELECT * FROM fasting_history WHERE startTimeEpochMillis >= :sinceTimestamp ORDER BY endTimeEpochMillis DESC")
+    @Query("SELECT * FROM fasting_history WHERE endTimeEpochMillis >= :sinceTimestamp ORDER BY endTimeEpochMillis DESC")
     fun getFastingsSince(sinceTimestamp: Long): Flow<List<FastingRecord>>
 
 }
