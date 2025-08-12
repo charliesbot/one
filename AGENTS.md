@@ -288,12 +288,22 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 
 ## When Making Changes
 
-1. **Think sync first** - will this change need to sync?
-2. **Update all UI components** - widgets, complications, tiles, ongoing activities
-3. **Test on both platforms** - phone and watch
-4. **Maintain clean architecture** - keep layer separation
-5. **Follow existing patterns** - consistency is key
-6. **Use existing libraries** - don't reinvent the wheel
-7. **Keep dependencies updated** - check `libs.versions.toml`
+1. **Make a plan first** - understand the requirements, identify affected components, and create a step-by-step approach
+2. **Think sync first** - will this change need to sync?
+3. **Update all UI components** - widgets, complications, tiles, ongoing activities
+4. **Test on both platforms** - phone and watch
+5. **Maintain clean architecture** - keep layer separation
+6. **Follow existing patterns** - consistency is key
+7. **Use existing libraries** - don't reinvent the wheel
+8. **Keep dependencies updated** - check `libs.versions.toml`
+9. **Update changelogs** - document major changes in `CHANGELOG.md` (Android app) and `CHANGELOG_WEAROS.md` (Wear OS app)
+
+## Changelog Management
+
+- **CHANGELOG.md**: Track changes for the Android phone/tablet app
+- **CHANGELOG_WEAROS.md**: Track changes for the Wear OS companion app
+- Add significant changes, bug fixes, and new features to the `[Unreleased]` section
+- When releasing, move items from `[Unreleased]` to a versioned section
+- Use standard categories: Added, Changed, Fixed, Deprecated, Removed, Security
 
 Remember: The core challenge of this project is maintaining perfect synchronization between devices while keeping all UI components updated. When in doubt, force update the UI components!
