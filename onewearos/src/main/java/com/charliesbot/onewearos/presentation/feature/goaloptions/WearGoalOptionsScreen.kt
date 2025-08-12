@@ -1,0 +1,105 @@
+package com.charliesbot.onewearos.presentation.feature.goaloptions
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import com.charliesbot.shared.R
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
+import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import androidx.wear.compose.material3.lazy.transformedHeight
+import androidx.wear.tooling.preview.devices.WearDevices
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.google.android.horologist.compose.layout.ColumnItemType
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
+
+
+@Composable
+fun WearGoalOptionsScreen() {
+    val fastGoals = remember {
+        PredefinedFastingGoals.allGoals
+    }
+    val columnState = rememberTransformingLazyColumnState()
+    val contentPadding = rememberResponsiveColumnPadding(
+        first = ColumnItemType.ListHeader,
+        last = ColumnItemType.Button,
+    )
+    val transformationSpec = rememberTransformationSpec()
+    ScreenScaffold(scrollState = columnState, contentPadding = contentPadding) {
+        TransformingLazyColumn(state = columnState, contentPadding = contentPadding) {
+            item {
+                ListHeader(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(this, transformationSpec),
+                    transformation = SurfaceTransformation(transformationSpec)
+                ) {
+                    Text(
+                        text = "Select a Goal",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            items(items = fastGoals) { goal ->
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = goal.color.copy(alpha = 0.8f),
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(this, transformationSpec),
+                    transformation = SurfaceTransformation(transformationSpec),
+                    onClick = { /* ... */ },
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = goal.durationDisplay,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.hours),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+@Composable
+private fun DefaultPreview() {
+    WearGoalOptionsScreen(
+
+    )
+}

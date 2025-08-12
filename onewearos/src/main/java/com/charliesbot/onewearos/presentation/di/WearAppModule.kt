@@ -5,7 +5,7 @@ import com.charliesbot.onewearos.presentation.data.WearStringProvider
 import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.onewearos.presentation.services.LocalWatchFastingCallbacks
-import com.charliesbot.onewearos.presentation.today.WearTodayViewModel
+import com.charliesbot.onewearos.presentation.feature.today.WearTodayViewModel
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventCallbacks

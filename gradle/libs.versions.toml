@@ -17,10 +17,7 @@ composeBom = "2025.07.00"
 koin-annotations = "2.1.0"
 playServicesWearable = "19.0.0"
 startupRuntime = "1.2.0"
-wearComposeMaterial = "1.5.0-rc01"
 compose-icon-ext = "1.7.8"
-wearCompose = "1.5.0-rc01"
-wearToolingPreview = "1.0.0"
 coreSplashscreen = "1.0.1"
 tiles = "1.5.0"
 tilesMaterial = "1.5.0"
@@ -46,8 +43,14 @@ lifecycleViewmodelNav3 = "1.0.0-alpha04"
 kotlinSerialization = "2.2.0"
 kotlinxSerializationCore = "1.9.0"
 material3Adaptive = "1.2.0-alpha10"
+# wearos
+wearCompose = "1.5.0-rc01"
+wearComposeMaterial = "1.5.0-rc01"
+wearComposeNavigation = "1.5.0-rc01"
+wearToolingPreview = "1.0.0"
 
 [libraries]
+androidx-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "wearComposeNavigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
@@ -102,6 +105,7 @@ androidx-tiles-material = { group = "androidx.wear.tiles", name = "tiles-materia
 androidx-tiles-tooling = { group = "androidx.wear.tiles", name = "tiles-tooling", version.ref = "tilesTooling" }
 androidx-tiles-tooling-preview = { group = "androidx.wear.tiles", name = "tiles-tooling-preview", version.ref = "tilesToolingPreview" }
 horologist-compose-tools = { group = "com.google.android.horologist", name = "horologist-compose-tools", version.ref = "horologistComposeTools" }
+horologist-compose-layout = { group = "com.google.android.horologist", name = "horologist-compose-layout", version.ref = "horologistComposeTools" }
 horologist-tiles = { group = "com.google.android.horologist", name = "horologist-tiles", version.ref = "horologistTiles" }
 androidx-watchface-complications-data-source-ktx = { group = "androidx.wear.watchface", name = "watchface-complications-data-source-ktx", version.ref = "watchfaceComplicationsDataSourceKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }

@@ -101,7 +101,7 @@ private fun TodayScreenContent(
     val screenPadding = 32.dp
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(startTimeInMillis)
-    var elapsedTime by remember { mutableLongStateOf(0L) }
+    var elapsedTime by remember { mutableLongStateOf(0L) };
     val fastButtonLabel =
         stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
     val scrollState = rememberScrollState()

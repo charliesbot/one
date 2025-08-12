@@ -302,8 +302,23 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 
 - **CHANGELOG.md**: Track changes for the Android phone/tablet app
 - **CHANGELOG_WEAROS.md**: Track changes for the Wear OS companion app
-- Add significant changes, bug fixes, and new features to the `[Unreleased]` section
+- Add **customer-facing** changes, bug fixes, and new features to the `[Unreleased]` section
 - When releasing, move items from `[Unreleased]` to a versioned section
 - Use standard categories: Added, Changed, Fixed, Deprecated, Removed, Security
+
+### What to Include in Changelog:
+- New features users can see/use
+- Bug fixes that affect user experience
+- UI/UX changes users will notice
+- Performance improvements users can feel
+- Breaking changes to user workflows
+
+### What NOT to Include:
+- Internal code refactoring
+- Component extractions/reorganization
+- Dependency updates (unless they affect users)
+- Architecture improvements
+- Code style changes
+- Developer tooling updates
 
 Remember: The core challenge of this project is maintaining perfect synchronization between devices while keeping all UI components updated. When in doubt, force update the UI components!

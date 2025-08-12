@@ -7,29 +7,21 @@ package com.charliesbot.onewearos.presentation
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.wear.compose.material.MaterialTheme
 import com.charliesbot.onewearos.core.components.NotificationPermissionDialog
+import com.charliesbot.onewearos.presentation.navigation.WearNavigation
 import com.charliesbot.onewearos.presentation.theme.OneTheme
-import com.charliesbot.onewearos.presentation.today.WearTodayScreen
 import com.charliesbot.shared.core.notifications.NotificationUtil
-import org.koin.androidx.compose.KoinAndroidContext
 
 
 class MainActivity : ComponentActivity() {
@@ -60,25 +52,17 @@ class MainActivity : ComponentActivity() {
             }
 
             OneTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colors.background),
-                    contentAlignment = Alignment.Center
-                ) {
-                    WearTodayScreen()
-
-                    NotificationPermissionDialog(
-                        isVisible = showNotificationPermission,
-                        onDismiss = { showNotificationPermission = false },
-                        onConfirm = {
-                            showNotificationPermission = false
-                            requestNotificationPermission.launch(
-                                Manifest.permission.POST_NOTIFICATIONS
-                            )
-                        }
-                    )
-                }
+                WearNavigation()
+                NotificationPermissionDialog(
+                    isVisible = showNotificationPermission,
+                    onDismiss = { showNotificationPermission = false },
+                    onConfirm = {
+                        showNotificationPermission = false
+                        requestNotificationPermission.launch(
+                            Manifest.permission.POST_NOTIFICATIONS
+                        )
+                    }
+                )
             }
         }
     }

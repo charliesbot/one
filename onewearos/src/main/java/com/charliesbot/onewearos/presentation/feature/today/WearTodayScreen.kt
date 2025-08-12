@@ -1,4 +1,4 @@
-package com.charliesbot.onewearos.presentation.today
+package com.charliesbot.onewearos.presentation.feature.today
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -54,13 +51,30 @@ fun rememberIsLargeScreen(): Boolean {
 
 @Composable
 fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
-    var elapsedTime by remember { mutableLongStateOf(0L) }
-    val isLargeScreen = rememberIsLargeScreen()
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
-    val startTimeInLocalDateTime =
-        convertMillisToLocalDateTime(startTimeInMillis)
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
+
+    WearTodayContent(
+        startTimeInMillis = startTimeInMillis,
+        isFasting = isFasting,
+        fastingGoalId = fastingGoalId,
+        onStartFasting = viewModel::onStartFasting,
+        onStopFasting = viewModel::onStopFasting
+    )
+}
+
+@Composable
+fun WearTodayContent(
+    startTimeInMillis: Long,
+    isFasting: Boolean,
+    fastingGoalId: String,
+    onStartFasting: () -> Unit,
+    onStopFasting: () -> Unit
+) {
+    var elapsedTime by remember { mutableLongStateOf(0L) }
+    val isLargeScreen = rememberIsLargeScreen()
+    val startTimeInLocalDateTime = convertMillisToLocalDateTime(startTimeInMillis)
     val fastButtonLabel =
         if (isFasting) stringResource(R.string.end_fast) else stringResource(R.string.start_fasting)
     val currentGoal = PredefinedFastingGoals.goalsById[fastingGoalId]
@@ -70,7 +84,8 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     } else {
         stringResource(R.string.target_duration_hours, currentGoal?.durationDisplay.toString())
     }
-    LaunchedEffect(isFasting) {
+
+    LaunchedEffect(isFasting, startTimeInMillis) {
         if (isFasting) {
             while (true) {
                 elapsedTime = System.currentTimeMillis() - startTimeInMillis
@@ -83,7 +98,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
     ScreenScaffold {
         FastingProgressBar(
             progress = calculateProgressFraction(elapsedTime, currentGoal?.durationMillis),
-            strokeWidth = 8.dp,
+            strokeWidth = 5.dp,
             indicatorColor = MaterialTheme.colorScheme.primaryDim,
             trackColor = MaterialTheme.colorScheme.onBackground,
         ) {
@@ -122,7 +137,7 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
                 TextToggleButton(
                     checked = !isFasting,
                     onCheckedChange = {
-                        if (isFasting) viewModel.onStopFasting() else viewModel.onStartFasting()
+                        if (isFasting) onStopFasting() else onStartFasting()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -136,6 +151,12 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
 
 @Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
 @Composable
-fun DefaultPreview() {
-    WearTodayScreen()
+private fun DefaultPreview() {
+    WearTodayContent(
+        startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
+        isFasting = false,
+        fastingGoalId = "16:8", // 16:8 fasting goal
+        onStartFasting = { },
+        onStopFasting = { }
+    )
 }
