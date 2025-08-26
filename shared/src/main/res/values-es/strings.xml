@@ -6,7 +6,9 @@
     <string name="fasting_goal_18_6">18:6\nTRF</string>
     <string name="fasting_goal_20_4">20:4\nTRF</string>
     <string name="fasting_goal_36_hour">Ayuno de\n36 Horas</string>
-    
+
     <!-- Common UI strings -->
     <string name="hours">horas</string>
+    <string name="select_goal">Elige una meta</string>
+    <string name="label_save">Guardar</string>
 </resources> 

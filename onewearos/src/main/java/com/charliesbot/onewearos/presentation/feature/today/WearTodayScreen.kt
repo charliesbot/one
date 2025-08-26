@@ -3,7 +3,6 @@ package com.charliesbot.onewearos.presentation.feature.today
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,16 +26,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TextButton
 import androidx.wear.compose.material3.TextToggleButton
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.R
+import com.charliesbot.onewearos.core.components.TimeButtonActions
 import com.charliesbot.shared.core.components.FastingProgressBar
-import com.charliesbot.shared.core.components.TimeInfoDisplay
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
-import com.charliesbot.shared.core.utils.getHours
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -50,7 +49,11 @@ fun rememberIsLargeScreen(): Boolean {
 
 
 @Composable
-fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
+fun WearTodayScreen(
+    viewModel: WearTodayViewModel = koinViewModel(),
+    onNavigateToStartDateSelection: () -> Unit,
+    onNavigateToGoalSelection: () -> Unit
+) {
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
@@ -60,7 +63,9 @@ fun WearTodayScreen(viewModel: WearTodayViewModel = koinViewModel()) {
         isFasting = isFasting,
         fastingGoalId = fastingGoalId,
         onStartFasting = viewModel::onStartFasting,
-        onStopFasting = viewModel::onStopFasting
+        onStopFasting = viewModel::onStopFasting,
+        onNavigateToGoalSelection = onNavigateToGoalSelection,
+        onNavigateToStartDateSelection = onNavigateToStartDateSelection
     )
 }
 
@@ -70,7 +75,9 @@ fun WearTodayContent(
     isFasting: Boolean,
     fastingGoalId: String,
     onStartFasting: () -> Unit,
-    onStopFasting: () -> Unit
+    onStopFasting: () -> Unit,
+    onNavigateToStartDateSelection: () -> Unit,
+    onNavigateToGoalSelection: () -> Unit
 ) {
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val isLargeScreen = rememberIsLargeScreen()
@@ -104,36 +111,42 @@ fun WearTodayContent(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 40.dp),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    text = timeLabel,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = if (isLargeScreen) 30.sp else 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(15.dp))
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp),
+                    onClick = {
+                        onNavigateToGoalSelection()
+                    }
+                ) {
+                    Text(
+                        text = timeLabel,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = if (isLargeScreen) 30.sp else 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                if (!isFasting) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
                 AnimatedVisibility(
                     visible = isFasting
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TimeInfoDisplay(
-                            title = stringResource(R.string.label_started),
-                            date = startTimeInLocalDateTime,
-                        )
-                        TimeInfoDisplay(
-                            title = stringResource(R.string.label_goal),
-                            date = startTimeInLocalDateTime.plusHours(getHours(currentGoal?.durationMillis)),
-                        )
-                    }
+                    TimeButtonActions(
+                        startTime = startTimeInLocalDateTime,
+                        goal = currentGoal,
+                        onStartTimeClick = {
+                            onNavigateToStartDateSelection()
+                        },
+                        onGoalTimeClick = {
+                            onNavigateToGoalSelection()
+                        }
+                    )
                 }
-                Spacer(Modifier.height(15.dp))
                 TextToggleButton(
                     checked = !isFasting,
                     onCheckedChange = {
@@ -141,6 +154,7 @@ fun WearTodayContent(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 40.dp),
                 ) {
                     Text(fastButtonLabel, fontSize = if (isLargeScreen) 16.sp else 12.sp)
                 }
@@ -154,9 +168,11 @@ fun WearTodayContent(
 private fun DefaultPreview() {
     WearTodayContent(
         startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
-        isFasting = false,
+        isFasting = true,
         fastingGoalId = "16:8", // 16:8 fasting goal
         onStartFasting = { },
-        onStopFasting = { }
+        onStopFasting = { },
+        onNavigateToGoalSelection = { },
+        onNavigateToStartDateSelection = { }
     )
 }

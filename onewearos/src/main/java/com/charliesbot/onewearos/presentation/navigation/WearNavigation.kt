@@ -1,11 +1,13 @@
 package com.charliesbot.onewearos.presentation.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import com.charliesbot.onewearos.presentation.feature.goaloptions.WearGoalOptionsScreen
+import com.charliesbot.onewearos.presentation.feature.today.WearGoalOptionsScreen
+import com.charliesbot.onewearos.presentation.feature.today.WearDatePickerScreen
+import com.charliesbot.onewearos.presentation.feature.today.WearStartDateScreen
+import com.charliesbot.onewearos.presentation.feature.today.WearTimePickerScreen
 import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.onewearos.presentation.feature.today.WearTodayScreen
 
@@ -15,13 +17,29 @@ fun WearNavigation() {
     OneTheme {
         SwipeDismissableNavHost(
             navController = navController,
-            startDestination = WearNavigationRoute.GoalOptions.route
+            startDestination = WearNavigationRoute.Today.route
         ) {
             composable(WearNavigationRoute.Today.route) {
-                WearTodayScreen()
+                WearTodayScreen(
+                    onNavigateToStartDateSelection = {
+                        navController.navigate(WearNavigationRoute.StartDateSelection.route)
+                    },
+                    onNavigateToGoalSelection = {
+                        navController.navigate(WearNavigationRoute.GoalOptions.route)
+                    }
+                )
+            }
+            composable(WearNavigationRoute.StartDateSelection.route) {
+                WearStartDateScreen(navController = navController)
             }
             composable(WearNavigationRoute.GoalOptions.route) {
-                WearGoalOptionsScreen()
+                WearGoalOptionsScreen(navController = navController)
+            }
+            composable(WearNavigationRoute.DatePicker.route) {
+                WearDatePickerScreen(navController = navController)
+            }
+            composable(WearNavigationRoute.TimePicker.route) {
+                WearTimePickerScreen(navController = navController)
             }
         }
     }

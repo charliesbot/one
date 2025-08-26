@@ -6,7 +6,9 @@
     <string name="fasting_goal_18_6">18:6\nTRF</string>
     <string name="fasting_goal_20_4">20:4\nTRF</string>
     <string name="fasting_goal_36_hour">36-Hour\nFast</string>
-    
+
     <!-- Common UI strings -->
     <string name="hours">hours</string>
-</resources> 
+    <string name="select_goal">Select a goal</string>
+    <string name="label_save">Save</string>
+</resources>

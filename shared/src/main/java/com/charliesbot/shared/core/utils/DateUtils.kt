@@ -9,6 +9,8 @@ import java.util.Locale
 
 enum class TimeFormat(val pattern: String) {
     DATE_TIME("EEE, h:mm a"),
+    DATE("MMMM d yyyy"),
+    MONTH_DAY("MMMM d"),
     TIME("h:mm a"),
     DURATION("HH:mm:ss")
 }

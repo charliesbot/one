@@ -122,38 +122,44 @@ class FastingDataRepositoryImpl(
     override suspend fun startFasting(
         startTimeInMillis: Long,
         fastingGoalId: String
-    ): FastingDataItem {
+    ): Pair<FastingDataItem?, FastingDataItem> {
+        val previousItem = getCurrentFasting()
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
             fastingGoalId = fastingGoalId
         )
-        return fastingDataItem.first()
+        val currentItem = getCurrentFasting()
+        return Pair(previousItem, currentItem)
     }
 
     // When stopping fasting, we need to send the startTime to the database.
     // The device storage will keep the startTime as well, but it is safe to ignore
     // as the fasting state is false.
-    override suspend fun stopFasting(fastingGoalId: String): FastingDataItem {
+    override suspend fun stopFasting(fastingGoalId: String): Pair<FastingDataItem, FastingDataItem> {
+        val previousItem = getCurrentFasting()
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = startTimeInMillis.first(),
             fastingGoalId = fastingGoalId
         )
-        return fastingDataItem.first()
+        val currentItem = getCurrentFasting()
+        return Pair(previousItem, currentItem)
     }
 
     override suspend fun updateFastingConfig(
         startTimeInMillis: Long?,
         fastingGoalId: String?
-    ): FastingDataItem {
-        val currentData = getCurrentFasting()
+    ): Pair<FastingDataItem, FastingDataItem> {
+        val previousItem = getCurrentFasting()
         updateLocalAndRemoteStore(
-            isFasting = currentData.isFasting,
-            startTimeInMillis = startTimeInMillis ?: currentData.startTimeInMillis,
-            fastingGoalId = fastingGoalId ?: currentData.fastingGoalId,
+            isFasting = previousItem.isFasting,
+            startTimeInMillis = startTimeInMillis ?: previousItem.startTimeInMillis,
+            fastingGoalId = fastingGoalId ?: previousItem.fastingGoalId,
         )
-        return fastingDataItem.first()
+
+        val currentItem = getCurrentFasting()
+        return Pair(previousItem, currentItem)
     }
 
     override suspend fun updateFastingStatusFromRemote(
@@ -172,7 +178,7 @@ class FastingDataRepositoryImpl(
 
     private suspend fun updateLocalAndRemoteStore(
         isFasting: Boolean,
-        startTimeInMillis: Long,
+        startTimeInMillis: Long?,
         fastingGoalId: String?,
     ) {
         val prefs = dataStore.data.first()
@@ -183,17 +189,19 @@ class FastingDataRepositoryImpl(
     }
 
     private suspend fun updateLocalStore(
-        isFasting: Boolean,
-        startTimeInMillis: Long,
-        fastingGoalId: String,
+        isFasting: Boolean?,
+        startTimeInMillis: Long?,
+        fastingGoalId: String?,
         lastUpdateTimestamp: Long = System.currentTimeMillis()
     ) {
         try {
             dataStore.edit { prefs ->
-                prefs[PrefKeys.IS_FASTING] = isFasting
-                prefs[PrefKeys.START_TIME] = startTimeInMillis
-                prefs[PrefKeys.FASTING_GOAL_ID] = fastingGoalId
                 prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] = lastUpdateTimestamp
+                isFasting?.let { prefs[PrefKeys.IS_FASTING] = it }
+                fastingGoalId?.let {
+                    prefs[PrefKeys.FASTING_GOAL_ID] = it
+                }
+                startTimeInMillis?.let { prefs[PrefKeys.START_TIME] = it }
             }
             Log.d(LOG_TAG, "Repo: DataStore updated successfully")
         } catch (e: Exception) {
@@ -205,14 +213,16 @@ class FastingDataRepositoryImpl(
     // which is in charge of syncing data between the watch and the phone.
     private suspend fun updateRemoteStore(
         isFasting: Boolean,
-        startTimeInMillis: Long,
+        startTimeInMillis: Long?,
         fastingGoalId: String,
         lastUpdateTimestamp: Long = System.currentTimeMillis()
     ) {
         val request: PutDataRequest =
             PutDataMapRequest.create(DataStoreConstants.FASTING_PATH_KEY).apply {
                 dataMap.putBoolean(DataStoreConstants.IS_FASTING_KEY, isFasting)
-                dataMap.putLong(DataStoreConstants.START_TIME_KEY, startTimeInMillis)
+                startTimeInMillis?.let {
+                    dataMap.putLong(DataStoreConstants.START_TIME_KEY, it)
+                }
                 dataMap.putString(DataStoreConstants.FASTING_GOAL_KEY, fastingGoalId)
                 dataMap.putLong(DataStoreConstants.UPDATE_TIMESTAMP_KEY, lastUpdateTimestamp)
             }.asPutDataRequest().setUrgent()

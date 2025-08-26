@@ -47,4 +47,14 @@ class WearTodayViewModel(
             fastingUseCase.stopFasting()
         }
     }
+
+    fun updateStartTime(timeInMillis: Long) {
+        viewModelScope.launch {
+            fastingUseCase.updateFastingConfig(startTimeMillis = timeInMillis)
+        }
+    }
+
+    suspend fun updateFastingGoal(fastingGoalId: String) {
+        fastingUseCase.updateFastingConfig(goalId = fastingGoalId)
+    }
 }

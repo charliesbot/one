@@ -15,6 +15,7 @@ import org.koin.dsl.module
 
 val wearAppModule = module {
     viewModelOf(::WearTodayViewModel)
+
     single<NotificationScheduler> {
         NotificationScheduler(
             context = androidContext(),
