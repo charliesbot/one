@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,8 +27,10 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.presentation.navigation.WearNavigationRoute
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.utils.TimeFormat
+import com.charliesbot.shared.core.utils.convertLocalDateTimeToMillis
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatDate
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
 
@@ -36,23 +39,28 @@ fun WearStartDateScreen(
     navController: NavController,
     viewModel: WearTodayViewModel = koinViewModel(),
 ) {
-    val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
-    val startTime = convertMillisToLocalDateTime(startTimeInMillis)
+    val temporalStartTime by viewModel.temporalStartTime.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        viewModel.initializeTemporalTime()
+    temporalStartTime?.let {
+        WearStartDateContent(
+            startTime = it,
+            onNavigateToDatePicker = {
+                navController.navigate(WearNavigationRoute.DatePicker.route)
+            },
+            onNavigateToTimePicker = {
+                navController.navigate(WearNavigationRoute.TimePicker.route)
+            },
+            onUpdateStartTime = { dateTime ->
+                scope.launch {
+                    viewModel.updateStartTime(
+                        convertLocalDateTimeToMillis(dateTime)
+                    )
+                    navController.popBackStack()
+                }
+            }
+        )
     }
-
-    WearStartDateContent(
-        startTime = startTime,
-        onNavigateToDatePicker = {
-            navController.navigate(WearNavigationRoute.DatePicker.route)
-        },
-        onNavigateToTimePicker = {
-            navController.navigate(WearNavigationRoute.TimePicker.route)
-        },
-        onUpdateStartTime = { viewModel::updateStartTime }
-    )
 }
 
 @Composable
@@ -60,7 +68,7 @@ fun WearStartDateContent(
     startTime: LocalDateTime,
     onNavigateToDatePicker: () -> Unit,
     onNavigateToTimePicker: () -> Unit,
-    onUpdateStartTime: (Long) -> Unit,
+    onUpdateStartTime: (LocalDateTime) -> Unit,
 ) {
     val listState = rememberScalingLazyListState()
     ScreenScaffold(
@@ -69,7 +77,7 @@ fun WearStartDateContent(
         edgeButton = {
             EdgeButton(
                 onClick = {
-//                    onUpdateStartTime()
+                    onUpdateStartTime(startTime)
                 },
                 buttonSize = EdgeButtonSize.Small
             ) {

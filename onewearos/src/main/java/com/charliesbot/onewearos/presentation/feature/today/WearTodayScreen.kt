@@ -62,6 +62,7 @@ fun WearTodayScreen(
         startTimeInMillis = startTimeInMillis,
         isFasting = isFasting,
         fastingGoalId = fastingGoalId,
+        initializeTemporalTime = viewModel::initializeTemporalTime,
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
         onNavigateToGoalSelection = onNavigateToGoalSelection,
@@ -74,6 +75,7 @@ fun WearTodayContent(
     startTimeInMillis: Long,
     isFasting: Boolean,
     fastingGoalId: String,
+    initializeTemporalTime: () -> Unit,
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
     onNavigateToStartDateSelection: () -> Unit,
@@ -140,6 +142,7 @@ fun WearTodayContent(
                         startTime = startTimeInLocalDateTime,
                         goal = currentGoal,
                         onStartTimeClick = {
+                            initializeTemporalTime()
                             onNavigateToStartDateSelection()
                         },
                         onGoalTimeClick = {
@@ -170,6 +173,7 @@ private fun DefaultPreview() {
         startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
         isFasting = true,
         fastingGoalId = "16:8", // 16:8 fasting goal
+        initializeTemporalTime = {},
         onStartFasting = { },
         onStopFasting = { },
         onNavigateToGoalSelection = { },

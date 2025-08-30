@@ -49,12 +49,9 @@ class WearTodayViewModel(
 
     fun initializeTemporalTime() {
         viewModelScope.launch {
-            // Only initialize if it's not already set, to preserve user changes
-            if (_temporalStartTime.value == null) {
-                val initialMillis = startTimeInMillis.first()
-                _temporalStartTime.value = convertMillisToLocalDateTime(initialMillis)
-                Log.e("TAG", "initializeTemporalTime: $temporalStartTime")
-            }
+            val initialMillis = startTimeInMillis.first()
+            _temporalStartTime.value = convertMillisToLocalDateTime(initialMillis)
+            Log.e("TAG", "initializeTemporalTime: $temporalStartTime")
         }
     }
 
@@ -69,6 +66,16 @@ class WearTodayViewModel(
         viewModelScope.launch {
             fastingUseCase.stopFasting()
         }
+    }
+
+    fun updateTemporalDate(newDate: LocalDate) {
+        val currentTime = _temporalStartTime.value?.toLocalTime() ?: LocalTime.now()
+        _temporalStartTime.value = LocalDateTime.of(newDate, currentTime)
+    }
+
+    fun updateTemporalTime(newTime: LocalTime) {
+        val currentDate = _temporalStartTime.value?.toLocalDate() ?: LocalDate.now()
+        _temporalStartTime.value = LocalDateTime.of(currentDate, newTime)
     }
 
     suspend fun updateStartTime(timeInMillis: Long) {

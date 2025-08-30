@@ -19,7 +19,7 @@ fun WearTimePickerScreen(
         TimePicker(
             initialTime = it.toLocalTime(),
             onTimePicked = { newTime ->
-//            viewModel.updateStartTime(newTime)
+                viewModel.updateTemporalTime(newTime)
                 navController.popBackStack()
             }
         )

@@ -19,6 +19,7 @@ fun WearDatePickerScreen(
         DatePicker(
             initialDate = it.toLocalDate(),
             onDatePicked = { newDate ->
+                viewModel.updateTemporalDate(newDate)
                 navController.popBackStack()
             }
         )

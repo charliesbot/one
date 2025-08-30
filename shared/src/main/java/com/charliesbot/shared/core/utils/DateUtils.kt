@@ -35,6 +35,10 @@ fun formatTimestamp(millis: Long): String {
     )
 }
 
+fun convertLocalDateTimeToMillis(dateTime: LocalDateTime): Long {
+    return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+}
+
 fun formatTimestamp(millis: Long, format: TimeFormat = TimeFormat.DURATION): String {
     val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
     return formatDate(dateTime, format)
