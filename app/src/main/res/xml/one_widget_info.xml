@@ -6,7 +6,7 @@
     android:minResizeWidth="140dp"
     android:minResizeHeight="48dp"
     android:maxResizeWidth="520dp"
-    android:maxResizeHeight="64dp"
+    android:maxResizeHeight="200dp"
     android:targetCellWidth="2"
     android:targetCellHeight="2"
     android:previewLayout="@layout/widget_preview"

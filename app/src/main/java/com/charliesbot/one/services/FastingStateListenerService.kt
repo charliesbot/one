@@ -13,6 +13,7 @@ class FastingStateListenerService : BaseFastingListenerService() {
     private val widgetUpdateManager: WidgetUpdateManager by inject()
     private val fastingHistoryRepository: FastingHistoryRepository by inject()
 
+    // Called when the WATCH starts a fast
     override suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
         super.onPlatformFastingCompleted(fastingDataItem)
         fastingHistoryRepository.saveFastingRecord(
@@ -32,9 +33,5 @@ class FastingStateListenerService : BaseFastingListenerService() {
             "${this::class.java.simpleName} - onFastingStateSynced: PRE-updateAll (Call ID: $uniqueCallId)"
         )
         widgetUpdateManager.requestUpdate()
-    }
-
-    override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
-        TODO("Not yet implemented")
     }
 }

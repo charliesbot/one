@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -101,7 +102,7 @@ private fun TodayScreenContent(
     val screenPadding = 32.dp
     val startTimeInLocalDateTime =
         convertMillisToLocalDateTime(startTimeInMillis)
-    var elapsedTime by remember { mutableLongStateOf(0L) };
+    var elapsedTime by remember { mutableLongStateOf(0L) }
     val fastButtonLabel =
         stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
     val scrollState = rememberScrollState()
@@ -141,105 +142,109 @@ private fun TodayScreenContent(
                 initialSelectedGoalId = fastingGoalId
             )
         }
-        Column(
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            WeeklyProgress(
-                weeklyProgress = weeklyProgress,
+            Column(
                 modifier = Modifier
-                    .widthIn(max = 500.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = screenPadding + 24.dp)
-            )
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(600.dp)
-                    .padding(screenPadding),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 4.dp,
-                )
+                    .widthIn(max = 600.dp)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
+                WeeklyProgress(
+                    weeklyProgress = weeklyProgress,
                     modifier = Modifier
-                        .padding(all = 32.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CurrentFastingProgress(
-                        isFasting = isFasting,
-                        elapsedTime = elapsedTime,
-                        fastingGoalId = fastingGoalId
+                        .fillMaxWidth()
+                        .padding(horizontal = screenPadding + 24.dp)
+                )
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(screenPadding),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp,
                     )
-                    Spacer(modifier = Modifier.height(40.dp))
-                    AnimatedVisibility(
-                        visible = isFasting,
-                        enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
-                                expandVertically(animationSpec = tween(durationMillis = 350)),
-                        exit =
-                            fadeOut(animationSpec = tween(durationMillis = 150)) +
-                                    shrinkVertically(animationSpec = tween(durationMillis = 350))
-                    ) {
-                        ButtonGroup(
-                            overflowIndicator = {},
-                            expandedRatio = 0f,
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-                        ) {
-                            customItem(
-                                buttonGroupContent = {
-                                    TimeDisplay(
-                                        title = stringResource(R.string.started),
-                                        date = startTimeInLocalDateTime,
-                                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(
-                                            pressedShape = RoundedCornerShape(60.dp),
-                                        ),
-                                        onClick = {
-                                            onOpenTimePickerDialog()
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                },
-                                menuContent = {}
-                            )
-                            customItem(
-                                buttonGroupContent = {
-                                    TimeDisplay(
-                                        title = stringResource(
-                                            R.string.goal_with_duration,
-                                            "${currentGoal?.durationDisplay}H"
-                                        ),
-                                        date = startTimeInLocalDateTime.plusHours(
-                                            getHours(
-                                                currentGoal?.durationMillis
-                                            )
-                                        ),
-                                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
-                                            pressedShape = RoundedCornerShape(60.dp),
-                                        ),
-                                        onClick = {
-                                            onOpenGoalBottomSheet()
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                },
-                                menuContent = {}
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    FilledTonalButton(
-                        onClick = if (isFasting) onStopFasting else onStartFasting,
+                ) {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
+                            .padding(all = screenPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Text(text = fastButtonLabel)
+                        CurrentFastingProgress(
+                            isFasting = isFasting,
+                            elapsedTime = elapsedTime,
+                            fastingGoalId = fastingGoalId,
+                            onFastingStatusClick = onOpenGoalBottomSheet,
+                        )
+                        Spacer(modifier = Modifier.height(40.dp))
+                        AnimatedVisibility(
+                            visible = isFasting,
+                            enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
+                                    expandVertically(animationSpec = tween(durationMillis = 350)),
+                            exit =
+                                fadeOut(animationSpec = tween(durationMillis = 150)) +
+                                        shrinkVertically(animationSpec = tween(durationMillis = 350))
+                        ) {
+                            ButtonGroup(
+                                overflowIndicator = {},
+                                expandedRatio = 0f,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                            ) {
+                                customItem(
+                                    buttonGroupContent = {
+                                        TimeDisplay(
+                                            title = stringResource(R.string.started),
+                                            date = startTimeInLocalDateTime,
+                                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(
+                                                pressedShape = RoundedCornerShape(60.dp),
+                                            ),
+                                            onClick = {
+                                                onOpenTimePickerDialog()
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    },
+                                    menuContent = {}
+                                )
+                                customItem(
+                                    buttonGroupContent = {
+                                        TimeDisplay(
+                                            title = stringResource(
+                                                R.string.goal_with_duration,
+                                                "${currentGoal?.durationDisplay}H"
+                                            ),
+                                            date = startTimeInLocalDateTime.plusHours(
+                                                getHours(
+                                                    currentGoal?.durationMillis
+                                                )
+                                            ),
+                                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
+                                                pressedShape = RoundedCornerShape(60.dp),
+                                            ),
+                                            onClick = {
+                                                onOpenGoalBottomSheet()
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    },
+                                    menuContent = {}
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        FilledTonalButton(
+                            onClick = if (isFasting) onStopFasting else onStartFasting,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                        ) {
+                            Text(text = fastButtonLabel)
+                        }
                     }
                 }
             }
@@ -250,6 +255,29 @@ private fun TodayScreenContent(
 @Preview(showBackground = true)
 @Composable
 fun PreviewTodayScreen() {
+    OneTheme {
+        TodayScreenContent(
+            isTimePickerDialogOpen = false,
+            isGoalBottomSheetOpen = false,
+            isFasting = true,
+            startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
+            fastingGoalId = "16:8",
+            weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+            onStartFasting = {},
+            onStopFasting = {},
+            onOpenTimePickerDialog = {},
+            onCloseTimePickerDialog = {},
+            onUpdateStartTime = {},
+            onOpenGoalBottomSheet = {},
+            onCloseGoalBottomSheet = {},
+            onUpdateFastingGoal = {}
+        )
+    }
+}
+
+@Preview(heightDp = 360, widthDp = 800)
+@Composable
+fun PreviewTodayScreenLandscape() {
     OneTheme {
         TodayScreenContent(
             isTimePickerDialogOpen = false,

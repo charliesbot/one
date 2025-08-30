@@ -15,13 +15,11 @@ fun WearDatePickerScreen(
 ) {
     val tempStartTime by viewModel.temporalStartTime.collectAsStateWithLifecycle()
 
-    tempStartTime?.let {
-        DatePicker(
-            initialDate = it.toLocalDate(),
-            onDatePicked = { newDate ->
-                viewModel.updateTemporalDate(newDate)
-                navController.popBackStack()
-            }
-        )
-    }
+    DatePicker(
+        initialDate = tempStartTime?.toLocalDate()!!,
+        onDatePicked = { newDate ->
+            viewModel.updateTemporalDate(newDate)
+            navController.popBackStack()
+        }
+    )
 }

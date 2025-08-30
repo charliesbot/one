@@ -1,11 +1,15 @@
 package com.charliesbot.one.today.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,11 +26,13 @@ import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FastingStatusIndicator(
     isFasting: Boolean,
     elapsedTime: Long,
     fastingGoalId: String,
+    onClick: () -> Unit
 ) {
     val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
     val headerLabel = if (isFasting) {
@@ -48,12 +54,16 @@ fun FastingStatusIndicator(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = headerLabel, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-        Text(
-            text = timeLabel,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = 38.sp,
-            fontWeight = FontWeight.Bold
-        )
+        TextButton(
+            onClick = onClick
+        ) {
+            Text(
+                text = timeLabel,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 38.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
     }
 }
 
@@ -61,20 +71,22 @@ fun FastingStatusIndicator(
 fun CurrentFastingProgress(
     elapsedTime: Long,
     fastingGoalId: String,
-    isFasting: Boolean = false
+    onFastingStatusClick: () -> Unit,
+    isFasting: Boolean = false,
 ) {
     val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
     val progress = calculateProgressFraction(elapsedTime, fastingGoal.durationMillis)
-    FastingProgressBar(
-        progress = progress,
-        strokeWidth = 35.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 400.dp),
-        innerContent = {
-            FastingStatusIndicator(isFasting, elapsedTime, fastingGoalId)
-        }
-    )
+    Box(contentAlignment = Alignment.Center) {
+        FastingProgressBar(
+            progress = progress,
+            strokeWidth = 35.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                .heightIn(max = 300.dp)
+        )
+        FastingStatusIndicator(isFasting, elapsedTime, fastingGoalId, onFastingStatusClick)
+    }
 }
 
 @Preview(showBackground = true)
@@ -82,11 +94,16 @@ fun CurrentFastingProgress(
 fun CurrentFastingProgressPreview() {
     OneTheme {
         Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
-            CurrentFastingProgress(isFasting = false, elapsedTime = 0L, fastingGoalId = "circadian")
+            CurrentFastingProgress(
+                isFasting = false,
+                elapsedTime = 0L,
+                fastingGoalId = "circadian",
+                onFastingStatusClick = {})
             CurrentFastingProgress(
                 isFasting = true,
                 elapsedTime = 7 * 1000 * 60 * 60,
-                fastingGoalId = "circadian"
+                fastingGoalId = "circadian",
+                onFastingStatusClick = {},
             )
         }
     }
