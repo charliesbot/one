@@ -1,15 +1,24 @@
 package com.charliesbot.onewearos.presentation.feature.today
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 
 class WearTodayViewModel(
     private val fastingUseCase: FastingUseCase,
@@ -35,6 +44,20 @@ class WearTodayViewModel(
             PredefinedFastingGoals.SIXTEEN_EIGHT.id
         )
 
+    private val _temporalStartTime = MutableStateFlow<LocalDateTime?>(null)
+    val temporalStartTime: StateFlow<LocalDateTime?> = _temporalStartTime.asStateFlow()
+
+    fun initializeTemporalTime() {
+        viewModelScope.launch {
+            // Only initialize if it's not already set, to preserve user changes
+            if (_temporalStartTime.value == null) {
+                val initialMillis = startTimeInMillis.first()
+                _temporalStartTime.value = convertMillisToLocalDateTime(initialMillis)
+                Log.e("TAG", "initializeTemporalTime: $temporalStartTime")
+            }
+        }
+    }
+
 
     fun onStartFasting() {
         viewModelScope.launch {
@@ -48,10 +71,8 @@ class WearTodayViewModel(
         }
     }
 
-    fun updateStartTime(timeInMillis: Long) {
-        viewModelScope.launch {
-            fastingUseCase.updateFastingConfig(startTimeMillis = timeInMillis)
-        }
+    suspend fun updateStartTime(timeInMillis: Long) {
+        fastingUseCase.updateFastingConfig(startTimeMillis = timeInMillis)
     }
 
     suspend fun updateFastingGoal(fastingGoalId: String) {

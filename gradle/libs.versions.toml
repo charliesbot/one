@@ -1,5 +1,5 @@
 [versions]
-agp = "8.12.0"
+agp = "8.12.2"
 datastorePreferences = "1.1.7"
 firebaseBom = "34.1.0"
 glanceAppwidget = "1.1.1"
@@ -38,9 +38,9 @@ googleFirebaseCrashlytics = "3.0.6"
 room = "2.7.2"
 room-plugin = "2.7.2"
 # navigation compose 3
-nav3Core = "1.0.0-alpha06"
+nav3Core = "1.0.0-alpha07"
 lifecycleViewmodelNav3 = "1.0.0-alpha04"
-kotlinSerialization = "2.2.0"
+kotlinSerialization = "2.2.10"
 kotlinxSerializationCore = "1.9.0"
 material3Adaptive = "1.2.0-alpha11"
 # wearos

@@ -11,16 +11,16 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun WearDatePickerScreen(
     navController: NavController,
-    viewModel: WearStartDateViewModel = koinViewModel()
+    viewModel: WearTodayViewModel = koinViewModel()
 ) {
-    val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
-    val initialDate = convertMillisToLocalDateTime(startTimeInMillis).toLocalDate()
+    val tempStartTime by viewModel.temporalStartTime.collectAsStateWithLifecycle()
 
-    DatePicker(
-        initialDate = initialDate,
-        onDatePicked = { newDate ->
-            viewModel.updateStartDate(newDate)
-            navController.popBackStack()
-        }
-    )
+    tempStartTime?.let {
+        DatePicker(
+            initialDate = it.toLocalDate(),
+            onDatePicked = { newDate ->
+                navController.popBackStack()
+            }
+        )
+    }
 }

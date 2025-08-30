@@ -3,6 +3,7 @@ package com.charliesbot.onewearos.presentation.feature.today
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,6 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -22,6 +24,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.presentation.navigation.WearNavigationRoute
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.utils.TimeFormat
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatDate
@@ -31,10 +34,14 @@ import java.time.LocalDateTime
 @Composable
 fun WearStartDateScreen(
     navController: NavController,
-    viewModel: WearStartDateViewModel = koinViewModel(),
+    viewModel: WearTodayViewModel = koinViewModel(),
 ) {
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val startTime = convertMillisToLocalDateTime(startTimeInMillis)
+
+    LaunchedEffect(Unit) {
+        viewModel.initializeTemporalTime()
+    }
 
     WearStartDateContent(
         startTime = startTime,
@@ -43,7 +50,8 @@ fun WearStartDateScreen(
         },
         onNavigateToTimePicker = {
             navController.navigate(WearNavigationRoute.TimePicker.route)
-        }
+        },
+        onUpdateStartTime = { viewModel::updateStartTime }
     )
 }
 
@@ -51,7 +59,8 @@ fun WearStartDateScreen(
 fun WearStartDateContent(
     startTime: LocalDateTime,
     onNavigateToDatePicker: () -> Unit,
-    onNavigateToTimePicker: () -> Unit
+    onNavigateToTimePicker: () -> Unit,
+    onUpdateStartTime: (Long) -> Unit,
 ) {
     val listState = rememberScalingLazyListState()
     ScreenScaffold(
@@ -59,10 +68,12 @@ fun WearStartDateContent(
         edgeButtonSpacing = 0.dp,
         edgeButton = {
             EdgeButton(
-                onClick = { /* ... */ },
+                onClick = {
+//                    onUpdateStartTime()
+                },
                 buttonSize = EdgeButtonSize.Small
             ) {
-                Text(stringResource(com.charliesbot.shared.R.string.label_save))
+                Text(stringResource(R.string.label_save))
             }
         }
     ) { contentPadding ->
@@ -107,6 +118,7 @@ private fun Preview() {
     WearStartDateContent(
         startTime = LocalDateTime.now(),
         onNavigateToDatePicker = {},
-        onNavigateToTimePicker = {}
+        onNavigateToTimePicker = {},
+        onUpdateStartTime = {}
     )
 }
