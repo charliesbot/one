@@ -24,36 +24,31 @@ fun FastingProgressBar(
     indicatorColor: Color = MaterialTheme.colorScheme.primary,
     trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     strokeWidth: Dp = 45.dp,
-    innerContent: @Composable () -> Unit = {}
 ) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Canvas(
-            modifier = Modifier
-                .aspectRatio(1f)
-        ) {
-            val canvasSize = size.minDimension
-            val radius = canvasSize / 2 - strokeWidth.toPx() / 2
+    Canvas(
+        modifier = Modifier
+            .aspectRatio(1f)
+    ) {
+        val canvasSize = size.minDimension
+        val radius = canvasSize / 2 - strokeWidth.toPx() / 2
 
-            drawCircle(
-                color = trackColor,
-                radius = radius,
-                style = Stroke(width = strokeWidth.toPx())
-            )
+        drawCircle(
+            color = trackColor,
+            radius = radius,
+            style = Stroke(width = strokeWidth.toPx())
+        )
 
-            val sweepAngle = progress * 360f
+        val sweepAngle = progress * 360f
 
-            drawArc(
-                color = indicatorColor,
-                startAngle = -90f, // Start from top
-                sweepAngle = sweepAngle,
-                useCenter = false,
-                topLeft = Offset(center.x - radius, center.y - radius),
-                size = Size(radius * 2, radius * 2),
-                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
-            )
-        }
-
-        innerContent()
+        drawArc(
+            color = indicatorColor,
+            startAngle = -90f, // Start from top
+            sweepAngle = sweepAngle,
+            useCenter = false,
+            topLeft = Offset(center.x - radius, center.y - radius),
+            size = Size(radius * 2, radius * 2),
+            style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
+        )
     }
 }
 

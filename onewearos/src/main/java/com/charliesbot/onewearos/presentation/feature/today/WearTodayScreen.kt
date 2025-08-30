@@ -1,7 +1,13 @@
 package com.charliesbot.onewearos.presentation.feature.today
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +34,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TextButton
 import androidx.wear.compose.material3.TextToggleButton
+import androidx.wear.compose.material3.TextToggleButtonDefaults
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.core.components.TimeButtonActions
@@ -105,12 +112,19 @@ fun WearTodayContent(
         }
     }
     ScreenScaffold {
-        FastingProgressBar(
-            progress = calculateProgressFraction(elapsedTime, currentGoal?.durationMillis),
-            strokeWidth = 5.dp,
-            indicatorColor = MaterialTheme.colorScheme.primaryDim,
-            trackColor = MaterialTheme.colorScheme.onBackground,
-        ) {
+        Box() {
+            AnimatedVisibility(
+                visible = isFasting,
+                enter = scaleIn(animationSpec = tween(500), initialScale = 0.9f) + fadeIn(),
+                exit = scaleOut(animationSpec = tween(500), targetScale = 1.2f) + fadeOut(),
+            ) {
+                FastingProgressBar(
+                    progress = calculateProgressFraction(elapsedTime, currentGoal?.durationMillis),
+                    strokeWidth = 5.dp,
+                    indicatorColor = MaterialTheme.colorScheme.primaryDim,
+                    trackColor = MaterialTheme.colorScheme.onBackground,
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -118,6 +132,7 @@ fun WearTodayContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 TextButton(
+                    enabled = !isFasting,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 40.dp),
@@ -151,13 +166,14 @@ fun WearTodayContent(
                     )
                 }
                 TextToggleButton(
+                    shapes = TextToggleButtonDefaults.animatedShapes(),
                     checked = !isFasting,
                     onCheckedChange = {
                         if (isFasting) onStopFasting() else onStartFasting()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 40.dp),
+                        .padding(horizontal = 50.dp)
                 ) {
                     Text(fastButtonLabel, fontSize = if (isLargeScreen) 16.sp else 12.sp)
                 }
@@ -166,12 +182,12 @@ fun WearTodayContent(
     }
 }
 
-@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
 private fun DefaultPreview() {
     WearTodayContent(
         startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
-        isFasting = true,
+        isFasting = false,
         fastingGoalId = "16:8", // 16:8 fasting goal
         initializeTemporalTime = {},
         onStartFasting = { },

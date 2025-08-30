@@ -27,12 +27,12 @@ class WearTodayViewModel(
     private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
+            started = SharingStarted.Eagerly,
             initialValue = null
         )
     val isFasting: StateFlow<Boolean> = currentFasting
         .map { it?.isFasting ?: false }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+        .stateIn(viewModelScope, started = SharingStarted.Eagerly, false)
     val startTimeInMillis: StateFlow<Long> = currentFasting
         .map { it?.startTimeInMillis ?: -1L }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), -1L)
