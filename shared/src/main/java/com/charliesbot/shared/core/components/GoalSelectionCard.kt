@@ -31,12 +31,9 @@ fun GoalSelectionCard(
     Card(
         onClick = onClick,
         border = if (isSelected) BorderStroke(
-            2.dp,
-            Color.White
+            3.dp,
+            MaterialTheme.colorScheme.onBackground
         ) else null,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) 2.dp else 1.dp
-        ),
         colors = CardDefaults.cardColors(
             containerColor = goal.color.copy(alpha = 0.8f)
         ),

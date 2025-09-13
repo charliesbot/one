@@ -2,9 +2,14 @@
 
 This document provides essential information for AI agents (Claude, Gemini, etc.) working on the ONE fasting tracker project. This is a Kotlin-based Android application with companion Wear OS support.
 
+## Architecture
+
+Follow ARCHITECTURE.md file to follow the project structure.
+
 ## Project Overview
 
 ONE is a fasting tracker app with:
+
 - **Android App**: Phone/tablet app with widgets and notifications
 - **Wear OS App**: Smartwatch app with complications, tiles, and ongoing activities
 - **Shared Module**: Common business logic and data synchronization
@@ -23,12 +28,14 @@ ONE is a fasting tracker app with:
 ## Core Libraries & Technologies
 
 ### Dependency Injection
+
 - **Koin** (v4.0.2): Lightweight DI framework
   - Modules: `AppModule`, `WearAppModule`, `SharedModule`
   - Use `koinViewModel()` for ViewModel injection in Compose
   - Example: `private val viewModel: TodayViewModel by koinViewModel()`
 
 ### UI Frameworks
+
 - **Jetpack Compose**: Modern UI toolkit for Android app
   - Material 3 design system (v1.4.0-alpha17)
   - Material Icons Extended for rich iconography
@@ -40,6 +47,7 @@ ONE is a fasting tracker app with:
   - Declarative API similar to Compose
 
 ### Data & State Management
+
 - **Kotlin Coroutines & Flow** (v1.8.1): Async programming
   - StateFlow for UI state
   - SharedFlow for events
@@ -54,6 +62,7 @@ ONE is a fasting tracker app with:
   - DAO: `FastingRecordDao`
 
 ### Wear OS Specific
+
 - **Wearable Data Layer API**: Phone-watch communication
   - Part of Play Services Wearable (v19.0.0)
   - DataClient for sync operations
@@ -63,11 +72,13 @@ ONE is a fasting tracker app with:
 - **Ongoing Activities**: Persistent notifications during fasts
 
 ### Background Processing
+
 - **WorkManager** (v2.10.1): Deferrable background work
   - Schedule notification reminders
   - Periodic widget updates
 
 ### Analytics & Monitoring
+
 - **Firebase Crashlytics**: Crash reporting
   - Auto-configured with google-services.json
   - Track non-fatal exceptions
@@ -76,20 +87,25 @@ ONE is a fasting tracker app with:
 ## Critical Project Rules
 
 ### 1. Data Synchronization is Sacred
+
 - **NEVER** break sync between phone and watch
 - All fasting state changes MUST propagate via Wearable Data Layer
 - Path: `/fasting_state` with keys: `is_fasting`, `start_time`, `fasting_goal`, `update_timestamp`
 - Always include timestamp for conflict resolution
 
 ### 2. UI Component Updates
+
 When data changes occur:
+
 - **Widgets**: Update via `WidgetUpdateManager` in app module
-- **Complications**: Force update via `ComplicationUpdateManager` in wear module  
+- **Complications**: Force update via `ComplicationUpdateManager` in wear module
 - **Tiles**: Refresh via `TileService.requestUpdate()`
 - **Ongoing Activities**: Managed by `OngoingActivityService`
 
 ### 3. Force Update Pattern
+
 When receiving remote data updates:
+
 ```kotlin
 // Example: In WatchFastingStateListenerService
 override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -102,6 +118,7 @@ override fun onDataChanged(dataEvents: DataEventBuffer) {
 ## Module Structure
 
 ### `/shared` - Shared Android Library
+
 - Core data models (`FastingDataItem`, `FastingRecord`)
 - Repository interfaces and implementations
 - `BaseFastingListenerService` - abstract service for sync
@@ -111,6 +128,7 @@ override fun onDataChanged(dataEvents: DataEventBuffer) {
 - DataStore configuration
 
 ### `/app` - Android Phone/Tablet App
+
 - Main UI with Jetpack Compose
 - Widget implementation (Glance)
 - Notification scheduling (WorkManager)
@@ -118,6 +136,7 @@ override fun onDataChanged(dataEvents: DataEventBuffer) {
 - Room database for history
 
 ### `/onewearos` - Wear OS App
+
 - Wear-specific UI with Wear Compose
 - Complications for watch faces
 - Tiles for quick access
@@ -127,6 +146,7 @@ override fun onDataChanged(dataEvents: DataEventBuffer) {
 ## Code Style Guidelines
 
 ### General Kotlin Conventions
+
 - Use `data class` for models
 - Prefer immutability (`val` over `var`)
 - Use Kotlin coroutines and Flows for async operations
@@ -134,12 +154,14 @@ override fun onDataChanged(dataEvents: DataEventBuffer) {
 - Follow standard Kotlin naming conventions
 
 ### Project-Specific Patterns
+
 - Repository pattern for data access
 - ViewModels for UI state management
 - Dependency injection via Koin modules
 - Reactive updates using StateFlow/SharedFlow
 
 ### Koin Dependency Injection
+
 ```kotlin
 // Define modules
 val appModule = module {
@@ -162,6 +184,7 @@ fun TodayScreen() {
 ```
 
 ### File Organization
+
 - Group related files in packages (e.g., `today/`, `notifications/`, `widgets/`)
 - Keep platform-specific code in respective modules
 - Share common logic in `/shared` module
@@ -169,6 +192,7 @@ fun TodayScreen() {
 ## Common Tasks
 
 ### Adding a New Feature
+
 1. Update shared models if needed in `/shared/core/models`
 2. Modify repository interfaces in `/shared/core/data/repositories`
 3. Add Koin definitions if new dependencies needed
@@ -177,18 +201,21 @@ fun TodayScreen() {
 6. Update relevant UI components (widgets/complications/tiles)
 
 ### Modifying Fasting Logic
+
 1. Update `FastingUseCase` in shared module
 2. Ensure `FastingEventManager` callbacks are triggered
 3. Test sync between devices
 4. Verify widgets/complications update correctly
 
 ### Working with Widgets/Complications/Tiles
+
 - Widgets: Use Glance API in `/app/widgets`
 - Complications: Update `MainComplicationService` in `/onewearos`
 - Tiles: Modify `MainTileService` in `/onewearos`
 - Always trigger manual updates after data changes
 
 ### Adding New Dependencies
+
 1. Add to `gradle/libs.versions.toml`
 2. Reference in module's `build.gradle.kts`
 3. Update Koin modules if needed
@@ -197,16 +224,19 @@ fun TodayScreen() {
 ## Code Quality Standards (Recommended)
 
 ### Linting
+
 Consider adding to `app/build.gradle.kts`:
+
 ```kotlin
 // ktlint
 id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 
-// detekt  
+// detekt
 id("io.gitlab.arturbosch.detekt") version "1.23.6"
 ```
 
 ### Formatting
+
 - Use Android Studio's default Kotlin style
 - Format code with Ctrl+Alt+L (Cmd+Option+L on Mac)
 - Optimize imports with Ctrl+Alt+O (Cmd+Option+O on Mac)
@@ -214,12 +244,14 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 ## Building and Running
 
 ### Via Android Studio
+
 1. Open project in Android Studio
 2. Select run configuration (app or onewearos)
 3. Choose device/emulator
 4. Click Run (Shift+F10)
 
 ### Gradle Commands (if needed)
+
 ```bash
 # Build debug APK
 ./gradlew app:assembleDebug
@@ -260,18 +292,21 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 ## Debugging Tips
 
 ### For Sync Issues
+
 1. Check logcat for both devices
 2. Verify DataLayer path and keys match
 3. Ensure timestamps are properly updated
 4. Check node ID filtering in listener services
 
-### For UI Update Issues  
+### For UI Update Issues
+
 1. Verify update managers are called
 2. Check if UI components are registered properly
 3. Look for lifecycle issues
 4. Ensure Glance/Compose states are updated
 
 ### For Dependency Injection Issues
+
 1. Check Koin module definitions
 2. Verify scope (single vs factory)
 3. Ensure modules are loaded in Application class
@@ -307,6 +342,7 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 - Use standard categories: Added, Changed, Fixed, Deprecated, Removed, Security
 
 ### What to Include in Changelog:
+
 - New features users can see/use
 - Bug fixes that affect user experience
 - UI/UX changes users will notice
@@ -314,6 +350,7 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 - Breaking changes to user workflows
 
 ### What NOT to Include:
+
 - Internal code refactoring
 - Component extractions/reorganization
 - Dependency updates (unless they affect users)
@@ -322,3 +359,4 @@ id("io.gitlab.arturbosch.detekt") version "1.23.6"
 - Developer tooling updates
 
 Remember: The core challenge of this project is maintaining perfect synchronization between devices while keeping all UI components updated. When in doubt, force update the UI components!
+

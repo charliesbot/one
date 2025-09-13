@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
         updateWidgetPreview(this)
         setContent {
             var showNotificationPermission by remember { mutableStateOf(false) }
+            var selectedItem by remember { mutableIntStateOf(0) }
 
             LaunchedEffect(Unit) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
