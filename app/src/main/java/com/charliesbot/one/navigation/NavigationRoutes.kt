@@ -5,4 +5,7 @@ import kotlinx.serialization.Serializable
 sealed interface NavigationRoute
 
 @Serializable
-data object Home : NavigationRoute
+data object Today : NavigationRoute
+
+@Serializable
+data object You : NavigationRoute

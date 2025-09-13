@@ -10,9 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -22,11 +20,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.charliesbot.one.core.components.NotificationPermissionDialog
-import com.charliesbot.one.features.dashboard.TodayScreen
+import com.charliesbot.one.navigation.MainNavigation
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.one.widgets.updateWidgetPreview
 import com.charliesbot.shared.core.notifications.NotificationUtil
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MainActivity : ComponentActivity() {
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -60,24 +59,19 @@ class MainActivity : ComponentActivity() {
             }
 
             OneTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.background
-                ) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        TodayScreen()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    MainNavigation()
 
-                        if (showNotificationPermission) {
-                            NotificationPermissionDialog(
-                                onDismiss = { showNotificationPermission = false },
-                                onConfirm = {
-                                    showNotificationPermission = false
-                                    requestNotificationPermission.launch(
-                                        Manifest.permission.POST_NOTIFICATIONS
-                                    )
-                                }
-                            )
-                        }
+                    if (showNotificationPermission) {
+                        NotificationPermissionDialog(
+                            onDismiss = { showNotificationPermission = false },
+                            onConfirm = {
+                                showNotificationPermission = false
+                                requestNotificationPermission.launch(
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                )
+                            }
+                        )
                     }
                 }
             }
