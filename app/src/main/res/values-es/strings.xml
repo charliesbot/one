@@ -16,11 +16,6 @@
     <string name="notification_permission_enable">Activar</string>
     <string name="notification_permission_not_now">Ahora No</string>
 
-    <!-- Time Picker Dialog -->
-    <string name="time_picker_select_time">Seleccionar Hora</string>
-    <string name="time_picker_cancel">Cancelar</string>
-    <string name="time_picker_save">Guardar</string>
-
     <!-- Notification Strings -->
     <string name="notification_one_hour_title">¡Queda 1 hora!</string>
     <string name="notification_one_hour_message">¡Lo estás haciendo muy bien! Solo queda una hora para completar tu ayuno.</string>
@@ -37,20 +32,6 @@
         <item quantity="many">horas restantes!</item>
         <item quantity="other">horas restantes!</item>
     </plurals>
-
-    <!-- Goal Bottom Sheet -->
-    <string name="select_goal">Seleccionar una Meta</string>
-    <string name="hours">horas</string>
-    <string name="save">Guardar</string>
-
-    <!-- Weekly Progress -->
-    <string name="monday">Lun</string>
-    <string name="tuesday">Mar</string>
-    <string name="wednesday">Mié</string>
-    <string name="thursday">Jue</string>
-    <string name="friday">Vie</string>
-    <string name="saturday">Sáb</string>
-    <string name="sunday">Dom</string>
 
     <!-- Widget -->
     <string name="progress_ring_desc">Anillo de Progreso</string>

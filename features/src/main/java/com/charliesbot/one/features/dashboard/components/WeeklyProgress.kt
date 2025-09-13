@@ -1,4 +1,4 @@
-package com.charliesbot.one.core.components
+package com.charliesbot.one.features.dashboard.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.charliesbot.one.R
-import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.testing.MockDataUtils
@@ -59,12 +58,10 @@ fun WeeklyProgress(modifier: Modifier = Modifier, weeklyProgress: List<TimePerio
 @Preview(showBackground = true)
 @Composable
 fun WeeklyProgressPreview() {
-    OneTheme {
-        Box(modifier = Modifier.width(300.dp)) {
-            WeeklyProgress(
-                modifier = Modifier.fillMaxWidth(),
-                weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-            )
-        }
+    Box(modifier = Modifier.width(300.dp)) {
+        WeeklyProgress(
+            modifier = Modifier.fillMaxWidth(),
+            weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+        )
     }
 }

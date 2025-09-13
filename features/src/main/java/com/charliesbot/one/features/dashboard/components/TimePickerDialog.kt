@@ -1,4 +1,4 @@
-package com.charliesbot.one.core.components
+package com.charliesbot.one.features.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,9 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.charliesbot.one.R
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
-import com.charliesbot.one.ui.theme.OneTheme
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -66,13 +65,13 @@ fun TimePickerDialog(
             shape = MaterialTheme.shapes.extraLarge,
             tonalElevation = 6.dp,
             modifier =
-            Modifier
-                .width(IntrinsicSize.Min)
-                .height(IntrinsicSize.Min)
-                .background(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface
-                ),
+                Modifier
+                    .width(IntrinsicSize.Min)
+                    .height(IntrinsicSize.Min)
+                    .background(
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.surface
+                    ),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -111,7 +110,5 @@ fun TimePickerDialog(
 @Preview
 @Composable
 fun InnerTimePickerPreview() {
-    OneTheme {
-        TimePickerDialog(onConfirm = {}, onDismiss = {}, startTimeMillis = 639716400000)
-    }
+    TimePickerDialog(onConfirm = {}, onDismiss = {}, startTimeMillis = 639716400000)
 }

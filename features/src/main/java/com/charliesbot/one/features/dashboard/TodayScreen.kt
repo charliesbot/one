@@ -1,4 +1,4 @@
-package com.charliesbot.one.today
+package com.charliesbot.one.features.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -38,13 +38,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.charliesbot.one.R
-import com.charliesbot.one.core.components.GoalBottomSheet
-import com.charliesbot.one.core.components.TimeDisplay
-import com.charliesbot.one.core.components.TimePickerDialog
-import com.charliesbot.one.core.components.WeeklyProgress
-import com.charliesbot.one.today.components.CurrentFastingProgress
-import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.R
+import com.charliesbot.one.features.dashboard.components.GoalBottomSheet
+import com.charliesbot.one.features.dashboard.components.TimeDisplay
+import com.charliesbot.one.features.dashboard.components.TimePickerDialog
+import com.charliesbot.one.features.dashboard.components.WeeklyProgress
+import com.charliesbot.one.features.dashboard.components.CurrentFastingProgress
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.testing.MockDataUtils
@@ -254,8 +253,7 @@ private fun TodayScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewTodayScreen() {
-    OneTheme {
+private fun PreviewTodayScreen() {
         TodayScreenContent(
             isTimePickerDialogOpen = false,
             isGoalBottomSheetOpen = false,
@@ -272,13 +270,11 @@ fun PreviewTodayScreen() {
             onCloseGoalBottomSheet = {},
             onUpdateFastingGoal = {}
         )
-    }
 }
 
 @Preview(heightDp = 360, widthDp = 800)
 @Composable
-fun PreviewTodayScreenLandscape() {
-    OneTheme {
+private fun PreviewTodayScreenLandscape() {
         TodayScreenContent(
             isTimePickerDialogOpen = false,
             isGoalBottomSheetOpen = false,
@@ -295,6 +291,5 @@ fun PreviewTodayScreenLandscape() {
             onCloseGoalBottomSheet = {},
             onUpdateFastingGoal = {}
         )
-    }
 }
 

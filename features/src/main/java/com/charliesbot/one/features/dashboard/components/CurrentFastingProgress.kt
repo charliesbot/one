@@ -1,4 +1,4 @@
-package com.charliesbot.one.today.components
+package com.charliesbot.one.features.dashboard.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,8 +22,7 @@ import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.formatTimestamp
-import com.charliesbot.one.R
-import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -92,19 +91,17 @@ fun CurrentFastingProgress(
 @Preview(showBackground = true)
 @Composable
 fun CurrentFastingProgressPreview() {
-    OneTheme {
-        Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
-            CurrentFastingProgress(
-                isFasting = false,
-                elapsedTime = 0L,
-                fastingGoalId = "circadian",
-                onFastingStatusClick = {})
-            CurrentFastingProgress(
-                isFasting = true,
-                elapsedTime = 7 * 1000 * 60 * 60,
-                fastingGoalId = "circadian",
-                onFastingStatusClick = {},
-            )
-        }
+    Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
+        CurrentFastingProgress(
+            isFasting = false,
+            elapsedTime = 0L,
+            fastingGoalId = "circadian",
+            onFastingStatusClick = {})
+        CurrentFastingProgress(
+            isFasting = true,
+            elapsedTime = 7 * 1000 * 60 * 60,
+            fastingGoalId = "circadian",
+            onFastingStatusClick = {},
+        )
     }
 }

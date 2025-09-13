@@ -16,11 +16,6 @@
     <string name="notification_permission_enable">Enable</string>
     <string name="notification_permission_not_now">Not Now</string>
 
-    <!-- Time Picker Dialog -->
-    <string name="time_picker_select_time">Select Time</string>
-    <string name="time_picker_cancel">Cancel</string>
-    <string name="time_picker_save">Save</string>
-
     <!-- Notification Strings -->
     <string name="notification_one_hour_title">1 Hour Remaining!</string>
     <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
@@ -36,20 +31,6 @@
         <item quantity="one">hour left!</item>
         <item quantity="other">hours left!</item>
     </plurals>
-
-    <!-- Goal Bottom Sheet -->
-    <string name="select_goal">Select a Goal</string>
-    <string name="hours">hours</string>
-    <string name="save">Save</string>
-
-    <!-- Weekly Progress -->
-    <string name="monday">Mon</string>
-    <string name="tuesday">Tue</string>
-    <string name="wednesday">Wed</string>
-    <string name="thursday">Thu</string>
-    <string name="friday">Fri</string>
-    <string name="saturday">Sat</string>
-    <string name="sunday">Sun</string>
 
     <!-- Widget -->
     <string name="progress_ring_desc">Progress Ring</string>

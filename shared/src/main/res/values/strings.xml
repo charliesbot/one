@@ -9,6 +9,30 @@
 
     <!-- Common UI strings -->
     <string name="hours">hours</string>
-    <string name="select_goal">Select a goal</string>
     <string name="label_save">Save</string>
+    <string name="elapsed_percentage">Elapsed (%1$d%%)</string>
+    <string name="upcoming_fast">Upcoming fast</string>
+    <string name="fasting_duration_hours">%1$s hours</string>
+    <string name="end_fast">End Fast</string>
+    <string name="start_fasting">Start Fasting</string>
+    <string name="goal_with_duration">%1$s Goal</string>
+    <string name="started">Started</string>
+
+    <!-- Weekly Progress -->
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
+
+    <!-- Goal Bottom Sheet -->
+    <string name="select_goal">Select a goal</string>
+    <string name="save">Save</string>
+
+    <!-- Time Picker Dialog -->
+    <string name="time_picker_select_time">Select Time</string>
+    <string name="time_picker_cancel">Cancel</string>
+    <string name="time_picker_save">Save</string>
 </resources>

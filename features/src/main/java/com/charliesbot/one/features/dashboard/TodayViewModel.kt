@@ -1,4 +1,4 @@
-package com.charliesbot.one.today
+package com.charliesbot.one.features.dashboard
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

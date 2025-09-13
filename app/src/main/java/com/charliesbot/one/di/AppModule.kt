@@ -11,7 +11,7 @@ import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import com.charliesbot.one.today.TodayViewModel
+import com.charliesbot.one.features.dashboard.TodayViewModel
 import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase

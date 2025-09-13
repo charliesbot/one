@@ -1,10 +1,9 @@
-package com.charliesbot.one.core.components
+package com.charliesbot.one.features.dashboard.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +13,7 @@ import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.core.utils.TimeFormat
 import com.charliesbot.shared.core.utils.formatDate
 import java.time.LocalDateTime
@@ -46,7 +45,7 @@ fun TimeDisplay(
                 .fillMaxWidth()
                 .padding(0.dp),
             style = TextStyle(
-                platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                platformStyle = PlatformTextStyle(
                     includeFontPadding = false
                 ),
                 textAlign = TextAlign.Center,
@@ -81,12 +80,10 @@ fun TimeDisplay(
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
 private fun TimeDisplayPreview() {
-    OneTheme {
-        TimeDisplay(
-            title = "Started",
-            date = LocalDateTime.now(),
-            onClick = {},
-            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes()
-        )
-    }
+    TimeDisplay(
+        title = "Started",
+        date = LocalDateTime.now(),
+        onClick = {},
+        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes()
+    )
 }

@@ -128,6 +128,7 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
     implementation(project(":shared"))
+    implementation(project(":features"))
     implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
