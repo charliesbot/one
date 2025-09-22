@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class TodayViewModel(
     application: Application,
-    private val fastingHistoryRepository: FastingHistoryRepository,
+    fastingHistoryRepository: FastingHistoryRepository,
     private val fastingUseCase: FastingUseCase,
 ) : AndroidViewModel(application) {
     private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()

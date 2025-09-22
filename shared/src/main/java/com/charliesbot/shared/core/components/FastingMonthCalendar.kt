@@ -12,14 +12,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,11 +41,11 @@ data class FastingDayData(
 
 @Composable
 fun FastingMonthCalendar(
+    modifier: Modifier = Modifier,
     yearMonth: YearMonth,
     fastingData: Map<LocalDate, FastingDayData> = emptyMap(),
     firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
     onDayClick: (LocalDate) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val monthName = yearMonth.format(DateTimeFormatter.ofPattern("MMM ''yy"))
     val monthTotalHours = fastingData.values.sumOf { it.durationHours ?: 0 }
@@ -117,7 +121,7 @@ private fun WeekDaysHeader(firstDayOfWeek: DayOfWeek) {
 }
 
 private fun getWeekDaysLabels(firstDayOfWeek: DayOfWeek): List<String> {
-    val allDays = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+    val allDays = listOf("S", "M", "T", "W", "T", "F", "S")
 
     return when (firstDayOfWeek) {
         DayOfWeek.SUNDAY -> allDays // Sun, Mon, Tue, Wed, Thu, Fri, Sat
@@ -182,6 +186,7 @@ private fun calculateStartOffset(firstDayOfMonth: DayOfWeek, calendarFirstDay: D
                 DayOfWeek.SATURDAY -> 6
             }
         }
+
         DayOfWeek.MONDAY -> {
             // Monday = 0, Tuesday = 1, ..., Sunday = 6
             when (firstDayOfMonth) {
@@ -194,12 +199,14 @@ private fun calculateStartOffset(firstDayOfMonth: DayOfWeek, calendarFirstDay: D
                 DayOfWeek.SUNDAY -> 6
             }
         }
+
         else -> 0 // Default case
     }
 
     return monthStartIndex
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun FastingDayCell(
     dayNumber: Int,
@@ -210,7 +217,7 @@ private fun FastingDayCell(
     val backgroundColor = when {
         fastingData?.durationHours != null && fastingData.isGoalMet -> MaterialTheme.colorScheme.primary
         fastingData?.durationHours != null -> MaterialTheme.colorScheme.surfaceVariant
-        else -> MaterialTheme.colorScheme.surface
+        else -> Color.Transparent
     }
 
     val contentColor = when {
@@ -221,9 +228,9 @@ private fun FastingDayCell(
 
     Box(
         modifier = modifier
-            .padding(2.dp)
-            .size(width = 44.dp, height = 36.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .padding(4.dp)
+            .size(44.dp)
+            .clip(MaterialShapes.Cookie12Sided.toShape())
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -235,7 +242,6 @@ private fun FastingDayCell(
                 text = dayNumber.toString(),
                 style = MaterialTheme.typography.bodySmall,
                 color = contentColor,
-                fontWeight = if (fastingData?.isGoalMet == true) FontWeight.Bold else FontWeight.Normal
             )
 
             fastingData?.durationHours?.let { hours ->
@@ -243,7 +249,7 @@ private fun FastingDayCell(
                     text = "${hours}h",
                     style = MaterialTheme.typography.labelSmall,
                     color = contentColor,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = if (fastingData.isGoalMet) FontWeight.Bold else FontWeight.Normal
                 )
             }
         }
@@ -251,7 +257,7 @@ private fun FastingDayCell(
 }
 
 // Hardcoded data for preview
-private fun createMockFastingData(yearMonth: YearMonth): Map<LocalDate, FastingDayData> {
+fun createMockFastingData(yearMonth: YearMonth): Map<LocalDate, FastingDayData> {
     val data = mutableMapOf<LocalDate, FastingDayData>()
     val daysInMonth = yearMonth.lengthOfMonth()
 
