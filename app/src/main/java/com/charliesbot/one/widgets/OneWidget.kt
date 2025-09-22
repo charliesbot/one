@@ -53,7 +53,7 @@ object ProgressBitmap {
 }
 
 class OneWidget() : GlanceAppWidget(), KoinComponent {
-    private val ringDp: Dp = 75.dp
+    private val ringDp: Dp = 60.dp
     private val strokeDp: Dp = 10.dp
     private val fastingDataRepository: FastingDataRepository by inject()
 

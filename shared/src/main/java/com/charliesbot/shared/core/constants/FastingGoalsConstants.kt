@@ -18,6 +18,9 @@ data class FastGoal(
 
 object PredefinedFastingGoals {
 
+    // Minimum hours to consider a completed fast
+    const val MIN_FASTING_HOURS = 13f
+
     // Helper to calculate milliseconds from hours
     private fun hoursToMillis(hours: Int): Long = hours * 60L * 60L * 1000L
 

@@ -17,6 +17,7 @@ import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import com.charliesbot.shared.core.services.FastingEventCallbacks
 import org.koin.android.ext.koin.androidContext
 
@@ -62,6 +63,8 @@ val appModule = module {
     single<StringProvider> {
         AndroidStringProvider(androidContext())
     }
+
+    factory{ GetMonthlyFastingMapUseCase(get()) }
 
     viewModelOf(::TodayViewModel)
     viewModelOf(::YouViewModel)

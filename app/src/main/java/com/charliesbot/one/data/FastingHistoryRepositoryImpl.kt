@@ -5,6 +5,8 @@ import com.charliesbot.shared.core.data.db.FastingRecordDao
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
 import kotlinx.coroutines.flow.Flow
+import java.time.YearMonth
+import java.time.ZoneId
 import java.util.Calendar
 
 class FastingHistoryRepositoryImpl(
@@ -61,6 +63,28 @@ class FastingHistoryRepositoryImpl(
 
         val sinceTimestamp = calendar.timeInMillis
         return fastingRecordDao.getFastingsSince(sinceTimestamp)
+    }
+
+    override fun getFastingsForMonth(yearMonth: YearMonth): Flow<List<FastingRecord>> {
+        // This is now even cleaner!
+
+        // 1. Get the start of the given month (e.g., 2025-09-01T00:00:00)
+        val startTimestamp = yearMonth.atDay(1)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+
+        // 2. Get the start of the NEXT month (e.g., 2025-10-01T00:00:00)
+        val endExclusiveTimestamp = yearMonth.plusMonths(1)
+            .atDay(1)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+
+        return fastingRecordDao.getFastingsForPeriod(
+            startTimestamp = startTimestamp,
+            endExclusiveTimestamp = endExclusiveTimestamp
+        )
     }
 
     override suspend fun saveFastingRecord(record: FastingRecord) {
