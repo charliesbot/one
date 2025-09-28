@@ -242,7 +242,7 @@ class MainComplicationService :
         getString(
             R.string.complication_text_fasting_format,
             fastingProgress.progressPercentage,
-            fastingProgress.elapsedHours.toInt(),
+            fastingProgress.elapsedHours.toInt().toString(),
             getString(R.string.target_duration_short, fastingGoal.durationDisplay)
         )
     ).build()
