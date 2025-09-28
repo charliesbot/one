@@ -29,7 +29,7 @@
 
             <meta-data
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="GOAL_PROGRESS" />
+                android:value="GOAL_PROGRESS,SHORT_TEXT,ICON,RANGED_VALUE,LONG_TEXT" />
             <meta-data
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
                 android:value="600" />
