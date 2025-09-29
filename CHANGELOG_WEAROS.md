@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [29] - 2025-09-28
+
+### Added
+- Support for additional complication formats: SHORT_TEXT, LONG_TEXT, RANGED_VALUE, and MONOCHROMATIC_IMAGE
+- Enhanced complication compatibility with more watch faces
+
+---
+
 ## [Previous Releases]
 
 <!-- Add completed releases here when ready -->

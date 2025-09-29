@@ -7,18 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Weekly progress display for fasting sessions that cross week boundaries (e.g., Sunday to Monday when week starts on Monday)
-
 ### Added
 
 ### Changed
+
+### Fixed
 
 ### Deprecated
 
 ### Removed
 
 ### Security
+
+---
+
+## [28] - 2025-09-28
+
+### Added
+- Month calendar view to track fasting progress over time
+- Long-term progress visualization in calendar format
+
+### Fixed
+- Weekly progress display for fasting sessions that cross week boundaries (e.g., Sunday to Monday when week starts on Monday)
 
 ---
 

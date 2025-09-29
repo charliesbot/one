@@ -26,7 +26,7 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 33
         targetSdk = 35
-        versionCode = 27
+        versionCode = 29
         versionName = "1.0"
 
     }
@@ -34,7 +34,11 @@ android {
     signingConfigs {
         create("release") {
             try {
-                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                val storeFileName = keystoreProperties.getProperty("storeFile")
+                // Get the user's home directory path
+                val userHome = System.getProperty("user.home")
+                // Build the full, OS-agnostic path and assign it
+                storeFile = file("$userHome/.android/$storeFileName")
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
