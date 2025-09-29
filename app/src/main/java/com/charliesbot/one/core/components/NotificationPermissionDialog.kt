@@ -1,12 +1,11 @@
 package com.charliesbot.one.core.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.charliesbot.one.R
@@ -20,7 +19,7 @@ fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
         title = { Text(stringResource(R.string.notification_permission_title)) },
         icon = {
             Icon(
-                Icons.Rounded.Notifications,
+                painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
                 contentDescription = stringResource(R.string.notification_permission_icon_desc)
             )
         },

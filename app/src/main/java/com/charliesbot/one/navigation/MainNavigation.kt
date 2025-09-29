@@ -1,11 +1,9 @@
 package com.charliesbot.one.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import com.charliesbot.shared.R
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -14,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -30,8 +30,13 @@ fun MainNavigation() {
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Today, contentDescription = "Today") },
-                    label = { Text("Today") },
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.today_24px),
+                            contentDescription = stringResource(R.string.nav_today)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.nav_today)) },
                     selected = currentDestination == Today,
                     onClick = {
                         if (currentDestination != Today) {
@@ -41,8 +46,13 @@ fun MainNavigation() {
                     }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Person, contentDescription = "You") },
-                    label = { Text("You") },
+                    icon = {
+                        Icon(
+                            painterResource(R.drawable.person_24px),
+                            contentDescription = stringResource(R.string.nav_you)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.nav_you)) },
                     selected = currentDestination == You,
                     onClick = {
                         if (currentDestination != You) {
