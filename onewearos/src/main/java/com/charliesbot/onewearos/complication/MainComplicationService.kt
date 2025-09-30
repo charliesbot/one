@@ -53,7 +53,7 @@ class MainComplicationService :
                 contentDescription = contentDescription
             )
                 .setMonochromaticImage(icon)
-                .setTitle(title)
+                .setText(title)
                 .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
@@ -78,7 +78,7 @@ class MainComplicationService :
                 max = MOCKED_TARGET_HOURS,
                 contentDescription = contentDescription
             )
-                .setTitle(title)
+                .setText(title)
                 .setMonochromaticImage(icon)
                 .build()
 
@@ -198,7 +198,7 @@ class MainComplicationService :
                 targetValue = fastingProgress.targetHours.toFloat(),
                 contentDescription = contentDescription
             )
-                .setTitle(title)
+                .setText(title)
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
                 .build()
@@ -219,7 +219,7 @@ class MainComplicationService :
                 max = fastingProgress.targetHours.toFloat(),
                 contentDescription = contentDescription
             )
-                .setTitle(title)
+                .setText(title)
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
                 .build()
