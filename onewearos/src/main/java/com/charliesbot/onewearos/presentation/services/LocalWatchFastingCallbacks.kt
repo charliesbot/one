@@ -17,7 +17,8 @@ import com.charliesbot.shared.core.services.FastingEventCallbacks
  */
 class LocalWatchFastingCallbacks(
     private val context: Context,
-    private val complicationUpdateManager: ComplicationUpdateManager
+    private val complicationUpdateManager: ComplicationUpdateManager,
+    private val ongoingActivityManager: OngoingActivityManager
 ) : FastingEventCallbacks {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
@@ -39,5 +40,8 @@ class LocalWatchFastingCallbacks(
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
         Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
+        complicationUpdateManager.requestUpdate()
+        ongoingActivityManager.requestUpdate()
+        Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
     }
 }

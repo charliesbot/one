@@ -1,9 +1,8 @@
 package com.charliesbot.onewearos.core.components
 
-import androidx.compose.material.icons.Icons
 import com.charliesbot.onewearos.R
-import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,7 +24,7 @@ fun NotificationPermissionDialog(
         onDismissRequest = onDismiss,
         icon = {
             Icon(
-                Icons.Rounded.Notifications,
+                painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
                 contentDescription = "Notification Permission"
             )
         },

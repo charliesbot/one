@@ -34,6 +34,6 @@ val wearAppModule = module {
             fastingDataRepository = get()
         )
     }
-    single { LocalWatchFastingCallbacks(get(), get()) }
+    single { LocalWatchFastingCallbacks(get(), get(), get()) }
     single<FastingEventCallbacks> { get<LocalWatchFastingCallbacks>() }
 }

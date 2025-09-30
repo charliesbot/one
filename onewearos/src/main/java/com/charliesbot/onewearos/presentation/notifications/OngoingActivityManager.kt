@@ -52,6 +52,14 @@ class OngoingActivityManager(
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun requestUpdate() {
+        Log.d(LOG_TAG, "OngoingActivityManager: Requesting immediate update.")
+        managerScope.launch {
+            updateNotification()
+        }
+    }
+
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun startPeriodicUpdates() {
         if (periodicUpdateJob?.isActive == true) {
             Log.d(LOG_TAG, "OngoingActivityManager: Periodic updates already running.")
