@@ -39,4 +39,10 @@
     <!-- Navigation -->
     <string name="nav_today">Today</string>
     <string name="nav_you">You</string>
+
+    <!-- Notification Strings -->
+    <string name="notification_one_hour_title">1 Hour Remaining!</string>
+    <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
+    <string name="notification_completion_title">Fasting Completed!</string>
+    <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
 </resources>

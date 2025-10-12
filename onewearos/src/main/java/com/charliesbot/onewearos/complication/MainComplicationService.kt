@@ -65,7 +65,8 @@ class MainComplicationService :
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder("8h / ${MOCKED_TARGET_HOURS.toInt()}h").build(),
+                text = PlainComplicationText.Builder("8h / ${MOCKED_TARGET_HOURS.toInt()}h")
+                    .build(),
                 contentDescription = contentDescription
             )
                 .setTitle(title)
@@ -129,6 +130,10 @@ class MainComplicationService :
                 targetValue = 1f, // Avoid division by zero
                 contentDescription = contentDescription
             )
+                .setText(
+                    PlainComplicationText.Builder("-")
+                        .build()
+                )
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
                 .build()
@@ -179,7 +184,12 @@ class MainComplicationService :
         ).build()
         val elapsedHours = fastingProgress.elapsedHours.toInt()
         val title =
-            PlainComplicationText.Builder(getString(R.string.complication_title_hours_format, elapsedHours))
+            PlainComplicationText.Builder(
+                getString(
+                    R.string.complication_title_hours_format,
+                    elapsedHours
+                )
+            )
                 .build()
 
         return when (type) {
@@ -204,7 +214,8 @@ class MainComplicationService :
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder("${elapsedHours}h / ${fastingGoal.durationDisplay}").build(),
+                text = PlainComplicationText.Builder("${elapsedHours}h / ${fastingGoal.durationDisplay}")
+                    .build(),
                 contentDescription = contentDescription
             )
                 .setTitle(title)

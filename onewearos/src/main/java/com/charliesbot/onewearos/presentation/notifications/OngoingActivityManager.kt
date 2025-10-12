@@ -115,24 +115,17 @@ class OngoingActivityManager(
     ): String {
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingDataItem.fastingGoalId)
         return if (fastingProgress.isComplete) {
-            context.getString(R.string.notification_completion_title)
+            context.getString(com.charliesbot.shared.R.string.notification_completion_title)
         } else {
-            val a =
+            context.getString(
+                R.string.complication_text_fasting_format,
+                fastingProgress.progressPercentage,
+                fastingProgress.elapsedHours.toString(),
                 context.getString(
-                    R.string.complication_text_fasting_format,
-                    fastingProgress.progressPercentage,
-                    fastingProgress.elapsedHours.toString(),
-                    context.getString(
-                        R.string.target_duration_short,
-                        fastingGoal.durationDisplay
-                    )
+                    R.string.target_duration_short,
+                    fastingGoal.durationDisplay
                 )
-            Log.d(LOG_TAG, "createStatusText: $a")
-            Log.d(
-                LOG_TAG,
-                "${fastingProgress.progressPercentage} and ${fastingProgress.elapsedHours} and ${fastingGoal.durationDisplay}"
             )
-            a
         }
     }
 

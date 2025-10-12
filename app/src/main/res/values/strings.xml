@@ -1,12 +1,5 @@
 <resources>
     <string name="app_name">One</string>
-    <string name="end_fast">End Fast</string>
-    <string name="start_fasting">Start Fasting</string>
-    <string name="started">Started</string>
-    <string name="goal_with_duration">%1$s Goal</string>
-    <string name="elapsed_percentage">Elapsed (%1$d%%)</string>
-    <string name="upcoming_fast">Upcoming fast</string>
-    <string name="fasting_duration_hours">%1$s hours</string>
 
     <!-- Notification Permission Dialog -->
     <string name="notification_permission_title">Enable Notifications</string>
@@ -15,12 +8,6 @@
         to send you notifications.\n\nWould you like to enable notifications?</string>
     <string name="notification_permission_enable">Enable</string>
     <string name="notification_permission_not_now">Not Now</string>
-
-    <!-- Notification Strings -->
-    <string name="notification_one_hour_title">1 Hour Remaining!</string>
-    <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
-    <string name="notification_completion_title">Fasting Completed!</string>
-    <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
 
     <!-- Widget Strings -->
     <string name="widget_goal_met_part_1">Goal</string>

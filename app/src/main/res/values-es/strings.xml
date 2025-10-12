@@ -1,12 +1,5 @@
 <resources>
     <string name="app_name">One</string>
-    <string name="end_fast">Terminar Ayuno</string>
-    <string name="start_fasting">Empezar Ayuno</string>
-    <string name="started">Empezó</string>
-    <string name="goal_with_duration">%1$s Meta</string>
-    <string name="elapsed_percentage">Transcurrido (%1$d%%)</string>
-    <string name="upcoming_fast">Próximo ayuno</string>
-    <string name="fasting_duration_hours">%1$s horas</string>
 
     <!-- Notification Permission Dialog -->
     <string name="notification_permission_title">Activar Notificaciones</string>
@@ -15,12 +8,6 @@
         enviarte notificaciones.\n\n¿Te gustaría activar las notificaciones?</string>
     <string name="notification_permission_enable">Activar</string>
     <string name="notification_permission_not_now">Ahora No</string>
-
-    <!-- Notification Strings -->
-    <string name="notification_one_hour_title">¡Queda 1 hora!</string>
-    <string name="notification_one_hour_message">¡Lo estás haciendo muy bien! Solo queda una hora para completar tu ayuno.</string>
-    <string name="notification_completion_title">¡Ayuno completado!</string>
-    <string name="notification_completion_message">¡Felicidades! Has completado tu ayuno.</string>
 
     <!-- Widget Strings -->
     <string name="widget_goal_met_part_1">Meta</string>
