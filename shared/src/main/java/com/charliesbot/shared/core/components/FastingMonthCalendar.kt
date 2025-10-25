@@ -43,7 +43,9 @@ import java.util.Locale
 data class FastingDayData(
     val date: LocalDate,
     val durationHours: Int? = null, // null means no fasting that day
-    val isGoalMet: Boolean = false
+    val isGoalMet: Boolean = false,
+    val startTimeEpochMillis: Long? = null,
+    val endTimeEpochMillis: Long? = null
 )
 
 @Composable

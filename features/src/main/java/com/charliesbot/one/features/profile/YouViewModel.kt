@@ -20,7 +20,8 @@ import java.time.YearMonth
 data class CalendarUiState(
     val selectedMonth: YearMonth = YearMonth.now(),
     val firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
-    val fastingData: Map<LocalDate, FastingDayData> = emptyMap()
+    val fastingData: Map<LocalDate, FastingDayData> = emptyMap(),
+    val selectedDay: FastingDayData? = null
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,6 +32,8 @@ class YouViewModel(
     private val _selectedMonth = MutableStateFlow(YearMonth.now())
     val selectedMonth: StateFlow<YearMonth> = _selectedMonth
 
+    private val _selectedDay = MutableStateFlow<FastingDayData?>(null)
+
     private val fastingDataFlow: Flow<Map<LocalDate, FastingDayData>> =
         _selectedMonth.flatMapLatest { month ->
             getMonthlyFastingMapUseCase(month)
@@ -38,11 +41,13 @@ class YouViewModel(
 
     val uiState: StateFlow<CalendarUiState> = combine(
         _selectedMonth,
-        fastingDataFlow
-    ) { month, data ->
+        fastingDataFlow,
+        _selectedDay
+    ) { month, data, selectedDay ->
         CalendarUiState(
             selectedMonth = month,
-            fastingData = data
+            fastingData = data,
+            selectedDay = selectedDay
         )
     }.stateIn(
         scope = viewModelScope,
@@ -56,6 +61,10 @@ class YouViewModel(
 
     fun onPreviousMonth() {
         _selectedMonth.value = _selectedMonth.value.minusMonths(1)
+    }
+
+    fun onDaySelected(day: FastingDayData?) {
+        _selectedDay.value = day
     }
 
 }
