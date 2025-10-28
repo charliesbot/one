@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -22,9 +19,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingDayData
 import java.time.Instant
 import java.time.LocalDate
@@ -81,7 +80,7 @@ fun FastingDetailsBottomSheet(
             TimeRow(
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.PlayArrow,
+                        painter = painterResource(R.drawable.play_arrow_24px),
                         contentDescription = "Start",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
@@ -97,7 +96,7 @@ fun FastingDetailsBottomSheet(
             TimeRow(
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.Stop,
+                        painter = painterResource(R.drawable.stop_24px),
                         contentDescription = "End",
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(24.dp)
