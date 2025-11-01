@@ -17,6 +17,7 @@
     <string name="start_fasting">Start Fasting</string>
     <string name="goal_with_duration">%1$s Goal</string>
     <string name="started">Started</string>
+    <string name="ended">Ended</string>
 
     <!-- Weekly Progress -->
     <string name="monday">Mon</string>
