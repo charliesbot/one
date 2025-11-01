@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -12,10 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.charliesbot.one.features.profile.components.FastingDetailsBottomSheet
 import com.charliesbot.shared.core.components.FastingMonthCalendar
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -32,7 +34,12 @@ fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
                     yearMonth = uiState.selectedMonth,
                     fastingData = uiState.fastingData,
                     firstDayOfWeek = uiState.firstDayOfWeek,
-                    onDayClick = {},
+                    onDayClick = { date ->
+                        val fastingData = uiState.fastingData[date]
+                        if (fastingData != null) {
+                            viewModel.onDaySelected(fastingData)
+                        }
+                    },
                     onNextMonth = {
                         viewModel.onNextMonth()
                     },
@@ -41,6 +48,16 @@ fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
                     }
                 )
             }
+        }
+
+        // Show bottom sheet when a day is selected
+        uiState.selectedDay?.let { selectedDay ->
+            FastingDetailsBottomSheet(
+                fastingData = selectedDay,
+                onDismiss = {
+                    viewModel.onDaySelected(null)
+                }
+            )
         }
     }
 }

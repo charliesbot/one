@@ -29,7 +29,9 @@ class GetMonthlyFastingMapUseCase(
                FastingDayData(
                    date = date,
                    durationHours = durationHours,
-                   isGoalMet = durationHours >= PredefinedFastingGoals.MIN_FASTING_HOURS
+                   isGoalMet = durationHours >= PredefinedFastingGoals.MIN_FASTING_HOURS,
+                   startTimeEpochMillis = longestFast.startTimeEpochMillis,
+                   endTimeEpochMillis = longestFast.endTimeEpochMillis
                )
            }
        }
