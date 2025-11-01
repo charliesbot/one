@@ -264,7 +264,7 @@ private fun FastingDayCell(
         modifier = modifier
             .padding(4.dp)
             .size(44.dp)
-            .clip(MaterialShapes.Cookie12Sided.toShape())
+            .clip(MaterialShapes.Square.toShape())
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
