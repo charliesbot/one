@@ -23,9 +23,8 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TextButton
 import androidx.wear.compose.material3.TextToggleButton
+import androidx.wear.compose.material3.TimePicker
 import androidx.wear.tooling.preview.devices.WearDevices
-import com.google.android.horologist.composables.TimePicker
-import com.google.android.horologist.composables.TimePickerResult
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -40,14 +39,12 @@ fun WearSettingsScreen(
 
     if (showTimePicker) {
         TimePicker(
-            onTimeConfirm = { hour, minute ->
-                viewModel.setBedtime(LocalTime.of(hour, minute))
+            initialTime = uiState.bedtime ?: LocalTime.of(22, 0), // Default 10 PM
+            onTimePicked = { newTime ->
+                viewModel.setBedtime(newTime)
                 showTimePicker = false
-            },
-            time = uiState.bedtime ?: LocalTime.of(22, 0) // Default 10 PM
-        ) {
-            showTimePicker = false
-        }
+            }
+        )
     } else {
         WearSettingsContent(
             smartNotificationsEnabled = uiState.smartNotificationsEnabled,

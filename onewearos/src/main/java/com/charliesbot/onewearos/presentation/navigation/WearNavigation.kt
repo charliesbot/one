@@ -33,6 +33,9 @@ fun WearNavigation() {
                     },
                     onNavigateToGoalSelection = {
                         navController.navigate(WearNavigationRoute.GoalOptions.route)
+                    },
+                    onNavigateToSettings = {
+                        navController.navigate(WearNavigationRoute.Settings.route)
                     }
                 )
             }

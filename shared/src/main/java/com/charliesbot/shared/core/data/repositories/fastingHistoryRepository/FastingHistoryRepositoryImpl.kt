@@ -1,8 +1,7 @@
-package com.charliesbot.one.data
+package com.charliesbot.shared.core.data.repositories.fastingHistoryRepository
 
 import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.data.db.FastingRecordDao
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -99,3 +98,4 @@ class FastingHistoryRepositoryImpl(
     }
 
 }
+

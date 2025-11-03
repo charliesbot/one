@@ -2,7 +2,6 @@ package com.charliesbot.onewearos.presentation
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.lifecycleScope
 import androidx.wear.phone.interactions.notifications.BridgingConfig
 import androidx.wear.phone.interactions.notifications.BridgingManager
 import androidx.work.Configuration
@@ -14,6 +13,9 @@ import com.charliesbot.onewearos.presentation.workers.DailyNotificationScheduler
 import com.charliesbot.shared.core.data.repositories.preferencesRepository.PreferencesRepository
 import com.charliesbot.shared.core.di.sharedModule
 import com.charliesbot.shared.core.notifications.NotificationUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -21,11 +23,13 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
 class MainApplication : Application(), Configuration.Provider {
+    
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    
     override fun onCreate() {
         super.onCreate()
 
@@ -59,8 +63,8 @@ class MainApplication : Application(), Configuration.Provider {
     private fun initializeDailyNotificationWorker() {
         val preferencesRepository: PreferencesRepository by inject()
         
-        // Use lifecycle scope to check preferences asynchronously
-        lifecycleScope.launch {
+        // Use application scope to check preferences asynchronously
+        applicationScope.launch {
             try {
                 val smartNotificationsEnabled = preferencesRepository.getSmartNotificationsEnabled().first()
                 

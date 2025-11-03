@@ -6,8 +6,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.gms.google.services)
-    alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.androidx.room)
+    // Temporarily disabled for testing without google-services.json
+    // alias(libs.plugins.google.gms.google.services)
+    // alias(libs.plugins.google.firebase.crashlytics)
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -76,19 +78,28 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
-
-    firebaseCrashlytics {
-        nativeSymbolUploadEnabled = true
-    }
+    
+    // Temporarily disabled for testing without google-services.json
+    // firebaseCrashlytics {
+    //     nativeSymbolUploadEnabled = true
+    // }
 }
 
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
-    implementation(platform(libs.firebase.bom))
+    // Temporarily disabled for testing without google-services.json
+    // implementation(platform(libs.firebase.bom))
+    // implementation(libs.firebase.crashlytics)
+    
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.core.coroutines)
@@ -114,8 +125,12 @@ dependencies {
     implementation(libs.androidx.wear.ongoing)
     implementation(libs.androidx.startup.runtime)
     implementation(project(":shared"))
+    
+    // Room database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
-    implementation(libs.firebase.crashlytics)
+    
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
