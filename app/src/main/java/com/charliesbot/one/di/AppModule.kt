@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import com.charliesbot.one.BuildConfig
 import com.charliesbot.one.data.AndroidStringProvider
-import com.charliesbot.one.data.FastingHistoryRepositoryImpl
 import com.charliesbot.one.notifications.NotificationWorker
+import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepositoryImpl
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import org.koin.core.module.dsl.viewModelOf

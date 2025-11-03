@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
 }
@@ -76,19 +77,26 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
-
+    
     firebaseCrashlytics {
-        nativeSymbolUploadEnabled = true
-    }
+         nativeSymbolUploadEnabled = true
+     }
 }
 
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.core.coroutines)
@@ -114,6 +122,10 @@ dependencies {
     implementation(libs.androidx.wear.ongoing)
     implementation(libs.androidx.startup.runtime)
     implementation(project(":shared"))
+    
+    // Room database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.firebase.crashlytics)
     androidTestImplementation(platform(libs.androidx.compose.bom))

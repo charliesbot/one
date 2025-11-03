@@ -46,4 +46,8 @@
     <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
     <string name="notification_completion_title">Fasting Completed!</string>
     <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
+    <string name="notification_smart_reminder_title">Time to Start Fasting</string>
+    <string name="notification_smart_reminder_message">Based on your routine, it\'s time to begin your fast</string>
+    <string name="notification_eating_window_title">Eating Window Closing</string>
+    <string name="notification_eating_window_message">1 hour left to eat. Ready to start your fast?</string>
 </resources>

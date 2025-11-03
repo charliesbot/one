@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,7 +61,8 @@ fun rememberIsLargeScreen(): Boolean {
 fun WearTodayScreen(
     viewModel: WearTodayViewModel = koinViewModel(),
     onNavigateToStartDateSelection: () -> Unit,
-    onNavigateToGoalSelection: () -> Unit
+    onNavigateToGoalSelection: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
@@ -73,7 +76,8 @@ fun WearTodayScreen(
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
         onNavigateToGoalSelection = onNavigateToGoalSelection,
-        onNavigateToStartDateSelection = onNavigateToStartDateSelection
+        onNavigateToStartDateSelection = onNavigateToStartDateSelection,
+        onNavigateToSettings = onNavigateToSettings
     )
 }
 
@@ -86,7 +90,8 @@ fun WearTodayContent(
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
     onNavigateToStartDateSelection: () -> Unit,
-    onNavigateToGoalSelection: () -> Unit
+    onNavigateToGoalSelection: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val isLargeScreen = rememberIsLargeScreen()
@@ -115,7 +120,7 @@ fun WearTodayContent(
         }
     }
     ScreenScaffold {
-        Box() {
+        Box(modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(
                 visible = isFasting,
                 enter = scaleIn(animationSpec = tween(500), initialScale = 0.9f) + fadeIn(),
@@ -128,6 +133,7 @@ fun WearTodayContent(
                     trackColor = MaterialTheme.colorScheme.onBackground,
                 )
             }
+            
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -180,6 +186,21 @@ fun WearTodayContent(
                 ) {
                     Text(fastButtonLabel, fontSize = if (isLargeScreen) 16.sp else 12.sp)
                 }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Settings button at bottom
+                androidx.wear.compose.material3.IconButton(
+                    onClick = onNavigateToSettings,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    androidx.wear.compose.material3.Icon(
+                        painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
+                        contentDescription = "Settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }
@@ -196,6 +217,7 @@ private fun DefaultPreview() {
         onStartFasting = { },
         onStopFasting = { },
         onNavigateToGoalSelection = { },
-        onNavigateToStartDateSelection = { }
+        onNavigateToStartDateSelection = { },
+        onNavigateToSettings = { }
     )
 }
