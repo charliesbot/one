@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.charliesbot.onewearos.presentation.feature.settings.WearSettingsScreen
 import com.charliesbot.onewearos.presentation.feature.today.WearGoalOptionsScreen
 import com.charliesbot.onewearos.presentation.feature.today.WearDatePickerScreen
 import com.charliesbot.onewearos.presentation.feature.today.WearStartDateScreen
@@ -58,6 +59,9 @@ fun WearNavigation() {
                     navController = navController,
                     viewModel = wearTodayViewModel
                 )
+            }
+            composable(WearNavigationRoute.Settings.route) {
+                WearSettingsScreen()
             }
         }
     }

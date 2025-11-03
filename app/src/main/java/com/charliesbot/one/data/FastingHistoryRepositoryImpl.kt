@@ -5,6 +5,7 @@ import com.charliesbot.shared.core.data.db.FastingRecordDao
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.YearMonth
 import java.time.ZoneId
 import java.util.Calendar
@@ -85,6 +86,12 @@ class FastingHistoryRepositoryImpl(
             startTimestamp = startTimestamp,
             endExclusiveTimestamp = endExclusiveTimestamp
         )
+    }
+
+    override fun getRecentFastStartTimes(limit: Int): Flow<List<Long>> {
+        return fastingRecordDao.getRecentRecords(limit).map { records ->
+            records.map { it.startTimeEpochMillis }
+        }
     }
 
     override suspend fun saveFastingRecord(record: FastingRecord) {

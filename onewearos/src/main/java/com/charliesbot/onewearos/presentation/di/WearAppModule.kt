@@ -2,6 +2,7 @@ package com.charliesbot.onewearos.presentation.di
 
 import com.charliesbot.onewearos.complication.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.data.WearStringProvider
+import com.charliesbot.onewearos.presentation.feature.settings.WearSettingsViewModel
 import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.onewearos.presentation.services.LocalWatchFastingCallbacks
@@ -15,6 +16,7 @@ import org.koin.dsl.module
 
 val wearAppModule = module {
     viewModelOf(::WearTodayViewModel)
+    viewModelOf(::WearSettingsViewModel)
 
     single<NotificationScheduler> {
         NotificationScheduler(

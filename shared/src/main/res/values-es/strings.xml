@@ -40,4 +40,8 @@
     <string name="notification_one_hour_message">¡Lo estás haciendo muy bien! Solo queda una hora para completar tu ayuno.</string>
     <string name="notification_completion_title">¡Ayuno completado!</string>
     <string name="notification_completion_message">¡Felicidades! Has completado tu ayuno.</string>
+    <string name="notification_smart_reminder_title">Hora de Comenzar el Ayuno</string>
+    <string name="notification_smart_reminder_message">Según tu rutina, es hora de comenzar tu ayuno</string>
+    <string name="notification_eating_window_title">Ventana de Comida Cerrando</string>
+    <string name="notification_eating_window_message">1 hora para comer. ¿Listo para comenzar tu ayuno?</string>
 </resources> 

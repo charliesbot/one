@@ -31,4 +31,7 @@ interface FastingRecordDao {
         endExclusiveTimestamp: Long
     ): Flow<List<FastingRecord>>
 
+    @Query("SELECT * FROM fasting_history ORDER BY startTimeEpochMillis DESC LIMIT :limit")
+    fun getRecentRecords(limit: Int): Flow<List<FastingRecord>>
+
 }

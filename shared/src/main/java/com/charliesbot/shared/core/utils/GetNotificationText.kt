@@ -15,5 +15,15 @@ fun getNotificationText(notificationType: NotificationType, stringProvider: Stri
             title = stringProvider.getString("notification_completion_title"),
             message = stringProvider.getString("notification_completion_message")
         )
+
+        NotificationType.SMART_REMINDER -> NotificationContent(
+            title = stringProvider.getString("notification_smart_reminder_title"),
+            message = stringProvider.getString("notification_smart_reminder_message")
+        )
+
+        NotificationType.EATING_WINDOW_CLOSING -> NotificationContent(
+            title = stringProvider.getString("notification_eating_window_title"),
+            message = stringProvider.getString("notification_eating_window_message")
+        )
     }
 }

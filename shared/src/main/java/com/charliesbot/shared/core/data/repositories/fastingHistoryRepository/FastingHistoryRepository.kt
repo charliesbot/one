@@ -15,5 +15,14 @@ interface FastingHistoryRepository {
      * @param yearMonth The specific month to retrieve records for.
      */
     fun getFastingsForMonth(yearMonth: YearMonth): Flow<List<FastingRecord>>
+    
+    /**
+     * Gets the start times of the most recent fasting records.
+     * Used for calculating smart notification times based on user's routine.
+     * @param limit Maximum number of records to retrieve (default 7)
+     * @return Flow of start time timestamps in milliseconds
+     */
+    fun getRecentFastStartTimes(limit: Int = 7): Flow<List<Long>>
+    
     suspend fun saveFastingRecord(record: FastingRecord)
 }
