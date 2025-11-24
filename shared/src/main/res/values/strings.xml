@@ -46,4 +46,30 @@
     <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
     <string name="notification_completion_title">Fasting Completed!</string>
     <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="navigate_back">Navigate back</string>
+
+    <!-- Settings - Notifications Section -->
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_enabled">Enable Notifications</string>
+    <string name="settings_notifications_enabled_desc">Receive fasting progress notifications</string>
+    <string name="settings_notify_completion">Notify when goal completed</string>
+    <string name="settings_notify_completion_desc">Get notified when you complete your fast</string>
+    <string name="settings_notify_one_hour">Notify 1 hour before goal</string>
+    <string name="settings_notify_one_hour_desc">Get a heads-up an hour before completion</string>
+
+    <!-- Settings - Data Management Section -->
+    <string name="settings_data_title">Data Management</string>
+    <string name="settings_export_history">Export History (CSV)</string>
+    <string name="settings_export_history_desc">Export your fasting history as a CSV file</string>
+    <string name="settings_force_sync">Force Sync to Watch</string>
+    <string name="settings_force_sync_desc">Manually sync current state to your watch</string>
+
+    <!-- Settings - App Info Section -->
+    <string name="settings_app_info_title">App Info</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_rate_app">Rate App</string>
+    <string name="settings_rate_app_desc">Help us by rating on the Play Store</string>
 </resources>

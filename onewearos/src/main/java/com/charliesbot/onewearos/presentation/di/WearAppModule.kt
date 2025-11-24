@@ -20,6 +20,7 @@ val wearAppModule = module {
         NotificationScheduler(
             context = androidContext(),
             workerClass = NotificationWorker::class.java,
+            settingsRepository = get(),
         )
     }
     single<StringProvider> {
