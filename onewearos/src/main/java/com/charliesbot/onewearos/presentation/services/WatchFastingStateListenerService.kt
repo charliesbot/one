@@ -87,10 +87,11 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 Log.d(LOG_TAG, "WatchListener: Received settings update from phone")
                 watchServiceScope.launch {
                     try {
-                        settingsRepository.setNotificationsEnabled(notificationsEnabled)
-                        settingsRepository.setNotifyOnCompletion(notifyCompletion)
-                        settingsRepository.setNotifyOneHourBefore(notifyOneHourBefore)
-                        Log.d(LOG_TAG, "WatchListener: Settings updated successfully")
+                        // syncToRemote = false: Watch should NEVER sync settings back to phone
+                        settingsRepository.setNotificationsEnabled(notificationsEnabled, syncToRemote = false)
+                        settingsRepository.setNotifyOnCompletion(notifyCompletion, syncToRemote = false)
+                        settingsRepository.setNotifyOneHourBefore(notifyOneHourBefore, syncToRemote = false)
+                        Log.d(LOG_TAG, "WatchListener: Settings updated successfully (local only, no sync back)")
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "WatchListener: Failed to update settings", e)
                     }

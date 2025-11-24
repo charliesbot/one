@@ -1,6 +1,12 @@
 package com.charliesbot.one.features.settings
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,14 +70,14 @@ fun SettingsScreen(
     // Show snackbar messages
     LaunchedEffect(uiState.showExportSuccess) {
         if (uiState.showExportSuccess) {
-            snackbarHostState.showSnackbar("Export successful!")
+            snackbarHostState.showSnackbar("History exported to Downloads folder")
             viewModel.dismissExportSuccess()
         }
     }
 
     LaunchedEffect(uiState.showExportError) {
         if (uiState.showExportError) {
-            snackbarHostState.showSnackbar("Export failed. No records found.")
+            snackbarHostState.showSnackbar("Export failed. Check if you have records.")
             viewModel.dismissExportError()
         }
     }
@@ -120,23 +126,36 @@ fun SettingsScreen(
                     label = stringResource(R.string.settings_notifications_enabled),
                     description = stringResource(R.string.settings_notifications_enabled_desc),
                     checked = uiState.notificationsEnabled,
-                    onCheckedChange = { viewModel.setNotificationsEnabled(it) }
+                    onCheckedChange = { viewModel.setNotificationsEnabled(it) },
+                    enableClickableRow = true
                 )
 
-                if (uiState.notificationsEnabled) {
-                    SwitchSettingItem(
-                        label = stringResource(R.string.settings_notify_completion),
-                        description = stringResource(R.string.settings_notify_completion_desc),
-                        checked = uiState.notifyOnCompletion,
-                        onCheckedChange = { viewModel.setNotifyOnCompletion(it) }
-                    )
+                AnimatedVisibility(
+                    visible = uiState.notificationsEnabled,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        SwitchSettingItem(
+                            label = stringResource(R.string.settings_notify_completion),
+                            description = stringResource(R.string.settings_notify_completion_desc),
+                            checked = uiState.notifyOnCompletion,
+                            onCheckedChange = { viewModel.setNotifyOnCompletion(it) },
+                            modifier = Modifier.padding(start = 16.dp),
+                            enableClickableRow = true
+                        )
 
-                    SwitchSettingItem(
-                        label = stringResource(R.string.settings_notify_one_hour),
-                        description = stringResource(R.string.settings_notify_one_hour_desc),
-                        checked = uiState.notifyOneHourBefore,
-                        onCheckedChange = { viewModel.setNotifyOneHourBefore(it) }
-                    )
+                        SwitchSettingItem(
+                            label = stringResource(R.string.settings_notify_one_hour),
+                            description = stringResource(R.string.settings_notify_one_hour_desc),
+                            checked = uiState.notifyOneHourBefore,
+                            onCheckedChange = { viewModel.setNotifyOneHourBefore(it) },
+                            modifier = Modifier.padding(start = 16.dp),
+                            enableClickableRow = true
+                        )
+                    }
                 }
             }
 
@@ -148,12 +167,7 @@ fun SettingsScreen(
                     label = stringResource(R.string.settings_export_history),
                     description = stringResource(R.string.settings_export_history_desc),
                     isLoading = uiState.isExporting,
-                    onClick = {
-                        val intent = viewModel.exportHistory()
-                        intent?.let {
-                            context.startActivity(Intent.createChooser(it, "Export History"))
-                        }
-                    }
+                    onClick = { viewModel.exportHistory() }
                 )
 
                 ButtonSettingItem(
@@ -223,14 +237,30 @@ private fun SwitchSettingItem(
     description: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enableClickableRow: Boolean = false
 ) {
+    val rowModifier = if (enableClickableRow) {
+        modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(vertical = 8.dp)
+    } else {
+        modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    }
+    
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = rowModifier,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp)
+        ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyLarge

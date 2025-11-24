@@ -1,10 +1,9 @@
 package com.charliesbot.one.features.settings
 
 import android.app.Application
-import android.content.Intent
-import android.net.Uri
+import android.content.ContentValues
+import android.provider.MediaStore
 import android.util.Log
-import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
@@ -18,8 +17,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileWriter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class SettingsUiState(
     val notificationsEnabled: Boolean = true,
@@ -93,8 +93,7 @@ class SettingsViewModel(
         }
     }
 
-    fun exportHistory(): Intent? {
-        var result: Intent? = null
+    fun exportHistory() {
         viewModelScope.launch {
             _isExporting.value = true
             try {
@@ -106,31 +105,55 @@ class SettingsViewModel(
                     return@launch
                 }
 
-                val csvFile = File(getApplication<Application>().cacheDir, "fasting_history.csv")
-                FileWriter(csvFile).use { writer ->
-                    // Write header
-                    writer.append("Start Time,End Time,Duration (hours),Goal\n")
-                    // Write records
-                    records.forEach { record ->
-                        val durationHours = (record.endTimeEpochMillis - record.startTimeEpochMillis) / (1000 * 60 * 60)
-                        writer.append("${record.startTimeEpochMillis},${record.endTimeEpochMillis},$durationHours,${record.fastingGoalId}\n")
+                // Create filename with timestamp
+                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                    .format(Date())
+                val fileName = "fasting_history_$timestamp.csv"
+
+                // Use MediaStore to save to Downloads folder (Android 10+)
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                    put(MediaStore.Downloads.MIME_TYPE, "text/csv")
+                    put(MediaStore.Downloads.IS_PENDING, 1)
+                }
+
+                val resolver = getApplication<Application>().contentResolver
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+                if (uri == null) {
+                    Log.e(LOG_TAG, "SettingsViewModel: Failed to create file in Downloads")
+                    _showExportError.value = true
+                    _isExporting.value = false
+                    return@launch
+                }
+
+                // Write CSV data with human-readable dates
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.bufferedWriter().use { writer ->
+                        // Write header
+                        writer.append("Start Time,End Time,Duration (hours),Goal\n")
+                        
+                        // Date formatter for human-readable timestamps
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                        
+                        // Write records
+                        records.forEach { record ->
+                            val startDate = dateFormat.format(Date(record.startTimeEpochMillis))
+                            val endDate = dateFormat.format(Date(record.endTimeEpochMillis))
+                            val durationHours = (record.endTimeEpochMillis - record.startTimeEpochMillis) / (1000 * 60 * 60)
+                            
+                            writer.append("$startDate,$endDate,$durationHours,${record.fastingGoalId}\n")
+                        }
                     }
                 }
 
-                val uri = FileProvider.getUriForFile(
-                    getApplication(),
-                    "${getApplication<Application>().packageName}.provider",
-                    csvFile
-                )
-
-                result = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/csv"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
+                // Mark file as complete (no longer pending)
+                contentValues.clear()
+                contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+                resolver.update(uri, contentValues, null, null)
 
                 _showExportSuccess.value = true
-                Log.d(LOG_TAG, "SettingsViewModel: Export successful")
+                Log.d(LOG_TAG, "SettingsViewModel: Export successful - saved to Downloads/$fileName")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Export failed", e)
                 _showExportError.value = true
@@ -138,7 +161,6 @@ class SettingsViewModel(
                 _isExporting.value = false
             }
         }
-        return result
     }
 
     fun forceSyncToWatch() {

@@ -14,6 +14,7 @@ import com.google.android.gms.wearable.PutDataRequest
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
@@ -36,21 +37,25 @@ class SettingsRepositoryImpl(
         .catch { exception -> handleDataStoreError(exception, "notifyOneHourBefore") }
         .map { it[PrefKeys.NOTIFY_ONE_HOUR_BEFORE] ?: true }
 
-    override suspend fun setNotificationsEnabled(enabled: Boolean) {
-        updateLocalAndRemoteStore(PrefKeys.NOTIFICATIONS_ENABLED, enabled)
+    override suspend fun setNotificationsEnabled(enabled: Boolean, syncToRemote: Boolean) {
+        updateLocalStore(PrefKeys.NOTIFICATIONS_ENABLED, enabled)
+        if (syncToRemote) {
+            syncSettingsToRemote()
+        }
     }
 
-    override suspend fun setNotifyOnCompletion(enabled: Boolean) {
-        updateLocalAndRemoteStore(PrefKeys.NOTIFY_COMPLETION, enabled)
+    override suspend fun setNotifyOnCompletion(enabled: Boolean, syncToRemote: Boolean) {
+        updateLocalStore(PrefKeys.NOTIFY_COMPLETION, enabled)
+        if (syncToRemote) {
+            syncSettingsToRemote()
+        }
     }
 
-    override suspend fun setNotifyOneHourBefore(enabled: Boolean) {
-        updateLocalAndRemoteStore(PrefKeys.NOTIFY_ONE_HOUR_BEFORE, enabled)
-    }
-
-    private suspend fun updateLocalAndRemoteStore(key: Preferences.Key<Boolean>, value: Boolean) {
-        updateLocalStore(key, value)
-        syncSettingsToRemote()
+    override suspend fun setNotifyOneHourBefore(enabled: Boolean, syncToRemote: Boolean) {
+        updateLocalStore(PrefKeys.NOTIFY_ONE_HOUR_BEFORE, enabled)
+        if (syncToRemote) {
+            syncSettingsToRemote()
+        }
     }
 
     private suspend fun updateLocalStore(key: Preferences.Key<Boolean>, value: Boolean) {
@@ -66,21 +71,21 @@ class SettingsRepositoryImpl(
 
     private suspend fun syncSettingsToRemote() {
         try {
-            val prefs = dataStore.data
-            val notificationsEnabled = prefs.map { it[PrefKeys.NOTIFICATIONS_ENABLED] ?: true }
-            val notifyCompletion = prefs.map { it[PrefKeys.NOTIFY_COMPLETION] ?: true }
-            val notifyOneHourBefore = prefs.map { it[PrefKeys.NOTIFY_ONE_HOUR_BEFORE] ?: true }
+            val prefs = dataStore.data.first() // Get actual snapshot, not Flow
+            val notificationsEnabled = prefs[PrefKeys.NOTIFICATIONS_ENABLED] ?: true
+            val notifyCompletion = prefs[PrefKeys.NOTIFY_COMPLETION] ?: true
+            val notifyOneHourBefore = prefs[PrefKeys.NOTIFY_ONE_HOUR_BEFORE] ?: true
 
             val request: PutDataRequest =
                 PutDataMapRequest.create(SETTINGS_PATH_KEY).apply {
-                    dataMap.putBoolean(NOTIFICATIONS_ENABLED_KEY, notificationsEnabled.toString().toBoolean())
-                    dataMap.putBoolean(NOTIFY_COMPLETION_KEY, notifyCompletion.toString().toBoolean())
-                    dataMap.putBoolean(NOTIFY_ONE_HOUR_BEFORE_KEY, notifyOneHourBefore.toString().toBoolean())
+                    dataMap.putBoolean(NOTIFICATIONS_ENABLED_KEY, notificationsEnabled)
+                    dataMap.putBoolean(NOTIFY_COMPLETION_KEY, notifyCompletion)
+                    dataMap.putBoolean(NOTIFY_ONE_HOUR_BEFORE_KEY, notifyOneHourBefore)
                     dataMap.putLong(TIMESTAMP_KEY, System.currentTimeMillis())
                 }.asPutDataRequest().setUrgent()
 
             dataClient.putDataItem(request).await()
-            Log.d(LOG_TAG, "SettingsRepo: Settings synced to Data Layer")
+            Log.d(LOG_TAG, "SettingsRepo: Settings synced to Data Layer - notifications: $notificationsEnabled, completion: $notifyCompletion, oneHour: $notifyOneHourBefore")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "SettingsRepo: Error syncing settings to Data Layer", e)
         }
