@@ -9,3 +9,6 @@ data object Today : NavigationRoute
 
 @Serializable
 data object You : NavigationRoute
+
+@Serializable
+data object Settings : NavigationRoute

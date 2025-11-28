@@ -34,4 +34,8 @@ class FastingStateListenerService : BaseFastingListenerService() {
         )
         widgetUpdateManager.requestUpdate()
     }
+
+    // Note: Settings sync is ONE-WAY (phone → watch only)
+    // The phone does NOT listen to settings from the watch
+    // Only fasting state is bidirectional
 }

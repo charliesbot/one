@@ -26,4 +26,30 @@
     <!-- Widget preview strings -->
     <string name="widget_preview_hours">16</string>
     <string name="widget_preview_hours_left">horas restantes!</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Configuración</string>
+    <string name="navigate_back">Volver</string>
+
+    <!-- Settings - Notifications Section -->
+    <string name="settings_notifications_title">Notificaciones</string>
+    <string name="settings_notifications_enabled">Activar Notificaciones</string>
+    <string name="settings_notifications_enabled_desc">Recibir notificaciones de progreso de ayuno</string>
+    <string name="settings_notify_completion">Notificar al completar meta</string>
+    <string name="settings_notify_completion_desc">Recibe notificación cuando completes tu ayuno</string>
+    <string name="settings_notify_one_hour">Notificar 1 hora antes de meta</string>
+    <string name="settings_notify_one_hour_desc">Recibe un aviso una hora antes de completar</string>
+
+    <!-- Settings - Data Management Section -->
+    <string name="settings_data_title">Gestión de Datos</string>
+    <string name="settings_export_history">Exportar Historial (CSV)</string>
+    <string name="settings_export_history_desc">Exporta tu historial de ayuno como archivo CSV</string>
+    <string name="settings_force_sync">Forzar Sincronización con Reloj</string>
+    <string name="settings_force_sync_desc">Sincroniza manualmente el estado actual con tu reloj</string>
+
+    <!-- Settings - App Info Section -->
+    <string name="settings_app_info_title">Información de la App</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_rate_app">Calificar App</string>
+    <string name="settings_rate_app_desc">Ayúdanos calificando en Play Store</string>
 </resources>

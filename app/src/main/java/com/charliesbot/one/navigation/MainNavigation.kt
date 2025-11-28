@@ -19,6 +19,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.charliesbot.one.features.dashboard.TodayScreen
 import com.charliesbot.one.features.profile.YouScreen
+import com.charliesbot.one.features.settings.SettingsScreen
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -72,7 +73,18 @@ fun MainNavigation() {
                     TodayScreen()
                 }
                 entry<You> {
-                    YouScreen()
+                    YouScreen(
+                        onNavigateToSettings = {
+                            backStack.add(Settings)
+                        }
+                    )
+                }
+                entry<Settings> {
+                    SettingsScreen(
+                        onNavigateBack = {
+                            backStack.removeLastOrNull()
+                        }
+                    )
                 }
             },
             modifier = Modifier.padding(paddingValues)

@@ -13,6 +13,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import com.charliesbot.one.features.dashboard.TodayViewModel
 import com.charliesbot.one.features.profile.YouViewModel
+import com.charliesbot.one.features.settings.SettingsViewModel
 import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase
@@ -53,6 +54,7 @@ val appModule = module {
         NotificationScheduler(
             context = androidContext(),
             workerClass = NotificationWorker::class.java,
+            settingsRepository = get(),
         )
     }
 
@@ -68,6 +70,7 @@ val appModule = module {
 
     viewModelOf(::TodayViewModel)
     viewModelOf(::YouViewModel)
+    viewModelOf(::SettingsViewModel)
 
     single { LocalFastingCallback(get(), get()) }
     single<FastingEventCallbacks> { get<LocalFastingCallback>() }
