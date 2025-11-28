@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.charliesbot.one.features.dashboard.TodayScreen
@@ -24,7 +24,7 @@ import com.charliesbot.one.features.settings.SettingsScreen
 @ExperimentalMaterial3ExpressiveApi
 @Composable
 fun MainNavigation() {
-    val backStack = remember { mutableStateListOf<NavigationRoute>(Today) }
+    val backStack = remember { mutableStateListOf<Any>(Today) }
     val currentDestination = backStack.lastOrNull() ?: Today
 
     Scaffold(
@@ -64,7 +64,7 @@ fun MainNavigation() {
                 )
             }
         }
-    ) { paddingValues ->
+    ) { _ ->
         NavDisplay(
             backStack = backStack,
             onBack = { backStack.removeLastOrNull() },
@@ -86,8 +86,7 @@ fun MainNavigation() {
                         }
                     )
                 }
-            },
-            modifier = Modifier.padding(paddingValues)
+            }
         )
     }
 }
