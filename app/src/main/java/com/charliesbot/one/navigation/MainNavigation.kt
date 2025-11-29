@@ -1,9 +1,7 @@
 package com.charliesbot.one.navigation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import com.charliesbot.shared.R
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -11,15 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.charliesbot.one.features.dashboard.TodayScreen
 import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
+import com.charliesbot.shared.R
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -62,6 +59,22 @@ fun MainNavigation() {
                         }
                     }
                 )
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            painterResource(R.drawable.settings_24px),
+                            contentDescription = stringResource(R.string.settings_title)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.settings_title)) },
+                    selected = currentDestination == Settings,
+                    onClick = {
+                        if (currentDestination != Settings) {
+                            backStack.clear()
+                            backStack.add(Settings)
+                        }
+                    }
+                )
             }
         }
     ) { _ ->
@@ -73,18 +86,10 @@ fun MainNavigation() {
                     TodayScreen()
                 }
                 entry<You> {
-                    YouScreen(
-                        onNavigateToSettings = {
-                            backStack.add(Settings)
-                        }
-                    )
+                    YouScreen()
                 }
                 entry<Settings> {
-                    SettingsScreen(
-                        onNavigateBack = {
-                            backStack.removeLastOrNull()
-                        }
-                    )
+                    SettingsScreen()
                 }
             }
         )
