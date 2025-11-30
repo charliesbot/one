@@ -1,15 +1,10 @@
 package com.charliesbot.one.features.settings
 
+import android.content.ClipData
 import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,19 +15,16 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -41,16 +33,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.R
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +56,8 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
 
     // Get version from package manager
     val versionName = remember {
@@ -117,83 +114,83 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Notifications Section
-            SettingsSection(title = stringResource(R.string.settings_notifications_title)) {
-                SwitchSettingItem(
-                    label = stringResource(R.string.settings_notifications_enabled),
-                    description = stringResource(R.string.settings_notifications_enabled_desc),
-                    checked = uiState.notificationsEnabled,
-                    onCheckedChange = { viewModel.setNotificationsEnabled(it) },
-                )
-                AnimatedVisibility(
-                    visible = uiState.notificationsEnabled,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    Column {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        SwitchSettingItem(
-                            label = stringResource(R.string.settings_notify_completion),
-                            description = stringResource(R.string.settings_notify_completion_desc),
-                            checked = uiState.notifyOnCompletion,
-                            onCheckedChange = { viewModel.setNotifyOnCompletion(it) },
-                            modifier = Modifier.padding(start = 16.dp),
-                        )
-                        SwitchSettingItem(
-                            label = stringResource(R.string.settings_notify_one_hour),
-                            description = stringResource(R.string.settings_notify_one_hour_desc),
-                            checked = uiState.notifyOneHourBefore,
-                            onCheckedChange = { viewModel.setNotifyOneHourBefore(it) },
-                            modifier = Modifier.padding(start = 16.dp),
-                        )
-                    }
-                }
-            }
+            SettingsGroup(
+                title = stringResource(R.string.settings_notifications_title),
+                items = listOf({
+                    SwitchSettingItem(
+                        label = stringResource(R.string.settings_notifications_enabled),
+                        description = stringResource(R.string.settings_notifications_enabled_desc),
+                        checked = uiState.notificationsEnabled,
+                        onCheckedChange = { viewModel.setNotificationsEnabled(it) },
+                    )
+                })
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Data Management Section
-            SettingsSection(title = stringResource(R.string.settings_data_title)) {
-                ActionSettingItem(
-                    label = stringResource(R.string.settings_export_history),
-                    description = stringResource(R.string.settings_export_history_desc),
-                    isLoading = uiState.isExporting,
-                    onClick = { viewModel.exportHistory() }
-                )
-                SettingsDivider()
-                ActionSettingItem(
-                    label = stringResource(R.string.settings_force_sync),
-                    description = stringResource(R.string.settings_force_sync_desc),
-                    isLoading = uiState.isSyncing,
-                    onClick = { viewModel.forceSyncToWatch() }
-                )
-            }
+            SettingsGroup(
+                title = stringResource(R.string.settings_data_title),
+                items = listOf(
+                    {
+                        ActionSettingItem(
+                            label = stringResource(R.string.settings_export_history),
+                            description = stringResource(R.string.settings_export_history_desc),
+                            isLoading = uiState.isExporting,
+                            onClick = { viewModel.exportHistory() }
+                        )
+                    },
+                    {
+
+                        ActionSettingItem(
+                            label = stringResource(R.string.settings_force_sync),
+                            description = stringResource(R.string.settings_force_sync_desc),
+                            isLoading = uiState.isSyncing,
+                            onClick = { viewModel.forceSyncToWatch() }
+                        )
+                    })
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // App Info Section
-            SettingsSection(title = stringResource(R.string.settings_app_info_title)) {
-                SettingTile(
-                    title = stringResource(R.string.settings_version),
-                    trailingContent = {
-                        Text(
-                            text = versionName,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+            SettingsGroup(
+                title = stringResource(R.string.settings_app_info_title),
+                items = listOf(
+                    {
+                        SettingTile(
+                            title = stringResource(R.string.settings_version),
+                            onClick = {
+                                scope.launch {
+                                    val clipData = ClipData.newPlainText("App Version", versionName)
+                                    clipboard.setClipEntry(ClipEntry(clipData))
+                                    snackbarHostState.showSnackbar("Version copied to clipboard")
+                                }
+                            },
+                            trailingContent = {
+                                Text(
+                                    text = versionName,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        )
+                    },
+                    {
+                        ActionSettingItem(
+                            label = stringResource(R.string.settings_rate_app),
+                            description = stringResource(R.string.settings_rate_app_desc),
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    data =
+                                        android.net.Uri.parse("market://details?id=${context.packageName}")
+                                }
+                                context.startActivity(intent)
+                            }
                         )
                     }
                 )
-                SettingsDivider()
-                ActionSettingItem(
-                    label = stringResource(R.string.settings_rate_app),
-                    description = stringResource(R.string.settings_rate_app_desc),
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data =
-                                android.net.Uri.parse("market://details?id=${context.packageName}")
-                        }
-                        context.startActivity(intent)
-                    }
-                )
-            }
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -201,49 +198,17 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SettingsSection(
-    title: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = modifier
-            .widthIn(max = 600.dp)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-        )
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {
-            Column {
-                content()
-            }
-        }
-    }
-}
-
-@Composable
 private fun SettingTile(
+    modifier: Modifier = Modifier,
     title: String,
     description: String? = null,
-    modifier: Modifier = Modifier,
     trailingContent: (@Composable () -> Unit)? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)
 ) {
     ListItem(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+            .then(Modifier.clickable(onClick = onClick)),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         headlineContent = {
             Text(
@@ -261,15 +226,6 @@ private fun SettingTile(
             }
         } else null,
         trailingContent = trailingContent
-    )
-}
-
-@Composable
-fun SettingsDivider() {
-    HorizontalDivider(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        thickness = 1.dp,
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
     )
 }
 
@@ -314,7 +270,7 @@ private fun ActionSettingItem(
         title = label,
         description = description,
         modifier = modifier,
-        onClick = if (isLoading) null else onClick,
+        onClick = if (isLoading) ({}) else onClick,
         trailingContent = {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -323,9 +279,63 @@ private fun ActionSettingItem(
                     color = MaterialTheme.colorScheme.primary
                 )
             } else {
-                // Optional: You can add a chevron icon here if you want
-                // Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
+                null
             }
         }
     )
+}
+
+@Composable
+fun SettingsGroup(
+    title: String,
+    items: List<@Composable () -> Unit>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        // Title
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+        )
+
+        // The Container
+        Column(
+            // KEY 1: This creates the "cut" between items
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            items.forEachIndexed { index, itemContent ->
+
+                // KEY 2: Calculate shape based on position
+                val shape = when {
+                    items.size == 1 -> RoundedCornerShape(24.dp) // Single item
+                    index == 0 -> RoundedCornerShape( // Top item
+                        topStart = 24.dp, topEnd = 24.dp,
+                        bottomStart = 4.dp, bottomEnd = 4.dp
+                    )
+
+                    index == items.lastIndex -> RoundedCornerShape( // Bottom item
+                        topStart = 4.dp, topEnd = 4.dp,
+                        bottomStart = 24.dp, bottomEnd = 24.dp
+                    )
+
+                    else -> RoundedCornerShape(4.dp) // Middle items
+                }
+
+                // KEY 3: Wrap each item in its own Surface
+                Surface(
+                    shape = shape,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    itemContent()
+                }
+            }
+        }
+    }
 }
