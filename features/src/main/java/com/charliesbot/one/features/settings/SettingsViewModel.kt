@@ -1,20 +1,26 @@
 package com.charliesbot.one.features.settings
 
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentValues
+import android.content.Context
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -27,11 +33,12 @@ data class SettingsUiState(
     val notifyOneHourBefore: Boolean = true,
     val isSyncing: Boolean = false,
     val isExporting: Boolean = false,
-    val showExportSuccess: Boolean = false,
-    val showExportError: Boolean = false,
-    val showSyncSuccess: Boolean = false,
-    val showSyncError: Boolean = false
+    val versionName: String = "Unknown",
 )
+
+sealed interface SettingsSideEffect {
+    data class ShowSnackbar(val messageRes: Int) : SettingsSideEffect
+}
 
 class SettingsViewModel(
     application: Application,
@@ -42,32 +49,33 @@ class SettingsViewModel(
 
     private val _isSyncing = MutableStateFlow(false)
     private val _isExporting = MutableStateFlow(false)
-    private val _showExportSuccess = MutableStateFlow(false)
-    private val _showExportError = MutableStateFlow(false)
-    private val _showSyncSuccess = MutableStateFlow(false)
-    private val _showSyncError = MutableStateFlow(false)
+
+    private val _sideEffects = Channel<SettingsSideEffect>(Channel.BUFFERED)
+    val sideEffects = _sideEffects.receiveAsFlow()
+
+    // Get version from package manager
+    private val versionName: String = try {
+        val context = getApplication<Application>()
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknown"
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "SettingsViewModel: Failed to get version name", e)
+        "Unknown"
+    }
 
     val uiState: StateFlow<SettingsUiState> = combine(
         settingsRepository.notificationsEnabled,
         settingsRepository.notifyOnCompletion,
         settingsRepository.notifyOneHourBefore,
         _isSyncing,
-        _isExporting,
-        _showExportSuccess,
-        _showExportError,
-        _showSyncSuccess,
-        _showSyncError
-    ) { flows ->
+        _isExporting
+    ) { notifications, onCompletion, oneHour, isSyncing, isExporting ->
         SettingsUiState(
-            notificationsEnabled = flows[0] as Boolean,
-            notifyOnCompletion = flows[1] as Boolean,
-            notifyOneHourBefore = flows[2] as Boolean,
-            isSyncing = flows[3] as Boolean,
-            isExporting = flows[4] as Boolean,
-            showExportSuccess = flows[5] as Boolean,
-            showExportError = flows[6] as Boolean,
-            showSyncSuccess = flows[7] as Boolean,
-            showSyncError = flows[8] as Boolean
+            notificationsEnabled = notifications,
+            notifyOnCompletion = onCompletion,
+            notifyOneHourBefore = oneHour,
+            isSyncing = isSyncing,
+            isExporting = isExporting,
+            versionName = versionName
         )
     }.stateIn(
         scope = viewModelScope,
@@ -100,8 +108,7 @@ class SettingsViewModel(
                 val records = fastingHistoryRepository.getAllHistory().first()
                 if (records.isEmpty()) {
                     Log.d(LOG_TAG, "SettingsViewModel: No records to export")
-                    _showExportError.value = true
-                    _isExporting.value = false
+                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
                     return@launch
                 }
 
@@ -122,8 +129,7 @@ class SettingsViewModel(
 
                 if (uri == null) {
                     Log.e(LOG_TAG, "SettingsViewModel: Failed to create file in Downloads")
-                    _showExportError.value = true
-                    _isExporting.value = false
+                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
                     return@launch
                 }
 
@@ -152,11 +158,11 @@ class SettingsViewModel(
                 contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
                 resolver.update(uri, contentValues, null, null)
 
-                _showExportSuccess.value = true
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_success))
                 Log.d(LOG_TAG, "SettingsViewModel: Export successful - saved to Downloads/$fileName")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Export failed", e)
-                _showExportError.value = true
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
             } finally {
                 _isExporting.value = false
             }
@@ -168,31 +174,36 @@ class SettingsViewModel(
             _isSyncing.value = true
             try {
                 fastingUseCase.syncCurrentState()
-                _showSyncSuccess.value = true
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_sync_success))
                 Log.d(LOG_TAG, "SettingsViewModel: Force sync successful")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Force sync failed", e)
-                _showSyncError.value = true
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_sync_error))
             } finally {
                 _isSyncing.value = false
             }
         }
     }
 
-    fun dismissExportSuccess() {
-        _showExportSuccess.value = false
+    fun copyVersionToClipboard() {
+        viewModelScope.launch {
+            try {
+                val context = getApplication<Application>()
+                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clipData = ClipData.newPlainText("App Version", versionName)
+                clipboard.setPrimaryClip(clipData)
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_version_copied))
+                Log.d(LOG_TAG, "SettingsViewModel: Version copied to clipboard")
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "SettingsViewModel: Failed to copy version to clipboard", e)
+            }
+        }
     }
 
-    fun dismissExportError() {
-        _showExportError.value = false
-    }
-
-    fun dismissSyncSuccess() {
-        _showSyncSuccess.value = false
-    }
-
-    fun dismissSyncError() {
-        _showSyncError.value = false
+    fun testSnackbar() {
+        viewModelScope.launch {
+            _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_version_copied)) // Reusing an existing string for testing
+        }
     }
 }
 

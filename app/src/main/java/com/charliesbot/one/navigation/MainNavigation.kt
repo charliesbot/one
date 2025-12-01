@@ -1,5 +1,7 @@
 package com.charliesbot.one.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -9,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entryProvider
@@ -77,21 +80,23 @@ fun MainNavigation() {
                 )
             }
         }
-    ) { _ ->
-        NavDisplay(
-            backStack = backStack,
-            onBack = { backStack.removeLastOrNull() },
-            entryProvider = entryProvider {
-                entry<Today> {
-                    TodayScreen()
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryProvider = entryProvider {
+                    entry<Today> {
+                        TodayScreen()
+                    }
+                    entry<You> {
+                        YouScreen()
+                    }
+                    entry<Settings> {
+                        SettingsScreen()
+                    }
                 }
-                entry<You> {
-                    YouScreen()
-                }
-                entry<Settings> {
-                    SettingsScreen()
-                }
-            }
-        )
+            )
+        }
     }
 }

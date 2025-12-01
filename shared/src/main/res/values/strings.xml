@@ -72,4 +72,11 @@
     <string name="settings_version">Version</string>
     <string name="settings_rate_app">Rate App</string>
     <string name="settings_rate_app_desc">Help us by rating on the Play Store</string>
+
+    <!-- Settings - Snackbar Messages -->
+    <string name="settings_export_success">History exported to Downloads folder</string>
+    <string name="settings_export_error">Export failed. Check if you have records.</string>
+    <string name="settings_sync_success">Sync to watch successful!</string>
+    <string name="settings_sync_error">Sync failed. Check watch connection.</string>
+    <string name="settings_version_copied">Version copied to clipboard</string>
 </resources>

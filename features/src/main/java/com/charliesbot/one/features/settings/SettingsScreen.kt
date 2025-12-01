@@ -1,6 +1,5 @@
 package com.charliesbot.one.features.settings
 
-import android.content.ClipData
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,19 +32,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.R
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,44 +51,15 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val clipboard = LocalClipboard.current
-    val scope = rememberCoroutineScope()
 
-    // Get version from package manager
-    val versionName = remember {
-        try {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknown"
-        } catch (e: Exception) {
-            "Unknown"
-        }
-    }
-
-    // Show snackbar messages
-    LaunchedEffect(uiState.showExportSuccess) {
-        if (uiState.showExportSuccess) {
-            snackbarHostState.showSnackbar("History exported to Downloads folder")
-            viewModel.dismissExportSuccess()
-        }
-    }
-
-    LaunchedEffect(uiState.showExportError) {
-        if (uiState.showExportError) {
-            snackbarHostState.showSnackbar("Export failed. Check if you have records.")
-            viewModel.dismissExportError()
-        }
-    }
-
-    LaunchedEffect(uiState.showSyncSuccess) {
-        if (uiState.showSyncSuccess) {
-            snackbarHostState.showSnackbar("Sync to watch successful!")
-            viewModel.dismissSyncSuccess()
-        }
-    }
-
-    LaunchedEffect(uiState.showSyncError) {
-        if (uiState.showSyncError) {
-            snackbarHostState.showSnackbar("Sync failed. Check watch connection.")
-            viewModel.dismissSyncError()
+    // Observe side effects
+    LaunchedEffect(viewModel.sideEffects) {
+        viewModel.sideEffects.collect { effect ->
+            when (effect) {
+                is SettingsSideEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(context.getString(effect.messageRes))
+                }
+            }
         }
     }
 
@@ -160,16 +126,10 @@ fun SettingsScreen(
                     {
                         SettingTile(
                             title = stringResource(R.string.settings_version),
-                            onClick = {
-                                scope.launch {
-                                    val clipData = ClipData.newPlainText("App Version", versionName)
-                                    clipboard.setClipEntry(ClipEntry(clipData))
-                                    snackbarHostState.showSnackbar("Version copied to clipboard")
-                                }
-                            },
+                            onClick = { viewModel.copyVersionToClipboard() },
                             trailingContent = {
                                 Text(
-                                    text = versionName,
+                                    text = uiState.versionName,
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -187,6 +147,22 @@ fun SettingsScreen(
                                 }
                                 context.startActivity(intent)
                             }
+                        )
+                    }
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Debug Section
+            SettingsGroup(
+                title = "Debug",
+                items = listOf(
+                    {
+                        ActionSettingItem(
+                            label = "Test Snackbar",
+                            description = "Trigger a test snackbar message",
+                            onClick = { viewModel.testSnackbar() }
                         )
                     }
                 )

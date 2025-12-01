@@ -66,4 +66,11 @@
     <string name="settings_version">Versión</string>
     <string name="settings_rate_app">Calificar App</string>
     <string name="settings_rate_app_desc">Ayúdanos calificando en Play Store</string>
+
+    <!-- Settings - Snackbar Messages -->
+    <string name="settings_export_success">Historial exportado a la carpeta Descargas</string>
+    <string name="settings_export_error">Exportación fallida. Verifica que tengas registros.</string>
+    <string name="settings_sync_success">¡Sincronización con reloj exitosa!</string>
+    <string name="settings_sync_error">Sincronización fallida. Verifica la conexión del reloj.</string>
+    <string name="settings_version_copied">Versión copiada al portapapeles</string>
 </resources> 

@@ -237,6 +237,7 @@ class FastingDataRepositoryImpl(
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error updating fasting state in Data Layer", e)
+            throw e
         }
     }
 
