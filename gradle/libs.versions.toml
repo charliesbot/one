@@ -42,7 +42,7 @@ lifecycleViewmodelNav3 = "2.10.0"
 kotlinSerialization = "2.2.21"
 kotlinxSerializationCore = "1.9.0"
 material3Adaptive = "1.3.0-alpha04"
-gradlePlayPublisher = "3.11.0"
+gradlePlayPublisher = "3.13.0"
 # wearos
 wearCompose = "1.5.5"
 wearComposeMaterial = "1.5.5"
