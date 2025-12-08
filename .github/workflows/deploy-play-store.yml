@@ -1,0 +1,114 @@
+name: Deploy to Google Play Store
+
+on:
+  # Weekly schedule: Every Monday at 10:00 AM UTC
+  schedule:
+    - cron: '0 10 * * 1'
+
+  # Manual trigger for ad-hoc deployments
+  workflow_dispatch:
+    inputs:
+      version_suffix:
+        description: 'Version suffix (optional, for same-day deploys)'
+        required: false
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Generate version numbers
+        id: version
+        run: |
+          BASE_VERSION=$(date +'%y%m%d')
+          SUFFIX="${{ github.event.inputs.version_suffix }}"
+          VERSION_CODE="${BASE_VERSION}${SUFFIX}"
+          VERSION_NAME="1.${BASE_VERSION}${SUFFIX}"
+
+          echo "VERSION_CODE=${VERSION_CODE}" >> $GITHUB_ENV
+          echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
+          echo "::notice::Generated versionCode: ${VERSION_CODE}, versionName: ${VERSION_NAME}"
+
+      - name: Restore keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_FILE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+          chmod 600 keystore.jks
+
+          # Create keystore.properties for build
+          cat > keystore.properties <<EOF
+          keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}
+          storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}
+          keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          storeFile=../keystore.jks
+          EOF
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build and publish phone app to Play Store
+        run: |
+          ./gradlew :app:publishBundle \
+            -PversionCode=$VERSION_CODE \
+            -PversionName=$VERSION_NAME \
+            --no-daemon \
+            --stacktrace
+
+      - name: Build and publish Wear OS app to Play Store
+        run: |
+          ./gradlew :onewearos:publishBundle \
+            -PversionCode=$VERSION_CODE \
+            -PversionName=$VERSION_NAME \
+            --no-daemon \
+            --stacktrace
+
+      - name: Upload Crashlytics mapping files
+        run: |
+          ./gradlew :app:uploadCrashlyticsSymbolFileRelease \
+            -PversionCode=$VERSION_CODE \
+            -PversionName=$VERSION_NAME \
+            --no-daemon || echo "::warning::Crashlytics upload failed for app"
+
+          ./gradlew :onewearos:uploadCrashlyticsSymbolFileRelease \
+            -PversionCode=$VERSION_CODE \
+            -PversionName=$VERSION_NAME \
+            --no-daemon || echo "::warning::Crashlytics upload failed for onewearos"
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: |
+          rm -f keystore.jks keystore.properties
+
+      - name: Upload build artifacts (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-outputs-${{ env.VERSION_CODE }}
+          path: |
+            app/build/outputs/
+            onewearos/build/outputs/
+          retention-days: 7

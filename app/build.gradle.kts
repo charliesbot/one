@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.gradle.play.publisher)
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -20,6 +21,12 @@ if (keystorePropertiesFile.isFile) {
     }
 }
 
+// Support for runtime version override from CI
+val versionCodeProperty = project.findProperty("versionCode") as String?
+    ?: throw GradleException("versionCode property is required. Use -PversionCode=YYMMDD")
+val versionNameProperty = project.findProperty("versionName") as String?
+    ?: throw GradleException("versionName property is required. Use -PversionName=1.YYMMDD")
+
 android {
     namespace = "com.charliesbot.one"
     compileSdk = 36
@@ -28,8 +35,8 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 31
         targetSdk = 36
-        versionCode = 33
-        versionName = "1.0"
+        versionCode = versionCodeProperty.toInt()
+        versionName = versionNameProperty
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -91,6 +98,18 @@ kotlin {
 
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
+}
+
+play {
+    // Service account credentials will be provided via file in CI
+    // Locally, you can create a service-account.json file (gitignored)
+    val serviceAccountFile = rootProject.file("play-store-service-account.json")
+    if (serviceAccountFile.exists()) {
+        serviceAccountCredentials.set(serviceAccountFile)
+    }
+    track.set("production")
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
+    defaultToAppBundles.set(true)
 }
 
 dependencies {

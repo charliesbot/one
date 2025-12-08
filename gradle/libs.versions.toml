@@ -42,6 +42,7 @@ lifecycleViewmodelNav3 = "2.10.0"
 kotlinSerialization = "2.2.21"
 kotlinxSerializationCore = "1.9.0"
 material3Adaptive = "1.3.0-alpha04"
+gradlePlayPublisher = "3.11.0"
 # wearos
 wearCompose = "1.5.5"
 wearComposeMaterial = "1.5.5"
@@ -128,5 +129,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 androidx-room = { id = "androidx.room", version.ref = "room-plugin" }
+gradle-play-publisher = { id = "com.github.triplet.play", version.ref = "gradlePlayPublisher" }
 
 

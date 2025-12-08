@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.gradle.play.publisher)
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -19,6 +20,13 @@ if (keystorePropertiesFile.isFile) {
     }
 }
 
+// Support for runtime version override from CI
+// Wear OS uses versionCode + 1 to avoid conflicts with phone app in Play Store
+val versionCodeProperty = project.findProperty("versionCode") as String?
+    ?: throw GradleException("versionCode property is required. Use -PversionCode=YYMMDD")
+val versionNameProperty = project.findProperty("versionName") as String?
+    ?: throw GradleException("versionName property is required. Use -PversionName=1.YYMMDD")
+
 android {
     namespace = "com.charliesbot.onewearos"
     compileSdk = 36
@@ -27,8 +35,8 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 33
         targetSdk = 35
-        versionCode = 30
-        versionName = "1.0"
+        versionCode = versionCodeProperty.toInt() + 1  // Wear OS gets +1 to avoid Play Store conflict
+        versionName = versionNameProperty
 
     }
 
@@ -89,6 +97,16 @@ kotlin {
 
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
+}
+
+play {
+    val serviceAccountFile = rootProject.file("play-store-service-account.json")
+    if (serviceAccountFile.exists()) {
+        serviceAccountCredentials.set(serviceAccountFile)
+    }
+    track.set("production")
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
+    defaultToAppBundles.set(true)
 }
 
 dependencies {

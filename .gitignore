@@ -20,3 +20,5 @@ keystore.properties
 .idea/deploymentTargetSelector.xml
 google-services.json
 .idea/
+play-store-service-account.json
+service-account.json
