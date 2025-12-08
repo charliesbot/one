@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.charliesbot.one.features.BuildConfig
 import com.charliesbot.shared.R
 import org.koin.androidx.compose.koinViewModel
 
@@ -67,6 +69,7 @@ fun SettingsScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.settings_title)) },
+                windowInsets = WindowInsets(top = 0.dp)
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -155,18 +158,20 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Debug Section
-            SettingsGroup(
-                title = "Debug",
-                items = listOf(
-                    {
-                        ActionSettingItem(
-                            label = "Test Snackbar",
-                            description = "Trigger a test snackbar message",
-                            onClick = { viewModel.testSnackbar() }
-                        )
-                    }
+            if (BuildConfig.DEBUG) {
+                SettingsGroup(
+                    title = "Debug",
+                    items = listOf(
+                        {
+                            ActionSettingItem(
+                                label = "Test Snackbar",
+                                description = "Trigger a test snackbar message",
+                                onClick = { viewModel.testSnackbar() }
+                            )
+                        }
+                    )
                 )
-            )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
         }

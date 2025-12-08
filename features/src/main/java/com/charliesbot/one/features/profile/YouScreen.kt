@@ -1,6 +1,7 @@
 package com.charliesbot.one.features.profile
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -31,6 +32,7 @@ fun YouScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                windowInsets = WindowInsets(top = 0.dp),
                 title = { Text(stringResource(R.string.nav_you)) },
             )
         }
