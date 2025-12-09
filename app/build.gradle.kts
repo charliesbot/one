@@ -1,5 +1,7 @@
 import java.util.Properties
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -22,10 +24,10 @@ if (keystorePropertiesFile.isFile) {
 }
 
 // Support for runtime version override from CI
-val versionCodeProperty = project.findProperty("versionCode") as String?
-    ?: throw GradleException("versionCode property is required. Use -PversionCode=YYMMDD")
-val versionNameProperty = project.findProperty("versionName") as String?
-    ?: throw GradleException("versionName property is required. Use -PversionName=1.YYMMDD")
+// If missing (local dev), default to current date (YYMMDD) to match CI style.
+val defaultVersionCode: String? = SimpleDateFormat("yyMMdd").format(Date())
+val versionCodeProperty = project.findProperty("versionCode") as String? ?: defaultVersionCode
+val versionNameProperty = project.findProperty("versionName") as String? ?: "1.$defaultVersionCode-dev"
 
 android {
     namespace = "com.charliesbot.one"
@@ -44,11 +46,14 @@ android {
     signingConfigs {
         create("release") {
             try {
-                val storeFileName = keystoreProperties.getProperty("storeFile")
-                // Get the user's home directory path
-                val userHome = System.getProperty("user.home")
-                // Build the full, OS-agnostic path and assign it
-                storeFile = file("$userHome/.android/$storeFileName")
+                val storePath = keystoreProperties.getProperty("storeFile")
+                val fileObj = file(storePath)
+                if (fileObj.exists()) {
+                    storeFile = fileObj
+                } else {
+                    val userHome = System.getProperty("user.home")
+                    storeFile = file("$userHome/.android/$storePath")
+                }
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
