@@ -25,8 +25,8 @@ if (keystorePropertiesFile.isFile) {
 // Support for runtime version override from CI
 // Wear OS uses versionCode + 1 to avoid conflicts with phone app in Play Store
 val defaultVersionCode = SimpleDateFormat("yyMMdd").format(Date())
-val versionCodeProperty = project.findProperty("versionCode") as String? ?: defaultVersionCode
-val versionNameProperty = project.findProperty("versionName") as String? ?: "1.$defaultVersionCode-dev"
+val versionCodeProperty: String = (project.findProperty("versionCode") as String?) ?: defaultVersionCode
+val versionNameProperty: String = (project.findProperty("versionName") as String?) ?: "1.$defaultVersionCode-dev"
 
 android {
     namespace = "com.charliesbot.onewearos"

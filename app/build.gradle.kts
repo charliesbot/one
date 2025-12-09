@@ -25,9 +25,9 @@ if (keystorePropertiesFile.isFile) {
 
 // Support for runtime version override from CI
 // If missing (local dev), default to current date (YYMMDD) to match CI style.
-val defaultVersionCode: String? = SimpleDateFormat("yyMMdd").format(Date())
-val versionCodeProperty = project.findProperty("versionCode") as String? ?: defaultVersionCode
-val versionNameProperty = project.findProperty("versionName") as String? ?: "1.$defaultVersionCode-dev"
+val defaultVersionCode = SimpleDateFormat("yyMMdd").format(Date())
+val versionCodeProperty: String = (project.findProperty("versionCode") as String?) ?: defaultVersionCode
+val versionNameProperty: String = (project.findProperty("versionName") as String?) ?: "1.$defaultVersionCode-dev"
 
 android {
     namespace = "com.charliesbot.one"
