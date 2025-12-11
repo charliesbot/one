@@ -12,7 +12,6 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.gradle.play.publisher)
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -103,23 +102,6 @@ kotlin {
 
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
-}
-
-play {
-    // Service account credentials will be provided via GOOGLE_APPLICATION_CREDENTIALS env var in CI
-    // Locally, you can create a service-account.json file (gitignored)
-    val credsEnv = System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    if (credsEnv != null) {
-        serviceAccountCredentials.set(file(credsEnv))
-    } else {
-        val serviceAccountFile = rootProject.file("play-store-service-account.json")
-        if (serviceAccountFile.exists()) {
-            serviceAccountCredentials.set(serviceAccountFile)
-        }
-    }
-    track.set("production")
-    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
-    defaultToAppBundles.set(true)
 }
 
 dependencies {

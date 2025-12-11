@@ -75,24 +75,53 @@ jobs:
           echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > onewearos/google-services.json
           echo "google-services.json created in app/ and onewearos/ directories."
 
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
+          create_credentials_file: true
+          export_environment_variables: true
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build and publish phone app to Play Store
+      - name: Build phone app AAB
         run: |
-          ./gradlew :app:publishBundle \
+          ./gradlew :app:bundleRelease \
             -PversionCode=$VERSION_CODE \
             -PversionName=$VERSION_NAME \
             --no-daemon \
             --stacktrace
 
-      - name: Build and publish Wear OS app to Play Store
+      - name: Build Wear OS app AAB
         run: |
-          ./gradlew :onewearos:publishBundle \
+          ./gradlew :onewearos:bundleRelease \
             -PversionCode=$VERSION_CODE \
             -PversionName=$VERSION_NAME \
             --no-daemon \
             --stacktrace
+
+      - name: Upload phone app to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
+          packageName: com.charliesbot.one
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: production
+          status: completed
+          whatsNewDirectory: .github/whatsnew
+
+      - name: Upload Wear OS app to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
+          packageName: com.charliesbot.one
+          releaseFiles: onewearos/build/outputs/bundle/release/onewearos-release.aab
+          track: production
+          status: completed
+          whatsNewDirectory: .github/whatsnew
 
       - name: Upload Crashlytics mapping files
         run: |
@@ -109,7 +138,8 @@ jobs:
       - name: Cleanup sensitive files
         if: always()
         run: |
-          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json gha-creds-*.json
+          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json
+          rm -f gha-creds-*.json
 
       - name: Upload build artifacts (on failure)
         if: failure()
