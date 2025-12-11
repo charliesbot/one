@@ -65,6 +65,7 @@ jobs:
           workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
           service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
           create_credentials_file: true
+          credentials_file_path: 'play-store-service-account.json'
           export_environment_variables: true
 
       - name: Create google-services.json
@@ -109,7 +110,7 @@ jobs:
       - name: Cleanup sensitive files
         if: always()
         run: |
-          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json
+          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json play-store-service-account.json
 
       - name: Upload build artifacts (on failure)
         if: failure()
