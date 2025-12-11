@@ -65,16 +65,7 @@ jobs:
           workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
           service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
           create_credentials_file: true
-          credentials_file_path: 'play-store-service-account.json'
           export_environment_variables: true
-
-      - name: Debug credentials setup
-        run: |
-          echo "Checking for credentials file..."
-          ls -la play-store-service-account.json || echo "File not found at play-store-service-account.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
-          echo "Files in workspace root:"
-          ls -la
 
       - name: Create google-services.json
         env:
@@ -118,7 +109,7 @@ jobs:
       - name: Cleanup sensitive files
         if: always()
         run: |
-          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json play-store-service-account.json
+          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json gha-creds-*.json
 
       - name: Upload build artifacts (on failure)
         if: failure()
