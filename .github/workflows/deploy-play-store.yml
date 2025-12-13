@@ -120,11 +120,6 @@ jobs:
           track: production
           status: completed
           whatsNewDirectory: .github/whatsnew
-          # TODO: Change this to 'false' when Google restores auto-publishing permission!
-          # This is currently required because Google temporarily requires manual review.
-          # After a few successful manual releases, try changing this to 'false' - if the workflow
-          # succeeds, you've regained full automation!
-          changesNotSentForReview: true
 
       - name: Cleanup sensitive files
         if: always()
