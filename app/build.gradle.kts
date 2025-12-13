@@ -37,7 +37,7 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = versionCodeProperty.toInt()
-        versionName = versionNameProperty
+        versionName = "$versionNameProperty-mobile"  // Append "-mobile" to distinguish from Wear OS app
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

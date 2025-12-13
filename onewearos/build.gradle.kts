@@ -36,7 +36,7 @@ android {
         minSdk = 33
         targetSdk = 35
         versionCode = versionCodeProperty.toInt() + 1  // Wear OS gets +1 to avoid Play Store conflict
-        versionName = versionNameProperty
+        versionName = "$versionNameProperty-wear"  // Append "-wear" to distinguish from phone app
 
     }
 
