@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresPermission
@@ -35,7 +36,11 @@ class OngoingActivityService : Service(), KoinComponent {
 
         // 🟢 Fulfill the foreground service promise IMMEDIATELY.
         val initialNotification = createInitialNotification()
-        startForeground(NotificationConstants.ONGOING_NOTIFICATION_ID, initialNotification)
+        startForeground(
+            NotificationConstants.ONGOING_NOTIFICATION_ID,
+            initialNotification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+        )
 
         ongoingActivityManager.startOngoingActivity()
 
