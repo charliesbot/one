@@ -36,7 +36,15 @@ jobs:
         id: version
         run: |
           BASE_VERSION=$(date +'%y%m%d')
-          SUFFIX="${{ github.event.inputs.version_suffix }}"
+
+          # For manual runs without explicit suffix, add time-based suffix for uniqueness
+          # For scheduled runs, keep simple date format
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -z "${{ github.event.inputs.version_suffix }}" ]; then
+            SUFFIX=$(date +'%H%M')
+          else
+            SUFFIX="${{ github.event.inputs.version_suffix }}"
+          fi
+
           VERSION_CODE="${BASE_VERSION}${SUFFIX}"
           VERSION_NAME="1.${BASE_VERSION}${SUFFIX}"
 
