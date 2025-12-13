@@ -116,7 +116,7 @@ jobs:
         with:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
-          releaseFiles: '**/*.aab'
+          releaseFiles: '**/outputs/bundle/release/*.aab'
           track: production
           status: completed
           whatsNewDirectory: .github/whatsnew
