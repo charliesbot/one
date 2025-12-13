@@ -126,18 +126,6 @@ jobs:
           # succeeds, you've regained full automation!
           changesNotSentForReview: true
 
-      - name: Upload Crashlytics mapping files
-        run: |
-          ./gradlew :app:uploadCrashlyticsSymbolFileRelease \
-            -PversionCode=$VERSION_CODE \
-            -PversionName=$VERSION_NAME \
-            --no-daemon || echo "::warning::Crashlytics upload failed for app"
-
-          ./gradlew :onewearos:uploadCrashlyticsSymbolFileRelease \
-            -PversionCode=$VERSION_CODE \
-            -PversionName=$VERSION_NAME \
-            --no-daemon || echo "::warning::Crashlytics upload failed for onewearos"
-
       - name: Cleanup sensitive files
         if: always()
         run: |
