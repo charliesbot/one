@@ -53,7 +53,7 @@ defaultConfig {
     applicationId = "com.example.yourapp"
     // ... other settings
     versionCode = versionCodeProperty.toInt()
-    versionName = versionNameProperty
+    versionName = "$versionNameProperty-mobile"  // Add -mobile suffix
 }
 ```
 
@@ -71,13 +71,13 @@ val versionCodeProperty: String = (project.findProperty("versionCode") as String
 val versionNameProperty: String = (project.findProperty("versionName") as String?) ?: "1.$defaultVersionCode-dev"
 ```
 
-**Important**: Use `versionCode + 1` for Wear OS to avoid conflicts:
+**Important**: Use `versionCode + 1` and `-wear` suffix for Wear OS:
 
 ```kotlin
 defaultConfig {
     applicationId = "com.example.yourapp"  // Same as phone app
     versionCode = versionCodeProperty.toInt() + 1  // Add +1 here!
-    versionName = versionNameProperty
+    versionName = "$versionNameProperty-wear"  // Add -wear suffix
 }
 ```
 
@@ -85,18 +85,18 @@ defaultConfig {
 
 ## Step 2: Create Release Notes
 
-### Create directory structure:
+### Create directory structure with flat files:
 
 ```
 .github/
   whatsnew/
-    en-US/
-      default.txt
-    es-ES/
-      default.txt
+    en-US.txt
+    es-ES.txt
 ```
 
-### English (`en-US/default.txt`):
+**Note**: Use flat `.txt` files (not subdirectories) for `r0adkll/upload-google-play` action.
+
+### English (`en-US.txt`):
 
 ```
 Bug fixes and performance improvements.
@@ -104,7 +104,7 @@ Bug fixes and performance improvements.
 Thank you for using [Your App Name]!
 ```
 
-### Spanish (`es-ES/default.txt`):
+### Spanish (`es-ES.txt`):
 
 ```
 Corrección de errores y mejoras de rendimiento.
@@ -112,7 +112,7 @@ Corrección de errores y mejoras de rendimiento.
 ¡Gracias por usar [Your App Name]!
 ```
 
-Add more locales as needed (e.g., `fr-FR`, `de-DE`, etc.)
+Add more locales as needed (e.g., `fr-FR.txt`, `de-DE.txt`, etc.)
 
 ---
 
@@ -132,15 +132,15 @@ name: Deploy to Google Play Store
 on:
   # Weekly schedule: Every Monday at 10:00 AM UTC
   schedule:
-    - cron: "0 10 * * 1"
+    - cron: '0 10 * * 1'
 
   # Manual trigger for ad-hoc deployments
   workflow_dispatch:
     inputs:
       version_suffix:
-        description: "Version suffix (optional, for same-day deploys)"
+        description: 'Version suffix (optional, for same-day deploys)'
         required: false
-        default: ""
+        default: ''
 
 jobs:
   deploy:
@@ -157,15 +157,23 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
-          cache: "gradle"
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
 
       - name: Generate version numbers
         id: version
         run: |
           BASE_VERSION=$(date +'%y%m%d')
-          SUFFIX="${{ github.event.inputs.version_suffix }}"
+
+          # For manual runs without explicit suffix, add hour-based suffix for uniqueness
+          # For scheduled runs, keep simple date format
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -z "${{ github.event.inputs.version_suffix }}" ]; then
+            SUFFIX=$(date +'%H')
+          else
+            SUFFIX="${{ github.event.inputs.version_suffix }}"
+          fi
+
           VERSION_CODE="${BASE_VERSION}${SUFFIX}"
           VERSION_NAME="1.${BASE_VERSION}${SUFFIX}"
 
@@ -191,8 +199,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
-          service_account: "github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com"
+          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
           create_credentials_file: true
           export_environment_variables: true
 
@@ -208,8 +216,8 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
-          service_account: "github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com"
+          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
           create_credentials_file: true
           export_environment_variables: true
 
@@ -232,32 +240,27 @@ jobs:
             --no-daemon \
             --stacktrace
 
-      - name: Upload phone and Wear OS apps to Play Store
+      - name: Upload phone app to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab, onewearos/build/outputs/bundle/release/onewearos-release.aab
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          debugSymbols: app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
           track: production
           status: completed
           whatsNewDirectory: .github/whatsnew
-          # TODO: Change this to 'false' when Google restores auto-publishing permission!
-          # This is currently required because Google temporarily requires manual review.
-          # After a few successful manual releases, try changing this to 'false' - if the workflow
-          # succeeds, you've regained full automation!
-          changesNotSentForReview: true
 
-      - name: Upload Crashlytics mapping files
-        run: |
-          ./gradlew :app:uploadCrashlyticsSymbolFileRelease \
-            -PversionCode=$VERSION_CODE \
-            -PversionName=$VERSION_NAME \
-            --no-daemon || echo "::warning::Crashlytics upload failed for app"
-
-          ./gradlew :onewearos:uploadCrashlyticsSymbolFileRelease \
-            -PversionCode=$VERSION_CODE \
-            -PversionName=$VERSION_NAME \
-            --no-daemon || echo "::warning::Crashlytics upload failed for onewearos"
+      - name: Upload Wear OS app to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
+          packageName: com.charliesbot.one
+          releaseFiles: onewearos/build/outputs/bundle/release/onewearos-release.aab
+          debugSymbols: onewearos/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
+          track: wear:production
+          status: completed
+          whatsNewDirectory: .github/whatsnew
 
       - name: Cleanup sensitive files
         if: always()
@@ -413,14 +416,14 @@ This copies the encoded JSON to your clipboard (or prints it to the console).
    - Release notes in your configured languages
    - Status may be "Draft" or "Ready for review" (if Google requires manual review)
 
-### If Manual Review is Required:
+### Understanding Separate Tracks:
 
-If Google requires manual review (common for new API usage):
+Since March 2023, Google requires Wear OS apps to use dedicated form factor tracks:
 
-1. The workflow will upload both AABs successfully ✅
-2. You'll need to click **"Send for review"** or **"Review and publish"** in Play Console 🖱️
-3. After a few successful reviews, try changing `changesNotSentForReview: false` in the workflow
-4. If successful, you've regained full automation! 🎉
+- **Phone app**: Uploads to `production` track
+- **Wear OS app**: Uploads to `wear:production` track
+
+In Play Console, you'll see them listed separately, even though they share the same package name. This is normal and expected!
 
 ---
 
@@ -443,14 +446,59 @@ After successful manual test, it will automatically deploy every week!
 
 ### How Versions Work:
 
-- **versionCode**: Date-based `YYMMDD` (e.g., `251208` for Dec 8, 2025)
-- **versionName**: `1.YYMMDD` (e.g., `1.251208`)
-- **Phone app**: Gets base versionCode (e.g., `251208`)
-- **Wear OS app**: Gets versionCode + 1 (e.g., `251209`) to avoid Play Store conflicts
+- **Base versionCode**: Date-based `YYMMDD` (e.g., `251208` for Dec 8, 2025)
+- **Base versionName**: `1.YYMMDD` (e.g., `1.251208`)
+- **Phone app**:
+  - versionCode: `251208`
+  - versionName: `1.251208-mobile`
+- **Wear OS app**:
+  - versionCode: `251209` (+1 to avoid conflicts)
+  - versionName: `1.251208-wear`
 
-### Same-Day Deployments:
+### Manual Runs (workflow_dispatch):
 
-Use version suffix to create: `2512081`, `2512082`, etc.
+- Automatically appends hour suffix (HH format) for uniqueness
+- Example: `25120814` (Dec 8, 2025 at 14:00)
+- Version names: `1.25120814-mobile` and `1.25120814-wear`
+
+### Scheduled Runs (weekly cron):
+
+- Uses clean date format: `251208`
+- Version names: `1.251208-mobile` and `1.251208-wear`
+
+### Custom Same-Day Deployments:
+
+- You can still provide a custom suffix in the workflow input
+- Example: Enter `1`, `2`, `3` to create `2512081`, `2512082`, etc.
+
+---
+
+## Step 8.5: Declare Foreground Service Permissions (If Applicable)
+
+If your app uses foreground services, you must declare them in Play Console before uploading.
+
+### Check if your app uses foreground services:
+
+Look in your `AndroidManifest.xml` for:
+- `<uses-permission android:name="android.permission.FOREGROUND_SERVICE*" />`
+- `<service android:foregroundServiceType="..." />`
+
+### Declare permissions in Play Console:
+
+1. Go to Play Console → Your App → **Policy** → **App content**
+2. Find **"Foreground service permissions"**
+3. Click **Manage** or **Start**
+4. Select the appropriate foreground service types your app uses:
+   - `FOREGROUND_SERVICE_DATA_SYNC` - for data synchronization
+   - `FOREGROUND_SERVICE_HEALTH` - for health/fitness tracking
+   - etc.
+5. Provide use case descriptions for each type
+6. Save
+
+**Important**: The declarations must match what's in your `AndroidManifest.xml`, otherwise uploads will fail with:
+```
+Error: You must let us know whether your app uses any Foreground Service permissions.
+```
 
 ---
 
@@ -475,10 +523,10 @@ Use version suffix to create: `2512081`, `2512082`, etc.
 
 ### "Error: Changes cannot be sent for review automatically"
 
-- This is normal for new API usage or after a policy violation
-- The workflow will upload AABs successfully, but you need to manually review in Play Console
-- The `changesNotSentForReview: true` flag in the workflow handles this
-- After successful reviews, try changing to `false` to regain automation
+- This indicates Google requires manual review (common for new apps or after policy issues)
+- The workflow uploads AABs successfully, you just need to click "Send for review" in Play Console
+- After several successful reviews, Google usually restores auto-publishing
+- If you get this error, it means you don't have auto-publishing permission yet
 
 ### "Error: Version code must be greater than X"
 
@@ -543,11 +591,13 @@ Use this checklist when setting up a new app:
 
 ## Resources
 
-- **gradle-play-publisher docs**: https://github.com/Triple-T/gradle-play-publisher
+- **r0adkll/upload-google-play action**: https://github.com/r0adkll/upload-google-play
 - **Google Play Publishing API**: https://developers.google.com/android-publisher
+- **Form Factor Tracks**: https://support.google.com/googleplay/android-developer/answer/13295490
 - **Workload Identity Federation**: https://cloud.google.com/iam/docs/workload-identity-federation
 - **GitHub Actions docs**: https://docs.github.com/en/actions
 - **Firebase Crashlytics**: https://firebase.google.com/docs/crashlytics
+- **Foreground Service Types**: https://developer.android.com/about/versions/14/changes/fgs-types-required
 
 ---
 
