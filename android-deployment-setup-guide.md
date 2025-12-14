@@ -416,14 +416,46 @@ This copies the encoded JSON to your clipboard (or prints it to the console).
    - Release notes in your configured languages
    - Status may be "Draft" or "Ready for review" (if Google requires manual review)
 
-### Understanding Separate Tracks:
+### Understanding Form Factor Tracks:
 
-Since March 2023, Google requires Wear OS apps to use dedicated form factor tracks:
+Since March 2023, Google requires apps targeting different form factors to use **dedicated tracks** with specific prefixes. This applies to all non-phone form factors.
 
-- **Phone app**: Uploads to `production` track
-- **Wear OS app**: Uploads to `wear:production` track
+**Track Naming Convention:**
+```
+[prefix]:trackName
+```
 
-In Play Console, you'll see them listed separately, even though they share the same package name. This is normal and expected!
+**Supported Form Factor Prefixes:**
+- `wear:` - Wear OS (smartwatches)
+- `automotive:` - Android Automotive OS (car infotainment systems)
+- `tv:` - Android TV
+- `xr:` - Android XR (AR/VR devices)
+
+**Examples:**
+```yaml
+# Phone/tablet app (no prefix)
+track: production
+
+# Wear OS app
+track: wear:production
+
+# Android Automotive app
+track: automotive:production
+
+# Android TV app
+track: tv:beta
+```
+
+**Important Notes:**
+- The **phone/tablet app uses NO prefix** - just `production`, `beta`, etc.
+- **All other form factors require the prefix** or the upload will fail
+- Apps with the **same package name** but different form factors are uploaded to **separate tracks**
+- In Play Console, you'll see them listed separately under their respective form factor tabs
+- The Google Play API automatically routes each binary to the correct device type based on the track prefix
+
+**For ONE Fasting Tracker:**
+- **Phone app**: `track: production` (no prefix)
+- **Wear OS app**: `track: wear:production` (wear prefix required)
 
 ---
 
