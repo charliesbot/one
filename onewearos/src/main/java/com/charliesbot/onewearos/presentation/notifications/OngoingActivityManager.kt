@@ -17,78 +17,49 @@ import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.NotificationConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
-import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationUtil
-import com.charliesbot.shared.core.utils.FastingProgress
-import com.charliesbot.shared.core.utils.FastingProgressUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
+import android.os.SystemClock
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
+/**
+ * Manages the OngoingActivity for fasting sessions on Wear OS.
+ *
+ * Uses Status.StopwatchPart for auto-updating elapsed time display.
+ * The system handles ticking the timer automatically - no periodic updates needed.
+ */
 class OngoingActivityManager(
     private val context: Context,
     private val fastingDataRepository: FastingDataRepository
 ) {
-    private var periodicUpdateJob: Job? = null
-    private val managerScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /**
+     * Starts the ongoing activity with a stopwatch that auto-updates.
+     * @param startTimeMillis The timestamp when the fasting session started
+     * @param fastingGoalId The ID of the fasting goal
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun startOngoingActivity() {
-        Log.d(LOG_TAG, "OngoingActivityManager: Starting ongoing activity.")
-        managerScope.launch {
-            updateNotification()
-        }
-        startPeriodicUpdates()
-    }
+    fun startOngoingActivity(startTimeMillis: Long, fastingGoalId: String) {
+        Log.d(LOG_TAG, "OngoingActivityManager: Starting ongoing activity. startTime=$startTimeMillis, goalId=$fastingGoalId")
 
-    fun stopOngoingActivity() {
-        Log.d(LOG_TAG, "OngoingActivityManager: Stopping ongoing activity.")
-        periodicUpdateJob?.cancel()
-    }
+        val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
+        val pendingIntent = createTouchIntent()
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun requestUpdate() {
-        Log.d(LOG_TAG, "OngoingActivityManager: Requesting immediate update.")
-        managerScope.launch {
-            updateNotification()
-        }
-    }
+        val notificationBuilder = buildNotification(startTimeMillis, fastingGoal.durationDisplay, pendingIntent)
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private fun startPeriodicUpdates() {
-        if (periodicUpdateJob?.isActive == true) {
-            Log.d(LOG_TAG, "OngoingActivityManager: Periodic updates already running.")
-            return
-        }
-        periodicUpdateJob = managerScope.launch {
-            while (isActive) {
-                delay(15_000) // 15-second interval
-                updateNotification()
-            }
-        }
-    }
+        // StopwatchPart uses SystemClock.elapsedRealtime() base, not Unix epoch
+        // Convert from System.currentTimeMillis() to elapsedRealtime base
+        val elapsedSinceStart = System.currentTimeMillis() - startTimeMillis
+        val stopwatchStartTime = SystemClock.elapsedRealtime() - elapsedSinceStart
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private suspend fun updateNotification() {
-        val data = fastingDataRepository.fastingDataItem.first()
-        val progress = FastingProgressUtil.calculateFastingProgress(data)
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val notificationBuilder = buildNotification(data, progress, pendingIntent)
+        // Use StopwatchPart - system auto-updates the elapsed time, no periodic loop needed
+        // Build template from localized string, replacing format args with Status placeholders
+        val statusTemplate = context.getString(R.string.ongoing_status_format, "#time#", "#goal#")
+        val goalText = context.getString(R.string.target_duration_short, fastingGoal.durationDisplay)
         val status = Status.Builder()
-            .addTemplate(createStatusText(data, progress))
+            .addTemplate(statusTemplate)
+            .addPart("time", Status.StopwatchPart(stopwatchStartTime))
+            .addPart("goal", Status.TextPart(goalText))
             .build()
 
         val ongoingActivity = OngoingActivity.Builder(
@@ -96,7 +67,6 @@ class OngoingActivityManager(
             NotificationConstants.ONGOING_NOTIFICATION_ID,
             notificationBuilder
         )
-
             .setAnimatedIcon(R.drawable.ic_notification_status)
             .setStaticIcon(R.drawable.ic_notification_status)
             .setTouchIntent(pendingIntent)
@@ -107,47 +77,63 @@ class OngoingActivityManager(
         ongoingActivity.apply(context)
         NotificationManagerCompat.from(context)
             .notify(NotificationConstants.ONGOING_NOTIFICATION_ID, notificationBuilder.build())
+
+        Log.d(LOG_TAG, "OngoingActivityManager: Ongoing activity started successfully")
     }
 
-    private fun createStatusText(
-        fastingDataItem: FastingDataItem,
-        fastingProgress: FastingProgress
-    ): String {
-        val fastingGoal = PredefinedFastingGoals.getGoalById(fastingDataItem.fastingGoalId)
-        return if (fastingProgress.isComplete) {
-            context.getString(com.charliesbot.shared.R.string.notification_completion_title)
-        } else {
-            context.getString(
-                R.string.complication_text_fasting_format,
-                fastingProgress.progressPercentage,
-                fastingProgress.elapsedHours.toString(),
-                context.getString(
-                    R.string.target_duration_short,
-                    fastingGoal.durationDisplay
-                )
-            )
+    /**
+     * Stops the ongoing activity and cancels the notification.
+     */
+    fun stopOngoingActivity() {
+        Log.d(LOG_TAG, "OngoingActivityManager: Stopping ongoing activity.")
+        NotificationManagerCompat.from(context).cancel(NotificationConstants.ONGOING_NOTIFICATION_ID)
+        Log.d(LOG_TAG, "OngoingActivityManager: Ongoing activity stopped.")
+    }
+
+    /**
+     * Updates the ongoing activity (e.g., when goal changes mid-fast).
+     */
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun requestUpdate() {
+        Log.d(LOG_TAG, "OngoingActivityManager: Requesting update.")
+        val data = runBlocking {
+            fastingDataRepository.fastingDataItem.first()
+        }
+        if (data.isFasting) {
+            startOngoingActivity(data.startTimeInMillis, data.fastingGoalId)
         }
     }
 
+    private fun createTouchIntent(): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        return PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 
     private fun buildNotification(
-        fastDataItem: FastingDataItem,
-        progress: FastingProgress,
+        startTimeMillis: Long,
+        goalDuration: String,
         pendingIntent: PendingIntent,
     ): NotificationCompat.Builder {
-        val notificationBuilder = NotificationCompat.Builder(context, NotificationUtil.CHANNEL_ID)
+        return NotificationCompat.Builder(context, NotificationUtil.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_status)
-            .setContentTitle("Fasting Timer")
-            .setContentText(createStatusText(fastDataItem, progress))
+            .setContentTitle(context.getString(R.string.ongoing_activity_title))
+            .setContentText(context.getString(R.string.target_duration_short, goalDuration))
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setShowWhen(false)
+            .setWhen(startTimeMillis)
+            .setUsesChronometer(true)  // System auto-updates elapsed time
             .setSilent(true)
             .setLocusId(LocusIdCompat(ONGOING_ACTIVITY_LOCUS_ID))
-        return notificationBuilder
     }
 
     companion object {

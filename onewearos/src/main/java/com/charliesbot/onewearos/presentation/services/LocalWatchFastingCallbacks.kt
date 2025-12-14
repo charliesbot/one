@@ -2,9 +2,9 @@ package com.charliesbot.onewearos.presentation.services
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.core.content.ContextCompat
 import com.charliesbot.onewearos.complication.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
@@ -23,16 +23,20 @@ class LocalWatchFastingCallbacks(
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
         Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting start")
-        val intent = Intent(context, OngoingActivityService::class.java)
-        context.startForegroundService(intent)
+        val intent = OngoingActivityService.createStartIntent(
+            context,
+            fastingDataItem.startTimeInMillis,
+            fastingDataItem.fastingGoalId
+        )
+        ContextCompat.startForegroundService(context, intent)
         complicationUpdateManager.requestUpdate()
         Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
     }
 
     override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
         Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
-        val intent = Intent(context, OngoingActivityService::class.java)
-        context.stopService(intent)
+        val intent = OngoingActivityService.createStopIntent(context)
+        context.startService(intent)  // Send stop action to the service
         complicationUpdateManager.requestUpdate()
         Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
     }

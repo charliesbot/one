@@ -18,5 +18,7 @@
     <string name="complication_text_not_fasting">Not Fasting. Tap to start.</string>
     <string name="complication_text_fasting_format">Fasting: %1$d%% (%2$s of %3$s)</string>
     <string name="complication_title_hours_format">%1$dH</string>
+    <string name="ongoing_activity_title">Fasting</string>
+    <string name="ongoing_status_format">%1$s of %2$s</string>
 
 </resources>
