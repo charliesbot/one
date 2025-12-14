@@ -132,15 +132,15 @@ name: Deploy to Google Play Store
 on:
   # Weekly schedule: Every Monday at 10:00 AM UTC
   schedule:
-    - cron: '0 10 * * 1'
+    - cron: "0 10 * * 1"
 
   # Manual trigger for ad-hoc deployments
   workflow_dispatch:
     inputs:
       version_suffix:
-        description: 'Version suffix (optional, for same-day deploys)'
+        description: "Version suffix (optional, for same-day deploys)"
         required: false
-        default: ''
+        default: ""
 
 jobs:
   deploy:
@@ -157,9 +157,9 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
 
       - name: Generate version numbers
         id: version
@@ -199,8 +199,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
+          service_account: "github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com"
           create_credentials_file: true
           export_environment_variables: true
 
@@ -216,8 +216,8 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
+          service_account: "github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com"
           create_credentials_file: true
           export_environment_variables: true
 
@@ -421,17 +421,20 @@ This copies the encoded JSON to your clipboard (or prints it to the console).
 Since March 2023, Google requires apps targeting different form factors to use **dedicated tracks** with specific prefixes. This applies to all non-phone form factors.
 
 **Track Naming Convention:**
+
 ```
 [prefix]:trackName
 ```
 
 **Supported Form Factor Prefixes:**
+
 - `wear:` - Wear OS (smartwatches)
 - `automotive:` - Android Automotive OS (car infotainment systems)
 - `tv:` - Android TV
 - `xr:` - Android XR (AR/VR devices)
 
 **Examples:**
+
 ```yaml
 # Phone/tablet app (no prefix)
 track: production
@@ -447,6 +450,7 @@ track: tv:beta
 ```
 
 **Important Notes:**
+
 - The **phone/tablet app uses NO prefix** - just `production`, `beta`, etc.
 - **All other form factors require the prefix** or the upload will fail
 - Apps with the **same package name** but different form factors are uploaded to **separate tracks**
@@ -454,6 +458,7 @@ track: tv:beta
 - The Google Play API automatically routes each binary to the correct device type based on the track prefix
 
 **For ONE Fasting Tracker:**
+
 - **Phone app**: `track: production` (no prefix)
 - **Wear OS app**: `track: wear:production` (wear prefix required)
 
@@ -512,6 +517,7 @@ If your app uses foreground services, you must declare them in Play Console befo
 ### Check if your app uses foreground services:
 
 Look in your `AndroidManifest.xml` for:
+
 - `<uses-permission android:name="android.permission.FOREGROUND_SERVICE*" />`
 - `<service android:foregroundServiceType="..." />`
 
@@ -528,6 +534,7 @@ Look in your `AndroidManifest.xml` for:
 6. Save
 
 **Important**: The declarations must match what's in your `AndroidManifest.xml`, otherwise uploads will fail with:
+
 ```
 Error: You must let us know whether your app uses any Foreground Service permissions.
 ```
