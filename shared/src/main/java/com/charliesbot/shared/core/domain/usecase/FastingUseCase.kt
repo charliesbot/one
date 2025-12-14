@@ -49,7 +49,8 @@ class FastingUseCase(
     /**
      * Complete the current fasting session locally.
      *
-     * @throws IllegalStateException if no active fasting session exists
+     * Returns early if no active fasting session exists (handles race conditions gracefully).
+     *
      * @throws Exception if any part of the process fails
      */
     suspend fun stopFasting() {
@@ -57,7 +58,8 @@ class FastingUseCase(
         try {
             val existingItem = fastingRepository.getCurrentFasting()
             if (existingItem?.isFasting != true) {
-                throw IllegalStateException("No active fasting session to stop")
+                Log.w(LOG_TAG, "FastingUseCase: stopFasting called but no active session found - ignoring")
+                return
             }
             val (previousItem, currentItem) = fastingRepository.stopFasting(existingItem.fastingGoalId)
             eventManager.processStateChange(previousItem, currentItem, localCallbacks)

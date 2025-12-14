@@ -15,4 +15,6 @@
     <string name="complication_text_not_fasting">No ayunando. Toca para empezar.</string>
     <string name="complication_text_fasting_format">Ayunando: %1$d%% (%2$s de %3$s)</string>
     <string name="complication_title_hours_format">%1$dH</string>
+    <string name="ongoing_activity_title">Ayunando</string>
+    <string name="ongoing_status_format">%1$s de %2$s</string>
 </resources>
