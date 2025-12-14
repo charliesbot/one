@@ -111,13 +111,23 @@ jobs:
             --no-daemon \
             --stacktrace
 
-      - name: Upload phone and Wear OS apps to Play Store
+      - name: Upload phone app to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
-          releaseFiles: '**/*-release.aab'
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: production
+          status: completed
+          whatsNewDirectory: .github/whatsnew
+
+      - name: Upload Wear OS app to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
+          packageName: com.charliesbot.one
+          releaseFiles: onewearos/build/outputs/bundle/release/onewearos-release.aab
+          track: wear:production
           status: completed
           whatsNewDirectory: .github/whatsnew
 
