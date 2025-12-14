@@ -652,13 +652,16 @@ Use this checklist when setting up a new app:
 
 ### What You Do for Each New App (Quick!):
 
-1. Add plugin to build files (5 min)
-2. Grant Play Console permissions (2 min)
-3. Add keystore secrets to GitHub (3 min)
-4. Copy workflow file (1 min)
-5. Test deployment (20 min)
+1. Add version properties to build files (5 min)
+2. Create release notes files (2 min)
+3. Grant Workload Identity Pool access (2 min)
+4. Grant Play Console permissions (2 min)
+5. Add keystore + google-services.json secrets to GitHub (5 min)
+6. Copy workflow file (1 min)
+7. Declare foreground service permissions if needed (3 min)
+8. Test deployment (20 min)
 
-**Total setup time per new app: ~30 minutes!**
+**Total setup time per new app: ~40 minutes!**
 
 ---
 
