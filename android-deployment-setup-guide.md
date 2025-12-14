@@ -22,70 +22,59 @@ You don't need to touch Google Cloud Console again for new apps! The hard part i
 
 ---
 
-## Setup for Each New Android App
+## Prerequisites
 
-### Prerequisites
+Before starting, make sure you have:
 
 - [ ] App already published on Google Play Store (initial version uploaded manually)
 - [ ] App has a release keystore (.jks file)
 - [ ] GitHub repository created for the app
+- [ ] Firebase project set up (for Crashlytics, if using)
 
 ---
 
-## Step 1: Configure Version Properties in Gradle
+## Setup Steps
 
-### 1.1 Update `app/build.gradle.kts`
+### Step 1: Configure Version Properties in Gradle
 
-**Add version property support (before `android {}` block):**
+Add version property support to your build files so the workflow can inject version codes dynamically.
+
+**In `app/build.gradle.kts` (before `android {}` block):**
 
 ```kotlin
-// Support for runtime version override from CI.
-// If missing (local dev), default to current date (YYMMDD) to match CI style.
+// Support for runtime version override from CI
 val defaultVersionCode = java.text.SimpleDateFormat("yyMMdd").format(java.util.Date())
 val versionCodeProperty: String = (project.findProperty("versionCode") as String?) ?: defaultVersionCode
 val versionNameProperty: String = (project.findProperty("versionName") as String?) ?: "1.$defaultVersionCode-dev"
 ```
 
-**Update defaultConfig:**
+**Update `defaultConfig`:**
 
 ```kotlin
 defaultConfig {
     applicationId = "com.example.yourapp"
-    // ... other settings
     versionCode = versionCodeProperty.toInt()
-    versionName = "$versionNameProperty-mobile"  // Add -mobile suffix
+    versionName = "$versionNameProperty-mobile"  // Add platform suffix
 }
 ```
 
-### 1.2 If You Have a Wear OS Module
-
-Repeat the same steps in `onewearos/build.gradle.kts` (or your wear module).
-
-**Add version property support (before `android {}` block):**
-
-```kotlin
-// Support for runtime version override from CI.
-// If missing (local dev), default to current date (YYMMDD) to match CI style.
-val defaultVersionCode = java.text.SimpleDateFormat("yyMMdd").format(java.util.Date())
-val versionCodeProperty: String = (project.findProperty("versionCode") as String?) ?: defaultVersionCode
-val versionNameProperty: String = (project.findProperty("versionName") as String?) ?: "1.$defaultVersionCode-dev"
-```
-
-**Important**: Use `versionCode + 1` and `-wear` suffix for Wear OS:
+**If you have a Wear OS module** (e.g., `onewearos/build.gradle.kts`), repeat the same but with:
 
 ```kotlin
 defaultConfig {
     applicationId = "com.example.yourapp"  // Same as phone app
-    versionCode = versionCodeProperty.toInt() + 1  // Add +1 here!
-    versionName = "$versionNameProperty-wear"  // Add -wear suffix
+    versionCode = versionCodeProperty.toInt() + 1  // +1 to avoid conflicts
+    versionName = "$versionNameProperty-wear"      // -wear suffix
 }
 ```
 
 ---
 
-## Step 2: Create Release Notes
+### Step 2: Create Release Notes
 
-### Create directory structure with flat files:
+Create release notes files that will be displayed in Play Store.
+
+**Directory structure:**
 
 ```
 .github/
@@ -94,9 +83,7 @@ defaultConfig {
     es-ES.txt
 ```
 
-**Note**: Use flat `.txt` files (not subdirectories) for `r0adkll/upload-google-play` action.
-
-### English (`en-US.txt`):
+**Example `en-US.txt`:**
 
 ```
 Bug fixes and performance improvements.
@@ -104,7 +91,7 @@ Bug fixes and performance improvements.
 Thank you for using [Your App Name]!
 ```
 
-### Spanish (`es-ES.txt`):
+**Example `es-ES.txt`:**
 
 ```
 Corrección de errores y mejoras de rendimiento.
@@ -112,35 +99,35 @@ Corrección de errores y mejoras de rendimiento.
 ¡Gracias por usar [Your App Name]!
 ```
 
-Add more locales as needed (e.g., `fr-FR.txt`, `de-DE.txt`, etc.)
+Add more locales as needed (`fr-FR.txt`, `de-DE.txt`, etc.)
 
 ---
 
-## Step 3: Copy GitHub Actions Workflow
+### Step 3: Copy GitHub Actions Workflow
 
-### Copy the workflow file from ONE:
+**Option 1: Copy from ONE project:**
 
 ```bash
 cp /path/to/one/.github/workflows/deploy-play-store.yml .github/workflows/
 ```
 
-Or create `.github/workflows/deploy-play-store.yml` with this content:
+**Option 2: Create new file** at `.github/workflows/deploy-play-store.yml`
+
+<details>
+<summary>Click to expand full workflow YAML</summary>
 
 ```yaml
 name: Deploy to Google Play Store
 
 on:
-  # Weekly schedule: Every Monday at 10:00 AM UTC
   schedule:
-    - cron: "0 10 * * 1"
-
-  # Manual trigger for ad-hoc deployments
+    - cron: '0 10 * * 1'  # Every Monday at 10:00 AM UTC
   workflow_dispatch:
     inputs:
       version_suffix:
-        description: "Version suffix (optional, for same-day deploys)"
+        description: 'Version suffix (optional, for same-day deploys)'
         required: false
-        default: ""
+        default: ''
 
 jobs:
   deploy:
@@ -157,17 +144,16 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
-          cache: "gradle"
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
 
       - name: Generate version numbers
         id: version
         run: |
           BASE_VERSION=$(date +'%y%m%d')
 
-          # For manual runs without explicit suffix, add hour-based suffix for uniqueness
-          # For scheduled runs, keep simple date format
+          # Auto-add hour suffix for manual runs (for uniqueness)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -z "${{ github.event.inputs.version_suffix }}" ]; then
             SUFFIX=$(date +'%H')
           else
@@ -188,7 +174,6 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
           chmod 600 keystore.jks
 
-          # Create keystore.properties for build
           cat > keystore.properties <<EOF
           keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}
           storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}
@@ -199,8 +184,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
-          service_account: "github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com"
+          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
           create_credentials_file: true
           export_environment_variables: true
 
@@ -210,14 +195,13 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
           echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > onewearos/google-services.json
-          echo "google-services.json created in app/ and onewearos/ directories."
 
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
-          service_account: "github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com"
+          workload_identity_provider: 'projects/984604330802/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com'
           create_credentials_file: true
           export_environment_variables: true
 
@@ -279,11 +263,18 @@ jobs:
           retention-days: 7
 ```
 
+</details>
+
+**Important notes:**
+- Update `packageName` to match your app
+- For **phone-only apps**, remove the Wear OS build and upload steps
+- For **other form factors** (TV, Automotive, XR), use the appropriate track prefix (see Appendix A)
+
 ---
 
-## Step 4: Grant Workload Identity Pool Access
+### Step 4: Grant Workload Identity Pool Access
 
-The Workload Identity Pool needs to allow your GitHub repository to impersonate the service account.
+Allow your GitHub repository to impersonate the service account.
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Select project `android-play-store-automation`
@@ -293,378 +284,231 @@ The Workload Identity Pool needs to allow your GitHub repository to impersonate 
 6. Select **"Grant access using service account impersonation"**
 7. Fill in:
    - **Service account:** `github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com`
-   - **Select principals:**
-     - From dropdown: Select `repository`
-     - In text field: Enter `charliesbot/your-repo-name`
+   - **Select principals:** Choose `repository` from dropdown
+   - **Repository:** Enter `charliesbot/your-repo-name`
 8. Click **Save**
-
-This grants your GitHub Actions workflow permission to impersonate the service account for Play Store uploads.
 
 ---
 
-## Step 5: Grant Play Console Permissions
+### Step 5: Grant Play Console Permissions
 
-Your service account needs permission to release **this specific app**.
+Give the service account permission to release your specific app.
 
-1. Go to: https://play.google.com/console
-2. Click **"Users and permissions"** (left sidebar under "Setup")
-3. Find `github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com` in the list
+1. Go to https://play.google.com/console
+2. Click **"Users and permissions"** (left sidebar)
+3. Find `github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com`
 4. Click on it to edit
 5. Under **"App permissions"**:
    - Click **"Add app"**
-   - Select your new app
-   - Check **"Releases"** or **"Release to production"**
+   - Select your app
+   - Check **"Releases"**
 6. Click **"Save"**
 
-**That's it!** The service account can now release your new app.
-
 ---
 
-## Step 6: Prepare Your Keystore
+### Step 6: Prepare Secrets
 
-### Find your app's keystore:
+Encode your keystore and Firebase config for GitHub Actions.
 
-Typically located at `~/.android/your-app-keystore.jks`
+#### Keystore
 
-### Get keystore information:
-
-You need 4 pieces of information:
-
-1. **Keystore file path**
-2. **Key alias** (e.g., `key0`, `upload`, `release`)
-3. **Keystore password**
-4. **Key password**
-
-These are usually in your local `keystore.properties` file or build configuration.
-
-### Encode the keystore to Base64:
+Find your keystore file (usually `~/.android/your-app-keystore.jks`) and encode it:
 
 ```bash
-base64 -i ~/.android/your-app-keystore.jks | pbcopy
+base64 -i ~/.android/your-app-keystore.jks | pbcopy  # macOS
+base64 -w 0 ~/.android/your-app-keystore.jks         # Linux
 ```
 
-This copies the encoded keystore to your clipboard.
+You'll also need from your `keystore.properties`:
+- Key alias (e.g., `key0`, `upload`)
+- Keystore password
+- Key password
 
----
+#### google-services.json (Firebase)
 
-## Step 6.5: Prepare Your `google-services.json`
-
-This file is required for Firebase (Crashlytics, Analytics, etc.) to function in your app, both locally and in CI.
-
-### Get your `google-services.json` file:
-
-1.  Go to your Firebase Console (console.firebase.google.com).
-2.  Select your project.
-3.  Find your Android app (with `applicationId` `com.charliesbot.one`).
-4.  Download the `google-services.json` file. It's usually found in the `app/` directory of your local project. If you have a Wear OS module, use the same file for both.
-
-### Encode the `google-services.json` to Base64:
+Download from Firebase Console and encode:
 
 ```bash
-base64 -w 0 path/to/your/app/google-services.json
+base64 app/google-services.json | pbcopy  # macOS
+base64 -w 0 app/google-services.json      # Linux
 ```
 
-(On macOS, use `base64 app/google-services.json | pbcopy` to copy directly to clipboard. On Linux, omit `-w 0` for default line wrapping, or use it for one long line).
+---
 
-This copies the encoded JSON to your clipboard (or prints it to the console).
+### Step 7: Add GitHub Secrets
+
+1. Go to your GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+2. Click **"New repository secret"** for each:
+
+| Secret Name | Value | Source |
+|-------------|-------|--------|
+| `KEYSTORE_FILE_BASE64` | Base64 encoded keystore | Step 6 |
+| `KEYSTORE_KEY_ALIAS` | Key alias | keystore.properties |
+| `KEYSTORE_STORE_PASSWORD` | Keystore password | keystore.properties |
+| `KEYSTORE_KEY_PASSWORD` | Key password | keystore.properties |
+| `GOOGLE_SERVICES_JSON_BASE64` | Base64 encoded JSON | Step 6 |
 
 ---
 
-## Step 7: Add GitHub Secrets
+### Step 8: Declare Foreground Service Permissions (If Applicable)
 
-1. Go to your GitHub repo: `https://github.com/charliesbot/your-new-app`
-2. **Settings** → **Secrets and variables** → **Actions**
-3. Click **"New repository secret"** for each:
+**Skip this step if your app doesn't use foreground services.**
 
-| Secret Name                   | Value                           | Example                       |
-| ----------------------------- | ------------------------------- | ----------------------------- |
-| `KEYSTORE_FILE_BASE64`        | Paste from clipboard (Step 6)   | Long base64 string            |
-| `KEYSTORE_KEY_ALIAS`          | Your key alias                  | `key0` or `upload`            |
-| `KEYSTORE_STORE_PASSWORD`     | Your keystore password          | From your keystore.properties |
-| `KEYSTORE_KEY_PASSWORD`       | Your key password               | From your keystore.properties |
-| `GOOGLE_SERVICES_JSON_BASE64` | Paste from clipboard (Step 6.5) | Long base64 string            |
-
-**Security Note**: Never commit keystore files or passwords to git!
-
----
-
-## Step 8: Test the Deployment
-
-### Manual Test Run:
-
-1. Go to your GitHub repo → **Actions** tab
-2. Click **"Deploy to Google Play Store"** workflow
-3. Click **"Run workflow"** (button on the right)
-4. Leave version suffix empty
-5. Click green **"Run workflow"** button
-6. Monitor the build (~15-20 minutes)
-
-### What to Check:
-
-✅ Workflow completes successfully
-✅ Green checkmarks on all steps
-✅ No red error messages
-
-### Verify in Play Console:
-
-1. Go to: https://play.google.com/console
-2. Select your app
-3. Go to **"Release"** → **"Production"**
-4. You should see a new release with:
-   - Phone AAB with today's date as versionCode (e.g., `251208`)
-   - Wear AAB with versionCode + 1 (if applicable)
-   - Release notes in your configured languages
-   - Status may be "Draft" or "Ready for review" (if Google requires manual review)
-
-### Understanding Form Factor Tracks:
-
-Since March 2023, Google requires apps targeting different form factors to use **dedicated tracks** with specific prefixes. This applies to all non-phone form factors.
-
-**Track Naming Convention:**
-
-```
-[prefix]:trackName
-```
-
-**Supported Form Factor Prefixes:**
-
-- `wear:` - Wear OS (smartwatches)
-- `automotive:` - Android Automotive OS (car infotainment systems)
-- `tv:` - Android TV
-- `xr:` - Android XR (AR/VR devices)
-
-**Examples:**
-
-```yaml
-# Phone/tablet app (no prefix)
-track: production
-
-# Wear OS app
-track: wear:production
-
-# Android Automotive app
-track: automotive:production
-
-# Android TV app
-track: tv:beta
-```
-
-**Important Notes:**
-
-- The **phone/tablet app uses NO prefix** - just `production`, `beta`, etc.
-- **All other form factors require the prefix** or the upload will fail
-- Apps with the **same package name** but different form factors are uploaded to **separate tracks**
-- In Play Console, you'll see them listed separately under their respective form factor tabs
-- The Google Play API automatically routes each binary to the correct device type based on the track prefix
-
-**For ONE Fasting Tracker:**
-
-- **Phone app**: `track: production` (no prefix)
-- **Wear OS app**: `track: wear:production` (wear prefix required)
-
----
-
-## Step 9: Enable Automatic Weekly Deployments
-
-The workflow is already configured to run **every Monday at 10:00 AM UTC**.
-
-After successful manual test, it will automatically deploy every week!
-
-### For Same-Day Hotfixes:
-
-1. Go to Actions → "Deploy to Google Play Store"
-2. Click "Run workflow"
-3. Enter version suffix: `1`, `2`, `3`, etc.
-4. This creates versions like `2512081`, `2512082`
-
----
-
-## Version Strategy
-
-### How Versions Work:
-
-- **Base versionCode**: Date-based `YYMMDD` (e.g., `251208` for Dec 8, 2025)
-- **Base versionName**: `1.YYMMDD` (e.g., `1.251208`)
-- **Phone app**:
-  - versionCode: `251208`
-  - versionName: `1.251208-mobile`
-- **Wear OS app**:
-  - versionCode: `251209` (+1 to avoid conflicts)
-  - versionName: `1.251208-wear`
-
-### Manual Runs (workflow_dispatch):
-
-- Automatically appends hour suffix (HH format) for uniqueness
-- Example: `25120814` (Dec 8, 2025 at 14:00)
-- Version names: `1.25120814-mobile` and `1.25120814-wear`
-
-### Scheduled Runs (weekly cron):
-
-- Uses clean date format: `251208`
-- Version names: `1.251208-mobile` and `1.251208-wear`
-
-### Custom Same-Day Deployments:
-
-- You can still provide a custom suffix in the workflow input
-- Example: Enter `1`, `2`, `3` to create `2512081`, `2512082`, etc.
-
----
-
-## Step 8.5: Declare Foreground Service Permissions (If Applicable)
-
-If your app uses foreground services, you must declare them in Play Console before uploading.
-
-### Check if your app uses foreground services:
-
-Look in your `AndroidManifest.xml` for:
-
+Check your `AndroidManifest.xml` for:
 - `<uses-permission android:name="android.permission.FOREGROUND_SERVICE*" />`
 - `<service android:foregroundServiceType="..." />`
 
-### Declare permissions in Play Console:
+If found, declare in Play Console:
 
 1. Go to Play Console → Your App → **Policy** → **App content**
 2. Find **"Foreground service permissions"**
-3. Click **Manage** or **Start**
-4. Select the appropriate foreground service types your app uses:
-   - `FOREGROUND_SERVICE_DATA_SYNC` - for data synchronization
-   - `FOREGROUND_SERVICE_HEALTH` - for health/fitness tracking
-   - etc.
-5. Provide use case descriptions for each type
+3. Click **Manage**
+4. Select the types your app uses (HEALTH, DATA_SYNC, etc.)
+5. Provide use case descriptions
 6. Save
 
-**Important**: The declarations must match what's in your `AndroidManifest.xml`, otherwise uploads will fail with:
-
-```
-Error: You must let us know whether your app uses any Foreground Service permissions.
-```
+**Important:** Declarations must match your manifest or uploads will fail.
 
 ---
 
-### Troubleshooting
+### Step 9: Test the Deployment
 
-### "File google-services.json is missing"
+1. Go to GitHub repo → **Actions** tab
+2. Click **"Deploy to Google Play Store"** workflow
+3. Click **"Run workflow"**
+4. Leave version suffix empty (auto-adds hour suffix)
+5. Click **"Run workflow"** button
+6. Monitor the build (~15-20 minutes)
 
-- This file is essential for Firebase (Crashlytics, etc.)
-- Ensure you have followed "Step 6.5: Prepare Your `google-services.json`"
-- Verify that the `GOOGLE_SERVICES_JSON_BASE64` secret exists and contains the correct Base64 encoded content.
+**Verify in Play Console:**
+1. Go to https://play.google.com/console
+2. Select your app
+3. Check **Release** → **Production** (and **Wear OS** tab if applicable)
+4. You should see a new release with version names ending in `-mobile` and `-wear`
 
-### "Error: Permission 'iam.serviceAccounts.getAccessToken' denied"
-
-- Make sure you completed Step 4 (Workload Identity Pool access)
-- Verify you granted "service account impersonation" access
-- Check that you specified the correct repository name (`charliesbot/your-repo`)
-
-### "Error: Service account not authorized"
-
-- Make sure you completed Step 5 (Play Console permissions)
-- Check that you selected the correct app and granted "Releases" permission
-
-### "Error: Changes cannot be sent for review automatically"
-
-- This indicates Google requires manual review (common for new apps or after policy issues)
-- The workflow uploads AABs successfully, you just need to click "Send for review" in Play Console
-- After several successful reviews, Google usually restores auto-publishing
-- If you get this error, it means you don't have auto-publishing permission yet
-
-### "Error: Version code must be greater than X"
-
-- Google Play requires monotonically increasing version codes
-- If you already uploaded a higher version manually, use a version suffix
-- Or wait for the next day when the date-based version will be higher
-
-### "Error: APKs must have unique version codes"
-
-- Phone and Wear OS apps sharing the same applicationId must have different version codes
-- Make sure Wear OS uses `versionCodeProperty.toInt() + 1`
-
-### "Build failed: versionCode property is required"
-
-- The workflow is working correctly - it requires version properties
-- This error is intentional to prevent building without proper versioning
-- The workflow sets these automatically via `-PversionCode` and `-PversionName`
-
-### "Authentication failed"
-
-- Check that Workload Identity Federation is properly configured
-- Verify the service account email is correct in the workflow
-- Make sure your repo is under `charliesbot/` organization/username
+**If you see "Ready for review":** Click "Send for review" manually. After several successful reviews, Google usually restores auto-publishing.
 
 ---
 
-## Quick Checklist for New Apps
+## You're Done! 🎉
 
-Use this checklist when setting up a new app:
+Your app will now automatically deploy **every Monday at 10:00 AM UTC**.
 
-- [ ] Add version property support to `app/build.gradle.kts` and `onewearos/build.gradle.kts`
-- [ ] Create `.github/whatsnew/` directories with release notes
-- [ ] Copy GitHub Actions workflow file from ONE project
-- [ ] Grant Workload Identity Pool access for your repository (Step 4)
-- [ ] Grant Play Console permissions to service account for new app (Step 5)
-- [ ] Encode keystore to Base64
-- [ ] Add 5 GitHub Secrets (4 keystore + google-services.json)
-- [ ] Test manual deployment via GitHub Actions
-- [ ] Verify both AABs appear in Play Console release
-- [ ] If manual review required, click "Send for review" in Play Console
-- [ ] Weekly deployments now automatic (with optional manual review step)!
+**For hotfixes:**
+- Go to Actions → "Deploy to Google Play Store" → "Run workflow"
+- Enter custom version suffix (`1`, `2`, etc.) or leave empty for auto hour suffix
 
 ---
 
-## Cost Considerations
+## Appendix A: Form Factor Tracks
 
-### Google Cloud
+Since March 2023, Google requires non-phone apps to use dedicated tracks with prefixes.
 
-- Workload Identity Federation: **Free**
-- Google Play Developer API calls: **Free** (within quota)
-- Service Account: **Free**
+**Track Format:** `[prefix]:trackName`
 
-### GitHub Actions
+**Supported Prefixes:**
+- **(none)** - Phone/tablet apps → `track: production`
+- `wear:` - Wear OS → `track: wear:production`
+- `automotive:` - Android Automotive OS → `track: automotive:production`
+- `tv:` - Android TV → `track: tv:production`
+- `xr:` - Android XR → `track: xr:production`
 
-- Public repos: **Unlimited** free minutes
-- Private repos: **2,000 free minutes/month**
-- Each deployment takes ~15-20 minutes
-- Weekly = ~4 deployments/month = ~60-80 minutes/month
-- Well within free tier!
+**Key Points:**
+- Phone apps use NO prefix
+- All other form factors REQUIRE the prefix
+- Apps with same package name go to separate tracks
+- The API routes binaries based on track prefix
+
+---
+
+## Appendix B: Version Strategy
+
+### How Versions Work
+
+**Phone app:**
+- versionCode: `251208` (YYMMDD)
+- versionName: `1.251208-mobile`
+
+**Wear OS app:**
+- versionCode: `251209` (YYMMDD + 1)
+- versionName: `1.251208-wear`
+
+### Manual Runs
+- Auto-appends hour suffix: `25120814` (Dec 8, 2025 at 14:00)
+- Version names: `1.25120814-mobile`, `1.25120814-wear`
+
+### Scheduled Runs
+- Clean date format: `251208`
+- Version names: `1.251208-mobile`, `1.251208-wear`
+
+### Custom Suffixes
+- Enter `1`, `2`, `3` in workflow input
+- Creates: `2512081`, `2512082`, etc.
+
+---
+
+## Troubleshooting
+
+### Permission Errors
+
+**"Permission 'iam.serviceAccounts.getAccessToken' denied"**
+- Complete Step 4 (Workload Identity Pool access)
+- Verify correct repository name in grant
+
+**"Service account not authorized"**
+- Complete Step 5 (Play Console permissions)
+- Verify "Releases" permission is checked
+
+### Upload Errors
+
+**"You must declare foreground service permissions"**
+- Complete Step 8
+- Ensure declarations match your AndroidManifest.xml
+
+**"Version code must be greater than X"**
+- Use a version suffix for same-day deploys
+- Or wait until tomorrow for higher date-based version
+
+**"APKs must have unique version codes"**
+- Ensure Wear OS uses `versionCodeProperty.toInt() + 1`
+
+### Build Errors
+
+**"File google-services.json is missing"**
+- Add `GOOGLE_SERVICES_JSON_BASE64` secret (Step 7)
+- Verify Base64 encoding is correct
+
+**"versionCode property is required"**
+- This is expected for local builds
+- Workflow provides these automatically
 
 ---
 
 ## Resources
 
-- **r0adkll/upload-google-play action**: https://github.com/r0adkll/upload-google-play
-- **Google Play Publishing API**: https://developers.google.com/android-publisher
-- **Form Factor Tracks**: https://support.google.com/googleplay/android-developer/answer/13295490
-- **Workload Identity Federation**: https://cloud.google.com/iam/docs/workload-identity-federation
-- **GitHub Actions docs**: https://docs.github.com/en/actions
-- **Firebase Crashlytics**: https://firebase.google.com/docs/crashlytics
-- **Foreground Service Types**: https://developer.android.com/about/versions/14/changes/fgs-types-required
+- [r0adkll/upload-google-play](https://github.com/r0adkll/upload-google-play)
+- [Form Factor Tracks](https://support.google.com/googleplay/android-developer/answer/13295490)
+- [Google Play Publishing API](https://developers.google.com/android-publisher)
+- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
+- [Foreground Service Types](https://developer.android.com/about/versions/14/changes/fgs-types-required)
 
 ---
 
 ## Summary
 
-### What You Did Once (for ONE Fasting Tracker):
+**One-time setup (already done):**
+✅ Google Cloud project, API, service account, Workload Identity Pool
 
-✅ Created Google Cloud project
-✅ Enabled Google Play Developer API
-✅ Set up Workload Identity Pool and Provider
-✅ Created service account
-✅ Configured OIDC authentication
-
-### What You Do for Each New App (Quick!):
-
+**Per-app setup (~40 minutes):**
 1. Add version properties to build files (5 min)
 2. Create release notes files (2 min)
 3. Grant Workload Identity Pool access (2 min)
 4. Grant Play Console permissions (2 min)
-5. Add keystore + google-services.json secrets to GitHub (5 min)
+5. Prepare and add secrets to GitHub (5 min)
 6. Copy workflow file (1 min)
-7. Declare foreground service permissions if needed (3 min)
+7. Declare foreground services if needed (3 min)
 8. Test deployment (20 min)
 
-**Total setup time per new app: ~40 minutes!**
-
----
-
-**Last updated**: December 2025
-**Infrastructure**: `android-play-store-automation` (Project #984604330802)
-**Service Account**: `github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com`
+**Last updated:** December 2025
+**Infrastructure:** `android-play-store-automation` (Project #984604330802)
+**Service Account:** `github-actions-deploy@android-play-store-automation.iam.gserviceaccount.com`
