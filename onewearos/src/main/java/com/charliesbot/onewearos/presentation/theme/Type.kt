@@ -8,41 +8,41 @@ import com.charliesbot.shared.core.theme.GoogleSans
 import com.charliesbot.shared.core.theme.GoogleSansTitleLargeSpecific
 import com.charliesbot.shared.core.theme.GoogleSansWide
 
-// Wear OS Material 3 Typography Scale
+// Wear OS Material 3 Typography Scale (optimized for small watch screens)
 val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
-        fontSize = 50.sp,
-        lineHeight = 56.sp,
+        fontSize = 40.sp,
+        lineHeight = 44.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
         fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
-        fontSize = 40.sp,
-        lineHeight = 46.sp,
+        fontSize = 34.sp,
+        lineHeight = 38.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
         fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
-        fontSize = 34.sp,
-        lineHeight = 40.sp,
+        fontSize = 30.sp,
+        lineHeight = 34.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
         fontFamily = GoogleSansTitleLargeSpecific,
         fontWeight = FontWeight(761),
-        fontSize = 24.sp,
-        lineHeight = 28.sp,
+        fontSize = 20.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        lineHeight = 22.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
@@ -56,7 +56,7 @@ val Typography = Typography(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 22.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
