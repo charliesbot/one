@@ -12,6 +12,7 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.components.Scaffold
@@ -40,8 +41,6 @@ import com.charliesbot.shared.core.utils.getHours
 @Composable
 fun OneWidgetContent(
     fastingData: FastingDataItem,
-    ringDp: Dp,
-    strokeDp: Dp,
     context: Context
 ) {
     val currentTime = System.currentTimeMillis()
@@ -51,32 +50,74 @@ fun OneWidgetContent(
     val hours = getHours(selectedGoal.durationMillis) - getHours(elapsedMillis)
     val isGoalMet = fastingData.isFasting && hours <= 0
 
+    val size = LocalSize.current
+    // Wide: Width is generous, Height is constrained (e.g. 300x120)
+    val isWide = size.width >= 250.dp && size.height < 160.dp
+    // Compact: Small dimensions (e.g. 120x120)
+    val isCompact = !isWide && (size.width < 160.dp || size.height < 160.dp)
+
+    val ringDp = if (isCompact) 48.dp else if (isWide) 56.dp else 60.dp
+    val strokeDp = if (isCompact) 6.dp else if (isWide) 8.dp else 10.dp
+    val verticalPadding = if (isCompact || isWide) 8.dp else 24.dp
+
     GlanceTheme {
         Scaffold(
             modifier = GlanceModifier
                 .background(GlanceTheme.colors.widgetBackground)
                 .clickable(actionStartActivity<MainActivity>())
         ) {
-            Column(
-                modifier = GlanceModifier
-                    .padding(vertical = 24.dp)
-                    .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                WidgetProgressBar(
-                    isFasting = fastingData.isFasting,
-                    elapsedTime = elapsedMillis,
-                    fastingGoalMillis = selectedGoal.durationMillis,
-                    isGoalMet = isGoalMet,
-                    ringDp = ringDp,
-                    strokeDp = strokeDp
-                )
-                Spacer(modifier = GlanceModifier.defaultWeight())
-                WidgetFooter(
-                    context,
-                    isFasting = fastingData.isFasting,
-                    hours = hours,
-                )
+            if (isWide) {
+                // Side-by-side layout for Wide
+                Row(
+                    modifier = GlanceModifier
+                        .padding(vertical = verticalPadding, horizontal = 16.dp)
+                        .fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    WidgetProgressBar(
+                        isFasting = fastingData.isFasting,
+                        elapsedTime = elapsedMillis,
+                        fastingGoalMillis = selectedGoal.durationMillis,
+                        isGoalMet = isGoalMet,
+                        ringDp = ringDp,
+                        strokeDp = strokeDp,
+                        alignEnd = false // Align start/center for row layout
+                    )
+                    Spacer(modifier = GlanceModifier.width(16.dp))
+                    WidgetFooter(
+                        context,
+                        isFasting = fastingData.isFasting,
+                        hours = hours,
+                        isCompact = false,
+                        isWide = true
+                    )
+                }
+            } else {
+                // Vertical layout for Compact and Medium/Expanded
+                Column(
+                    modifier = GlanceModifier
+                        .padding(vertical = verticalPadding)
+                        .fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    WidgetProgressBar(
+                        isFasting = fastingData.isFasting,
+                        elapsedTime = elapsedMillis,
+                        fastingGoalMillis = selectedGoal.durationMillis,
+                        isGoalMet = isGoalMet,
+                        ringDp = ringDp,
+                        strokeDp = strokeDp,
+                        alignEnd = true // Original behavior
+                    )
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+                    WidgetFooter(
+                        context,
+                        isFasting = fastingData.isFasting,
+                        hours = hours,
+                        isCompact = isCompact,
+                        isWide = false
+                    )
+                }
             }
         }
     }
@@ -89,7 +130,8 @@ private fun WidgetProgressBar(
     fastingGoalMillis: Long,
     isGoalMet: Boolean,
     ringDp: Dp,
-    strokeDp: Dp
+    strokeDp: Dp,
+    alignEnd: Boolean
 ) {
     val context = LocalContext.current
     val progress = calculateProgressFraction(elapsedTime, fastingGoalMillis)
@@ -118,8 +160,8 @@ private fun WidgetProgressBar(
     }
 
     Row(
-        horizontalAlignment = Alignment.End,
-        modifier = GlanceModifier.fillMaxWidth()
+        horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
+        modifier = if (alignEnd) GlanceModifier.fillMaxWidth() else GlanceModifier
     ) {
         Image(
             provider = ImageProvider(ringBitmap),
@@ -134,15 +176,22 @@ private fun WidgetFooter(
     context: Context,
     isFasting: Boolean,
     hours: Long,
+    isCompact: Boolean,
+    isWide: Boolean
 ) {
     val actualHours = hours.coerceAtLeast(0)
+
+    val largeTextSize = if (isCompact) 36.sp else if (isWide) 48.sp else 60.sp
+    val smallTextSize = if (isCompact) 14.sp else if (isWide) 16.sp else 20.sp
+    val goalMetTextSize = if (isCompact) 20.sp else 30.sp
+
     if (isFasting && actualHours <= 0) {
         return Row {
             Text(
                 text = context.getString(R.string.widget_goal_met_part_1),
                 style = TextStyle(
                     color = GlanceTheme.colors.onPrimaryContainer,
-                    fontSize = 30.sp,
+                    fontSize = goalMetTextSize,
                 )
             )
             Spacer(modifier = GlanceModifier.width(6.dp))
@@ -150,7 +199,7 @@ private fun WidgetFooter(
                 text = context.getString(R.string.widget_goal_met_part_2),
                 style = TextStyle(
                     color = GlanceTheme.colors.onTertiaryContainer,
-                    fontSize = 30.sp,
+                    fontSize = goalMetTextSize,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -163,7 +212,7 @@ private fun WidgetFooter(
                 text = actualHours.toString(),
                 style = TextStyle(
                     color = GlanceTheme.colors.primary,
-                    fontSize = 60.sp,
+                    fontSize = largeTextSize,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -174,7 +223,7 @@ private fun WidgetFooter(
                 ),
                 style = TextStyle(
                     color = GlanceTheme.colors.secondary,
-                    fontSize = 20.sp,
+                    fontSize = smallTextSize,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -185,7 +234,8 @@ private fun WidgetFooter(
         Text(
             text = context.getString(R.string.widget_not_fasting),
             style = TextStyle(
-                color = GlanceTheme.colors.onSurface, fontSize = 24.sp,
+                color = GlanceTheme.colors.onSurface,
+                fontSize = if (isCompact) 18.sp else 24.sp,
                 fontWeight = FontWeight.Bold
             )
         )
@@ -199,16 +249,14 @@ val widgetMockFastingData = FastingDataItem(
 )
 
 @OptIn(ExperimentalGlancePreviewApi::class)
-@Preview(widthDp = 120, heightDp = 120) // Min drop size
-@Preview(widthDp = 140, heightDp = 140)
-@Preview(widthDp = 300, heightDp = 200)
-@Preview(widthDp = 400, heightDp = 200) // Max size
+@Preview(widthDp = 120, heightDp = 120) // Compact
+@Preview(widthDp = 300, heightDp = 120) // Wide (New)
+@Preview(widthDp = 300, heightDp = 200) // Medium
+@Preview(widthDp = 300, heightDp = 300) // Expanded
 @Composable
 private fun OneWidgetContentPreview() {
-        OneWidgetContent(
-            fastingData = widgetMockFastingData,
-            ringDp = 75.dp,
-            strokeDp = 10.dp,
-            context = LocalContext.current
-        )
+    OneWidgetContent(
+        fastingData = widgetMockFastingData,
+        context = LocalContext.current
+    )
 }

@@ -53,13 +53,12 @@ object ProgressBitmap {
 }
 
 class OneWidget() : GlanceAppWidget(), KoinComponent {
-    private val ringDp: Dp = 60.dp
-    private val strokeDp: Dp = 10.dp
     private val fastingDataRepository: FastingDataRepository by inject()
 
     override val sizeMode: SizeMode = SizeMode.Responsive(
         sizes = setOf(
             OneWidgetSize.COMPACT,
+            OneWidgetSize.WIDE,
             OneWidgetSize.MEDIUM,
             OneWidgetSize.EXPANDED
         )
@@ -75,8 +74,6 @@ class OneWidget() : GlanceAppWidget(), KoinComponent {
 
             OneWidgetContent(
                 fastingData = fastingData,
-                ringDp = ringDp,
-                strokeDp = strokeDp,
                 context = context
             )
         }
