@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.charliesbot.onewearos.complication.ComplicationUpdateManager
+import com.charliesbot.onewearos.tile.TileUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
 import com.charliesbot.shared.core.models.FastingDataItem
@@ -20,6 +21,7 @@ import org.koin.core.component.inject
 
 class WatchFastingStateListenerService : BaseFastingListenerService() {
     private val complicationUpdateManager: ComplicationUpdateManager by inject()
+    private val tileUpdateManager: TileUpdateManager by inject()
     private val settingsRepository: SettingsRepository by inject()
     private val watchServiceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -29,6 +31,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
         super.onPlatformFastingStateSynced()
         Log.d(LOG_TAG, "${this::class.java.simpleName} - Handling a remote data sync")
         complicationUpdateManager.requestUpdate()
+        tileUpdateManager.requestUpdate()
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
