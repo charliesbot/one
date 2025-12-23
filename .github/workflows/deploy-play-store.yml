@@ -117,7 +117,6 @@ jobs:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          debugSymbols: app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
           track: production
           status: completed
           whatsNewDirectory: .github/whatsnew
@@ -128,7 +127,6 @@ jobs:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
           releaseFiles: onewearos/build/outputs/bundle/release/onewearos-release.aab
-          debugSymbols: onewearos/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
           track: wear:production
           status: completed
           whatsNewDirectory: .github/whatsnew
