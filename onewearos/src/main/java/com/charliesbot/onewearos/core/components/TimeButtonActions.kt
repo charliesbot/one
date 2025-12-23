@@ -14,8 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.ButtonGroup
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.TextButton
@@ -49,13 +48,13 @@ private fun TimeInfoDisplay(
         ) {
             Text(
                 text = title.uppercase(),
-                fontSize = 8.sp,
+                style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.W500,
                 color = textColor
             )
             Text(
                 text = formatDate(date, dateFormat),
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
                 color = textColor
             )
