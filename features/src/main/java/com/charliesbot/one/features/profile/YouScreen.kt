@@ -2,8 +2,11 @@ package com.charliesbot.one.features.profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -20,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.features.profile.components.FastingDetailsBottomSheet
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingMonthCalendar
+import com.charliesbot.shared.core.utils.isWidthAtLeastMedium
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -39,11 +43,12 @@ fun YouScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxHeight()
+                .fillMaxWidth()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Card(modifier = Modifier.padding(vertical = 12.dp, horizontal = 20.dp)) {
+            Card(modifier = Modifier.padding(vertical = 12.dp, horizontal = 20.dp).widthIn(max = 600.dp)) {
                 FastingMonthCalendar(
                     yearMonth = uiState.selectedMonth,
                     fastingData = uiState.fastingData,

@@ -9,6 +9,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,11 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -41,17 +43,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.charliesbot.shared.R
+import com.charliesbot.one.features.dashboard.components.CurrentFastingProgress
 import com.charliesbot.one.features.dashboard.components.GoalBottomSheet
 import com.charliesbot.one.features.dashboard.components.TimeDisplay
 import com.charliesbot.one.features.dashboard.components.TimePickerDialog
 import com.charliesbot.one.features.dashboard.components.WeeklyProgress
-import com.charliesbot.one.features.dashboard.components.CurrentFastingProgress
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.testing.MockDataUtils
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.getHours
+import com.charliesbot.shared.core.utils.isWidthAtLeastMedium
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -64,6 +67,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
     val weeklyProgress by viewModel.weeklyProgress.collectAsStateWithLifecycle()
+    val isWidthAtLeastMedium = isWidthAtLeastMedium()
 
     TodayScreenContent(
         isTimePickerDialogOpen = isTimePickerDialogOpen,
@@ -72,6 +76,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
         startTimeInMillis = starTimeInMillis,
         fastingGoalId = fastingGoalId,
         weeklyProgress = weeklyProgress,
+        isWidthAtLeastMedium = isWidthAtLeastMedium,
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
         onOpenTimePickerDialog = viewModel::openTimePickerDialog,
@@ -92,6 +97,7 @@ private fun TodayScreenContent(
     startTimeInMillis: Long,
     fastingGoalId: String,
     weeklyProgress: List<TimePeriodProgress>,
+    isWidthAtLeastMedium: Boolean,
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
     onOpenTimePickerDialog: () -> Unit,
@@ -129,6 +135,7 @@ private fun TodayScreenContent(
             )
         },
     ) { innerPadding ->
+        val maxWidth = if (isWidthAtLeastMedium) 800.dp else 600.dp
         if (isTimePickerDialogOpen) {
             TimePickerDialog(
                 startTimeInMillis,
@@ -159,7 +166,7 @@ private fun TodayScreenContent(
         ) {
             Column(
                 modifier = Modifier
-                    .widthIn(max = 600.dp)
+                    .widthIn(max = maxWidth)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -169,26 +176,22 @@ private fun TodayScreenContent(
                         .fillMaxWidth()
                         .padding(horizontal = screenPadding + 24.dp)
                 )
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(screenPadding),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 4.dp,
-                    )
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(all = screenPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
+                    val progressContent: @Composable () -> Unit = {
                         CurrentFastingProgress(
                             isFasting = isFasting,
                             elapsedTime = elapsedTime,
                             fastingGoalId = fastingGoalId,
                             onFastingStatusClick = onOpenGoalBottomSheet,
                         )
-                        Spacer(modifier = Modifier.height(40.dp))
+                    }
+
+                    val buttonsContent: @Composable () -> Unit = {
                         AnimatedVisibility(
                             visible = isFasting,
                             enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
@@ -200,8 +203,7 @@ private fun TodayScreenContent(
                             ButtonGroup(
                                 overflowIndicator = {},
                                 expandedRatio = 0f,
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                             ) {
                                 customItem(
@@ -212,9 +214,7 @@ private fun TodayScreenContent(
                                             shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(
                                                 pressedShape = RoundedCornerShape(60.dp),
                                             ),
-                                            onClick = {
-                                                onOpenTimePickerDialog()
-                                            },
+                                            onClick = { onOpenTimePickerDialog() },
                                             modifier = Modifier.weight(1f)
                                         )
                                     },
@@ -228,16 +228,12 @@ private fun TodayScreenContent(
                                                 "${currentGoal?.durationDisplay}H"
                                             ),
                                             date = startTimeInLocalDateTime.plusHours(
-                                                getHours(
-                                                    currentGoal?.durationMillis
-                                                )
+                                                getHours(currentGoal?.durationMillis)
                                             ),
                                             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
                                                 pressedShape = RoundedCornerShape(60.dp),
                                             ),
-                                            onClick = {
-                                                onOpenGoalBottomSheet()
-                                            },
+                                            onClick = { onOpenGoalBottomSheet() },
                                             modifier = Modifier.weight(1f)
                                         )
                                     },
@@ -253,6 +249,31 @@ private fun TodayScreenContent(
                                 .height(50.dp)
                         ) {
                             Text(text = fastButtonLabel)
+                        }
+                    }
+
+                    if (isWidthAtLeastMedium) {
+                        Row(
+                            modifier = Modifier
+                                .padding(all = screenPadding)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(32.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) { progressContent() }
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) { buttonsContent() }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.padding(all = screenPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            progressContent()
+                            Spacer(modifier = Modifier.height(40.dp))
+                            buttonsContent()
                         }
                     }
                 }
@@ -271,6 +292,7 @@ private fun PreviewTodayScreen() {
             startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
             fastingGoalId = "16:8",
             weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+            isWidthAtLeastMedium = false,
             onStartFasting = {},
             onStopFasting = {},
             onOpenTimePickerDialog = {},
@@ -278,7 +300,7 @@ private fun PreviewTodayScreen() {
             onUpdateStartTime = {},
             onOpenGoalBottomSheet = {},
             onCloseGoalBottomSheet = {},
-            onUpdateFastingGoal = {}
+            onUpdateFastingGoal = {},
         )
 }
 
@@ -292,6 +314,7 @@ private fun PreviewTodayScreenLandscape() {
             startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
             fastingGoalId = "16:8",
             weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+            isWidthAtLeastMedium = true,
             onStartFasting = {},
             onStopFasting = {},
             onOpenTimePickerDialog = {},
@@ -299,7 +322,7 @@ private fun PreviewTodayScreenLandscape() {
             onUpdateStartTime = {},
             onOpenGoalBottomSheet = {},
             onCloseGoalBottomSheet = {},
-            onUpdateFastingGoal = {}
+            onUpdateFastingGoal = {},
         )
 }
 
