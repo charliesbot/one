@@ -12,6 +12,11 @@ on:
         description: 'Version suffix (optional, for same-day deploys)'
         required: false
         default: ''
+      skip_review:
+        description: 'Skip automatic review submission (use after app rejection)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   deploy:
@@ -120,6 +125,7 @@ jobs:
           track: production
           status: completed
           whatsNewDirectory: .github/whatsnew
+          changesNotSentForReview: ${{ github.event.inputs.skip_review == 'true' }}
 
       - name: Upload Wear OS app to Play Store
         uses: r0adkll/upload-google-play@v1
@@ -130,6 +136,7 @@ jobs:
           track: wear:production
           status: completed
           whatsNewDirectory: .github/whatsnew
+          changesNotSentForReview: ${{ github.event.inputs.skip_review == 'true' }}
 
       - name: Cleanup sensitive files
         if: always()
