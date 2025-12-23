@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -146,7 +145,7 @@ fun WearTodayContent(
                     Text(
                         text = timeLabel,
                         color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = if (isLargeScreen) 30.sp else 20.sp,
+                        style = if (isLargeScreen) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -178,7 +177,10 @@ fun WearTodayContent(
                         .fillMaxWidth()
                         .padding(horizontal = 50.dp)
                 ) {
-                    Text(fastButtonLabel, fontSize = if (isLargeScreen) 16.sp else 12.sp)
+                    Text(
+                        text = fastButtonLabel,
+                        style = if (isLargeScreen) MaterialTheme.typography.labelLarge else MaterialTheme.typography.labelMedium
+                    )
                 }
             }
         }
