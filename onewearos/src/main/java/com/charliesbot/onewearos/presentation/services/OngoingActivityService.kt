@@ -1,6 +1,7 @@
 package com.charliesbot.onewearos.presentation.services
 
 import android.Manifest
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.Service
 import android.content.Context
@@ -62,11 +63,21 @@ class OngoingActivityService : Service(), KoinComponent {
 
                 // Fulfill the foreground service promise IMMEDIATELY
                 val initialNotification = createInitialNotification()
-                startForeground(
-                    NotificationConstants.ONGOING_NOTIFICATION_ID,
-                    initialNotification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
-                )
+                try {
+                    startForeground(
+                        NotificationConstants.ONGOING_NOTIFICATION_ID,
+                        initialNotification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+                    )
+                } catch (e: ForegroundServiceStartNotAllowedException) {
+                    // This can happen when:
+                    // 1. dataSync quota is exhausted (Android 14+)
+                    // 2. App doesn't have foreground start privileges (Android 12+)
+                    // Gracefully stop - fasting still works, just no ongoing activity indicator
+                    Log.e(LOG_TAG, "$serviceTag failed to start foreground: ${e.message}")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
 
                 // Now create the real ongoing activity with auto-updating stopwatch
                 ongoingActivityManager.startOngoingActivity(startTimeMillis, fastingGoalId)
