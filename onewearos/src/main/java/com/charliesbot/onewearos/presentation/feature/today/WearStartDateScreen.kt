@@ -74,8 +74,8 @@ fun WearStartDateContent(
 ) {
     val listState = rememberScalingLazyListState()
     val contentPadding = rememberResponsiveColumnPadding(
-        first = ColumnItemType.Chip,
-        last = ColumnItemType.Chip,
+        first = ColumnItemType.Button,
+        last = ColumnItemType.Button,
     )
     ScreenScaffold(
         scrollState = listState,
