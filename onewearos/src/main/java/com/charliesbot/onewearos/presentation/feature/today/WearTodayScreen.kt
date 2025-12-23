@@ -115,7 +115,7 @@ fun WearTodayContent(
         }
     }
     ScreenScaffold {
-        Box() {
+        Box {
             AnimatedVisibility(
                 visible = isFasting,
                 enter = scaleIn(animationSpec = tween(500), initialScale = 0.9f) + fadeIn(),
@@ -190,7 +190,7 @@ fun WearTodayContent(
 private fun DefaultPreview() {
     WearTodayContent(
         startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
-        isFasting = false,
+        isFasting = true,
         fastingGoalId = "16:8", // 16:8 fasting goal
         initializeTemporalTime = {},
         onStartFasting = { },

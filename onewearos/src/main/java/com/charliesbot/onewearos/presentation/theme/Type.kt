@@ -1,91 +1,69 @@
-package com.charliesbot.one.ui.theme
+package com.charliesbot.onewearos.presentation.theme
 
-import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material3.Typography
 import com.charliesbot.shared.core.theme.GoogleSans
 import com.charliesbot.shared.core.theme.GoogleSansTitleLargeSpecific
 import com.charliesbot.shared.core.theme.GoogleSansWide
 
-
-// Material 3 Typography Scale
+// Wear OS Material 3 Typography Scale (optimized for small watch screens)
 val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
-        fontSize = 57.sp,
-        lineHeight = 64.sp,
+        fontSize = 40.sp,
+        lineHeight = 44.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
         fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
-        fontSize = 45.sp,
-        lineHeight = 52.sp,
+        fontSize = 34.sp,
+        lineHeight = 38.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
         fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
-        fontSize = 36.sp,
-        lineHeight = 44.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = GoogleSansWide,
-        fontWeight = FontWeight.Normal,
-        fontSize = 32.sp,
-        lineHeight = 40.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = GoogleSansWide,
-        fontWeight = FontWeight(621),
-        fontSize = 28.sp,
-        lineHeight = 36.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = GoogleSans,
-        fontWeight = FontWeight.Normal,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
+        fontSize = 30.sp,
+        lineHeight = 34.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = GoogleSansTitleLargeSpecific, // Using the new specific FontFamily
-        fontWeight = FontWeight(761), // Applied here as well for clarity and explicit weight
-        fontSize = 28.sp, // Specific size
-        lineHeight = 28.sp,
+        fontFamily = GoogleSansTitleLargeSpecific,
+        fontWeight = FontWeight(761),
+        fontSize = 20.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.1.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
@@ -99,7 +77,7 @@ val Typography = Typography(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
@@ -112,8 +90,8 @@ val Typography = Typography(
     labelSmall = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
+        fontSize = 10.sp,
+        lineHeight = 14.sp,
         letterSpacing = 0.5.sp
     )
 )

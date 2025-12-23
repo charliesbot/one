@@ -11,6 +11,7 @@ fun OneTheme(
 ) {
     MaterialTheme(
         colorScheme = dynamicColorScheme(LocalContext.current) ?: MaterialTheme.colorScheme,
+        typography = Typography,
         content = content
     )
 }
