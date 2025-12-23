@@ -24,6 +24,8 @@ import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
+import com.google.android.horologist.compose.layout.ColumnItemType
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
 import com.charliesbot.onewearos.presentation.navigation.WearNavigationRoute
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.utils.TimeFormat
@@ -71,9 +73,14 @@ fun WearStartDateContent(
     onUpdateStartTime: (LocalDateTime) -> Unit,
 ) {
     val listState = rememberScalingLazyListState()
+    val contentPadding = rememberResponsiveColumnPadding(
+        first = ColumnItemType.Chip,
+        last = ColumnItemType.Chip,
+    )
     ScreenScaffold(
         scrollState = listState,
         edgeButtonSpacing = 0.dp,
+        contentPadding = contentPadding,
         edgeButton = {
             EdgeButton(
                 onClick = {
@@ -84,7 +91,7 @@ fun WearStartDateContent(
                 Text(stringResource(R.string.label_save))
             }
         }
-    ) { contentPadding ->
+    ) {
         ScalingLazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
