@@ -67,6 +67,8 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
     val weeklyProgress by viewModel.weeklyProgress.collectAsStateWithLifecycle()
+    val smartRemindersEnabled by viewModel.smartRemindersEnabled.collectAsStateWithLifecycle()
+    val suggestedFastingTime by viewModel.suggestedFastingTime.collectAsStateWithLifecycle()
     val isWidthAtLeastMedium = isWidthAtLeastMedium()
 
     TodayScreenContent(
@@ -76,6 +78,10 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
         startTimeInMillis = starTimeInMillis,
         fastingGoalId = fastingGoalId,
         weeklyProgress = weeklyProgress,
+        smartRemindersEnabled = smartRemindersEnabled,
+        suggestedTimeMinutes = suggestedFastingTime?.suggestedTimeMinutes,
+        suggestedTimeReasoning = suggestedFastingTime?.reasoning,
+        suggestedTimeSource = suggestedFastingTime?.source,
         isWidthAtLeastMedium = isWidthAtLeastMedium,
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
@@ -97,6 +103,10 @@ private fun TodayScreenContent(
     startTimeInMillis: Long,
     fastingGoalId: String,
     weeklyProgress: List<TimePeriodProgress>,
+    smartRemindersEnabled: Boolean,
+    suggestedTimeMinutes: Int?,
+    suggestedTimeReasoning: String?,
+    suggestedTimeSource: com.charliesbot.shared.core.models.SuggestionSource?,
     isWidthAtLeastMedium: Boolean,
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
@@ -176,6 +186,27 @@ private fun TodayScreenContent(
                         .fillMaxWidth()
                         .padding(horizontal = screenPadding + 24.dp)
                 )
+
+                // Smart Suggestion Card - shown when not fasting and reminders are enabled
+                AnimatedVisibility(
+                    visible = smartRemindersEnabled && !isFasting && suggestedTimeMinutes != null,
+                    enter = fadeIn(animationSpec = tween(durationMillis = 300)) +
+                            expandVertically(animationSpec = tween(durationMillis = 300)),
+                    exit = fadeOut(animationSpec = tween(durationMillis = 150)) +
+                            shrinkVertically(animationSpec = tween(durationMillis = 200))
+                ) {
+                    suggestedTimeMinutes?.let { minutes ->
+                        SmartSuggestionCard(
+                            suggestedTimeMinutes = minutes,
+                            reasoning = suggestedTimeReasoning ?: "",
+                            source = suggestedTimeSource,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = screenPadding, vertical = 8.dp)
+                        )
+                    }
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -282,6 +313,60 @@ private fun TodayScreenContent(
     }
 }
 
+@Composable
+private fun SmartSuggestionCard(
+    suggestedTimeMinutes: Int,
+    reasoning: String,
+    source: com.charliesbot.shared.core.models.SuggestionSource?,
+    modifier: Modifier = Modifier
+) {
+    val hours = suggestedTimeMinutes / 60
+    val mins = suggestedTimeMinutes % 60
+    val formattedTime = String.format("%02d:%02d", hours % 24, mins)
+    val sourceText = when (source) {
+        com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> "Based on recent average"
+        com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> "Based on bedtime fallback"
+        else -> null
+    }
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.upcoming_fast),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = formattedTime,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = reasoning,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+            )
+            if (sourceText != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = sourceText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewTodayScreen() {
@@ -292,6 +377,10 @@ private fun PreviewTodayScreen() {
             startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
             fastingGoalId = "16:8",
             weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+            smartRemindersEnabled = true,
+            suggestedTimeMinutes = 1200, // 8:00 PM
+            suggestedTimeReasoning = "Based on your recent 7-day average",
+            suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
             isWidthAtLeastMedium = false,
             onStartFasting = {},
             onStopFasting = {},
@@ -314,6 +403,10 @@ private fun PreviewTodayScreenLandscape() {
             startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
             fastingGoalId = "16:8",
             weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+            smartRemindersEnabled = true,
+            suggestedTimeMinutes = 1200,
+            suggestedTimeReasoning = "Based on your recent 7-day average",
+            suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
             isWidthAtLeastMedium = true,
             onStartFasting = {},
             onStopFasting = {},

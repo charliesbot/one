@@ -2,6 +2,7 @@ package com.charliesbot.one
 
 import android.app.Application
 import com.charliesbot.one.di.appModule
+import com.charliesbot.one.notifications.SmartReminderWorker
 import com.charliesbot.shared.core.di.sharedModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -22,5 +23,9 @@ class MainApplication : Application() {
                 appModule
             )
         }
+
+        // Schedule the daily smart reminder worker
+        // The worker itself checks if smart reminders are enabled before executing
+        SmartReminderWorker.scheduleDailyWorker(this)
     }
 }
