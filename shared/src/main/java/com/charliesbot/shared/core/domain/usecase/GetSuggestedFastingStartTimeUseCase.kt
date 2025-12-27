@@ -63,6 +63,9 @@ class GetSuggestedFastingStartTimeUseCase(
                     )
                 }
             }
+            SmartReminderMode.FIXED_TIME -> {
+                calculateFromFixedTime()
+            }
             SmartReminderMode.AUTO -> {
                 if (hasEnoughHistory) {
                     calculateFromMovingAverage(recentFasts.map { it.startTimeEpochMillis })
@@ -110,13 +113,13 @@ class GetSuggestedFastingStartTimeUseCase(
 
     /**
      * Calculate suggested start time based on bedtime setting.
-     * Suggested start = bedtime - 5 hours.
+     * Suggested start = bedtime - 4 hours.
      */
     private suspend fun calculateFromBedtime(): SuggestedFastingTime {
         val bedtimeMinutes = settingsRepository.bedtimeMinutes.first()
 
-        // Subtract 5 hours (300 minutes), handling wrap-around
-        // e.g., bedtime 00:30 (30 min) -> start at 19:30 (1170 min previous day)
+        // Subtract 4 hours (240 minutes), handling wrap-around
+        // e.g., bedtime 00:30 (30 min) -> start at 20:30 (1230 min previous day)
         var suggestedMinutes = bedtimeMinutes - (HOURS_BEFORE_BEDTIME * 60)
         if (suggestedMinutes < 0) {
             suggestedMinutes += MINUTES_IN_DAY
@@ -135,6 +138,27 @@ class GetSuggestedFastingStartTimeUseCase(
             suggestedTimeMinutes = suggestedMinutes,
             reasoning = "Based on your $formattedBedtime bedtime (4h before)",
             source = SuggestionSource.BEDTIME_BASED
+        )
+    }
+
+    /**
+     * Calculate suggested start time from user's fixed time setting.
+     */
+    private suspend fun calculateFromFixedTime(): SuggestedFastingTime {
+        val fixedMinutes = settingsRepository.fixedFastingStartMinutes.first()
+        val suggestedTimeMillis = minutesToTodayTimestamp(fixedMinutes)
+
+        val hours = fixedMinutes / 60
+        val mins = fixedMinutes % 60
+        val formattedTime = String.format("%02d:%02d", hours % 24, mins)
+
+        Log.d(LOG_TAG, "GetSuggestedFastingStartTimeUseCase: Fixed time ($formattedTime)")
+
+        return SuggestedFastingTime(
+            suggestedTimeMillis = suggestedTimeMillis,
+            suggestedTimeMinutes = fixedMinutes,
+            reasoning = "Your scheduled fasting time",
+            source = SuggestionSource.FIXED_TIME
         )
     }
 

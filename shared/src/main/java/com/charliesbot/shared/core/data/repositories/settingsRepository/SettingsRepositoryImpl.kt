@@ -58,6 +58,10 @@ class SettingsRepositoryImpl(
             }
         }
 
+    override val fixedFastingStartMinutes: Flow<Int> = dataStore.data
+        .catch { exception -> handleDataStoreError(exception, "fixedFastingStartMinutes") }
+        .map { it[PrefKeys.FIXED_FASTING_START_MINUTES] ?: DEFAULT_FIXED_FASTING_START_MINUTES }
+
     override suspend fun setNotificationsEnabled(enabled: Boolean, syncToRemote: Boolean) {
         updateLocalStore(PrefKeys.NOTIFICATIONS_ENABLED, enabled)
         if (syncToRemote) {
@@ -115,6 +119,20 @@ class SettingsRepositoryImpl(
         }
     }
 
+    override suspend fun setFixedFastingStartMinutes(minutes: Int, syncToRemote: Boolean) {
+        try {
+            dataStore.edit { prefs ->
+                prefs[PrefKeys.FIXED_FASTING_START_MINUTES] = minutes
+            }
+            Log.d(LOG_TAG, "SettingsRepo: Fixed fasting start time set to $minutes minutes from midnight")
+            if (syncToRemote) {
+                syncSettingsToRemote()
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "SettingsRepo: Error updating fixed fasting start time in DataStore", e)
+        }
+    }
+
     private suspend fun updateLocalStore(key: Preferences.Key<Boolean>, value: Boolean) {
         try {
             dataStore.edit { prefs ->
@@ -135,6 +153,7 @@ class SettingsRepositoryImpl(
             val smartRemindersEnabled = prefs[PrefKeys.SMART_REMINDERS_ENABLED] ?: false
             val bedtimeMinutes = prefs[PrefKeys.BEDTIME_MINUTES] ?: DEFAULT_BEDTIME_MINUTES
             val smartReminderMode = prefs[PrefKeys.SMART_REMINDER_MODE] ?: SmartReminderMode.AUTO.name
+            val fixedFastingStartMinutes = prefs[PrefKeys.FIXED_FASTING_START_MINUTES] ?: DEFAULT_FIXED_FASTING_START_MINUTES
 
             val request: PutDataRequest =
                 PutDataMapRequest.create(SETTINGS_PATH_KEY).apply {
@@ -144,13 +163,14 @@ class SettingsRepositoryImpl(
                     dataMap.putBoolean(SMART_REMINDERS_ENABLED_KEY, smartRemindersEnabled)
                     dataMap.putInt(BEDTIME_MINUTES_KEY, bedtimeMinutes)
                     dataMap.putString(SMART_REMINDER_MODE_KEY, smartReminderMode)
+                    dataMap.putInt(FIXED_FASTING_START_MINUTES_KEY, fixedFastingStartMinutes)
                     dataMap.putLong(TIMESTAMP_KEY, System.currentTimeMillis())
                 }.asPutDataRequest().setUrgent()
 
             dataClient.putDataItem(request).await()
             Log.d(
                 LOG_TAG,
-                "SettingsRepo: Settings synced to Data Layer - notifications: $notificationsEnabled, completion: $notifyCompletion, oneHour: $notifyOneHourBefore, smartReminders: $smartRemindersEnabled, bedtime: $bedtimeMinutes, mode: $smartReminderMode"
+                "SettingsRepo: Settings synced to Data Layer - notifications: $notificationsEnabled, completion: $notifyCompletion, oneHour: $notifyOneHourBefore, smartReminders: $smartRemindersEnabled, bedtime: $bedtimeMinutes, mode: $smartReminderMode, fixedStart: $fixedFastingStartMinutes"
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "SettingsRepo: Error syncing settings to Data Layer", e)
@@ -173,6 +193,7 @@ class SettingsRepositoryImpl(
         val SMART_REMINDERS_ENABLED = booleanPreferencesKey("smart_reminders_enabled")
         val BEDTIME_MINUTES = intPreferencesKey("bedtime_minutes")
         val SMART_REMINDER_MODE = stringPreferencesKey("smart_reminder_mode")
+        val FIXED_FASTING_START_MINUTES = intPreferencesKey("fixed_fasting_start_minutes")
     }
 
     companion object {
@@ -183,10 +204,13 @@ class SettingsRepositoryImpl(
         private const val SMART_REMINDERS_ENABLED_KEY = "smart_reminders_enabled"
         private const val BEDTIME_MINUTES_KEY = "bedtime_minutes"
         private const val SMART_REMINDER_MODE_KEY = "smart_reminder_mode"
+        private const val FIXED_FASTING_START_MINUTES_KEY = "fixed_fasting_start_minutes"
         private const val TIMESTAMP_KEY = "timestamp"
 
         // 10:00 PM = 22 * 60 = 1320 minutes from midnight
         const val DEFAULT_BEDTIME_MINUTES = 1320
+        // 7:00 PM = 19 * 60 = 1140 minutes from midnight
+        const val DEFAULT_FIXED_FASTING_START_MINUTES = 1140
     }
 }
 

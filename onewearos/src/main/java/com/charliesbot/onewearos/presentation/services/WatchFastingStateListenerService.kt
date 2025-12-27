@@ -113,6 +113,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 val notifyOneHourBefore = dataMap.getBoolean("notify_one_hour_before", true)
                 val smartRemindersEnabled = dataMap.getBoolean("smart_reminders_enabled", false)
                 val bedtimeMinutes = dataMap.getInt("bedtime_minutes", 1320)
+                val fixedFastingStartMinutes = dataMap.getInt("fixed_fasting_start_minutes", 1140)
                 val smartReminderModeString = dataMap.getString("smart_reminder_mode", SmartReminderMode.AUTO.name)
                 val smartReminderMode = try {
                     SmartReminderMode.valueOf(smartReminderModeString ?: SmartReminderMode.AUTO.name)
@@ -123,7 +124,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 Log.d(
                     LOG_TAG,
                     "WatchListener: Received settings update from phone " +
-                            "(notifications=$notificationsEnabled, completion=$notifyCompletion, oneHour=$notifyOneHourBefore, smartReminders=$smartRemindersEnabled, bedtime=$bedtimeMinutes, mode=$smartReminderMode)"
+                            "(notifications=$notificationsEnabled, completion=$notifyCompletion, oneHour=$notifyOneHourBefore, smartReminders=$smartRemindersEnabled, bedtime=$bedtimeMinutes, fixedStart=$fixedFastingStartMinutes, mode=$smartReminderMode)"
                 )
                 watchServiceScope.launch {
                     try {
@@ -133,6 +134,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                         settingsRepository.setNotifyOneHourBefore(notifyOneHourBefore, syncToRemote = false)
                         settingsRepository.setSmartRemindersEnabled(smartRemindersEnabled, syncToRemote = false)
                         settingsRepository.setBedtimeMinutes(bedtimeMinutes, syncToRemote = false)
+                        settingsRepository.setFixedFastingStartMinutes(fixedFastingStartMinutes, syncToRemote = false)
                         settingsRepository.setSmartReminderMode(smartReminderMode, syncToRemote = false)
                         Log.d(LOG_TAG, "WatchListener: Settings updated successfully (local only, no sync back)")
                     } catch (e: Exception) {

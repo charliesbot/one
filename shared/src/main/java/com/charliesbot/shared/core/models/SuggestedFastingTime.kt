@@ -18,7 +18,9 @@ data class SuggestedFastingTime(
 enum class SuggestionSource {
     /** Calculated from 7-day moving average of user's actual fast start times */
     MOVING_AVERAGE,
-    /** Fallback: bedtime minus 5 hours */
-    BEDTIME_BASED
+    /** Fallback: bedtime minus 4 hours */
+    BEDTIME_BASED,
+    /** User-specified fixed time */
+    FIXED_TIME
 }
 
