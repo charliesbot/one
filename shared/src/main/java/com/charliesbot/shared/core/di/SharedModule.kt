@@ -10,6 +10,7 @@ import com.charliesbot.shared.core.data.repositories.settingsRepository.Settings
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepositoryImpl
 import com.charliesbot.shared.core.datastore.fastingDataStore
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
 import com.charliesbot.shared.core.services.FastingEventManager
 import com.google.android.gms.wearable.Wearable
 
@@ -29,6 +30,7 @@ val sharedModule = module {
     }
     single<FastingEventManager> { FastingEventManager() }
     single { FastingUseCase(get(), get(), get()) }
+    single { GetSuggestedFastingStartTimeUseCase(get(), get()) }
 
     single { Wearable.getDataClient(androidContext()) }
     single { Wearable.getMessageClient(androidContext()) }

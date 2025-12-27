@@ -13,7 +13,11 @@ import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
+import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
+import com.charliesbot.shared.core.services.SmartReminderCallback
+import com.charliesbot.shared.core.models.SuggestedFastingTime
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,6 +35,9 @@ data class SettingsUiState(
     val notificationsEnabled: Boolean = true,
     val notifyOnCompletion: Boolean = true,
     val notifyOneHourBefore: Boolean = true,
+    val smartRemindersEnabled: Boolean = false,
+    val bedtimeMinutes: Int = 1320, // 10:00 PM default
+    val smartReminderMode: SmartReminderMode = SmartReminderMode.AUTO,
     val isSyncing: Boolean = false,
     val isExporting: Boolean = false,
     val versionName: String = "Unknown",
@@ -44,7 +51,9 @@ class SettingsViewModel(
     application: Application,
     private val settingsRepository: SettingsRepository,
     private val fastingHistoryRepository: FastingHistoryRepository,
-    private val fastingUseCase: FastingUseCase
+    private val fastingUseCase: FastingUseCase,
+    private val smartReminderCallback: SmartReminderCallback,
+    private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
 ) : AndroidViewModel(application) {
 
     private val _isSyncing = MutableStateFlow(false)
@@ -52,6 +61,9 @@ class SettingsViewModel(
 
     private val _sideEffects = Channel<SettingsSideEffect>(Channel.BUFFERED)
     val sideEffects = _sideEffects.receiveAsFlow()
+
+    private val _suggestedFastingTime = MutableStateFlow<SuggestedFastingTime?>(null)
+    val suggestedFastingTime: StateFlow<SuggestedFastingTime?> = _suggestedFastingTime
 
     // Get version from package manager
     private val versionName: String = try {
@@ -66,22 +78,40 @@ class SettingsViewModel(
         settingsRepository.notificationsEnabled,
         settingsRepository.notifyOnCompletion,
         settingsRepository.notifyOneHourBefore,
-        _isSyncing,
-        _isExporting
-    ) { notifications, onCompletion, oneHour, isSyncing, isExporting ->
+        settingsRepository.smartRemindersEnabled,
+        settingsRepository.bedtimeMinutes,
+    ) { notifications, onCompletion, oneHour, smartReminders, bedtime ->
         SettingsUiState(
             notificationsEnabled = notifications,
             notifyOnCompletion = onCompletion,
             notifyOneHourBefore = oneHour,
-            isSyncing = isSyncing,
-            isExporting = isExporting,
+            smartRemindersEnabled = smartReminders,
+            bedtimeMinutes = bedtime,
             versionName = versionName
         )
+    }.combine(settingsRepository.smartReminderMode) { state, mode ->
+        state.copy(smartReminderMode = mode)
+    }.combine(_isSyncing) { state, isSyncing ->
+        state.copy(isSyncing = isSyncing)
+    }.combine(_isExporting) { state, isExporting ->
+        state.copy(isExporting = isExporting)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = SettingsUiState()
     )
+
+    init {
+        // Load suggestion initially
+        refreshSuggestion()
+
+        // Reload when bedtime changes
+        viewModelScope.launch {
+            settingsRepository.bedtimeMinutes.collect {
+                refreshSuggestion()
+            }
+        }
+    }
 
     fun setNotificationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
@@ -98,6 +128,33 @@ class SettingsViewModel(
     fun setNotifyOneHourBefore(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setNotifyOneHourBefore(enabled)
+        }
+    }
+
+    fun setSmartRemindersEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setSmartRemindersEnabled(enabled)
+            Log.d(LOG_TAG, "SettingsViewModel: Smart reminders set to $enabled, triggering recalculation")
+            smartReminderCallback.onSmartReminderSettingsChanged()
+            refreshSuggestion()
+        }
+    }
+
+    fun setBedtimeMinutes(minutes: Int) {
+        viewModelScope.launch {
+            settingsRepository.setBedtimeMinutes(minutes)
+            Log.d(LOG_TAG, "SettingsViewModel: Bedtime set to $minutes minutes, triggering recalculation")
+            smartReminderCallback.onSmartReminderSettingsChanged()
+            refreshSuggestion()
+        }
+    }
+
+    fun setSmartReminderMode(mode: SmartReminderMode) {
+        viewModelScope.launch {
+            settingsRepository.setSmartReminderMode(mode)
+            Log.d(LOG_TAG, "SettingsViewModel: Smart reminder mode set to $mode, triggering recalculation")
+            smartReminderCallback.onSmartReminderSettingsChanged()
+            refreshSuggestion()
         }
     }
 
@@ -203,6 +260,60 @@ class SettingsViewModel(
     fun testSnackbar() {
         viewModelScope.launch {
             _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_version_copied)) // Reusing an existing string for testing
+        }
+    }
+
+    /**
+     * DEBUG: Insert mock fasting records to test the moving average calculation.
+     * Inserts 5 records with start times around 7 PM over the last 5 days.
+     */
+    fun insertMockFastingRecords() {
+        viewModelScope.launch {
+            try {
+                val now = System.currentTimeMillis()
+                val oneDayMillis = 24 * 60 * 60 * 1000L
+
+                // Create 5 mock records starting around 7 PM (19:00) with some variation
+                for (i in 1..5) {
+                    val dayOffset = i * oneDayMillis
+                    // Start around 7 PM with +/- 30 min variation
+                    val startHour = 19
+                    val startMinute = (kotlin.random.Random.nextInt(-30, 31))
+                    val startTimeOfDay = (startHour * 60 + startMinute) * 60 * 1000L
+
+                    // Get start of that day (midnight) and add time of day
+                    val startTime = now - dayOffset - (now % oneDayMillis) + startTimeOfDay
+                    val endTime = startTime + (16 * 60 * 60 * 1000L) // 16 hour fast
+
+                    val record = com.charliesbot.shared.core.data.db.FastingRecord(
+                        startTimeEpochMillis = startTime,
+                        endTimeEpochMillis = endTime,
+                        fastingGoalId = "16:8"
+                    )
+                    fastingHistoryRepository.saveFastingRecord(record)
+                    Log.d(LOG_TAG, "SettingsViewModel: Inserted mock record $i - start: ${java.util.Date(startTime)}")
+                }
+
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_sync_success)) // Reusing string
+                Log.d(LOG_TAG, "SettingsViewModel: Mock records inserted successfully")
+
+                // Trigger recalculation
+                smartReminderCallback.onSmartReminderSettingsChanged()
+                refreshSuggestion()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "SettingsViewModel: Failed to insert mock records", e)
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
+            }
+        }
+    }
+
+    private fun refreshSuggestion() {
+        viewModelScope.launch {
+            try {
+                _suggestedFastingTime.value = getSuggestedFastingStartTimeUseCase.execute()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "SettingsViewModel: Failed to load suggestion", e)
+            }
         }
     }
 }

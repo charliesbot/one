@@ -8,6 +8,7 @@ import com.charliesbot.one.data.AndroidStringProvider
 import com.charliesbot.one.data.FastingHistoryRepositoryImpl
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
+import com.charliesbot.one.services.SmartReminderCallbackImpl
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -20,6 +21,7 @@ import com.charliesbot.shared.core.data.db.AppDatabase
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import com.charliesbot.shared.core.services.FastingEventCallbacks
+import com.charliesbot.shared.core.services.SmartReminderCallback
 import org.koin.android.ext.koin.androidContext
 
 val appModule = module {
@@ -74,4 +76,6 @@ val appModule = module {
 
     single { LocalFastingCallback(get(), get()) }
     single<FastingEventCallbacks> { get<LocalFastingCallback>() }
+
+    single<SmartReminderCallback> { SmartReminderCallbackImpl(androidContext()) }
 }

@@ -47,6 +47,12 @@
     <string name="notification_completion_title">Fasting Completed!</string>
     <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
 
+    <!-- Smart Reminder Notification Strings -->
+    <string name="notification_smart_reminder_1h_title">One Hour Left to Eat!</string>
+    <string name="notification_smart_reminder_1h_message">Your fasting window starts soon. Finish eating in the next hour.</string>
+    <string name="notification_smart_reminder_start_title">Time to Start Your Fast</string>
+    <string name="notification_smart_reminder_start_message">Your eating window has ended. Start fasting now for best results.</string>
+
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
     <string name="navigate_back">Navigate back</string>
@@ -59,6 +65,13 @@
     <string name="settings_notify_completion_desc">Get notified when you complete your fast</string>
     <string name="settings_notify_one_hour">Notify 1 hour before goal</string>
     <string name="settings_notify_one_hour_desc">Get a heads-up an hour before completion</string>
+
+    <!-- Settings - Smart Reminders Section -->
+    <string name="settings_smart_reminders_title">Smart Reminders</string>
+    <string name="settings_smart_reminders_enabled">Enable Smart Reminders</string>
+    <string name="settings_smart_reminders_enabled_desc">Get reminded when to start your fast based on your habits</string>
+    <string name="settings_bedtime">Target Bedtime</string>
+    <string name="settings_bedtime_desc">Used to suggest fasting start time (4 hours before)</string>
 
     <!-- Settings - Data Management Section -->
     <string name="settings_data_title">Data Management</string>
