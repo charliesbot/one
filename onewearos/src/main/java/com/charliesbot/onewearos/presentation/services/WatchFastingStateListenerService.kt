@@ -11,6 +11,7 @@ import com.charliesbot.shared.core.data.repositories.settingsRepository.Settings
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationScheduler
+import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.shared.core.services.BaseFastingListenerService
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -90,6 +91,10 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 if (suggestedTimeMillis > System.currentTimeMillis()) {
                     watchServiceScope.launch {
                         try {
+                            // Ensure notification channel exists (safe to call multiple times)
+                            // This guarantees notifications work even after app updates
+                            NotificationUtil.createNotificationChannel(this@WatchFastingStateListenerService)
+                            
                             // Schedule local notifications on the watch
                             notificationScheduler.scheduleSmartReminderNotifications(suggestedTimeMillis)
                             Log.d(LOG_TAG, "WatchListener: Smart reminder notifications scheduled on watch")
