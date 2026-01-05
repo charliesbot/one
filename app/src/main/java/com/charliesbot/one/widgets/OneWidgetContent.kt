@@ -158,10 +158,13 @@ private fun WidgetProgressBar(
         trackComposeColor
     }
 
+    // Use density for crisp rendering
+    val density = context.resources.displayMetrics.density
+
     // Create bitmap synchronously for preview - this will work in both preview and runtime
-    val ringBitmap = remember(progress, indicatorComposeColor, trackComposeColor) {
-        val sizePx = (ringDp.value * 3).toInt() // Use a simple multiplier instead of density
-        val strokePx = (strokeDp.value * 3)
+    val ringBitmap = remember(progress, indicatorComposeColor, trackComposeColor, density) {
+        val sizePx = (ringDp.value * density).toInt()
+        val strokePx = (strokeDp.value * density)
 
         ProgressBitmap.draw(
             progress = progress,
@@ -172,13 +175,24 @@ private fun WidgetProgressBar(
         )
     }
 
+    val remainingHours = (getHours(fastingGoalMillis) - getHours(elapsedTime)).coerceAtLeast(0)
+    val contentDescription = if (isFasting) {
+        context.getString(
+            R.string.accessibility_fasting_status,
+            (progress * 100).toInt(),
+            remainingHours
+        )
+    } else {
+        context.getString(R.string.widget_not_fasting)
+    }
+
     Row(
         horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
         modifier = if (alignEnd) GlanceModifier.fillMaxWidth() else GlanceModifier
     ) {
         Image(
             provider = ImageProvider(ringBitmap),
-            contentDescription = context.getString(R.string.progress_ring_desc),
+            contentDescription = contentDescription,
             modifier = GlanceModifier.size(ringDp)
         )
     }
