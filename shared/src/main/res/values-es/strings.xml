@@ -31,6 +31,13 @@
     <string name="time_picker_cancel">Cancelar</string>
     <string name="time_picker_save">Guardar</string>
 
+    <!-- Delete Confirmation -->
+    <string name="delete_entry">Eliminar registro</string>
+    <string name="delete_confirmation_title">¿Eliminar registro de ayuno?</string>
+    <string name="delete_confirmation_message">Esta acción no se puede deshacer.</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+
     <!-- Navigation -->
     <string name="nav_today">Hoy</string>
     <string name="nav_you">Tú</string>
