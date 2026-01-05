@@ -31,4 +31,6 @@ interface FastingRecordDao {
         endExclusiveTimestamp: Long
     ): Flow<List<FastingRecord>>
 
+    @Query("DELETE FROM fasting_history WHERE startTimeEpochMillis = :startTimeEpochMillis")
+    suspend fun deleteByStartTime(startTimeEpochMillis: Long)
 }

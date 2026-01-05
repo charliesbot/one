@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.components.FastingDayData
+import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -27,7 +29,8 @@ data class CalendarUiState(
 @OptIn(ExperimentalCoroutinesApi::class)
 class YouViewModel(
     application: Application,
-    getMonthlyFastingMapUseCase: GetMonthlyFastingMapUseCase
+    getMonthlyFastingMapUseCase: GetMonthlyFastingMapUseCase,
+    private val fastingHistoryRepository: FastingHistoryRepository
 ) : AndroidViewModel(application) {
     private val _selectedMonth = MutableStateFlow(YearMonth.now())
     val selectedMonth: StateFlow<YearMonth> = _selectedMonth
@@ -67,4 +70,10 @@ class YouViewModel(
         _selectedDay.value = day
     }
 
+    fun onDeleteFastingEntry(startTimeEpochMillis: Long) {
+        viewModelScope.launch {
+            fastingHistoryRepository.deleteFastingRecord(startTimeEpochMillis)
+            _selectedDay.value = null
+        }
+    }
 }
