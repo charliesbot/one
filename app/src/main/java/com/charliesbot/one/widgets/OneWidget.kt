@@ -56,11 +56,10 @@ class OneWidget() : GlanceAppWidget(), KoinComponent {
     private val fastingDataRepository: FastingDataRepository by inject()
 
     override val sizeMode: SizeMode = SizeMode.Responsive(
-        sizes = setOf(
-            OneWidgetSize.COMPACT,
-            OneWidgetSize.WIDE,
-            OneWidgetSize.MEDIUM,
-            OneWidgetSize.EXPANDED
+        setOf(
+            OneWidgetSize.SMALL_SQUARE,
+            OneWidgetSize.HORIZONTAL_RECTANGLE,
+            OneWidgetSize.BIG_SQUARE
         )
     )
 
