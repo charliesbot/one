@@ -21,6 +21,7 @@
 
     <!-- Widget -->
     <string name="progress_ring_desc">Progress Ring</string>
+    <string name="accessibility_fasting_status">Fasting %1$d%%, %2$d hours remaining</string>
 
     <!-- Widget preview strings -->
     <string name="widget_preview_hours">16</string>
