@@ -131,6 +131,12 @@ dependencies {
     implementation(project(":shared"))
     ksp(libs.androidx.room.compiler)
     implementation(libs.firebase.crashlytics)
+    // Tiles
+    implementation(libs.androidx.tiles)
+    implementation(libs.androidx.tiles.material)
+    implementation(libs.horologist.tiles)
+    debugImplementation(libs.androidx.tiles.tooling)
+    debugImplementation(libs.androidx.tiles.tooling.preview)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
