@@ -7,6 +7,7 @@ import androidx.wear.phone.interactions.notifications.BridgingManager
 import androidx.work.Configuration
 import com.charliesbot.onewearos.presentation.di.wearAppModule
 import com.charliesbot.shared.core.di.sharedModule
+import com.charliesbot.shared.core.notifications.NotificationUtil
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
@@ -16,6 +17,9 @@ class MainApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         disableNotificationBridge()
+        
+        // Create notification channel early so smart reminders can use it
+        NotificationUtil.createNotificationChannel(this)
 
         startKoin {
             androidLogger()
