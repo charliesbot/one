@@ -40,18 +40,15 @@ jobs:
       - name: Generate version numbers
         id: version
         run: |
-          BASE_VERSION=$(date +'%y%m%d')
-
-          # For manual runs without explicit suffix, add hour-based suffix for uniqueness
-          # For scheduled runs, keep simple date format
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -z "${{ github.event.inputs.version_suffix }}" ]; then
-            SUFFIX=$(date +'%H')
+          # Always use YYMMDDHH format (8 digits)
+          # Custom suffix can override the hour if provided
+          if [ -n "${{ github.event.inputs.version_suffix }}" ]; then
+            VERSION_CODE=$(date +'%y%m%d')${{ github.event.inputs.version_suffix }}
           else
-            SUFFIX="${{ github.event.inputs.version_suffix }}"
+            VERSION_CODE=$(date +'%y%m%d%H')
           fi
 
-          VERSION_CODE="${BASE_VERSION}${SUFFIX}"
-          VERSION_NAME="1.${BASE_VERSION}${SUFFIX}"
+          VERSION_NAME="1.${VERSION_CODE}"
 
           echo "VERSION_CODE=${VERSION_CODE}" >> $GITHUB_ENV
           echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV

@@ -75,6 +75,11 @@ fun YouScreen(
                 fastingData = selectedDay,
                 onDismiss = {
                     viewModel.onDaySelected(null)
+                },
+                onDelete = {
+                    selectedDay.startTimeEpochMillis?.let { startTime ->
+                        viewModel.onDeleteFastingEntry(startTime)
+                    }
                 }
             )
         }

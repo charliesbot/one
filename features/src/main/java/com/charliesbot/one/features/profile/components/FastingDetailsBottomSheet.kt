@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -15,9 +16,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,9 +45,42 @@ import java.time.format.FormatStyle
 fun FastingDetailsBottomSheet(
     fastingData: FastingDayData,
     onDismiss: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState()
 ) {
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text(stringResource(R.string.delete_confirmation_title)) },
+            text = { Text(stringResource(R.string.delete_confirmation_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirmation = false
+                        scope.launch {
+                            sheetState.hide()
+                            onDelete()
+                        }
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -106,6 +147,26 @@ fun FastingDetailsBottomSheet(
                 label = stringResource(R.string.ended),
                 time = formatTime(fastingData.endTimeEpochMillis ?: 0L)
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(
+                onClick = { showDeleteConfirmation = true }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.delete_24px),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = stringResource(R.string.delete_entry),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -184,7 +245,8 @@ private fun FastingDetailsBottomSheetPreview() {
 
         FastingDetailsBottomSheet(
             fastingData = testData,
-            onDismiss = {}
+            onDismiss = {},
+            onDelete = {}
         )
     }
 }
