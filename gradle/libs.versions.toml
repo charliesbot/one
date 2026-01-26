@@ -1,11 +1,11 @@
 [versions]
-agp = "8.13.1"
+agp = "9.0.0"
 datastorePreferences = "1.2.0"
 firebaseBom = "34.8.0"
 glanceAppwidget = "1.1.1"
 koinBom = "4.1.1"
 kotlin = "2.3.0"
-ksp = "2.3.0"
+ksp = "2.3.2"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -15,7 +15,6 @@ mockk = "1.14.7"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2026.01.00"
-koin-annotations = "2.3.1"
 playServicesWearable = "19.0.0"
 startupRuntime = "1.2.0"
 coreSplashscreen = "1.2.0"
@@ -89,8 +88,6 @@ koin-core-coroutines = { module = "io.insert-koin:koin-core-coroutines" }
 kotlinx-coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }           # version comes from the BOM
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services" }
-koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
-koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations" }
 androidx-wear-ongoing = { group = "androidx.wear", name = "wear-ongoing", version = "1.1.0" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "wearComposeMaterial" }
@@ -123,7 +120,6 @@ androidx-material3-adaptive = { module = "androidx.compose.material3.adaptive:ad
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
