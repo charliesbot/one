@@ -14,8 +14,8 @@ val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 55.sp,
-        lineHeight = 62.sp,
+        fontSize = 57.sp,
+        lineHeight = 64.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
