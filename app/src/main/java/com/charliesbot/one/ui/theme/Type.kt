@@ -12,21 +12,21 @@ import com.charliesbot.shared.core.theme.GoogleSansWide
 // Material 3 Typography Scale
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = GoogleSansWide,
+        fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = GoogleSansWide,
+        fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
         fontSize = 45.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = GoogleSansWide,
+        fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
         fontSize = 36.sp,
         lineHeight = 44.sp,

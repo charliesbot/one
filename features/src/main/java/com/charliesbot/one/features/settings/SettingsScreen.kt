@@ -36,9 +36,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberTimePickerState
+import com.charliesbot.one.features.dashboard.components.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,7 +58,10 @@ import com.charliesbot.shared.R
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.utils.formatMinutesAsTime
+import androidx.compose.ui.tooling.preview.Preview
+import com.charliesbot.shared.core.models.SuggestionSource
 import org.koin.androidx.compose.koinViewModel
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,12 +80,75 @@ fun SettingsScreen(
         viewModel.sideEffects.collect { effect ->
             when (effect) {
                 is SettingsSideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(context.getString(effect.messageRes))
+                    snackbarHostState.showSnackbar(effect.message)
                 }
             }
         }
     }
 
+    SettingsScreenContent(
+        uiState = uiState,
+        suggestedFastingTime = suggestedFastingTime,
+        snackbarHostState = snackbarHostState,
+        onNotificationsEnabledChange = viewModel::setNotificationsEnabled,
+        onSmartRemindersEnabledChange = viewModel::setSmartRemindersEnabled,
+        onSmartReminderModeSelected = viewModel::setSmartReminderMode,
+        onBedtimeClick = { showBedtimePicker = true },
+        onFixedTimeClick = { showFixedTimePicker = true },
+        onExportHistory = viewModel::exportHistory,
+        onForceSyncToWatch = viewModel::forceSyncToWatch,
+        onCopyVersionToClipboard = viewModel::copyVersionToClipboard,
+        onRateAppClick = {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = "market://details?id=${context.packageName}".toUri()
+            }
+            context.startActivity(intent)
+        }
+    )
+
+    // Bedtime Picker Dialog
+    if (showBedtimePicker) {
+        TimePickerDialog(
+            title = stringResource(R.string.settings_bedtime),
+            currentMinutes = uiState.bedtimeMinutes,
+            onConfirm = { minutes ->
+                viewModel.setBedtimeMinutes(minutes)
+                showBedtimePicker = false
+            },
+            onDismiss = { showBedtimePicker = false }
+        )
+    }
+
+    // Fixed Time Picker Dialog
+    if (showFixedTimePicker) {
+        TimePickerDialog(
+            title = stringResource(R.string.settings_fasting_start_time),
+            currentMinutes = uiState.fixedFastingStartMinutes,
+            onConfirm = { minutes ->
+                viewModel.setFixedFastingStartMinutes(minutes)
+                showFixedTimePicker = false
+            },
+            onDismiss = { showFixedTimePicker = false }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsScreenContent(
+    uiState: SettingsUiState,
+    suggestedFastingTime: SuggestedFastingTime?,
+    snackbarHostState: SnackbarHostState,
+    onNotificationsEnabledChange: (Boolean) -> Unit,
+    onSmartRemindersEnabledChange: (Boolean) -> Unit,
+    onSmartReminderModeSelected: (SmartReminderMode) -> Unit,
+    onBedtimeClick: () -> Unit,
+    onFixedTimeClick: () -> Unit,
+    onExportHistory: () -> Unit,
+    onForceSyncToWatch: () -> Unit,
+    onCopyVersionToClipboard: () -> Unit,
+    onRateAppClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -112,7 +177,7 @@ fun SettingsScreen(
                             label = stringResource(R.string.settings_notifications_enabled),
                             description = stringResource(R.string.settings_notifications_enabled_desc),
                             checked = uiState.notificationsEnabled,
-                            onCheckedChange = { viewModel.setNotificationsEnabled(it) },
+                            onCheckedChange = onNotificationsEnabledChange,
                         )
                     })
                 )
@@ -122,14 +187,14 @@ fun SettingsScreen(
                 // Smart Reminders Section - New Design
                 SmartRemindersCard(
                     enabled = uiState.smartRemindersEnabled,
-                    onEnabledChange = { viewModel.setSmartRemindersEnabled(it) },
+                    onEnabledChange = onSmartRemindersEnabledChange,
                     suggestedFastingTime = suggestedFastingTime,
                     currentMode = uiState.smartReminderMode,
-                    onModeSelected = { viewModel.setSmartReminderMode(it) },
+                    onModeSelected = onSmartReminderModeSelected,
                     bedtimeMinutes = uiState.bedtimeMinutes,
-                    onBedtimeClick = { showBedtimePicker = true },
+                    onBedtimeClick = onBedtimeClick,
                     fixedStartMinutes = uiState.fixedFastingStartMinutes,
-                    onFixedTimeClick = { showFixedTimePicker = true }
+                    onFixedTimeClick = onFixedTimeClick
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -143,7 +208,7 @@ fun SettingsScreen(
                                 label = stringResource(R.string.settings_export_history),
                                 description = stringResource(R.string.settings_export_history_desc),
                                 isLoading = uiState.isExporting,
-                                onClick = { viewModel.exportHistory() }
+                                onClick = onExportHistory
                             )
                         },
                         {
@@ -151,7 +216,7 @@ fun SettingsScreen(
                                 label = stringResource(R.string.settings_force_sync),
                                 description = stringResource(R.string.settings_force_sync_desc),
                                 isLoading = uiState.isSyncing,
-                                onClick = { viewModel.forceSyncToWatch() }
+                                onClick = onForceSyncToWatch
                             )
                         }
                     )
@@ -166,7 +231,7 @@ fun SettingsScreen(
                         {
                             SettingTile(
                                 title = stringResource(R.string.settings_version),
-                                onClick = { viewModel.copyVersionToClipboard() },
+                                onClick = onCopyVersionToClipboard,
                                 trailingContent = {
                                     Text(
                                         text = uiState.versionName,
@@ -180,13 +245,7 @@ fun SettingsScreen(
                             ActionSettingItem(
                                 label = stringResource(R.string.settings_rate_app),
                                 description = stringResource(R.string.settings_rate_app_desc),
-                                onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        data =
-                                            android.net.Uri.parse("market://details?id=${context.packageName}")
-                                    }
-                                    context.startActivity(intent)
-                                }
+                                onClick = onRateAppClick
                             )
                         }
                     )
@@ -195,32 +254,6 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
-    }
-
-    // Bedtime Picker Dialog
-    if (showBedtimePicker) {
-        TimePickerDialog(
-            title = stringResource(R.string.settings_bedtime),
-            currentMinutes = uiState.bedtimeMinutes,
-            onConfirm = { minutes ->
-                viewModel.setBedtimeMinutes(minutes)
-                showBedtimePicker = false
-            },
-            onDismiss = { showBedtimePicker = false }
-        )
-    }
-
-    // Fixed Time Picker Dialog
-    if (showFixedTimePicker) {
-        TimePickerDialog(
-            title = stringResource(R.string.settings_fasting_start_time),
-            currentMinutes = uiState.fixedFastingStartMinutes,
-            onConfirm = { minutes ->
-                viewModel.setFixedFastingStartMinutes(minutes)
-                showFixedTimePicker = false
-            },
-            onDismiss = { showFixedTimePicker = false }
-        )
     }
 }
 
@@ -264,7 +297,7 @@ private fun SmartRemindersCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                         Text(
                             text = stringResource(R.string.settings_smart_reminders_enabled),
                             style = MaterialTheme.typography.titleMedium
@@ -309,7 +342,7 @@ private fun SmartRemindersCard(
 
                             Text(
                                 text = stringResource(R.string.settings_start_fast_at, formattedTime),
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
@@ -340,10 +373,13 @@ private fun SmartRemindersCard(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                        Text(
-                            text = if (isCustomizeExpanded) "▲" else "▼",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Icon(
+                            painter = painterResource(
+                                if (isCustomizeExpanded) R.drawable.keyboard_arrow_up_24px
+                                else R.drawable.keyboard_arrow_down_24px
+                            ),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -415,9 +451,9 @@ private fun SmartRemindersCard(
                                         )
                                         Text(
                                             text = formattedFixed,
-                                            style = MaterialTheme.typography.bodyLarge,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Medium
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
@@ -439,9 +475,9 @@ private fun SmartRemindersCard(
                                         )
                                         Text(
                                             text = formattedBedtime,
-                                            style = MaterialTheme.typography.bodyLarge,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Medium
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
@@ -600,61 +636,33 @@ fun SettingsGroup(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
 @Composable
-private fun TimePickerDialog(
-    title: String,
-    currentMinutes: Int,
-    onConfirm: (Int) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val initialHour = currentMinutes / 60
-    val initialMinute = currentMinutes % 60
-
-    val timePickerState = rememberTimePickerState(
-        initialHour = initialHour,
-        initialMinute = initialMinute,
-        is24Hour = false
+private fun PreviewSettingsScreen() {
+    SettingsScreenContent(
+        uiState = SettingsUiState(
+            notificationsEnabled = true,
+            smartRemindersEnabled = true,
+            smartReminderMode = SmartReminderMode.AUTO,
+            bedtimeMinutes = 1320, // 10:00 PM
+            fixedFastingStartMinutes = 1140, // 7:00 PM
+            versionName = "1.0.0"
+        ),
+        suggestedFastingTime = SuggestedFastingTime(
+            suggestedTimeMillis = System.currentTimeMillis(),
+            suggestedTimeMinutes = 1200, // 8:00 PM
+            reasoning = "Based on your recent 7-day average",
+            source = SuggestionSource.MOVING_AVERAGE
+        ),
+        snackbarHostState = remember { SnackbarHostState() },
+        onNotificationsEnabledChange = {},
+        onSmartRemindersEnabledChange = {},
+        onSmartReminderModeSelected = {},
+        onBedtimeClick = {},
+        onFixedTimeClick = {},
+        onExportHistory = {},
+        onForceSyncToWatch = {},
+        onCopyVersionToClipboard = {},
+        onRateAppClick = {}
     )
-
-    androidx.compose.ui.window.Dialog(
-        onDismissRequest = onDismiss,
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = 6.dp,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 20.dp),
-                    text = title,
-                    style = MaterialTheme.typography.labelMedium
-                )
-                TimePicker(state = timePickerState)
-                Row(
-                    modifier = Modifier
-                        .height(40.dp)
-                        .fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    androidx.compose.material3.TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.time_picker_cancel))
-                    }
-                    androidx.compose.material3.TextButton(onClick = {
-                        val selectedMinutes = timePickerState.hour * 60 + timePickerState.minute
-                        onConfirm(selectedMinutes)
-                    }) {
-                        Text(stringResource(R.string.time_picker_save))
-                    }
-                }
-            }
-        }
-    }
 }

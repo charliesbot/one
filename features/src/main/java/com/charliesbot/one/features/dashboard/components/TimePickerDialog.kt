@@ -33,7 +33,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
-fun convertTimePickerStateToMillis(
+private fun convertTimePickerStateToMillis(
     timePickerState: TimePickerState
 ): Long {
     val zoneId = ZoneId.systemDefault()
@@ -43,17 +43,21 @@ fun convertTimePickerStateToMillis(
     return newDate.atZone(zoneId).toInstant().toEpochMilli()
 }
 
+/**
+ * Base TimePickerDialog that works with hour and minute values.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    startTimeMillis: Long,
-    onConfirm: (Long) -> Unit,
+    title: String = stringResource(R.string.time_picker_select_time),
+    initialHour: Int,
+    initialMinute: Int,
+    onConfirm: (hour: Int, minute: Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val startTime = convertMillisToLocalDateTime(startTimeMillis)
     val timePickerState = rememberTimePickerState(
-        initialHour = startTime.hour,
-        initialMinute = startTime.minute,
+        initialHour = initialHour,
+        initialMinute = initialMinute,
         is24Hour = false,
     )
 
@@ -64,14 +68,13 @@ fun TimePickerDialog(
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
             tonalElevation = 6.dp,
-            modifier =
-                Modifier
-                    .width(IntrinsicSize.Min)
-                    .height(IntrinsicSize.Min)
-                    .background(
-                        shape = MaterialTheme.shapes.extraLarge,
-                        color = MaterialTheme.colorScheme.surface
-                    ),
+            modifier = Modifier
+                .width(IntrinsicSize.Min)
+                .height(IntrinsicSize.Min)
+                .background(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.surface
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -81,34 +84,84 @@ fun TimePickerDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
-                    text = stringResource(R.string.time_picker_select_time),
+                    text = title,
                     style = MaterialTheme.typography.labelMedium
                 )
-                TimePicker(
-                    state = timePickerState,
-                )
+                TimePicker(state = timePickerState)
                 Row(
                     modifier = Modifier
                         .height(40.dp)
                         .fillMaxWidth()
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.time_picker_cancel)) }
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(R.string.time_picker_cancel))
+                    }
                     TextButton(onClick = {
-                        onConfirm(
-                            convertTimePickerStateToMillis(
-                                timePickerState
-                            )
-                        )
-                    }) { Text(stringResource(R.string.time_picker_save)) }
+                        onConfirm(timePickerState.hour, timePickerState.minute)
+                    }) {
+                        Text(stringResource(R.string.time_picker_save))
+                    }
                 }
             }
         }
     }
 }
 
+/**
+ * TimePickerDialog overload that works with milliseconds (for selecting datetime).
+ */
+@Composable
+fun TimePickerDialog(
+    startTimeMillis: Long,
+    onConfirm: (Long) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val startTime = convertMillisToLocalDateTime(startTimeMillis)
+    TimePickerDialog(
+        initialHour = startTime.hour,
+        initialMinute = startTime.minute,
+        onConfirm = { hour, minute ->
+            val zoneId = ZoneId.systemDefault()
+            val today = LocalDate.now(zoneId)
+            val newDate = LocalDateTime.of(today, LocalTime.of(hour, minute))
+            onConfirm(newDate.atZone(zoneId).toInstant().toEpochMilli())
+        },
+        onDismiss = onDismiss,
+    )
+}
+
+/**
+ * TimePickerDialog overload that works with minutes from midnight (for time-of-day selection).
+ */
+@Composable
+fun TimePickerDialog(
+    title: String,
+    currentMinutes: Int,
+    onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val initialHour = currentMinutes / 60
+    val initialMinute = currentMinutes % 60
+
+    TimePickerDialog(
+        title = title,
+        initialHour = initialHour,
+        initialMinute = initialMinute,
+        onConfirm = { hour, minute ->
+            onConfirm(hour * 60 + minute)
+        },
+        onDismiss = onDismiss,
+    )
+}
+
 @Preview
 @Composable
-fun InnerTimePickerPreview() {
-    TimePickerDialog(onConfirm = {}, onDismiss = {}, startTimeMillis = 639716400000)
+private fun TimePickerDialogPreview() {
+    TimePickerDialog(
+        initialHour = 10,
+        initialMinute = 30,
+        onConfirm = { _, _ -> },
+        onDismiss = {}
+    )
 }
