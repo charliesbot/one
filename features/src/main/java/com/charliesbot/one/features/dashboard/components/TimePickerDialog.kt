@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.components.DateTimeWheelPickerDialog
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -110,6 +111,7 @@ fun TimePickerDialog(
 
 /**
  * TimePickerDialog overload that works with milliseconds (for selecting datetime).
+ * Uses DateTimeWheelPicker to allow both date and time selection.
  */
 @Composable
 fun TimePickerDialog(
@@ -117,17 +119,10 @@ fun TimePickerDialog(
     onConfirm: (Long) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val startTime = convertMillisToLocalDateTime(startTimeMillis)
-    TimePickerDialog(
-        initialHour = startTime.hour,
-        initialMinute = startTime.minute,
-        onConfirm = { hour, minute ->
-            val zoneId = ZoneId.systemDefault()
-            val today = LocalDate.now(zoneId)
-            val newDate = LocalDateTime.of(today, LocalTime.of(hour, minute))
-            onConfirm(newDate.atZone(zoneId).toInstant().toEpochMilli())
-        },
-        onDismiss = onDismiss,
+    DateTimeWheelPickerDialog(
+        initialDateTimeMillis = startTimeMillis,
+        onConfirm = onConfirm,
+        onDismiss = onDismiss
     )
 }
 

@@ -37,6 +37,12 @@
     <string name="time_picker_cancel">Cancel</string>
     <string name="time_picker_save">Save</string>
 
+    <!-- Wheel Picker -->
+    <string name="wheel_picker_today">Today</string>
+    <string name="wheel_picker_yesterday">Yesterday</string>
+    <string name="wheel_picker_select_date_time">Select Date and Time</string>
+    <string name="wheel_picker_update">Update starting time</string>
+
     <!-- Delete Confirmation -->
     <string name="delete_entry">Delete entry</string>
     <string name="delete_confirmation_title">Delete fasting entry?</string>

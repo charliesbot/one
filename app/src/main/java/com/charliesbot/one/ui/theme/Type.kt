@@ -49,7 +49,7 @@ val Typography = Typography(
     headlineSmall = TextStyle(
         fontFamily = GoogleSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 24.sp,
+        fontSize = 20.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
