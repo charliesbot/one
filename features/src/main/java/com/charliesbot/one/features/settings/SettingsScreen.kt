@@ -1,13 +1,16 @@
 package com.charliesbot.one.features.settings
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,27 +27,37 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.charliesbot.one.features.BuildConfig
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
+import com.charliesbot.shared.core.models.SuggestedFastingTime
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,8 +66,11 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val suggestedFastingTime by viewModel.suggestedFastingTime.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    var showBedtimePicker by remember { mutableStateOf(false) }
+    var showFixedTimePicker by remember { mutableStateOf(false) }
 
     // Observe side effects
     LaunchedEffect(viewModel.sideEffects) {
@@ -87,98 +103,361 @@ fun SettingsScreen(
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-            // Notifications Section
-            SettingsGroup(
-                title = stringResource(R.string.settings_notifications_title),
-                items = listOf({
-                    SwitchSettingItem(
-                        label = stringResource(R.string.settings_notifications_enabled),
-                        description = stringResource(R.string.settings_notifications_enabled_desc),
-                        checked = uiState.notificationsEnabled,
-                        onCheckedChange = { viewModel.setNotificationsEnabled(it) },
-                    )
-                })
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Data Management Section
-            SettingsGroup(
-                title = stringResource(R.string.settings_data_title),
-                items = listOf(
-                    {
-                        ActionSettingItem(
-                            label = stringResource(R.string.settings_export_history),
-                            description = stringResource(R.string.settings_export_history_desc),
-                            isLoading = uiState.isExporting,
-                            onClick = { viewModel.exportHistory() }
-                        )
-                    },
-                    {
-
-                        ActionSettingItem(
-                            label = stringResource(R.string.settings_force_sync),
-                            description = stringResource(R.string.settings_force_sync_desc),
-                            isLoading = uiState.isSyncing,
-                            onClick = { viewModel.forceSyncToWatch() }
+                // Notifications Section
+                SettingsGroup(
+                    title = stringResource(R.string.settings_notifications_title),
+                    items = listOf({
+                        SwitchSettingItem(
+                            label = stringResource(R.string.settings_notifications_enabled),
+                            description = stringResource(R.string.settings_notifications_enabled_desc),
+                            checked = uiState.notificationsEnabled,
+                            onCheckedChange = { viewModel.setNotificationsEnabled(it) },
                         )
                     })
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // App Info Section
-            SettingsGroup(
-                title = stringResource(R.string.settings_app_info_title),
-                items = listOf(
-                    {
-                        SettingTile(
-                            title = stringResource(R.string.settings_version),
-                            onClick = { viewModel.copyVersionToClipboard() },
-                            trailingContent = {
-                                Text(
-                                    text = uiState.versionName,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        )
-                    },
-                    {
-                        ActionSettingItem(
-                            label = stringResource(R.string.settings_rate_app),
-                            description = stringResource(R.string.settings_rate_app_desc),
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW).apply {
-                                    data =
-                                        android.net.Uri.parse("market://details?id=${context.packageName}")
-                                }
-                                context.startActivity(intent)
-                            }
-                        )
-                    }
                 )
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Debug Section
-            if (BuildConfig.DEBUG) {
+                // Smart Reminders Section - New Design
+                SmartRemindersCard(
+                    enabled = uiState.smartRemindersEnabled,
+                    onEnabledChange = { viewModel.setSmartRemindersEnabled(it) },
+                    suggestedFastingTime = suggestedFastingTime,
+                    currentMode = uiState.smartReminderMode,
+                    onModeSelected = { viewModel.setSmartReminderMode(it) },
+                    bedtimeMinutes = uiState.bedtimeMinutes,
+                    onBedtimeClick = { showBedtimePicker = true },
+                    fixedStartMinutes = uiState.fixedFastingStartMinutes,
+                    onFixedTimeClick = { showFixedTimePicker = true }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Data Management Section
                 SettingsGroup(
-                    title = "Debug",
+                    title = stringResource(R.string.settings_data_title),
                     items = listOf(
                         {
                             ActionSettingItem(
-                                label = "Test Snackbar",
-                                description = "Trigger a test snackbar message",
-                                onClick = { viewModel.testSnackbar() }
+                                label = stringResource(R.string.settings_export_history),
+                                description = stringResource(R.string.settings_export_history_desc),
+                                isLoading = uiState.isExporting,
+                                onClick = { viewModel.exportHistory() }
+                            )
+                        },
+                        {
+                            ActionSettingItem(
+                                label = stringResource(R.string.settings_force_sync),
+                                description = stringResource(R.string.settings_force_sync_desc),
+                                isLoading = uiState.isSyncing,
+                                onClick = { viewModel.forceSyncToWatch() }
                             )
                         }
                     )
                 )
-            }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // App Info Section
+                SettingsGroup(
+                    title = stringResource(R.string.settings_app_info_title),
+                    items = listOf(
+                        {
+                            SettingTile(
+                                title = stringResource(R.string.settings_version),
+                                onClick = { viewModel.copyVersionToClipboard() },
+                                trailingContent = {
+                                    Text(
+                                        text = uiState.versionName,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            )
+                        },
+                        {
+                            ActionSettingItem(
+                                label = stringResource(R.string.settings_rate_app),
+                                description = stringResource(R.string.settings_rate_app_desc),
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        data =
+                                            android.net.Uri.parse("market://details?id=${context.packageName}")
+                                    }
+                                    context.startActivity(intent)
+                                }
+                            )
+                        }
+                    )
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
+            }
+        }
+    }
+
+    // Bedtime Picker Dialog
+    if (showBedtimePicker) {
+        TimePickerDialog(
+            title = stringResource(R.string.settings_bedtime),
+            currentMinutes = uiState.bedtimeMinutes,
+            onConfirm = { minutes ->
+                viewModel.setBedtimeMinutes(minutes)
+                showBedtimePicker = false
+            },
+            onDismiss = { showBedtimePicker = false }
+        )
+    }
+
+    // Fixed Time Picker Dialog
+    if (showFixedTimePicker) {
+        TimePickerDialog(
+            title = "Fasting Start Time",
+            currentMinutes = uiState.fixedFastingStartMinutes,
+            onConfirm = { minutes ->
+                viewModel.setFixedFastingStartMinutes(minutes)
+                showFixedTimePicker = false
+            },
+            onDismiss = { showFixedTimePicker = false }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SmartRemindersCard(
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
+    suggestedFastingTime: SuggestedFastingTime?,
+    currentMode: SmartReminderMode,
+    onModeSelected: (SmartReminderMode) -> Unit,
+    bedtimeMinutes: Int,
+    onBedtimeClick: () -> Unit,
+    fixedStartMinutes: Int,
+    onFixedTimeClick: () -> Unit
+) {
+    var isCustomizeExpanded by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        // Section Title
+        Text(
+            text = stringResource(R.string.settings_smart_reminders_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+        )
+
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Header with toggle
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_smart_reminders_enabled),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_smart_reminders_enabled_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = enabled,
+                        onCheckedChange = onEnabledChange,
+                        thumbContent = {
+                            Icon(
+                                painterResource(if (enabled) R.drawable.check_24px else R.drawable.close_24px),
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        }
+                    )
+                }
+
+                // Suggested time display (only show when enabled)
+                if (enabled && suggestedFastingTime != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Prominent time display
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "🕐",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Spacer(modifier = Modifier.size(12.dp))
+                        Column {
+                            val hours = suggestedFastingTime.suggestedTimeMinutes / 60
+                            val mins = suggestedFastingTime.suggestedTimeMinutes % 60
+                            val formattedTime = String.format("%02d:%02d", hours % 24, mins)
+
+                            Text(
+                                text = "Start your fast at $formattedTime",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = suggestedFastingTime.reasoning,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Customize expandable section
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { isCustomizeExpanded = !isCustomizeExpanded }
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "⚙️", style = MaterialTheme.typography.bodyLarge)
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text(
+                                text = "Customize",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Text(
+                            text = if (isCustomizeExpanded) "▲" else "▼",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Expandable settings
+                    AnimatedVisibility(
+                        visible = isCustomizeExpanded,
+                        enter = expandVertically(),
+                        exit = shrinkVertically()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        ) {
+                            // Mode selector with segmented buttons
+                            Text(
+                                text = "Calculation Mode",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+
+                            SingleChoiceSegmentedButtonRow(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                val modes = listOf(
+                                    SmartReminderMode.AUTO to "Auto",
+                                    SmartReminderMode.BEDTIME_ONLY to "Bedtime",
+                                    SmartReminderMode.MOVING_AVERAGE_ONLY to "History",
+                                    SmartReminderMode.FIXED_TIME to "Fixed"
+                                )
+                                modes.forEachIndexed { index, (mode, label) ->
+                                    SegmentedButton(
+                                        selected = currentMode == mode,
+                                        onClick = { onModeSelected(mode) },
+                                        shape = SegmentedButtonDefaults.itemShape(
+                                            index = index,
+                                            count = modes.size
+                                        )
+                                    ) {
+                                        Text(label, style = MaterialTheme.typography.labelSmall)
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Time setting based on mode
+                            when (currentMode) {
+                                SmartReminderMode.FIXED_TIME -> {
+                                    val fixedHours = fixedStartMinutes / 60
+                                    val fixedMins = fixedStartMinutes % 60
+                                    val formattedFixed = String.format("%02d:%02d", fixedHours % 24, fixedMins)
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { onFixedTimeClick() }
+                                            .padding(vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Fasting Start Time",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = formattedFixed,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+
+                                SmartReminderMode.BEDTIME_ONLY, SmartReminderMode.AUTO -> {
+                                    val bedtimeHours = bedtimeMinutes / 60
+                                    val bedtimeMins = bedtimeMinutes % 60
+                                    val formattedBedtime = String.format("%02d:%02d", bedtimeHours % 24, bedtimeMins)
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { onBedtimeClick() }
+                                            .padding(vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Target Bedtime",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = formattedBedtime,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+
+                                SmartReminderMode.MOVING_AVERAGE_ONLY -> {
+                                    Text(
+                                        text = "Using your recent fasting history to calculate the best time",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -293,34 +572,87 @@ fun SettingsGroup(
 
         // The Container
         Column(
-            // KEY 1: This creates the "cut" between items
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             items.forEachIndexed { index, itemContent ->
-
-                // KEY 2: Calculate shape based on position
                 val shape = when {
-                    items.size == 1 -> RoundedCornerShape(24.dp) // Single item
-                    index == 0 -> RoundedCornerShape( // Top item
+                    items.size == 1 -> RoundedCornerShape(24.dp)
+                    index == 0 -> RoundedCornerShape(
                         topStart = 24.dp, topEnd = 24.dp,
                         bottomStart = 4.dp, bottomEnd = 4.dp
                     )
-
-                    index == items.lastIndex -> RoundedCornerShape( // Bottom item
+                    index == items.lastIndex -> RoundedCornerShape(
                         topStart = 4.dp, topEnd = 4.dp,
                         bottomStart = 24.dp, bottomEnd = 24.dp
                     )
-
-                    else -> RoundedCornerShape(4.dp) // Middle items
+                    else -> RoundedCornerShape(4.dp)
                 }
 
-                // KEY 3: Wrap each item in its own Surface
                 Surface(
                     shape = shape,
                     color = MaterialTheme.colorScheme.surfaceContainer,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     itemContent()
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimePickerDialog(
+    title: String,
+    currentMinutes: Int,
+    onConfirm: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val initialHour = currentMinutes / 60
+    val initialMinute = currentMinutes % 60
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = initialHour,
+        initialMinute = initialMinute,
+        is24Hour = false
+    )
+
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = onDismiss,
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 6.dp,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    text = title,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                TimePicker(state = timePickerState)
+                Row(
+                    modifier = Modifier
+                        .height(40.dp)
+                        .fillMaxWidth()
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    androidx.compose.material3.TextButton(onClick = onDismiss) {
+                        Text(stringResource(R.string.time_picker_cancel))
+                    }
+                    androidx.compose.material3.TextButton(onClick = {
+                        val selectedMinutes = timePickerState.hour * 60 + timePickerState.minute
+                        onConfirm(selectedMinutes)
+                    }) {
+                        Text(stringResource(R.string.time_picker_save))
+                    }
                 }
             }
         }
