@@ -9,7 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.shared.R
+import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
@@ -44,10 +44,6 @@ data class SettingsUiState(
     val versionName: String = "Unknown",
 )
 
-sealed interface SettingsSideEffect {
-    data class ShowSnackbar(val messageRes: Int) : SettingsSideEffect
-}
-
 class SettingsViewModel(
     application: Application,
     private val settingsRepository: SettingsRepository,
@@ -55,6 +51,7 @@ class SettingsViewModel(
     private val fastingUseCase: FastingUseCase,
     private val smartReminderCallback: SmartReminderCallback,
     private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
+    private val stringProvider: StringProvider,
 ) : AndroidViewModel(application) {
 
     private val _isSyncing = MutableStateFlow(false)
@@ -187,7 +184,7 @@ class SettingsViewModel(
                 val records = fastingHistoryRepository.getAllHistory().first()
                 if (records.isEmpty()) {
                     Log.d(LOG_TAG, "SettingsViewModel: No records to export")
-                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
+                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)))
                     return@launch
                 }
 
@@ -208,7 +205,7 @@ class SettingsViewModel(
 
                 if (uri == null) {
                     Log.e(LOG_TAG, "SettingsViewModel: Failed to create file in Downloads")
-                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
+                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)))
                     return@launch
                 }
 
@@ -237,11 +234,11 @@ class SettingsViewModel(
                 contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
                 resolver.update(uri, contentValues, null, null)
 
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_success))
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_SUCCESS)))
                 Log.d(LOG_TAG, "SettingsViewModel: Export successful - saved to Downloads/$fileName")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Export failed", e)
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_export_error))
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)))
             } finally {
                 _isExporting.value = false
             }
@@ -253,11 +250,11 @@ class SettingsViewModel(
             _isSyncing.value = true
             try {
                 fastingUseCase.syncCurrentState()
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_sync_success))
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_SUCCESS)))
                 Log.d(LOG_TAG, "SettingsViewModel: Force sync successful")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Force sync failed", e)
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_sync_error))
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_ERROR)))
             } finally {
                 _isSyncing.value = false
             }
@@ -271,7 +268,7 @@ class SettingsViewModel(
                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clipData = ClipData.newPlainText("App Version", versionName)
                 clipboard.setPrimaryClip(clipData)
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(R.string.settings_version_copied))
+                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.VERSION_COPIED)))
                 Log.d(LOG_TAG, "SettingsViewModel: Version copied to clipboard")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Failed to copy version to clipboard", e)

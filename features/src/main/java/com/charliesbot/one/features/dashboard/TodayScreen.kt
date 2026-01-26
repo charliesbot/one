@@ -203,7 +203,7 @@ private fun TodayScreenContent(
                             source = suggestedTimeSource,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = screenPadding, vertical = 8.dp)
+                                .padding(start = screenPadding, end = screenPadding, top = 30.dp)
                         )
                     }
                 }
@@ -211,7 +211,7 @@ private fun TodayScreenContent(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(screenPadding),
+                        .padding(start = screenPadding, end = screenPadding, top = 30.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
                 ) {
                     val progressContent: @Composable () -> Unit = {
@@ -369,52 +369,78 @@ private fun SmartSuggestionCard(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewTodayScreen() {
-        TodayScreenContent(
-            isTimePickerDialogOpen = false,
-            isGoalBottomSheetOpen = false,
-            isFasting = true,
-            startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
-            fastingGoalId = "16:8",
-            weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-            smartRemindersEnabled = true,
-            suggestedTimeMinutes = 1200, // 8:00 PM
-            suggestedTimeReasoning = "Based on your recent 7-day average",
-            suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
-            isWidthAtLeastMedium = false,
-            onStartFasting = {},
-            onStopFasting = {},
-            onOpenTimePickerDialog = {},
-            onCloseTimePickerDialog = {},
-            onUpdateStartTime = {},
-            onOpenGoalBottomSheet = {},
-            onCloseGoalBottomSheet = {},
-            onUpdateFastingGoal = {},
-        )
+    TodayScreenContent(
+        isTimePickerDialogOpen = false,
+        isGoalBottomSheetOpen = false,
+        isFasting = true,
+        startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
+        fastingGoalId = "16:8",
+        weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+        smartRemindersEnabled = true,
+        suggestedTimeMinutes = 1200, // 8:00 PM
+        suggestedTimeReasoning = "Based on your recent 7-day average",
+        suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+        isWidthAtLeastMedium = false,
+        onStartFasting = {},
+        onStopFasting = {},
+        onOpenTimePickerDialog = {},
+        onCloseTimePickerDialog = {},
+        onUpdateStartTime = {},
+        onOpenGoalBottomSheet = {},
+        onCloseGoalBottomSheet = {},
+        onUpdateFastingGoal = {},
+    )
 }
 
 @Preview(heightDp = 360, widthDp = 800)
 @Composable
 private fun PreviewTodayScreenLandscape() {
-        TodayScreenContent(
-            isTimePickerDialogOpen = false,
-            isGoalBottomSheetOpen = false,
-            isFasting = true,
-            startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
-            fastingGoalId = "16:8",
-            weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-            smartRemindersEnabled = true,
-            suggestedTimeMinutes = 1200,
-            suggestedTimeReasoning = "Based on your recent 7-day average",
-            suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
-            isWidthAtLeastMedium = true,
-            onStartFasting = {},
-            onStopFasting = {},
-            onOpenTimePickerDialog = {},
-            onCloseTimePickerDialog = {},
-            onUpdateStartTime = {},
-            onOpenGoalBottomSheet = {},
-            onCloseGoalBottomSheet = {},
-            onUpdateFastingGoal = {},
-        )
+    TodayScreenContent(
+        isTimePickerDialogOpen = false,
+        isGoalBottomSheetOpen = false,
+        isFasting = true,
+        startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
+        fastingGoalId = "16:8",
+        weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+        smartRemindersEnabled = true,
+        suggestedTimeMinutes = 1200,
+        suggestedTimeReasoning = "Based on your recent 7-day average",
+        suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+        isWidthAtLeastMedium = true,
+        onStartFasting = {},
+        onStopFasting = {},
+        onOpenTimePickerDialog = {},
+        onCloseTimePickerDialog = {},
+        onUpdateStartTime = {},
+        onOpenGoalBottomSheet = {},
+        onCloseGoalBottomSheet = {},
+        onUpdateFastingGoal = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewTodayScreenWithUpcomingFast() {
+    TodayScreenContent(
+        isTimePickerDialogOpen = false,
+        isGoalBottomSheetOpen = false,
+        isFasting = false,
+        startTimeInMillis = System.currentTimeMillis(),
+        fastingGoalId = "16:8",
+        weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+        smartRemindersEnabled = true,
+        suggestedTimeMinutes = 1200, // 8:00 PM
+        suggestedTimeReasoning = "Based on your recent 7-day average",
+        suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+        isWidthAtLeastMedium = false,
+        onStartFasting = {},
+        onStopFasting = {},
+        onOpenTimePickerDialog = {},
+        onCloseTimePickerDialog = {},
+        onUpdateStartTime = {},
+        onOpenGoalBottomSheet = {},
+        onCloseGoalBottomSheet = {},
+        onUpdateFastingGoal = {},
+    )
 }
 
