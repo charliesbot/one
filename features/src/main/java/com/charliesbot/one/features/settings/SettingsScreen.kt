@@ -58,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
+import com.charliesbot.shared.core.utils.formatMinutesAsTime
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -212,7 +213,7 @@ fun SettingsScreen(
     // Fixed Time Picker Dialog
     if (showFixedTimePicker) {
         TimePickerDialog(
-            title = "Fasting Start Time",
+            title = stringResource(R.string.settings_fasting_start_time),
             currentMinutes = uiState.fixedFastingStartMinutes,
             onConfirm = { minutes ->
                 viewModel.setFixedFastingStartMinutes(minutes)
@@ -304,12 +305,10 @@ private fun SmartRemindersCard(
                         )
                         Spacer(modifier = Modifier.size(12.dp))
                         Column {
-                            val hours = suggestedFastingTime.suggestedTimeMinutes / 60
-                            val mins = suggestedFastingTime.suggestedTimeMinutes % 60
-                            val formattedTime = String.format("%02d:%02d", hours % 24, mins)
+                            val formattedTime = formatMinutesAsTime(suggestedFastingTime.suggestedTimeMinutes)
 
                             Text(
-                                text = "Start your fast at $formattedTime",
+                                text = stringResource(R.string.settings_start_fast_at, formattedTime),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -336,7 +335,7 @@ private fun SmartRemindersCard(
                             Text(text = "⚙️", style = MaterialTheme.typography.bodyLarge)
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(
-                                text = "Customize",
+                                text = stringResource(R.string.settings_customize),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -361,20 +360,25 @@ private fun SmartRemindersCard(
                         ) {
                             // Mode selector with segmented buttons
                             Text(
-                                text = "Calculation Mode",
+                                text = stringResource(R.string.settings_calculation_mode),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
 
+                            val modeAutoLabel = stringResource(R.string.settings_mode_auto)
+                            val modeBedtimeLabel = stringResource(R.string.settings_mode_bedtime)
+                            val modeHistoryLabel = stringResource(R.string.settings_mode_history)
+                            val modeFixedLabel = stringResource(R.string.settings_mode_fixed)
+
                             SingleChoiceSegmentedButtonRow(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 val modes = listOf(
-                                    SmartReminderMode.AUTO to "Auto",
-                                    SmartReminderMode.BEDTIME_ONLY to "Bedtime",
-                                    SmartReminderMode.MOVING_AVERAGE_ONLY to "History",
-                                    SmartReminderMode.FIXED_TIME to "Fixed"
+                                    SmartReminderMode.AUTO to modeAutoLabel,
+                                    SmartReminderMode.BEDTIME_ONLY to modeBedtimeLabel,
+                                    SmartReminderMode.MOVING_AVERAGE_ONLY to modeHistoryLabel,
+                                    SmartReminderMode.FIXED_TIME to modeFixedLabel
                                 )
                                 modes.forEachIndexed { index, (mode, label) ->
                                     SegmentedButton(
@@ -395,9 +399,7 @@ private fun SmartRemindersCard(
                             // Time setting based on mode
                             when (currentMode) {
                                 SmartReminderMode.FIXED_TIME -> {
-                                    val fixedHours = fixedStartMinutes / 60
-                                    val fixedMins = fixedStartMinutes % 60
-                                    val formattedFixed = String.format("%02d:%02d", fixedHours % 24, fixedMins)
+                                    val formattedFixed = formatMinutesAsTime(fixedStartMinutes)
 
                                     Row(
                                         modifier = Modifier
@@ -408,7 +410,7 @@ private fun SmartRemindersCard(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "Fasting Start Time",
+                                            text = stringResource(R.string.settings_fasting_start_time),
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                         Text(
@@ -421,9 +423,7 @@ private fun SmartRemindersCard(
                                 }
 
                                 SmartReminderMode.BEDTIME_ONLY, SmartReminderMode.AUTO -> {
-                                    val bedtimeHours = bedtimeMinutes / 60
-                                    val bedtimeMins = bedtimeMinutes % 60
-                                    val formattedBedtime = String.format("%02d:%02d", bedtimeHours % 24, bedtimeMins)
+                                    val formattedBedtime = formatMinutesAsTime(bedtimeMinutes)
 
                                     Row(
                                         modifier = Modifier
@@ -434,7 +434,7 @@ private fun SmartRemindersCard(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "Target Bedtime",
+                                            text = stringResource(R.string.settings_bedtime),
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                         Text(
@@ -448,7 +448,7 @@ private fun SmartRemindersCard(
 
                                 SmartReminderMode.MOVING_AVERAGE_ONLY -> {
                                     Text(
-                                        text = "Using your recent fasting history to calculate the best time",
+                                        text = stringResource(R.string.settings_using_history),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(vertical = 8.dp)

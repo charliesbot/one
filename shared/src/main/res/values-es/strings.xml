@@ -61,6 +61,29 @@
     <string name="settings_notify_one_hour">Notificar 1 hora antes de meta</string>
     <string name="settings_notify_one_hour_desc">Recibe un aviso una hora antes de completar</string>
 
+    <!-- Settings - Smart Reminders Section -->
+    <string name="settings_smart_reminders_title">Recordatorios Inteligentes</string>
+    <string name="settings_smart_reminders_enabled">Activar Recordatorios Inteligentes</string>
+    <string name="settings_smart_reminders_enabled_desc">Recibe recordatorios de cuándo empezar tu ayuno basado en tus hábitos</string>
+    <string name="settings_bedtime">Hora de Dormir</string>
+    <string name="settings_fasting_start_time">Hora de Inicio del Ayuno</string>
+    <string name="settings_start_fast_at">Empieza tu ayuno a las %1$s</string>
+    <string name="settings_customize">Personalizar</string>
+    <string name="settings_calculation_mode">Modo de Cálculo</string>
+    <string name="settings_mode_auto">Auto</string>
+    <string name="settings_mode_bedtime">Dormir</string>
+    <string name="settings_mode_history">Historial</string>
+    <string name="settings_mode_fixed">Fijo</string>
+    <string name="settings_using_history">Usando tu historial reciente de ayuno para calcular el mejor horario</string>
+    <string name="smart_suggestion_based_on_average">Basado en promedio reciente</string>
+    <string name="smart_suggestion_based_on_bedtime">Basado en hora de dormir</string>
+
+    <!-- Smart Reminder Notification Strings -->
+    <string name="notification_smart_reminder_1h_title">¡Última llamada! 🍽️</string>
+    <string name="notification_smart_reminder_1h_message">Tu ventana de alimentación cierra en 1 hora. ¡Hora de terminar!</string>
+    <string name="notification_smart_reminder_start_title">Modo Ayuno: Activado ⚡</string>
+    <string name="notification_smart_reminder_start_message">Ventana de alimentación cerrada. ¡Tú puedes!</string>
+
     <!-- Settings - Data Management Section -->
     <string name="settings_data_title">Gestión de Datos</string>
     <string name="settings_export_history">Exportar Historial (CSV)</string>

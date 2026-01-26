@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -68,9 +69,9 @@ class TodayViewModel(
         // Load suggested time when view model is created
         loadSuggestedFastingTime()
 
-        // Reload when bedtime changes
+        // Reload when bedtime changes (skip initial emission to avoid duplicate load)
         viewModelScope.launch {
-            settingsRepository.bedtimeMinutes.collect { _ ->
+            settingsRepository.bedtimeMinutes.drop(1).collect { _ ->
                 Log.d(LOG_TAG, "TodayViewModel: Bedtime changed, reloading suggestion")
                 loadSuggestedFastingTime()
             }

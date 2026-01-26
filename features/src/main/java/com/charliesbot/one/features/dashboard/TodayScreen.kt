@@ -53,6 +53,7 @@ import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.testing.MockDataUtils
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
+import com.charliesbot.shared.core.utils.formatMinutesAsTime
 import com.charliesbot.shared.core.utils.getHours
 import com.charliesbot.shared.core.utils.isWidthAtLeastMedium
 import kotlinx.coroutines.delay
@@ -320,12 +321,10 @@ private fun SmartSuggestionCard(
     source: com.charliesbot.shared.core.models.SuggestionSource?,
     modifier: Modifier = Modifier
 ) {
-    val hours = suggestedTimeMinutes / 60
-    val mins = suggestedTimeMinutes % 60
-    val formattedTime = String.format("%02d:%02d", hours % 24, mins)
+    val formattedTime = formatMinutesAsTime(suggestedTimeMinutes)
     val sourceText = when (source) {
-        com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> "Based on recent average"
-        com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> "Based on bedtime fallback"
+        com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> stringResource(R.string.smart_suggestion_based_on_average)
+        com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> stringResource(R.string.smart_suggestion_based_on_bedtime)
         else -> null
     }
 

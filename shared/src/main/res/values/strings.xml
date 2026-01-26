@@ -78,6 +78,17 @@
     <string name="settings_smart_reminders_enabled">Enable Smart Reminders</string>
     <string name="settings_smart_reminders_enabled_desc">Get reminded when to start your fast based on your habits</string>
     <string name="settings_bedtime">Target Bedtime</string>
+    <string name="settings_fasting_start_time">Fasting Start Time</string>
+    <string name="settings_start_fast_at">Start your fast at %1$s</string>
+    <string name="settings_customize">Customize</string>
+    <string name="settings_calculation_mode">Calculation Mode</string>
+    <string name="settings_mode_auto">Auto</string>
+    <string name="settings_mode_bedtime">Bedtime</string>
+    <string name="settings_mode_history">History</string>
+    <string name="settings_mode_fixed">Fixed</string>
+    <string name="settings_using_history">Using your recent fasting history to calculate the best time</string>
+    <string name="smart_suggestion_based_on_average">Based on recent average</string>
+    <string name="smart_suggestion_based_on_bedtime">Based on bedtime fallback</string>
 
     <!-- Settings - Data Management Section -->
     <string name="settings_data_title">Data Management</string>
