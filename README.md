@@ -113,3 +113,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with Jetpack Compose and Material 3
 - Icons from Material Icons Extended
 - Fasting windows based on popular intermittent fasting protocols
+
+## Author
+
+Made with love by [@charliesbot](https://twitter.com/charliesbot)
+
+## Contributors
+
+Thanks to these awesome people for their contributions:
+
+- [@nikunjgoel95](https://github.com/nikunjgoel95)
