@@ -31,6 +31,12 @@
     <string name="time_picker_cancel">Cancelar</string>
     <string name="time_picker_save">Guardar</string>
 
+    <!-- Wheel Picker -->
+    <string name="wheel_picker_today">Hoy</string>
+    <string name="wheel_picker_yesterday">Ayer</string>
+    <string name="wheel_picker_select_date_time">Selecciona Fecha y Hora</string>
+    <string name="wheel_picker_update">Actualizar hora de inicio</string>
+
     <!-- Delete Confirmation -->
     <string name="delete_entry">Eliminar registro</string>
     <string name="delete_confirmation_title">¿Eliminar registro de ayuno?</string>
