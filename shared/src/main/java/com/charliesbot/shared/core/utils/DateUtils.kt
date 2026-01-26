@@ -1,10 +1,12 @@
 package com.charliesbot.shared.core.utils
 
 import android.text.format.DateUtils
+import java.text.DateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Locale
 
 enum class TimeFormat(val pattern: String) {
@@ -64,4 +66,20 @@ fun getFormattedRelativeTime(
         minResolution,
         flags
     ).toString()
+}
+
+/**
+ * Formats minutes from midnight as a locale-aware time string.
+ * Uses 12-hour or 24-hour format based on user's system settings.
+ *
+ * @param minutes Minutes from midnight (0-1439)
+ * @return Formatted time string (e.g., "8:00 PM" or "20:00" depending on locale)
+ */
+fun formatMinutesAsTime(minutes: Int): String {
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, minutes / 60)
+        set(Calendar.MINUTE, minutes % 60)
+    }
+    val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
+    return timeFormat.format(calendar.time)
 }
