@@ -17,6 +17,7 @@
     <string name="start_fasting">Empezar Ayuno</string>
     <string name="started">Empezó</string>
     <string name="ended">Terminó</string>
+    <string name="fasting_goal">Objectivo</string>
     <string name="monday">Lun</string>
     <string name="tuesday">Mar</string>
     <string name="wednesday">Mié</string>
