@@ -28,9 +28,6 @@ fun WearNavigation() {
             composable(WearNavigationRoute.Today.route) {
                 WearTodayScreen(
                     viewModel = wearTodayViewModel,
-                    onNavigateToStartDateSelection = {
-                        navController.navigate(WearNavigationRoute.StartDateSelection.route)
-                    },
                     onNavigateToGoalSelection = {
                         navController.navigate(WearNavigationRoute.GoalOptions.route)
                     },

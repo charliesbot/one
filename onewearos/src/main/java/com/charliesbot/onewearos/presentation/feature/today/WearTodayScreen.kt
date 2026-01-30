@@ -13,8 +13,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -71,7 +79,6 @@ fun rememberIsLargeScreen(): Boolean {
 @Composable
 fun WearTodayScreen(
     viewModel: WearTodayViewModel = koinViewModel(),
-    onNavigateToStartDateSelection: () -> Unit,
     onNavigateToGoalSelection: () -> Unit,
     onNavigateToFastingOptions: () -> Unit
 ) {
@@ -83,11 +90,9 @@ fun WearTodayScreen(
         startTimeInMillis = startTimeInMillis,
         isFasting = isFasting,
         fastingGoalId = fastingGoalId,
-        initializeTemporalTime = viewModel::initializeTemporalTime,
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
         onNavigateToGoalSelection = onNavigateToGoalSelection,
-        onNavigateToStartDateSelection = onNavigateToStartDateSelection,
         onNavigateToFastingOptions = onNavigateToFastingOptions
     )
 }
@@ -96,8 +101,21 @@ fun WearTodayScreen(
 private fun StatusIndicator(
     isActive: Boolean
 ) {
+    val isFasting = !isActive
     val label =
         if (isActive) stringResource(WearR.string.status_ready) else stringResource(WearR.string.ongoing_activity_title)
+
+    val infiniteTransition = rememberInfiniteTransition(label = "status_pulse")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse_alpha"
+    )
+
     Box(
         modifier = Modifier
             .background(
@@ -107,17 +125,24 @@ private fun StatusIndicator(
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(
-                        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                        shape = CircleShape
-                    )
-            )
+            AnimatedVisibility(
+                visible = isFasting,
+                enter = expandHorizontally(animationSpec = tween(300)),
+                exit = shrinkHorizontally(animationSpec = tween(300))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .size(8.dp)
+                        .alpha(pulseAlpha)
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryDim,
+                            shape = CircleShape
+                        )
+                )
+            }
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyExtraSmall
@@ -230,12 +255,12 @@ private fun ActiveFastingCardContent(
                 value = startTime.plusHours(getHours(goal?.durationMillis)).format(timeFormatter),
             )
         }
-        Column(
-            verticalArrangement = Arrangement.Center,
+        Box(
+            contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
                 progress = { animatedProgress },
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(50.dp),
                 startAngle = 120f,
                 endAngle = 60f,
                 strokeWidth = 6.dp,
@@ -244,12 +269,12 @@ private fun ActiveFastingCardContent(
                     trackColor = MaterialTheme.colorScheme.surfaceContainerLow
                 )
             )
-//            Icon(
-//                painter = painterResource(R.drawable.today_24px),
-//                contentDescription = null,
-//                modifier = Modifier.size(8.dp),
-//                tint = MaterialTheme.colorScheme.primary
-//            )
+            Icon(
+                painter = painterResource(WearR.drawable.ic_notification_status),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
@@ -259,10 +284,8 @@ fun WearTodayContent(
     startTimeInMillis: Long,
     isFasting: Boolean,
     fastingGoalId: String,
-    initializeTemporalTime: () -> Unit,
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
-    onNavigateToStartDateSelection: () -> Unit,
     onNavigateToGoalSelection: () -> Unit,
     onNavigateToFastingOptions: () -> Unit
 ) {
@@ -366,11 +389,9 @@ private fun DefaultPreview() {
         startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
         isFasting = false,
         fastingGoalId = "16:8", // 16:8 fasting goal
-        initializeTemporalTime = {},
         onStartFasting = { },
         onStopFasting = { },
         onNavigateToGoalSelection = { },
-        onNavigateToStartDateSelection = { },
         onNavigateToFastingOptions = { }
     )
 }
@@ -382,11 +403,9 @@ private fun ActivePreview() {
         startTimeInMillis = System.currentTimeMillis() - (2 * 60 * 60 * 1000), // 2 hours ago
         isFasting = true,
         fastingGoalId = "16:8", // 16:8 fasting goal
-        initializeTemporalTime = {},
         onStartFasting = { },
         onStopFasting = { },
         onNavigateToGoalSelection = { },
-        onNavigateToStartDateSelection = { },
         onNavigateToFastingOptions = { }
     )
 }
