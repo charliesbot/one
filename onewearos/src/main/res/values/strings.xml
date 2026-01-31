@@ -26,4 +26,14 @@
     <string name="fasting_options_title">Update Fast</string>
     <string name="update_goal">Update Goal</string>
 
+    <!-- Tile strings -->
+    <string name="tile_label">Fasting Progress</string>
+    <string name="tile_description">Shows your current fasting progress</string>
+    <string name="tile_title_fasting">Fasting</string>
+    <string name="tile_title_not_fasting">Not Fasting</string>
+    <string name="tile_remaining_format">%1$dh %2$dm left</string>
+    <string name="tile_goal_format">Goal: %1$sh</string>
+    <string name="tile_goal_reached">Goal reached!</string>
+    <string name="tile_tap_to_start">Tap to start</string>
+
 </resources>
