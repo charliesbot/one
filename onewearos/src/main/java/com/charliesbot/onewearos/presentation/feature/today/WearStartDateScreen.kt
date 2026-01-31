@@ -58,7 +58,7 @@ fun WearStartDateScreen(
                     viewModel.updateStartTime(
                         convertLocalDateTimeToMillis(dateTime)
                     )
-                    navController.popBackStack()
+                    navController.popBackStack(WearNavigationRoute.Today.route, inclusive = false)
                 }
             }
         )

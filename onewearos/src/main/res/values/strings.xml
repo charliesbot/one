@@ -20,5 +20,10 @@
     <string name="complication_title_hours_format">%1$dH</string>
     <string name="ongoing_activity_title">Fasting</string>
     <string name="ongoing_status_format">%1$s of %2$s</string>
+    <string name="status_ready">Ready?</string>
+
+    <!-- Fasting Options Screen -->
+    <string name="fasting_options_title">Update Fast</string>
+    <string name="update_goal">Update Goal</string>
 
 </resources>
