@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
@@ -88,6 +87,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
     firebaseCrashlytics {
         nativeSymbolUploadEnabled = true
@@ -98,10 +98,6 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
     }
-}
-
-ksp {
-    arg("KOIN_CONFIG_CHECK", "true")
 }
 
 dependencies {
@@ -117,7 +113,6 @@ dependencies {
     implementation(libs.koin.core.coroutines)
     implementation(libs.koin.androidx.workmanager)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.annotations)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -154,5 +149,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    ksp(libs.koin.ksp)
 }
