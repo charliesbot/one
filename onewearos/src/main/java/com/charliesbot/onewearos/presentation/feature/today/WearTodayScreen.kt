@@ -82,19 +82,25 @@ fun WearTodayScreen(
     onNavigateToGoalSelection: () -> Unit,
     onNavigateToFastingOptions: () -> Unit
 ) {
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
     val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
 
-    WearTodayContent(
-        startTimeInMillis = startTimeInMillis,
-        isFasting = isFasting,
-        fastingGoalId = fastingGoalId,
-        onStartFasting = viewModel::onStartFasting,
-        onStopFasting = viewModel::onStopFasting,
-        onNavigateToGoalSelection = onNavigateToGoalSelection,
-        onNavigateToFastingOptions = onNavigateToFastingOptions
-    )
+    AnimatedVisibility(
+        visible = !isLoading,
+        enter = fadeIn(animationSpec = tween(300))
+    ) {
+        WearTodayContent(
+            startTimeInMillis = startTimeInMillis,
+            isFasting = isFasting,
+            fastingGoalId = fastingGoalId,
+            onStartFasting = viewModel::onStartFasting,
+            onStopFasting = viewModel::onStopFasting,
+            onNavigateToGoalSelection = onNavigateToGoalSelection,
+            onNavigateToFastingOptions = onNavigateToFastingOptions
+        )
+    }
 }
 
 @Composable

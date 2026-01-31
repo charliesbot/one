@@ -30,6 +30,11 @@ class WearTodayViewModel(
             started = SharingStarted.Eagerly,
             initialValue = null
         )
+
+    val isLoading: StateFlow<Boolean> = currentFasting
+        .map { it == null }
+        .stateIn(viewModelScope, started = SharingStarted.Eagerly, true)
+
     val isFasting: StateFlow<Boolean> = currentFasting
         .map { it?.isFasting ?: false }
         .stateIn(viewModelScope, started = SharingStarted.Eagerly, false)
