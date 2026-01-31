@@ -121,7 +121,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 val fixedFastingStartMinutes = dataMap.getInt("fixed_fasting_start_minutes", 1140)
                 val smartReminderModeString = dataMap.getString("smart_reminder_mode", SmartReminderMode.AUTO.name)
                 val smartReminderMode = try {
-                    SmartReminderMode.valueOf(smartReminderModeString ?: SmartReminderMode.AUTO.name)
+                    SmartReminderMode.valueOf(smartReminderModeString)
                 } catch (e: IllegalArgumentException) {
                     SmartReminderMode.AUTO
                 }
