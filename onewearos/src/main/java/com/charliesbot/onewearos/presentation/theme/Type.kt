@@ -5,32 +5,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Typography
 import com.charliesbot.shared.core.theme.GoogleSans
+import com.charliesbot.shared.core.theme.GoogleSansTitleLargeSpecific
+import com.charliesbot.shared.core.theme.GoogleSansWide
 
 // Wear OS Material 3 Typography Scale (optimized for small watch screens)
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = GoogleSans,
+        fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
         fontSize = 40.sp,
         lineHeight = 44.sp,
         letterSpacing = (-0.25).sp
     ),
     displayMedium = TextStyle(
-        fontFamily = GoogleSans,
+        fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
         fontSize = 34.sp,
         lineHeight = 38.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = GoogleSans,
+        fontFamily = GoogleSansWide,
         fontWeight = FontWeight.Normal,
         fontSize = 30.sp,
         lineHeight = 34.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = GoogleSans,
+        fontFamily = GoogleSansTitleLargeSpecific,
         fontWeight = FontWeight(761),
         fontSize = 20.sp,
         lineHeight = 24.sp,
