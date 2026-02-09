@@ -25,7 +25,6 @@ import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
-import com.charliesbot.onewearos.presentation.navigation.WearNavigationRoute
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.google.android.horologist.compose.layout.ColumnItemType
@@ -79,7 +78,7 @@ fun WearGoalOptionsScreen(
                     onClick = {
                         scope.launch {
                             viewModel.updateFastingGoal(goal.id)
-                            navController.popBackStack(WearNavigationRoute.Today.route, inclusive = false)
+                            navController.popBackStack()
                         }
                     },
                 ) {

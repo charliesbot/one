@@ -17,9 +17,4 @@
     <string name="complication_title_hours_format">%1$dH</string>
     <string name="ongoing_activity_title">Ayunando</string>
     <string name="ongoing_status_format">%1$s de %2$s</string>
-    <string name="status_ready">Listo?</string>
-
-    <!-- Fasting Options Screen -->
-    <string name="fasting_options_title">Actualizar Ayuno</string>
-    <string name="update_goal">Actualizar Meta</string>
 </resources>
