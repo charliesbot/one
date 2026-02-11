@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
@@ -53,7 +52,6 @@ dependencies {
     implementation(libs.koin.core.coroutines)
     implementation(libs.koin.androidx.workmanager)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.annotations)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.core.ktx)
