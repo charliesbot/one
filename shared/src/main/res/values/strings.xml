@@ -41,7 +41,8 @@
     <string name="wheel_picker_today">Today</string>
     <string name="wheel_picker_yesterday">Yesterday</string>
     <string name="wheel_picker_select_date_time">Select Date and Time</string>
-    <string name="wheel_picker_update">Update starting time</string>
+    <string name="wheel_picker_update_start_time">Update start time</string>
+    <string name="wheel_picker_update_end_time">Update end time</string>
 
     <!-- Delete Confirmation -->
     <string name="delete_entry">Delete entry</string>

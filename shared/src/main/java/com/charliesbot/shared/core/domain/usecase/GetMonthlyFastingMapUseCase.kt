@@ -31,7 +31,8 @@ class GetMonthlyFastingMapUseCase(
                    durationHours = durationHours,
                    isGoalMet = durationHours >= PredefinedFastingGoals.MIN_FASTING_HOURS,
                    startTimeEpochMillis = longestFast.startTimeEpochMillis,
-                   endTimeEpochMillis = longestFast.endTimeEpochMillis
+                   endTimeEpochMillis = longestFast.endTimeEpochMillis,
+                   goalId = longestFast.fastingGoalId
                )
            }
        }

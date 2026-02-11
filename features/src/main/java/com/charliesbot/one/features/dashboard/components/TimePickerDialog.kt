@@ -112,17 +112,27 @@ fun TimePickerDialog(
 /**
  * TimePickerDialog overload that works with milliseconds (for selecting datetime).
  * Uses DateTimeWheelPicker to allow both date and time selection.
+ *
+ * @param startTimeMillis Initial time to show in the picker
+ * @param onConfirm Called when user confirms the selection
+ * @param onDismiss Called when user dismisses the dialog
+ * @param buttonText Custom text for the confirm button
+ * @param isValidSelection Additional validation for the selected time
  */
 @Composable
 fun TimePickerDialog(
     startTimeMillis: Long,
     onConfirm: (Long) -> Unit,
     onDismiss: () -> Unit,
+    buttonText: String? = null,
+    isValidSelection: ((Long) -> Boolean)? = null,
 ) {
     DateTimeWheelPickerDialog(
         initialDateTimeMillis = startTimeMillis,
         onConfirm = onConfirm,
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        buttonText = buttonText ?: stringResource(R.string.wheel_picker_update_start_time),
+        isValidSelection = isValidSelection ?: { true }
     )
 }
 
