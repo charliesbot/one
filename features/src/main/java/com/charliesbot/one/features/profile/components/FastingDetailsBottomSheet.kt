@@ -1,5 +1,6 @@
 package com.charliesbot.one.features.profile.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,8 +19,10 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
+import com.charliesbot.one.features.dashboard.components.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,11 +49,26 @@ fun FastingDetailsBottomSheet(
     fastingData: FastingDayData,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
+    onUpdateStartTime: (newStartTime: Long) -> Unit,
+    onUpdateEndTime: (newEndTime: Long) -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState()
 ) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var showStartTimePicker by remember { mutableStateOf(false) }
+    var showEndTimePicker by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    // Local state for times - allows immediate UI updates
+    var currentStartTime by remember { mutableLongStateOf(fastingData.startTimeEpochMillis ?: 0L) }
+    var currentEndTime by remember { mutableLongStateOf(fastingData.endTimeEpochMillis ?: 0L) }
+
+    // Derive date from end time (fasts are grouped by end date in the calendar)
+    val currentDate = remember(currentEndTime) {
+        Instant.ofEpochMilli(currentEndTime)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+    }
 
     if (showDeleteConfirmation) {
         AlertDialog(
@@ -81,6 +99,36 @@ fun FastingDetailsBottomSheet(
         )
     }
 
+    // Start time picker dialog
+    if (showStartTimePicker) {
+        TimePickerDialog(
+            startTimeMillis = currentStartTime,
+            onConfirm = { newStartTime ->
+                currentStartTime = newStartTime
+                onUpdateStartTime(newStartTime)
+                showStartTimePicker = false
+            },
+            onDismiss = { showStartTimePicker = false },
+            buttonText = stringResource(R.string.wheel_picker_update_start_time),
+            isValidSelection = { selectedTime -> selectedTime < currentEndTime }
+        )
+    }
+
+    // End time picker dialog
+    if (showEndTimePicker) {
+        TimePickerDialog(
+            startTimeMillis = currentEndTime,
+            onConfirm = { newEndTime ->
+                currentEndTime = newEndTime
+                onUpdateEndTime(newEndTime)
+                showEndTimePicker = false
+            },
+            onDismiss = { showEndTimePicker = false },
+            buttonText = stringResource(R.string.wheel_picker_update_end_time),
+            isValidSelection = { selectedTime -> selectedTime > currentStartTime }
+        )
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -94,7 +142,7 @@ fun FastingDetailsBottomSheet(
         ) {
             // Date Header
             Text(
-                text = formatDate(fastingData.date),
+                text = formatDate(currentDate),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -104,10 +152,7 @@ fun FastingDetailsBottomSheet(
 
             // Duration
             Text(
-                text = formatDuration(
-                    fastingData.startTimeEpochMillis ?: 0L,
-                    fastingData.endTimeEpochMillis ?: 0L
-                ),
+                text = formatDuration(currentStartTime, currentEndTime),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -129,7 +174,8 @@ fun FastingDetailsBottomSheet(
                     )
                 },
                 label = stringResource(R.string.started),
-                time = formatTime(fastingData.startTimeEpochMillis ?: 0L)
+                time = formatDateTime(currentStartTime),
+                onClick = { showStartTimePicker = true }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -145,7 +191,8 @@ fun FastingDetailsBottomSheet(
                     )
                 },
                 label = stringResource(R.string.ended),
-                time = formatTime(fastingData.endTimeEpochMillis ?: 0L)
+                time = formatDateTime(currentEndTime),
+                onClick = { showEndTimePicker = true }
             )
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider()
@@ -176,10 +223,13 @@ private fun TimeRow(
     icon: @Composable () -> Unit,
     label: String,
     time: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -198,6 +248,13 @@ private fun TimeRow(
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
+
+        Icon(
+            painter = painterResource(R.drawable.chevron_right_24px),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
 
@@ -208,10 +265,11 @@ private fun formatDate(date: LocalDate): String {
     return date.format(formatter)
 }
 
-private fun formatTime(epochMillis: Long): String {
+private fun formatDateTime(epochMillis: Long): String {
     val instant = Instant.ofEpochMilli(epochMillis)
     val zonedDateTime = instant.atZone(ZoneId.systemDefault())
-    val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+    // Format: "Feb 10, 7:15 PM" (month, day, time - no year)
+    val formatter = DateTimeFormatter.ofPattern("MMM d, h:mm a")
     return zonedDateTime.format(formatter)
 }
 
@@ -246,7 +304,9 @@ private fun FastingDetailsBottomSheetPreview() {
         FastingDetailsBottomSheet(
             fastingData = testData,
             onDismiss = {},
-            onDelete = {}
+            onDelete = {},
+            onUpdateStartTime = {},
+            onUpdateEndTime = {}
         )
     }
 }

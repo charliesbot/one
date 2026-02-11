@@ -94,4 +94,20 @@ class FastingHistoryRepositoryImpl(
     override suspend fun deleteFastingRecord(startTimeEpochMillis: Long) {
         fastingRecordDao.deleteByStartTime(startTimeEpochMillis)
     }
+
+    override suspend fun updateFastingRecord(
+        originalStartTime: Long,
+        newStartTime: Long,
+        newEndTime: Long,
+        goalId: String
+    ) {
+        fastingRecordDao.deleteByStartTime(originalStartTime)
+        fastingRecordDao.insert(
+            FastingRecord(
+                startTimeEpochMillis = newStartTime,
+                endTimeEpochMillis = newEndTime,
+                fastingGoalId = goalId
+            )
+        )
+    }
 }

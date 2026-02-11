@@ -269,14 +269,23 @@ private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Co
 
 /**
  * Dialog wrapper for DateTimeWheelPicker.
+ *
+ * @param initialDateTimeMillis Initial time to show in the picker
+ * @param onConfirm Called when user confirms the selection
+ * @param onDismiss Called when user dismisses the dialog
+ * @param buttonText Custom text for the confirm button (defaults to "Update starting time")
+ * @param isValidSelection Additional validation for the selected time. Combined with future time check.
  */
 @Composable
 fun DateTimeWheelPickerDialog(
     initialDateTimeMillis: Long,
     onConfirm: (Long) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    buttonText: String = stringResource(R.string.wheel_picker_update_start_time),
+    isValidSelection: (selectedMillis: Long) -> Boolean = { true }
 ) {
     val state = rememberDateTimeWheelPickerState(initialDateTimeMillis)
+    val isEnabled = !state.isFutureTime && isValidSelection(state.selectedMillis)
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -321,17 +330,17 @@ fun DateTimeWheelPickerDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Confirm button (disabled for future times)
+                // Confirm button (disabled for future times or invalid selection)
                 FilledTonalButton(
                     onClick = { onConfirm(state.selectedMillis) },
-                    enabled = !state.isFutureTime,
+                    enabled = isEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.wheel_picker_update),
+                        text = buttonText,
                         style = MaterialTheme.typography.labelLarge
                     )
                 }

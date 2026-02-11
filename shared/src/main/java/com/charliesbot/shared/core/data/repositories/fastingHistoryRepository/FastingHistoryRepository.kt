@@ -17,4 +17,10 @@ interface FastingHistoryRepository {
     fun getFastingsForMonth(yearMonth: YearMonth): Flow<List<FastingRecord>>
     suspend fun saveFastingRecord(record: FastingRecord)
     suspend fun deleteFastingRecord(startTimeEpochMillis: Long)
+    suspend fun updateFastingRecord(
+        originalStartTime: Long,
+        newStartTime: Long,
+        newEndTime: Long,
+        goalId: String
+    )
 }

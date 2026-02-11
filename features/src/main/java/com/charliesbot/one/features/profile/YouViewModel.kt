@@ -76,4 +76,28 @@ class YouViewModel(
             _selectedDay.value = null
         }
     }
+
+    fun onUpdateFastingEntry(
+        originalStartTime: Long,
+        newStartTime: Long,
+        newEndTime: Long,
+        goalId: String
+    ) {
+        viewModelScope.launch {
+            fastingHistoryRepository.updateFastingRecord(
+                originalStartTime = originalStartTime,
+                newStartTime = newStartTime,
+                newEndTime = newEndTime,
+                goalId = goalId
+            )
+            // Update selected day with new times so the bottom sheet reflects the change
+            val durationMillis = newEndTime - newStartTime
+            val newDurationHours = (durationMillis / 3_600_000).toInt()
+            _selectedDay.value = _selectedDay.value?.copy(
+                startTimeEpochMillis = newStartTime,
+                endTimeEpochMillis = newEndTime,
+                durationHours = newDurationHours
+            )
+        }
+    }
 }

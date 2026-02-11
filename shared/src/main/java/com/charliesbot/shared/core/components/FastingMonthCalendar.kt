@@ -45,7 +45,8 @@ data class FastingDayData(
     val durationHours: Int? = null, // null means no fasting that day
     val isGoalMet: Boolean = false,
     val startTimeEpochMillis: Long? = null,
-    val endTimeEpochMillis: Long? = null
+    val endTimeEpochMillis: Long? = null,
+    val goalId: String? = null
 )
 
 @Composable

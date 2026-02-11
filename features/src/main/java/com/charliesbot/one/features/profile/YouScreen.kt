@@ -80,6 +80,28 @@ fun YouScreen(
                     selectedDay.startTimeEpochMillis?.let { startTime ->
                         viewModel.onDeleteFastingEntry(startTime)
                     }
+                },
+                onUpdateStartTime = { newStartTime ->
+                    selectedDay.startTimeEpochMillis?.let { originalStart ->
+                        selectedDay.endTimeEpochMillis?.let { endTime ->
+                            viewModel.onUpdateFastingEntry(
+                                originalStartTime = originalStart,
+                                newStartTime = newStartTime,
+                                newEndTime = endTime,
+                                goalId = selectedDay.goalId ?: "16:8"
+                            )
+                        }
+                    }
+                },
+                onUpdateEndTime = { newEndTime ->
+                    selectedDay.startTimeEpochMillis?.let { startTime ->
+                        viewModel.onUpdateFastingEntry(
+                            originalStartTime = startTime,
+                            newStartTime = startTime,
+                            newEndTime = newEndTime,
+                            goalId = selectedDay.goalId ?: "16:8"
+                        )
+                    }
                 }
             )
         }
