@@ -140,7 +140,7 @@ fun FastingDetailsBottomSheet(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
         ) {
-            // Date Header (derived from end time)
+            // Date Header
             Text(
                 text = formatDate(currentDate),
                 style = MaterialTheme.typography.headlineSmall,
@@ -150,7 +150,7 @@ fun FastingDetailsBottomSheet(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Duration (uses local state for immediate updates)
+            // Duration
             Text(
                 text = formatDuration(currentStartTime, currentEndTime),
                 style = MaterialTheme.typography.titleMedium,
