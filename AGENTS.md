@@ -4,7 +4,7 @@ Kotlin Android + Wear OS fasting tracker. Jetpack Compose UI, Koin DI, Room DB, 
 
 ## Before You Start
 
-1. Read `ARCHITECTURE.md` for the full project structure
+1. Read `docs/ARCHITECTURE.md` for the full project structure
 2. Create a feature branch from `main`
 3. Ask: **does this change need to sync between phone and watch?**
 
@@ -91,6 +91,7 @@ wear ──→ features:dashboard:wear ──→ core
 
 ## Project Docs
 
-- `ARCHITECTURE.md` — full project structure and layer breakdown
+- `docs/ARCHITECTURE.md` — full project structure and layer breakdown
+- `docs/DATA_SYNC.md` — phone <-> Wear OS data sync deep dive
 - `CHANGELOG.md` / `CHANGELOG_WEAROS.md` — release history
 - `gradle/libs.versions.toml` — all dependency versions

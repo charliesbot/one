@@ -100,7 +100,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Development Tips
 
 - See [CLAUDE.md](CLAUDE.md) for detailed development guidelines
-- See [ARCHITECTURE.md](ARCHITECTURE.md) for system design details
+- See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design details
 - Ensure phone-watch sync works before submitting PRs
 - Test all UI components (widgets, complications, tiles)
 - Follow existing code style and patterns
