@@ -52,7 +52,7 @@ To enable crash reporting and analytics:
 1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
 2. Add two Android apps (one for phone, one for wear)
 3. Download `google-services.json` for each
-4. Place them in `app/` and `onewearos/` directories
+4. Place them in `app/` and `wear/` directories
 
 #### Release Builds
 For release builds, create `keystore.properties` in the root:
@@ -66,7 +66,7 @@ keyPassword=your_key_password
 Then build:
 ```bash
 ./gradlew app:installRelease
-./gradlew onewearos:installRelease
+./gradlew wear:installRelease
 ```
 </details>
 
@@ -76,7 +76,8 @@ The project follows clean architecture principles with three main modules:
 
 - **`/shared`**: Common business logic, data models, and synchronization
 - **`/app`**: Android phone/tablet application
-- **`/onewearos`**: Wear OS application
+- **`/wear`**: Wear OS application
+- **`/features`**: Feature modules (`dashboard`, `profile`, `settings`)
 
 ### Key Technologies
 

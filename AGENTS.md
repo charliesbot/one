@@ -12,9 +12,9 @@ Kotlin Android + Wear OS fasting tracker. Jetpack Compose UI, Koin DI, Room DB, 
 
 ```bash
 ./gradlew app:assembleDebug              # Build phone app
-./gradlew onewearos:assembleDebug        # Build wear app
+./gradlew wear:assembleDebug             # Build wear app
 ./gradlew app:installDebug               # Install phone app on device
-./gradlew onewearos:installDebug         # Install wear app on device
+./gradlew wear:installDebug              # Install wear app on device
 ./gradlew clean                          # Clean build
 ```
 
@@ -34,24 +34,28 @@ Kotlin Android + Wear OS fasting tracker. Jetpack Compose UI, Koin DI, Room DB, 
 ### Dependency flow
 
 ```
-app ──→ features ──→ shared
-onewearos ──────────→ shared
+app ──→ features:dashboard ──→ shared
+    ──→ features:profile   ──→ shared
+    ──→ features:settings  ──→ shared
+wear ──→ shared
 ```
 
 ### Modules
 
-| Module       | Purpose                                                                  |
-| ------------ | ------------------------------------------------------------------------ |
-| `:app`       | Phone/tablet app — Compose UI, Glance widgets, WorkManager notifications |
-| `:onewearos` | Wear OS app — Wear Compose, complications, tiles, ongoing activities     |
-| `:features`  | Feature modules shared by phone app                                      |
-| `:shared`    | Core models, repositories, sync services, Room DB, DataStore, constants  |
+| Module                | Purpose                                                                  |
+| --------------------- | ------------------------------------------------------------------------ |
+| `:app`                | Phone/tablet app — Compose UI, Glance widgets, WorkManager notifications |
+| `:wear`               | Wear OS app — Wear Compose, complications, tiles, ongoing activities     |
+| `:features:dashboard` | Dashboard / today screen feature                                         |
+| `:features:profile`   | User profile and fasting history feature                                 |
+| `:features:settings`  | App settings feature                                                     |
+| `:shared`             | Core models, repositories, sync services, Room DB, DataStore, constants  |
 
 ### Key patterns
 
 - Repository pattern for data access; repositories return `Flow`
 - ViewModels manage UI state with `StateFlow`/`SharedFlow`
-- Koin modules: `AppModule`, `WearAppModule`, `SharedModule` — use `koinViewModel()` in Compose
+- Koin modules: `AppModule`, `WearAppModule`, `SharedModule`, `DashboardModule`, `ProfileModule`, `SettingsModule` — use `koinViewModel()` in Compose
 - Shared models live in `shared/core/models`; repository interfaces in `shared/core/data/repositories`
 
 ### Data sync

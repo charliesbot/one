@@ -2,17 +2,22 @@
 
 ## Overview
 
-Multi-platform Android app architecture with **2 shared modules** and **multiple platform modules**.
+Multi-platform Android app architecture with **1 shared module**, **feature modules**, and **multiple platform modules**.
 
-**Shared modules:**
+**Shared module:**
 
 - `:core` - Business logic, data, shared UI
-- `:features` - All app features as packages
+
+**Feature modules:**
+
+- `:features:dashboard` - Dashboard / today screen
+- `:features:profile` - User profile and fasting history
+- `:features:settings` - App settings
 
 **Platform modules:**
 
 - `:app` - Mobile Android
-- `:wearos` - WearOS
+- `:wear` - WearOS
 - `:tv` - Android TV (optional)
 - `:auto` - Android Auto (optional)
 
@@ -20,20 +25,20 @@ Multi-platform Android app architecture with **2 shared modules** and **multiple
 
 A **feature** is a complete user journey or business capability, not just a single screen. This distinction is crucial for creating a clean and maintainable structure.
 
-### ✅ Good Features (Business Capabilities)
+### Good Features (Business Capabilities)
 
 - **auth**: The entire authentication flow (login, register, forgot password).
 - **profile**: User profile management (view, edit, settings).
 - **cart**: The complete shopping cart and checkout process.
 
-### ❌ Poor Features (Just Screens)
+### Poor Features (Just Screens)
 
 - **login-screen**: Too granular. This should be part of the `auth` feature.
 - **settings-screen**: Should be part of the `profile` feature.
 
-By grouping related screens and logic into feature packages within the `:features` module, you create cohesive and self-contained units that are easier to manage and test.
+Each feature is its own Gradle module under `features/`. Features enforce compile-time boundaries — they cannot depend on each other, only on `:core`.
 
-## Simplified Module Structure
+## Module Structure
 
 ```
 android-dojo/
@@ -48,7 +53,7 @@ android-dojo/
 │           └── scenes/
 │               └── DashboardScene.kt
 │
-├── wearos/                   # WearOS app module
+├── wear/                     # WearOS app module
 │   └── src/main/kotlin/com/yourpackage/wear/
 │       ├── MainActivity.kt
 │       ├── di/
@@ -74,26 +79,27 @@ android-dojo/
 │       │   └── util/         # UI utilities
 │       └── di/               # Core infrastructure DI (repositories, network, database)
 │
-└── features/                 # SINGLE module containing all features as packages
-    └── src/main/kotlin/com/yourpackage/features/
-        ├── auth/             # Auth feature package (presentation only)
-        │   ├── di/
-        │   │   └── AuthModule.kt     # DI for the ViewModel
-        │   │
-        │   ├── AuthViewModel.kt      # SHARED ViewModel for mobile & wear
-        │   │
-        │   ├── LoginScreen.kt        # Mobile or shared UI screen
-        │   │
-        │   └── wear/                 # Sub-package for WearOS-specific UI
-        │       └── WearLoginScreen.kt
-        │
-        ├── dashboard/        # Dashboard feature package
-        │   ├── di/
-        │   │   └── DashboardModule.kt # DI for dashboard ViewModels
-        │   ├── DashboardViewModel.kt
-        │   └── DashboardScreen.kt
-        │
-        └── profile/          # Additional features as packages...
+└── features/                 # Parent directory for feature modules
+    ├── dashboard/            # :features:dashboard module
+    │   └── src/main/kotlin/com/yourpackage/features/dashboard/
+    │       ├── di/
+    │       │   └── DashboardModule.kt # DI for dashboard ViewModels
+    │       ├── DashboardViewModel.kt
+    │       └── DashboardScreen.kt
+    │
+    ├── profile/              # :features:profile module
+    │   └── src/main/kotlin/com/yourpackage/features/profile/
+    │       ├── di/
+    │       │   └── ProfileModule.kt
+    │       ├── ProfileViewModel.kt
+    │       └── ProfileScreen.kt
+    │
+    └── settings/             # :features:settings module
+        └── src/main/kotlin/com/yourpackage/features/settings/
+            ├── di/
+            │   └── SettingsModule.kt
+            ├── SettingsViewModel.kt
+            └── SettingsScreen.kt
 ```
 
 ## Platform-Specific Navigation
@@ -102,45 +108,57 @@ A key strength of this architecture is how it isolates platform-specific impleme
 
 **`:app` Module**: Uses the Navigation 3 library (`androidx.navigation3`) to handle adaptive layouts with scenes, a savable back stack with keys, and a central `NavDisplay`.
 
-**`:wearos` Module**: Uses the specialized Wear Compose Navigation library (`androidx.wear.compose:compose-navigation`), which provides components tailored for watches, like the `SwipeDismissableNavHost`.
+**`:wear` Module**: Uses the specialized Wear Compose Navigation library (`androidx.wear.compose:compose-navigation`), which provides components tailored for watches, like the `SwipeDismissableNavHost`.
 
-The `:features` module simply provides the `@Composable` screens. The `:app` and `:wearos` modules are independently responsible for calling those screens using the correct navigation library for their platform.
+The feature modules simply provide the `@Composable` screens. The `:app` and `:wear` modules are independently responsible for calling those screens using the correct navigation library for their platform.
 
-## Why This is a Good Starting Point
+## Why This Works
 
-**Minimal Overhead**: You only manage a few core modules instead of many. Adding new features doesn't require creating new modules - just new packages within `:features`.
+**Build Cache Isolation**: Each feature module is compiled independently. Changing one feature doesn't recompile the others.
 
-**Multi-platform Ready**: All platform modules (`:app`, `:wearos`, `:tv`, `:auto`, etc.) can share feature code from day one without any additional setup.
+**Compile-Time Boundaries**: Features cannot depend on each other — only on `:core`. This is enforced by Gradle, not just convention.
 
-**Keeps Clean Dependencies**: Features packages cannot depend on each other, only on `:core`. This prevents your project from becoming a "ball of mud."
+**Multi-platform Ready**: All platform modules (`:app`, `:wear`, `:tv`, `:auto`, etc.) can share feature code from day one without any additional setup.
 
-**Easy to Evolve**: If your project grows, you can easily extract individual feature packages into separate modules (e.g., `:features:auth`) or split the `:core` module into sub-modules.
+**Keeps Clean Dependencies**: Feature modules cannot depend on each other, only on `:core`. This prevents your project from becoming a "ball of mud."
 
-## The Dependency Flow Remains the Same
+**Easy to Add Features**: Adding a new feature means creating a new module under `features/` with a `build.gradle.kts`. Auto-discovery in `settings.gradle.kts` picks it up automatically.
 
-The fundamental principle is unchanged. The dependency direction is still strictly enforced:
+## Dependency Flow
+
+The dependency direction is strictly enforced:
 
 ```
-app/wearos → features → core
+app ──→ features:dashboard ──→ core
+    ──→ features:profile   ──→ core
+    ──→ features:settings  ──→ core
+
+wear ──→ core
 ```
 
 ## Example Module Dependencies
 
 ```kotlin
-// In app/build.gradle.kts and wearos/build.gradle.kts
+// In app/build.gradle.kts
 dependencies {
-    // Both platforms depend on the same modules
     implementation(project(":core"))
-    implementation(project(":features"))
+    implementation(project(":features:dashboard"))
+    implementation(project(":features:profile"))
+    implementation(project(":features:settings"))
 }
 
-// In features/build.gradle.kts
+// In wear/build.gradle.kts
 dependencies {
-    // Features module depends ONLY on the core module
+    implementation(project(":core"))
+}
+
+// In features/dashboard/build.gradle.kts (same pattern for all features)
+dependencies {
+    // Feature modules depend ONLY on the core module
     implementation(project(":core"))
 
-    // NO dependency on app/wearos modules allowed!
-    // ❌ implementation(project(":app")) // This would cause circular dependency
+    // NO dependency on app/wear modules allowed!
+    // NO dependency on other feature modules allowed!
 }
 
 // In core/build.gradle.kts
@@ -149,8 +167,6 @@ dependencies {
     // Only external libraries (Retrofit, Room, etc.)
 }
 ```
-
-This simplified structure maintains all the critical architectural benefits while reducing initial setup complexity, making it ideal for personal projects.
 
 ## Tech Stack
 
@@ -164,17 +180,16 @@ This simplified structure maintains all the critical architectural benefits whil
 
 ## Benefits
 
-- **Solo Development Optimized**: Minimal modules reduces overhead while maintaining benefits
+- **Solo Development Optimized**: Minimal overhead while maintaining architectural benefits
 - **Multi-platform Code Sharing**: Features work across all platforms (mobile, wear, TV, auto) from day one
-- **Faster Builds**: Gradle caches unchanged modules, fewer modules to compile
+- **Faster Builds**: Gradle caches unchanged modules independently
 - **Platform Flexibility**: Each platform uses optimal navigation solution
-- **Easy Evolution**: Can extract individual features or split core later if needed
-- **Feature Organization**: Features are organized as packages within single module
+- **Feature Isolation**: Each feature is a separate module with compile-time boundary enforcement
 
 ## Getting Started
 
 1. **Create unified core**: Build single `:core` module with all shared logic
-2. **Create features module**: Build single `:features` module
-3. **Add first feature**: Create `auth` package within `:features` with ViewModel and screens
-4. **Platform setup**: Implement platform modules (`:app`, `:wearos`, `:tv`, etc.) with appropriate navigation, all depending on `:features`
-5. **Iterate**: Add more feature packages as needed, each containing only presentation layer
+2. **Create first feature module**: Create `features/dashboard/` with its own `build.gradle.kts`
+3. **Add auto-discovery**: Use `settings.gradle.kts` to auto-discover feature modules
+4. **Platform setup**: Implement platform modules (`:app`, `:wear`, `:tv`, etc.) with appropriate navigation, depending on feature modules
+5. **Iterate**: Add more feature modules as needed, each containing only presentation layer
