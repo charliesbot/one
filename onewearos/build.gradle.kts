@@ -6,7 +6,6 @@ import java.util.Date
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
@@ -85,6 +84,7 @@ android {
     }
     buildFeatures {
         compose = true
+        resValues = true
     }
 
     firebaseCrashlytics {
@@ -98,10 +98,6 @@ kotlin {
     }
 }
 
-ksp {
-    arg("KOIN_CONFIG_CHECK", "true")
-}
-
 dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(platform(libs.koin.bom))
@@ -109,7 +105,6 @@ dependencies {
     implementation(libs.koin.core.coroutines)
     implementation(libs.koin.androidx.workmanager)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.annotations)
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.compose.navigation)
     implementation(platform(libs.androidx.compose.bom))
