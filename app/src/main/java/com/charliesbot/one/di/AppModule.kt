@@ -10,11 +10,7 @@ import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
 import com.charliesbot.shared.core.notifications.NotificationScheduler
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import com.charliesbot.one.features.dashboard.TodayViewModel
-import com.charliesbot.one.features.profile.YouViewModel
-import com.charliesbot.one.features.settings.SettingsViewModel
 import com.charliesbot.one.widgets.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase
@@ -69,10 +65,6 @@ val appModule = module {
     }
 
     factory{ GetMonthlyFastingMapUseCase(get()) }
-
-    viewModelOf(::TodayViewModel)
-    viewModelOf(::YouViewModel)
-    viewModelOf(::SettingsViewModel)
 
     single { LocalFastingCallback(get(), get()) }
     single<FastingEventCallbacks> { get<LocalFastingCallback>() }

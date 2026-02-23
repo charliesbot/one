@@ -8,13 +8,13 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
+build/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 app/release/
-onewearos/release/
+wear/release/
 keystore.properties
 .idea/deploymentTargetDropDown.xml
 .idea/deploymentTargetSelector.xml

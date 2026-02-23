@@ -145,7 +145,9 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
     implementation(project(":shared"))
-    implementation(project(":features"))
+    implementation(project(":features:dashboard"))
+    implementation(project(":features:profile"))
+    implementation(project(":features:settings"))
     implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
