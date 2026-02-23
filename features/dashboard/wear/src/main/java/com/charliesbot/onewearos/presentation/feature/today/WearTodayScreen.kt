@@ -98,7 +98,7 @@ fun WearTodayContent(
         formatTimestamp(elapsedTime)
     } else {
         stringResource(
-            com.charliesbot.onewearos.R.string.target_duration_hours,
+            com.charliesbot.one.features.dashboard.wear.R.string.target_duration_hours,
             currentGoal?.durationDisplay.toString()
         )
     }

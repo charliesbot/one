@@ -18,7 +18,7 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.ButtonGroup
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.TextButton
-import com.charliesbot.onewearos.R
+import com.charliesbot.one.features.dashboard.wear.R
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.TimeFormat

@@ -80,14 +80,22 @@ android-dojo/
 │       └── di/               # Core infrastructure DI (repositories, network, database)
 │
 └── features/                 # Parent directory for feature modules
-    ├── dashboard/            # :features:dashboard module
-    │   └── src/main/kotlin/com/yourpackage/features/dashboard/
-    │       ├── di/
-    │       │   └── DashboardModule.kt # DI for dashboard ViewModels
-    │       ├── DashboardViewModel.kt
-    │       └── DashboardScreen.kt
+    ├── dashboard/            # Features with platform-specific UI get submodules
+    │   ├── app/              # :features:dashboard:app — Phone UI (Material 3)
+    │   │   └── src/main/kotlin/com/yourpackage/features/dashboard/
+    │   │       ├── di/
+    │   │       │   └── DashboardModule.kt
+    │   │       ├── DashboardViewModel.kt
+    │   │       └── DashboardScreen.kt
+    │   │
+    │   └── wear/             # :features:dashboard:wear — Wear UI (Wear Material 3)
+    │       └── src/main/kotlin/com/yourpackage/features/dashboard/wear/
+    │           ├── di/
+    │           │   └── WearDashboardModule.kt
+    │           ├── WearDashboardViewModel.kt
+    │           └── WearDashboardScreen.kt
     │
-    ├── profile/              # :features:profile module
+    ├── profile/              # Phone-only features stay flat
     │   └── src/main/kotlin/com/yourpackage/features/profile/
     │       ├── di/
     │       │   └── ProfileModule.kt
@@ -124,16 +132,19 @@ The feature modules simply provide the `@Composable` screens. The `:app` and `:w
 
 **Easy to Add Features**: Adding a new feature means creating a new module under `features/` with a `build.gradle.kts`. Auto-discovery in `settings.gradle.kts` picks it up automatically.
 
+**Platform-Specific UI Separation**: Features that need different UI per platform (phone vs watch) use submodules (`app/` and `wear/`) under the feature directory. Each submodule pulls only its platform's Compose toolkit. Phone-only features stay flat.
+
 ## Dependency Flow
 
 The dependency direction is strictly enforced:
 
 ```
-app ──→ features:dashboard ──→ core
-    ──→ features:profile   ──→ core
-    ──→ features:settings  ──→ core
+app ──→ features:dashboard:app  ──→ core
+    ──→ features:profile        ──→ core
+    ──→ features:settings       ──→ core
 
-wear ──→ core
+wear ──→ features:dashboard:wear ──→ core
+     ──→ core
 ```
 
 ## Example Module Dependencies
@@ -142,7 +153,7 @@ wear ──→ core
 // In app/build.gradle.kts
 dependencies {
     implementation(project(":core"))
-    implementation(project(":features:dashboard"))
+    implementation(project(":features:dashboard:app"))
     implementation(project(":features:profile"))
     implementation(project(":features:settings"))
 }
@@ -150,9 +161,10 @@ dependencies {
 // In wear/build.gradle.kts
 dependencies {
     implementation(project(":core"))
+    implementation(project(":features:dashboard:wear"))
 }
 
-// In features/dashboard/build.gradle.kts (same pattern for all features)
+// In features/dashboard/app/build.gradle.kts (same pattern for all features)
 dependencies {
     // Feature modules depend ONLY on the core module
     implementation(project(":core"))
