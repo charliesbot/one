@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background circle -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#1C1B1F"/>
+            <size android:width="400dp" android:height="400dp"/>
+        </shape>
+    </item>
+    <!-- Progress arc (green accent) -->
+    <item
+        android:left="16dp"
+        android:top="16dp"
+        android:right="16dp"
+        android:bottom="16dp">
+        <shape android:shape="ring"
+            android:thickness="8dp"
+            android:useLevel="false">
+            <solid android:color="#82B387"/>
+        </shape>
+    </item>
+    <!-- Center icon -->
+    <item
+        android:gravity="center"
+        android:width="64dp"
+        android:height="64dp"
+        android:drawable="@drawable/ic_notification_status"/>
+</layer-list>
