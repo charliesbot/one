@@ -128,7 +128,7 @@ dependencies {
     implementation(libs.androidx.wear.phone.interactions)
     implementation(libs.androidx.wear.ongoing)
     implementation(libs.androidx.startup.runtime)
-    implementation(project(":shared"))
+    implementation(project(":core"))
     implementation(project(":features:dashboard:wear"))
     ksp(libs.androidx.room.compiler)
     implementation(libs.firebase.crashlytics)

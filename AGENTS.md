@@ -34,11 +34,11 @@ Kotlin Android + Wear OS fasting tracker. Jetpack Compose UI, Koin DI, Room DB, 
 ### Dependency flow
 
 ```
-app ──→ features:dashboard:app  ──→ shared
-    ──→ features:profile        ──→ shared
-    ──→ features:settings       ──→ shared
-wear ──→ features:dashboard:wear ──→ shared
-     ──→ shared
+app ──→ features:dashboard:app  ──→ core
+    ──→ features:profile        ──→ core
+    ──→ features:settings       ──→ core
+wear ──→ features:dashboard:wear ──→ core
+     ──→ core
 ```
 
 ### Modules
@@ -51,14 +51,14 @@ wear ──→ features:dashboard:wear ──→ shared
 | `:features:dashboard:wear` | Wear OS dashboard / today screen feature                                 |
 | `:features:profile`        | User profile and fasting history feature                                 |
 | `:features:settings`       | App settings feature                                                     |
-| `:shared`                  | Core models, repositories, sync services, Room DB, DataStore, constants  |
+| `:core`                    | Core models, repositories, sync services, Room DB, DataStore, constants  |
 
 ### Key patterns
 
 - Repository pattern for data access; repositories return `Flow`
 - ViewModels manage UI state with `StateFlow`/`SharedFlow`
 - Koin modules: `AppModule`, `WearAppModule`, `SharedModule`, `DashboardModule`, `WearDashboardModule`, `ProfileModule`, `SettingsModule` — use `koinViewModel()` in Compose
-- Shared models live in `shared/core/models`; repository interfaces in `shared/core/data/repositories`
+- Shared models live in `core/src/main/java/.../core/models`; repository interfaces in `core/src/main/java/.../core/data/repositories`
 
 ### Data sync
 

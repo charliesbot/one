@@ -144,7 +144,7 @@ dependencies {
     implementation(libs.androidx.material3.adaptive)
 
     ksp(libs.androidx.room.compiler)
-    implementation(project(":shared"))
+    implementation(project(":core"))
     implementation(project(":features:dashboard:app"))
     implementation(project(":features:profile"))
     implementation(project(":features:settings"))

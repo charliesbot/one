@@ -74,7 +74,7 @@ Then build:
 
 The project follows clean architecture principles with three main modules:
 
-- **`/shared`**: Common business logic, data models, and synchronization
+- **`/core`**: Common business logic, data models, and synchronization
 - **`/app`**: Android phone/tablet application
 - **`/wear`**: Wear OS application
 - **`/features`**: Feature modules (`dashboard`, `profile`, `settings`)
