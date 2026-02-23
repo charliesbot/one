@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.wear.phone.interactions.notifications.BridgingConfig
 import androidx.wear.phone.interactions.notifications.BridgingManager
 import androidx.work.Configuration
+import com.charliesbot.onewearos.di.wearDashboardModule
 import com.charliesbot.onewearos.presentation.di.wearAppModule
 import com.charliesbot.shared.core.di.sharedModule
 import com.charliesbot.shared.core.notifications.NotificationUtil
@@ -24,7 +25,7 @@ class MainApplication : Application(), Configuration.Provider {
         startKoin {
             androidLogger()
             androidContext(this@MainApplication)
-            modules(sharedModule, wearAppModule)
+            modules(sharedModule, wearAppModule, wearDashboardModule)
         }
     }
 

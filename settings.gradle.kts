@@ -25,5 +25,13 @@ include(":wear")
 include(":shared")
 
 file("features").listFiles()
-    ?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
-    ?.forEach { include(":features:${it.name}") }
+    ?.filter { it.isDirectory }
+    ?.forEach { featureDir ->
+        val submodules = featureDir.listFiles()
+            ?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
+        if (submodules != null && submodules.isNotEmpty()) {
+            submodules.forEach { include(":features:${featureDir.name}:${it.name}") }
+        } else if (File(featureDir, "build.gradle.kts").exists()) {
+            include(":features:${featureDir.name}")
+        }
+    }

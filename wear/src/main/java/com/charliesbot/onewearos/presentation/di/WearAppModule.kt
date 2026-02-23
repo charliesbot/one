@@ -5,17 +5,13 @@ import com.charliesbot.onewearos.presentation.data.WearStringProvider
 import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.onewearos.presentation.services.LocalWatchFastingCallbacks
-import com.charliesbot.onewearos.presentation.feature.today.WearTodayViewModel
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventCallbacks
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val wearAppModule = module {
-    viewModelOf(::WearTodayViewModel)
-
     single<NotificationScheduler> {
         NotificationScheduler(
             context = androidContext(),
