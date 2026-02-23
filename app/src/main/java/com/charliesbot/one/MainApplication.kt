@@ -2,6 +2,9 @@ package com.charliesbot.one
 
 import android.app.Application
 import com.charliesbot.one.di.appModule
+import com.charliesbot.one.features.dashboard.di.dashboardModule
+import com.charliesbot.one.features.profile.di.profileModule
+import com.charliesbot.one.features.settings.di.settingsModule
 import com.charliesbot.one.notifications.SmartReminderWorker
 import com.charliesbot.shared.core.di.sharedModule
 import org.koin.android.ext.koin.androidContext
@@ -20,7 +23,10 @@ class MainApplication : Application() {
             // Load modules
             modules(
                 sharedModule,
-                appModule
+                appModule,
+                dashboardModule,
+                profileModule,
+                settingsModule
             )
         }
 

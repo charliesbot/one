@@ -82,8 +82,8 @@ jobs:
           GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
           echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
-          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > onewearos/google-services.json
-          echo "google-services.json created in app/ and onewearos/ directories."
+          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > wear/google-services.json
+          echo "google-services.json created in app/ and wear/ directories."
 
       - name: Authenticate to Google Cloud
         id: auth
@@ -107,7 +107,7 @@ jobs:
 
       - name: Build Wear OS app AAB
         run: |
-          ./gradlew :onewearos:bundleRelease \
+          ./gradlew :wear:bundleRelease \
             -PversionCode=$VERSION_CODE \
             -PversionName=$VERSION_NAME \
             --no-daemon \
@@ -129,7 +129,7 @@ jobs:
         with:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
-          releaseFiles: onewearos/build/outputs/bundle/release/onewearos-release.aab
+          releaseFiles: wear/build/outputs/bundle/release/wear-release.aab
           track: wear:production
           status: completed
           whatsNewDirectory: .github/whatsnew
@@ -138,7 +138,7 @@ jobs:
       - name: Cleanup sensitive files
         if: always()
         run: |
-          rm -f keystore.jks keystore.properties app/google-services.json onewearos/google-services.json
+          rm -f keystore.jks keystore.properties app/google-services.json wear/google-services.json
           rm -f gha-creds-*.json
 
       - name: Upload build artifacts (on failure)
@@ -148,5 +148,5 @@ jobs:
           name: build-outputs-${{ env.VERSION_CODE }}
           path: |
             app/build/outputs/
-            onewearos/build/outputs/
+            wear/build/outputs/
           retention-days: 7

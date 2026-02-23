@@ -21,6 +21,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "One"
 include(":app")
-include(":onewearos")
+include(":wear")
 include(":shared")
-include(":features")
+
+file("features").listFiles()
+    ?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
+    ?.forEach { include(":features:${it.name}") }
