@@ -22,7 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "One"
 include(":app")
 include(":wear")
-include(":shared")
+include(":core")
 
 file("features").listFiles()
     ?.filter { it.isDirectory }
