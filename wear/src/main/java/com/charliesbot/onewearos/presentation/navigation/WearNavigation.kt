@@ -5,13 +5,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import com.charliesbot.onewearos.presentation.feature.today.WearGoalOptionsScreen
-import com.charliesbot.onewearos.presentation.feature.today.WearDatePickerScreen
-import com.charliesbot.onewearos.presentation.feature.today.WearStartDateScreen
-import com.charliesbot.onewearos.presentation.feature.today.WearTimePickerScreen
+import com.charliesbot.onewearos.WearGoalOptionsScreen
+import com.charliesbot.onewearos.WearDatePickerScreen
+import com.charliesbot.onewearos.WearStartDateScreen
+import com.charliesbot.onewearos.WearTimePickerScreen
 import com.charliesbot.onewearos.presentation.theme.OneTheme
-import com.charliesbot.onewearos.presentation.feature.today.WearTodayScreen
-import com.charliesbot.onewearos.presentation.feature.today.WearTodayViewModel
+import com.charliesbot.onewearos.WearTodayScreen
+import com.charliesbot.onewearos.WearTodayViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -38,7 +38,13 @@ fun WearNavigation() {
             composable(WearNavigationRoute.StartDateSelection.route) {
                 WearStartDateScreen(
                     navController = navController,
-                    viewModel = wearTodayViewModel
+                    viewModel = wearTodayViewModel,
+                    onNavigateToDatePicker = {
+                        navController.navigate(WearNavigationRoute.DatePicker.route)
+                    },
+                    onNavigateToTimePicker = {
+                        navController.navigate(WearNavigationRoute.TimePicker.route)
+                    }
                 )
             }
             composable(WearNavigationRoute.DatePicker.route) {

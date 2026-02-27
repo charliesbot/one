@@ -1,4 +1,4 @@
-package com.charliesbot.onewearos.presentation.feature.today
+package com.charliesbot.onewearos
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +26,6 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.google.android.horologist.compose.layout.ColumnItemType
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
-import com.charliesbot.onewearos.presentation.navigation.WearNavigationRoute
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.utils.TimeFormat
 import com.charliesbot.shared.core.utils.convertLocalDateTimeToMillis
@@ -40,6 +39,8 @@ import java.time.LocalDateTime
 fun WearStartDateScreen(
     navController: NavController,
     viewModel: WearTodayViewModel = koinViewModel(),
+    onNavigateToDatePicker: () -> Unit,
+    onNavigateToTimePicker: () -> Unit,
 ) {
     val temporalStartTime by viewModel.temporalStartTime.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -47,12 +48,8 @@ fun WearStartDateScreen(
     temporalStartTime?.let {
         WearStartDateContent(
             startTime = it,
-            onNavigateToDatePicker = {
-                navController.navigate(WearNavigationRoute.DatePicker.route)
-            },
-            onNavigateToTimePicker = {
-                navController.navigate(WearNavigationRoute.TimePicker.route)
-            },
+            onNavigateToDatePicker = onNavigateToDatePicker,
+            onNavigateToTimePicker = onNavigateToTimePicker,
             onUpdateStartTime = { dateTime ->
                 scope.launch {
                     viewModel.updateStartTime(

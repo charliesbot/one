@@ -1,4 +1,4 @@
-package com.charliesbot.onewearos.presentation.feature.today
+package com.charliesbot.onewearos
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

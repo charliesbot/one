@@ -1,4 +1,4 @@
-package com.charliesbot.onewearos.core.components
+package com.charliesbot.onewearos.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement

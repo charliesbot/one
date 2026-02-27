@@ -1,4 +1,4 @@
-package com.charliesbot.onewearos.presentation.feature.today
+package com.charliesbot.onewearos
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
