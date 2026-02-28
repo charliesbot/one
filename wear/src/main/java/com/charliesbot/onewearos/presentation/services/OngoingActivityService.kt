@@ -51,6 +51,7 @@ class OngoingActivityService :
                 stopSelf()
                 return START_NOT_STICKY
             }
+
             ACTION_START, null -> {
                 Log.d(LOG_TAG, "$serviceTag received START action.")
 
@@ -89,6 +90,7 @@ class OngoingActivityService :
 
                 return START_NOT_STICKY // Don't restart if killed - state may be stale
             }
+
             else -> {
                 Log.w(LOG_TAG, "$serviceTag received unknown action: $action")
                 return START_NOT_STICKY

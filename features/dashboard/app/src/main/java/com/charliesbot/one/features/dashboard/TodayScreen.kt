@@ -362,9 +362,11 @@ private fun SmartSuggestionCard(
         com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> stringResource(
             R.string.smart_suggestion_based_on_average,
         )
+
         com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> stringResource(
             R.string.smart_suggestion_based_on_bedtime,
         )
+
         else -> null
     }
 

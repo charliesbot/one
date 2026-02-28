@@ -252,7 +252,9 @@ fun DateTimeWheelPicker(state: DateTimeWheelPickerState, modifier: Modifier = Mo
 private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Context): String =
     when (dateItem.daysAgo) {
         0 -> context.getString(R.string.wheel_picker_today)
+
         1 -> context.getString(R.string.wheel_picker_yesterday)
+
         else -> {
             val formatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale.getDefault())
             dateItem.date.format(formatter)

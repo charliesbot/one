@@ -35,7 +35,7 @@ val sharedModule = module {
     single { FastingUseCase(get(), get(), get()) }
     single { GetSuggestedFastingStartTimeUseCase(get(), get()) }
 
-    single<CustomGoalRepository> { CustomGoalRepositoryImpl(dataStore = get()) }
+    single<CustomGoalRepository> { CustomGoalRepositoryImpl(androidContext(), dataStore = get()) }
     single { GoalResolver(get()) }
 
     single { Wearable.getDataClient(androidContext()) }

@@ -9,9 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Custom fasting goals from the phone now appear in watch goal selection
+
 ### Changed
 
 ### Fixed
+
+- Watch now correctly resolves custom fasting goals instead of falling back to 16:8
 
 ### Deprecated
 

@@ -3,9 +3,11 @@ package com.charliesbot.onewearos
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.utils.GoalResolver
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +21,14 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-class WearTodayViewModel(private val fastingUseCase: FastingUseCase) : ViewModel() {
+class WearTodayViewModel(private val fastingUseCase: FastingUseCase, goalResolver: GoalResolver) : ViewModel() {
+
+    val allGoals: StateFlow<List<FastGoal>> = goalResolver.allGoals
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            PredefinedFastingGoals.allGoals,
+        )
 
     private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
         .stateIn(

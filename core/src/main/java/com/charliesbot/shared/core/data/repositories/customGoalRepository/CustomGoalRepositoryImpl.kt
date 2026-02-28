@@ -1,21 +1,28 @@
 package com.charliesbot.shared.core.data.repositories.customGoalRepository
 
+import android.content.Context
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.constants.DataLayerConstants
 import com.charliesbot.shared.core.constants.FastGoal
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class CustomGoalRepositoryImpl(private val dataStore: DataStore<Preferences>) : CustomGoalRepository {
+class CustomGoalRepositoryImpl(context: Context, private val dataStore: DataStore<Preferences>) :
+    CustomGoalRepository {
 
+    private val dataClient = Wearable.getDataClient(context.applicationContext)
     private val json = Json { ignoreUnknownKeys = true }
 
     override val customGoals: Flow<List<FastGoal>> = dataStore.data
@@ -33,7 +40,7 @@ class CustomGoalRepositoryImpl(private val dataStore: DataStore<Preferences>) : 
             }
         }
 
-    override suspend fun saveCustomGoal(goal: FastGoal) {
+    override suspend fun saveCustomGoal(goal: FastGoal, syncToRemote: Boolean) {
         try {
             dataStore.edit { prefs ->
                 val existing = deserializeGoals(prefs)
@@ -41,12 +48,15 @@ class CustomGoalRepositoryImpl(private val dataStore: DataStore<Preferences>) : 
                 prefs[CUSTOM_GOALS_KEY] = json.encodeToString(updated)
             }
             Log.d(LOG_TAG, "CustomGoalRepo: Saved custom goal ${goal.id}")
+            if (syncToRemote) {
+                syncCustomGoalsToRemote()
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "CustomGoalRepo: Error saving custom goal", e)
         }
     }
 
-    override suspend fun deleteCustomGoal(goalId: String) {
+    override suspend fun deleteCustomGoal(goalId: String, syncToRemote: Boolean) {
         try {
             dataStore.edit { prefs ->
                 val existing = deserializeGoals(prefs)
@@ -54,8 +64,53 @@ class CustomGoalRepositoryImpl(private val dataStore: DataStore<Preferences>) : 
                 prefs[CUSTOM_GOALS_KEY] = json.encodeToString(updated)
             }
             Log.d(LOG_TAG, "CustomGoalRepo: Deleted custom goal $goalId")
+            if (syncToRemote) {
+                syncCustomGoalsToRemote()
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "CustomGoalRepo: Error deleting custom goal", e)
+        }
+    }
+
+    override suspend fun replaceAllCustomGoals(goals: List<FastGoal>, syncToRemote: Boolean) {
+        try {
+            dataStore.edit { prefs ->
+                val data = goals.map { it.toData() }
+                prefs[CUSTOM_GOALS_KEY] = json.encodeToString(data)
+            }
+            Log.d(LOG_TAG, "CustomGoalRepo: Replaced all custom goals (count=${goals.size})")
+            if (syncToRemote) {
+                syncCustomGoalsToRemote()
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "CustomGoalRepo: Error replacing custom goals", e)
+        }
+    }
+
+    override suspend fun replaceAllCustomGoalsFromJson(goalsJson: String, syncToRemote: Boolean) {
+        try {
+            val goalDataList = json.decodeFromString<List<CustomGoalData>>(goalsJson)
+            val goals = goalDataList.map { it.toFastGoal() }
+            replaceAllCustomGoals(goals, syncToRemote)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "CustomGoalRepo: Error replacing custom goals from JSON", e)
+        }
+    }
+
+    private suspend fun syncCustomGoalsToRemote() {
+        try {
+            val prefs = dataStore.data.first()
+            val goalsJson = prefs[CUSTOM_GOALS_KEY] ?: "[]"
+
+            val request = PutDataMapRequest.create(DataLayerConstants.CUSTOM_GOALS_PATH).apply {
+                dataMap.putString(DataLayerConstants.CUSTOM_GOALS_JSON_KEY, goalsJson)
+                dataMap.putLong(DataLayerConstants.CUSTOM_GOALS_TIMESTAMP_KEY, System.currentTimeMillis())
+            }.asPutDataRequest().setUrgent()
+
+            dataClient.putDataItem(request).await()
+            Log.d(LOG_TAG, "CustomGoalRepo: Custom goals synced to Data Layer")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "CustomGoalRepo: Error syncing custom goals to Data Layer", e)
         }
     }
 
@@ -72,24 +127,4 @@ class CustomGoalRepositoryImpl(private val dataStore: DataStore<Preferences>) : 
     companion object {
         private val CUSTOM_GOALS_KEY = stringPreferencesKey("custom_fasting_goals")
     }
-}
-
-private fun CustomGoalData.toFastGoal(): FastGoal = FastGoal(
-    id = id,
-    titleText = name,
-    durationDisplay = formatDurationDisplay(durationMillis),
-    color = Color(colorHex.toULong()),
-    durationMillis = durationMillis,
-)
-
-private fun FastGoal.toData(): CustomGoalData = CustomGoalData(
-    id = id,
-    name = titleText ?: id,
-    durationMillis = durationMillis,
-    colorHex = color.value.toLong(),
-)
-
-private fun formatDurationDisplay(millis: Long): String {
-    val totalHours = millis / (60L * 60L * 1000L)
-    return totalHours.toString()
 }

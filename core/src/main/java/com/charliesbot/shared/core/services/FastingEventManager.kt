@@ -41,12 +41,14 @@ class FastingEventManager : KoinComponent {
                 )
                 callbacks.onFastingStarted(currentItem)
             }
+
             // Case 2: An existing fast has stopped (true -> false)
             wasFasting && !isNowFasting -> {
                 Log.d(LOG_TAG, "EventManager: Firing onFastingCompleted.")
                 notificationScheduler.cancelAllNotifications()
                 callbacks.onFastingCompleted(currentItem)
             }
+
             // Case 3: An *active* fast was updated (true -> true)
             wasFasting && isNowFasting -> {
                 Log.d(LOG_TAG, "EventManager: Firing onFastingUpdated for an active fast.")
@@ -58,6 +60,7 @@ class FastingEventManager : KoinComponent {
                 )
                 callbacks.onFastingUpdated(currentItem)
             }
+
             // Case 4: An *inactive* fast's config was updated (false -> false)
             else -> {
                 Log.d(LOG_TAG, "EventManager: Firing onFastingUpdated for an inactive fast.")

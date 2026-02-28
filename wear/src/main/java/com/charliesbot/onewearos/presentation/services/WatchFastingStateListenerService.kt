@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import com.charliesbot.onewearos.complication.ComplicationUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataLayerConstants
+import com.charliesbot.shared.core.data.repositories.customGoalRepository.CustomGoalRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.models.FastingDataItem
@@ -25,6 +26,7 @@ import org.koin.core.component.inject
 class WatchFastingStateListenerService : BaseFastingListenerService() {
     private val complicationUpdateManager: ComplicationUpdateManager by inject()
     private val settingsRepository: SettingsRepository by inject()
+    private val customGoalRepository: CustomGoalRepository by inject()
     private val notificationScheduler: NotificationScheduler by inject()
     private val watchServiceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -73,6 +75,8 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
         handleSettingsSync(dataEvents)
         // Handle smart reminder sync
         handleSmartReminderSync(dataEvents)
+        // Handle custom goals sync
+        handleCustomGoalsSync(dataEvents)
         // Then, call parent to handle fasting state
         super.onDataChanged(dataEvents)
     }
@@ -107,6 +111,28 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                     }
                 } else {
                     Log.d(LOG_TAG, "WatchListener: Smart reminder time has passed, skipping")
+                }
+            }
+        }
+    }
+
+    private fun handleCustomGoalsSync(dataEvents: DataEventBuffer) {
+        for (event in dataEvents) {
+            if (event.type == DataEvent.TYPE_CHANGED &&
+                event.dataItem.uri.path == DataLayerConstants.CUSTOM_GOALS_PATH
+            ) {
+                val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+                val goalsJson = dataMap.getString(DataLayerConstants.CUSTOM_GOALS_JSON_KEY, "[]")
+
+                Log.d(LOG_TAG, "WatchListener: Received custom goals update from phone")
+
+                watchServiceScope.launch {
+                    try {
+                        customGoalRepository.replaceAllCustomGoalsFromJson(goalsJson, syncToRemote = false)
+                        Log.d(LOG_TAG, "WatchListener: Custom goals updated successfully")
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG, "WatchListener: Failed to update custom goals", e)
+                    }
                 }
             }
         }
