@@ -1,6 +1,7 @@
 package com.charliesbot.onewearos.presentation.services
 
 import android.Manifest
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
@@ -28,7 +29,11 @@ class LocalWatchFastingCallbacks(
             fastingDataItem.startTimeInMillis,
             fastingDataItem.fastingGoalId,
         )
-        ContextCompat.startForegroundService(context, intent)
+        try {
+            ContextCompat.startForegroundService(context, intent)
+        } catch (e: ForegroundServiceStartNotAllowedException) {
+            Log.w(LOG_TAG, "LocalWatch: Cannot start ongoing activity — app is in background", e)
+        }
         complicationUpdateManager.requestUpdate()
         Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
     }
