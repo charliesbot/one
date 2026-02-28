@@ -92,14 +92,14 @@ fun WearTodayContent(
     val startTimeInLocalDateTime = convertMillisToLocalDateTime(startTimeInMillis)
     val fastButtonLabel =
         if (isFasting) stringResource(R.string.end_fast) else stringResource(R.string.start_fasting)
-    val currentGoal = PredefinedFastingGoals.goalsById[fastingGoalId]
+    val currentGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
 
     val timeLabel = if (isFasting) {
         formatTimestamp(elapsedTime)
     } else {
         stringResource(
             WearR.string.target_duration_hours,
-            currentGoal?.durationDisplay.toString(),
+            currentGoal.durationDisplay,
         )
     }
 
@@ -121,7 +121,7 @@ fun WearTodayContent(
                 exit = scaleOut(animationSpec = tween(500), targetScale = 1.2f) + fadeOut(),
             ) {
                 FastingProgressBar(
-                    progress = calculateProgressFraction(elapsedTime, currentGoal?.durationMillis),
+                    progress = calculateProgressFraction(elapsedTime, currentGoal.durationMillis),
                     strokeWidth = 5.dp,
                     indicatorColor = MaterialTheme.colorScheme.primaryDim,
                     trackColor = MaterialTheme.colorScheme.onBackground,

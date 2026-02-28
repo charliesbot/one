@@ -56,6 +56,7 @@ class GetSuggestedFastingStartTimeUseCase(
             SmartReminderMode.BEDTIME_ONLY -> {
                 calculateFromBedtime()
             }
+
             SmartReminderMode.MOVING_AVERAGE_ONLY -> {
                 if (hasEnoughHistory) {
                     calculateFromMovingAverage(recentFasts.map { it.startTimeEpochMillis })
@@ -67,9 +68,11 @@ class GetSuggestedFastingStartTimeUseCase(
                     )
                 }
             }
+
             SmartReminderMode.FIXED_TIME -> {
                 calculateFromFixedTime()
             }
+
             SmartReminderMode.AUTO -> {
                 if (hasEnoughHistory) {
                     calculateFromMovingAverage(recentFasts.map { it.startTimeEpochMillis })

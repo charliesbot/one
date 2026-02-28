@@ -96,7 +96,9 @@ object PredefinedFastingGoals {
         val custom = customGoalsMap[id]
         when {
             predefined != null -> predefined
+
             custom != null -> custom
+
             else -> {
                 Log.e(AppConstants.LOG_TAG, "Invalid goal id: $id")
                 goalsById["16:8"]!!

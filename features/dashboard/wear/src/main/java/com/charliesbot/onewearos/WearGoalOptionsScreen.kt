@@ -1,17 +1,14 @@
 package com.charliesbot.onewearos
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
@@ -26,7 +23,6 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import com.charliesbot.shared.R
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.google.android.horologist.compose.layout.ColumnItemType
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
 import kotlinx.coroutines.launch
@@ -35,9 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun WearGoalOptionsScreen(viewModel: WearTodayViewModel = koinViewModel(), navController: NavController) {
     val scope = rememberCoroutineScope()
-    val fastGoals = remember {
-        PredefinedFastingGoals.allGoals
-    }
+    val fastGoals by viewModel.allGoals.collectAsStateWithLifecycle()
     val columnState = rememberTransformingLazyColumnState()
     val contentPadding = rememberResponsiveColumnPadding(
         first = ColumnItemType.ListHeader,
@@ -78,20 +72,18 @@ fun WearGoalOptionsScreen(viewModel: WearTodayViewModel = koinViewModel(), navCo
                         }
                     },
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = goal.durationDisplay,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(R.string.hours),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
+                    val hours = stringResource(R.string.hours)
+                    val label = if (goal.titleText != null) {
+                        "${goal.titleText} ${goal.durationDisplay} $hours"
+                    } else {
+                        "${goal.durationDisplay} $hours"
                     }
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
