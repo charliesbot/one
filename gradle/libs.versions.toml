@@ -37,6 +37,7 @@ googleGmsGoogleServices = "4.4.4"
 googleFirebaseCrashlytics = "3.0.6"
 room = "2.8.4"
 room-plugin = "2.8.4"
+spotless = "7.0.4"
 # navigation compose 3
 nav3Core = "1.0.0"
 lifecycleViewmodelNav3 = "2.10.0"
@@ -131,5 +132,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 androidx-room = { id = "androidx.room", version.ref = "room-plugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 
