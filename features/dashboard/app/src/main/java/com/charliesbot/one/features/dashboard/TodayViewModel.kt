@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.data.repositories.customGoalRepository.CustomGoalRepository
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
@@ -14,6 +16,7 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.utils.FastingProgressCalculator
+import com.charliesbot.shared.core.utils.GoalResolver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +32,8 @@ class TodayViewModel(
     private val fastingUseCase: FastingUseCase,
     private val settingsRepository: SettingsRepository,
     private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
+    private val customGoalRepository: CustomGoalRepository,
+    goalResolver: GoalResolver,
 ) : AndroidViewModel(application) {
     private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
         .stateIn(
@@ -57,6 +62,13 @@ class TodayViewModel(
                 SharingStarted.WhileSubscribed(5000L),
                 emptyList()
             )
+
+    val allGoals: StateFlow<List<FastGoal>> = goalResolver.allGoals
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            PredefinedFastingGoals.allGoals
+        )
 
     // Smart Reminders
     val smartRemindersEnabled: StateFlow<Boolean> = settingsRepository.smartRemindersEnabled
@@ -140,6 +152,23 @@ class TodayViewModel(
     fun updateFastingGoal(fastingGoalId: String) {
         viewModelScope.launch {
             fastingUseCase.updateFastingConfig(goalId = fastingGoalId)
+        }
+    }
+
+    fun saveCustomGoal(goal: FastGoal) {
+        viewModelScope.launch {
+            customGoalRepository.saveCustomGoal(goal)
+            fastingUseCase.updateFastingConfig(goalId = goal.id)
+        }
+    }
+
+    fun deleteCustomGoal(goalId: String) {
+        viewModelScope.launch {
+            customGoalRepository.deleteCustomGoal(goalId)
+            // If the deleted goal was active, fall back to 16:8
+            if (fastingGoalId.value == goalId) {
+                fastingUseCase.updateFastingConfig(goalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id)
+            }
         }
     }
 }

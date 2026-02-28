@@ -27,6 +27,21 @@
     <string name="end_fast">Terminar Ayuno</string>
     <string name="goal_with_duration">%1$s Meta</string>
     <string name="save">Guardar</string>
+
+    <!-- Custom Goal -->
+    <string name="custom_fast">Ayuno personalizado</string>
+    <string name="custom_goal_name_label">Nombra tu meta</string>
+    <string name="custom_goal_days">Días</string>
+    <string name="custom_goal_hours">Horas</string>
+    <string name="custom_goal_color_label">Color</string>
+    <string name="save_goal">Guardar meta</string>
+    <string name="custom_goal_saved">Meta personalizada guardada</string>
+    <string name="custom_goal_updated">Meta personalizada actualizada</string>
+    <string name="custom_goal_deleted">Meta personalizada eliminada</string>
+    <string name="edit_goal">Editar meta</string>
+    <string name="update_goal">Actualizar meta</string>
+    <string name="delete_goal">Eliminar meta</string>
+
     <string name="time_picker_select_time">Elige la hora</string>
     <string name="time_picker_cancel">Cancelar</string>
     <string name="time_picker_save">Guardar</string>

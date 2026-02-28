@@ -76,6 +76,7 @@ wear ──→ features:dashboard:wear ──→ core
 
 - PR title: use conventional commits format (`feat`, `fix`, `chore`, etc.) with optional scope, e.g. `feat(sync): add conflict resolution`
 - PR body: brief description of what changed and why
+- Don't add a test plan section
 - Keep the title under 70 characters
 - Use the description for details, not the title
 - Do not add "Co-Authored-By" lines

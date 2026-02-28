@@ -32,6 +32,20 @@
     <string name="select_goal">Select a goal</string>
     <string name="save">Save</string>
 
+    <!-- Custom Goal -->
+    <string name="custom_fast">Custom fast</string>
+    <string name="custom_goal_name_label">Name your goal</string>
+    <string name="custom_goal_days">Days</string>
+    <string name="custom_goal_hours">Hours</string>
+    <string name="custom_goal_color_label">Color</string>
+    <string name="save_goal">Save goal</string>
+    <string name="custom_goal_saved">Custom goal saved</string>
+    <string name="custom_goal_updated">Custom goal updated</string>
+    <string name="custom_goal_deleted">Custom goal deleted</string>
+    <string name="edit_goal">Edit goal</string>
+    <string name="update_goal">Update goal</string>
+    <string name="delete_goal">Delete goal</string>
+
     <!-- Time Picker Dialog -->
     <string name="time_picker_select_time">Select Time</string>
     <string name="time_picker_cancel">Cancel</string>
