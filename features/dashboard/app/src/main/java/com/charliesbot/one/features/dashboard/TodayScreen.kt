@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
@@ -36,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +52,7 @@ import com.charliesbot.one.features.dashboard.components.TimeDisplay
 import com.charliesbot.shared.core.components.TimePickerDialog
 import com.charliesbot.one.features.dashboard.components.WeeklyProgress
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.testing.MockDataUtils
@@ -57,6 +61,7 @@ import com.charliesbot.shared.core.utils.formatMinutesAsTime
 import com.charliesbot.shared.core.utils.getHours
 import com.charliesbot.shared.core.utils.isWidthAtLeastMedium
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -70,6 +75,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
     val weeklyProgress by viewModel.weeklyProgress.collectAsStateWithLifecycle()
     val smartRemindersEnabled by viewModel.smartRemindersEnabled.collectAsStateWithLifecycle()
     val suggestedFastingTime by viewModel.suggestedFastingTime.collectAsStateWithLifecycle()
+    val allGoals by viewModel.allGoals.collectAsStateWithLifecycle()
     val isWidthAtLeastMedium = isWidthAtLeastMedium()
 
     TodayScreenContent(
@@ -83,6 +89,7 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
         suggestedTimeMinutes = suggestedFastingTime?.suggestedTimeMinutes,
         suggestedTimeReasoning = suggestedFastingTime?.reasoning,
         suggestedTimeSource = suggestedFastingTime?.source,
+        allGoals = allGoals,
         isWidthAtLeastMedium = isWidthAtLeastMedium,
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
@@ -91,7 +98,9 @@ fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
         onUpdateStartTime = viewModel::updateStartTime,
         onOpenGoalBottomSheet = viewModel::openGoalBottomSheet,
         onCloseGoalBottomSheet = viewModel::closeGoalBottomSheet,
-        onUpdateFastingGoal = viewModel::updateFastingGoal
+        onUpdateFastingGoal = viewModel::updateFastingGoal,
+        onSaveCustomGoal = viewModel::saveCustomGoal,
+        onDeleteCustomGoal = viewModel::deleteCustomGoal,
     )
 }
 
@@ -108,6 +117,7 @@ private fun TodayScreenContent(
     suggestedTimeMinutes: Int?,
     suggestedTimeReasoning: String?,
     suggestedTimeSource: com.charliesbot.shared.core.models.SuggestionSource?,
+    allGoals: List<FastGoal>,
     isWidthAtLeastMedium: Boolean,
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
@@ -116,7 +126,9 @@ private fun TodayScreenContent(
     onUpdateStartTime: (Long) -> Unit,
     onOpenGoalBottomSheet: () -> Unit,
     onCloseGoalBottomSheet: () -> Unit,
-    onUpdateFastingGoal: (String) -> Unit
+    onUpdateFastingGoal: (String) -> Unit,
+    onSaveCustomGoal: (FastGoal) -> Unit,
+    onDeleteCustomGoal: (String) -> Unit,
 ) {
     val screenPadding = 32.dp
     val startTimeInLocalDateTime =
@@ -125,7 +137,12 @@ private fun TodayScreenContent(
     val fastButtonLabel =
         stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
     val scrollState = rememberScrollState()
-    val currentGoal = PredefinedFastingGoals.goalsById[fastingGoalId]
+    val currentGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val customGoalSavedMessage = stringResource(R.string.custom_goal_saved)
+    val customGoalUpdatedMessage = stringResource(R.string.custom_goal_updated)
+    val customGoalDeletedMessage = stringResource(R.string.custom_goal_deleted)
 
     LaunchedEffect(isFasting, startTimeInMillis) {
         if (isFasting) {
@@ -145,6 +162,7 @@ private fun TodayScreenContent(
                 title = { Text(stringResource(R.string.nav_today)) },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         val maxWidth = if (isWidthAtLeastMedium) 800.dp else 600.dp
         if (isTimePickerDialogOpen) {
@@ -166,7 +184,25 @@ private fun TodayScreenContent(
                     onUpdateFastingGoal(id)
                     onCloseGoalBottomSheet()
                 },
-                initialSelectedGoalId = fastingGoalId
+                onSaveCustomGoal = { goal ->
+                    val isUpdate = allGoals.any { it.id == goal.id }
+                    onSaveCustomGoal(goal)
+                    onCloseGoalBottomSheet()
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            if (isUpdate) customGoalUpdatedMessage else customGoalSavedMessage
+                        )
+                    }
+                },
+                onDeleteCustomGoal = { goalId ->
+                    onDeleteCustomGoal(goalId)
+                    onCloseGoalBottomSheet()
+                    scope.launch {
+                        snackbarHostState.showSnackbar(customGoalDeletedMessage)
+                    }
+                },
+                initialSelectedGoalId = fastingGoalId,
+                allGoals = allGoals,
             )
         }
         Box(
@@ -257,10 +293,10 @@ private fun TodayScreenContent(
                                         TimeDisplay(
                                             title = stringResource(
                                                 R.string.goal_with_duration,
-                                                "${currentGoal?.durationDisplay}H"
+                                                "${currentGoal.durationDisplay}H"
                                             ),
                                             date = startTimeInLocalDateTime.plusHours(
-                                                getHours(currentGoal?.durationMillis)
+                                                getHours(currentGoal.durationMillis)
                                             ),
                                             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
                                                 pressedShape = RoundedCornerShape(60.dp),
@@ -380,6 +416,7 @@ private fun PreviewTodayScreen() {
         suggestedTimeMinutes = 1200, // 8:00 PM
         suggestedTimeReasoning = "Based on your recent 7-day average",
         suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+        allGoals = PredefinedFastingGoals.allGoals,
         isWidthAtLeastMedium = false,
         onStartFasting = {},
         onStopFasting = {},
@@ -389,6 +426,8 @@ private fun PreviewTodayScreen() {
         onOpenGoalBottomSheet = {},
         onCloseGoalBottomSheet = {},
         onUpdateFastingGoal = {},
+        onSaveCustomGoal = {},
+        onDeleteCustomGoal = {},
     )
 }
 
@@ -406,6 +445,7 @@ private fun PreviewTodayScreenLandscape() {
         suggestedTimeMinutes = 1200,
         suggestedTimeReasoning = "Based on your recent 7-day average",
         suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+        allGoals = PredefinedFastingGoals.allGoals,
         isWidthAtLeastMedium = true,
         onStartFasting = {},
         onStopFasting = {},
@@ -415,6 +455,8 @@ private fun PreviewTodayScreenLandscape() {
         onOpenGoalBottomSheet = {},
         onCloseGoalBottomSheet = {},
         onUpdateFastingGoal = {},
+        onSaveCustomGoal = {},
+        onDeleteCustomGoal = {},
     )
 }
 
@@ -432,6 +474,7 @@ private fun PreviewTodayScreenWithUpcomingFast() {
         suggestedTimeMinutes = 1200, // 8:00 PM
         suggestedTimeReasoning = "Based on your recent 7-day average",
         suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+        allGoals = PredefinedFastingGoals.allGoals,
         isWidthAtLeastMedium = false,
         onStartFasting = {},
         onStopFasting = {},
@@ -441,6 +484,8 @@ private fun PreviewTodayScreenWithUpcomingFast() {
         onOpenGoalBottomSheet = {},
         onCloseGoalBottomSheet = {},
         onUpdateFastingGoal = {},
+        onSaveCustomGoal = {},
+        onDeleteCustomGoal = {},
     )
 }
 
