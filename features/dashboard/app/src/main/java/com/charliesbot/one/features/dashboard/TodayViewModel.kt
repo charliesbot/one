@@ -20,7 +20,6 @@ import com.charliesbot.shared.core.utils.GoalResolver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -39,7 +38,7 @@ class TodayViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = null
+            initialValue = null,
         )
     val isFasting: StateFlow<Boolean> = currentFasting
         .map { it?.isFasting ?: false }
@@ -52,7 +51,7 @@ class TodayViewModel(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            PredefinedFastingGoals.SIXTEEN_EIGHT.id
+            PredefinedFastingGoals.SIXTEEN_EIGHT.id,
         )
     val weeklyProgress: StateFlow<List<TimePeriodProgress>> =
         fastingHistoryRepository.getCurrentWeekHistory()
@@ -60,14 +59,14 @@ class TodayViewModel(
             .stateIn(
                 scope = viewModelScope,
                 SharingStarted.WhileSubscribed(5000L),
-                emptyList()
+                emptyList(),
             )
 
     val allGoals: StateFlow<List<FastGoal>> = goalResolver.allGoals
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            PredefinedFastingGoals.allGoals
+            PredefinedFastingGoals.allGoals,
         )
 
     // Smart Reminders
@@ -102,7 +101,10 @@ class TodayViewModel(
             try {
                 val suggestion = getSuggestedFastingStartTimeUseCase.execute()
                 _suggestedFastingTime.value = suggestion
-                Log.d(LOG_TAG, "TodayViewModel: Loaded suggestion - ${suggestion.suggestedTimeMinutes}min, ${suggestion.reasoning}")
+                Log.d(
+                    LOG_TAG,
+                    "TodayViewModel: Loaded suggestion - ${suggestion.suggestedTimeMinutes}min, ${suggestion.reasoning}",
+                )
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "TodayViewModel: Failed to load suggested time", e)
             }

@@ -19,7 +19,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
-import com.charliesbot.shared.core.components.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -28,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,11 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingDayData
+import com.charliesbot.shared.core.components.TimePickerDialog
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +51,7 @@ fun FastingDetailsBottomSheet(
     onUpdateStartTime: (newStartTime: Long) -> Unit,
     onUpdateEndTime: (newEndTime: Long) -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberModalBottomSheetState()
+    sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showStartTimePicker by remember { mutableStateOf(false) }
@@ -83,11 +82,11 @@ fun FastingDetailsBottomSheet(
                             sheetState.hide()
                             onDelete()
                         }
-                    }
+                    },
                 ) {
                     Text(
                         text = stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 }
             },
@@ -95,7 +94,7 @@ fun FastingDetailsBottomSheet(
                 TextButton(onClick = { showDeleteConfirmation = false }) {
                     Text(stringResource(R.string.cancel))
                 }
-            }
+            },
         )
     }
 
@@ -110,7 +109,7 @@ fun FastingDetailsBottomSheet(
             },
             onDismiss = { showStartTimePicker = false },
             buttonText = stringResource(R.string.wheel_picker_update_start_time),
-            isValidSelection = { selectedTime -> selectedTime < currentEndTime }
+            isValidSelection = { selectedTime -> selectedTime < currentEndTime },
         )
     }
 
@@ -125,27 +124,27 @@ fun FastingDetailsBottomSheet(
             },
             onDismiss = { showEndTimePicker = false },
             buttonText = stringResource(R.string.wheel_picker_update_end_time),
-            isValidSelection = { selectedTime -> selectedTime > currentStartTime }
+            isValidSelection = { selectedTime -> selectedTime > currentStartTime },
         )
     }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp)
+                .padding(bottom = 32.dp),
         ) {
             // Date Header
             Text(
                 text = formatDate(currentDate),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -154,7 +153,7 @@ fun FastingDetailsBottomSheet(
             Text(
                 text = formatDuration(currentStartTime, currentEndTime),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -170,12 +169,12 @@ fun FastingDetailsBottomSheet(
                         painter = painterResource(R.drawable.play_arrow_24px),
                         contentDescription = "Start",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 },
                 label = stringResource(R.string.started),
                 time = formatDateTime(currentStartTime),
-                onClick = { showStartTimePicker = true }
+                onClick = { showStartTimePicker = true },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -187,12 +186,12 @@ fun FastingDetailsBottomSheet(
                         painter = painterResource(R.drawable.stop_24px),
                         contentDescription = "End",
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 },
                 label = stringResource(R.string.ended),
                 time = formatDateTime(currentEndTime),
-                onClick = { showEndTimePicker = true }
+                onClick = { showEndTimePicker = true },
             )
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider()
@@ -200,18 +199,18 @@ fun FastingDetailsBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(
-                onClick = { showDeleteConfirmation = true }
+                onClick = { showDeleteConfirmation = true },
             ) {
                 Icon(
                     painter = painterResource(R.drawable.delete_24px),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
                     text = stringResource(R.string.delete_entry),
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }
@@ -224,14 +223,14 @@ private fun TimeRow(
     label: String,
     time: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         icon()
 
@@ -239,13 +238,13 @@ private fun TimeRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = time,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
 
@@ -253,7 +252,7 @@ private fun TimeRow(
             painter = painterResource(R.drawable.chevron_right_24px),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
     }
 }
@@ -298,7 +297,7 @@ private fun FastingDetailsBottomSheetPreview() {
             durationHours = 16,
             isGoalMet = true,
             startTimeEpochMillis = now - (16 * 60 * 60 * 1000) - (15 * 60 * 1000), // 16h 15m ago
-            endTimeEpochMillis = now - (15 * 60 * 1000) // 15 minutes ago
+            endTimeEpochMillis = now - (15 * 60 * 1000), // 15 minutes ago
         )
 
         FastingDetailsBottomSheet(
@@ -306,8 +305,7 @@ private fun FastingDetailsBottomSheetPreview() {
             onDismiss = {},
             onDelete = {},
             onUpdateStartTime = {},
-            onUpdateEndTime = {}
+            onUpdateEndTime = {},
         )
     }
 }
-

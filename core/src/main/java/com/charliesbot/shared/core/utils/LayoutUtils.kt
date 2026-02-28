@@ -24,6 +24,5 @@ fun isWidthAtLeastMedium(): Boolean {
 fun areBothWindowDimensionsAtLeastMedium(): Boolean {
     val sizeClass = calculateWindowSizeClass()
     return sizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND) &&
-            sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+        sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 }
-

@@ -9,9 +9,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 import java.util.Calendar
 
-class FastingHistoryRepositoryImpl(
-    private val fastingRecordDao: FastingRecordDao
-) : FastingHistoryRepository {
+class FastingHistoryRepositoryImpl(private val fastingRecordDao: FastingRecordDao) : FastingHistoryRepository {
 
     private fun getWeekStartDaySetting(): Int {
         // TODO: Replace with actual settings when settings view is implemented
@@ -49,9 +47,7 @@ class FastingHistoryRepositoryImpl(
         return fastingRecordDao.getFastingsSince(startOfWeek)
     }
 
-    override fun getAllHistory(): Flow<List<FastingRecord>> {
-        return fastingRecordDao.getAllFastings()
-    }
+    override fun getAllHistory(): Flow<List<FastingRecord>> = fastingRecordDao.getAllFastings()
 
     override fun getHistoryByTimePeriod(period: FastingHistoryTimePeriod): Flow<List<FastingRecord>> {
         val calendar = Calendar.getInstance()
@@ -83,7 +79,7 @@ class FastingHistoryRepositoryImpl(
 
         return fastingRecordDao.getFastingsForPeriod(
             startTimestamp = startTimestamp,
-            endExclusiveTimestamp = endExclusiveTimestamp
+            endExclusiveTimestamp = endExclusiveTimestamp,
         )
     }
 
@@ -99,15 +95,15 @@ class FastingHistoryRepositoryImpl(
         originalStartTime: Long,
         newStartTime: Long,
         newEndTime: Long,
-        goalId: String
+        goalId: String,
     ) {
         fastingRecordDao.deleteByStartTime(originalStartTime)
         fastingRecordDao.insert(
             FastingRecord(
                 startTimeEpochMillis = newStartTime,
                 endTimeEpochMillis = newEndTime,
-                fastingGoalId = goalId
-            )
+                fastingGoalId = goalId,
+            ),
         )
     }
 }

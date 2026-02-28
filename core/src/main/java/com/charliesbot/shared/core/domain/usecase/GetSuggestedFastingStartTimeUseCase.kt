@@ -23,7 +23,7 @@ import java.time.ZoneId
  */
 class GetSuggestedFastingStartTimeUseCase(
     private val historyRepository: FastingHistoryRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
 ) {
     companion object {
         private const val HISTORY_DAYS = 14
@@ -47,7 +47,10 @@ class GetSuggestedFastingStartTimeUseCase(
         val recentFasts = allHistory.filter { it.startTimeEpochMillis > cutoffTime }
         val hasEnoughHistory = recentFasts.size >= MIN_RECORDS_FOR_AVERAGE
 
-        Log.d(LOG_TAG, "GetSuggestedFastingStartTimeUseCase: Mode=$mode, Found ${recentFasts.size} fasts in last $HISTORY_DAYS days")
+        Log.d(
+            LOG_TAG,
+            "GetSuggestedFastingStartTimeUseCase: Mode=$mode, Found ${recentFasts.size} fasts in last $HISTORY_DAYS days",
+        )
 
         return when (mode) {
             SmartReminderMode.BEDTIME_ONLY -> {
@@ -59,7 +62,8 @@ class GetSuggestedFastingStartTimeUseCase(
                 } else {
                     // Not enough data, fall back to bedtime with explanation
                     calculateFromBedtime().copy(
-                        reasoning = "Not enough history (need $MIN_RECORDS_FOR_AVERAGE records). Using bedtime fallback."
+                        reasoning = "Not enough history (need $MIN_RECORDS_FOR_AVERAGE records). " +
+                            "Using bedtime fallback.",
                     )
                 }
             }
@@ -107,7 +111,7 @@ class GetSuggestedFastingStartTimeUseCase(
             suggestedTimeMillis = suggestedTimeMillis,
             suggestedTimeMinutes = avgMinutes,
             reasoning = "Based on your recent ${startTimes.size}-day average",
-            source = SuggestionSource.MOVING_AVERAGE
+            source = SuggestionSource.MOVING_AVERAGE,
         )
     }
 
@@ -137,7 +141,7 @@ class GetSuggestedFastingStartTimeUseCase(
             suggestedTimeMillis = suggestedTimeMillis,
             suggestedTimeMinutes = suggestedMinutes,
             reasoning = "Based on your $formattedBedtime bedtime (4h before)",
-            source = SuggestionSource.BEDTIME_BASED
+            source = SuggestionSource.BEDTIME_BASED,
         )
     }
 
@@ -158,7 +162,7 @@ class GetSuggestedFastingStartTimeUseCase(
             suggestedTimeMillis = suggestedTimeMillis,
             suggestedTimeMinutes = fixedMinutes,
             reasoning = "Your scheduled fasting time",
-            source = SuggestionSource.FIXED_TIME
+            source = SuggestionSource.FIXED_TIME,
         )
     }
 
@@ -209,4 +213,3 @@ class GetSuggestedFastingStartTimeUseCase(
         }
     }
 }
-

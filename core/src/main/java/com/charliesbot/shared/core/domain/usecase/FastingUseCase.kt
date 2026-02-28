@@ -7,17 +7,14 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.services.FastingEventCallbacks
 import com.charliesbot.shared.core.services.FastingEventManager
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 
 class FastingUseCase(
     private val fastingRepository: FastingDataRepository,
     private val eventManager: FastingEventManager,
-    private val localCallbacks: FastingEventCallbacks
+    private val localCallbacks: FastingEventCallbacks,
 ) {
 
-    fun getCurrentFastingFlow(): Flow<FastingDataItem?> {
-        return fastingRepository.fastingDataItem
-    }
+    fun getCurrentFastingFlow(): Flow<FastingDataItem?> = fastingRepository.fastingDataItem
 
     /**
      * Start a new fasting session locally.
@@ -73,14 +70,13 @@ class FastingUseCase(
     suspend fun updateFastingConfig(startTimeMillis: Long? = null, goalId: String? = null) {
         Log.d(LOG_TAG, "FastingUseCase: Updating Fasting config locally")
         try {
-
             if (startTimeMillis == null && goalId == null) {
                 throw IllegalStateException("No valid update config provided")
             }
 
             val (previousItem, currentItem) = fastingRepository.updateFastingConfig(
                 startTimeMillis,
-                goalId
+                goalId,
             )
 
             eventManager.processStateChange(previousItem, currentItem, localCallbacks)
@@ -90,7 +86,6 @@ class FastingUseCase(
             throw e
         }
     }
-
 
     /**
      * Manually sync the current fasting state with the other device.
@@ -104,7 +99,7 @@ class FastingUseCase(
             // Use updateFastingGoalId to trigger a sync without changing the goal
             fastingRepository.updateFastingConfig(
                 currentFasting?.startTimeInMillis,
-                currentFasting?.fastingGoalId
+                currentFasting?.fastingGoalId,
             )
             Log.d(LOG_TAG, "FastingUseCase: Successfully synced current state")
         } catch (e: Exception) {

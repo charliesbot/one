@@ -14,9 +14,7 @@ data class FastGoal(
 ) {
     val isCustom: Boolean get() = id.startsWith("custom_")
 
-    fun getTitle(context: android.content.Context): String {
-        return titleText ?: context.getString(titleResId)
-    }
+    fun getTitle(context: android.content.Context): String = titleText ?: context.getString(titleResId)
 }
 
 object PredefinedFastingGoals {
@@ -32,7 +30,7 @@ object PredefinedFastingGoals {
         titleResId = R.string.fasting_goal_circadian,
         durationDisplay = "13",
         color = Color(0xFF6096BA), // Dusty Blue / Muted Teal
-        durationMillis = hoursToMillis(13)
+        durationMillis = hoursToMillis(13),
     )
 
     val SIXTEEN_EIGHT = FastGoal(
@@ -48,7 +46,7 @@ object PredefinedFastingGoals {
         titleResId = R.string.fasting_goal_18_6,
         durationDisplay = "18",
         color = Color(0xFFE5A98C), // Muted Peach / Terracotta
-        durationMillis = hoursToMillis(18)
+        durationMillis = hoursToMillis(18),
     )
 
     val TWENTY_FOUR = FastGoal(
@@ -56,7 +54,7 @@ object PredefinedFastingGoals {
         titleResId = R.string.fasting_goal_20_4,
         durationDisplay = "20",
         color = Color(0xFFC9AB6A), // Muted Gold / Ochre
-        durationMillis = hoursToMillis(20)
+        durationMillis = hoursToMillis(20),
     )
 
     val THIRTY_SIX_HOUR = FastGoal(
@@ -64,7 +62,7 @@ object PredefinedFastingGoals {
         titleResId = R.string.fasting_goal_36_hour,
         durationDisplay = "36",
         color = Color(0xFF9787BE), // Dusty Lavender / Muted Plum
-        durationMillis = hoursToMillis(36)
+        durationMillis = hoursToMillis(36),
     )
 
     val allGoals: List<FastGoal> = listOf(
@@ -72,7 +70,7 @@ object PredefinedFastingGoals {
         SIXTEEN_EIGHT,
         EIGHTEEN_SIX,
         TWENTY_FOUR,
-        THIRTY_SIX_HOUR
+        THIRTY_SIX_HOUR,
     )
 
     val goalsById: Map<String, FastGoal> = allGoals.associateBy { it.id }

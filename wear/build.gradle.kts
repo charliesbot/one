@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.util.Properties
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -35,9 +35,8 @@ android {
         applicationId = "com.charliesbot.one"
         minSdk = 33
         targetSdk = 35
-        versionCode = versionCodeProperty.toInt() + 1  // Wear OS gets +1 to avoid Play Store conflict
-        versionName = "$versionNameProperty-wear"  // Append "-wear" to distinguish from phone app
-
+        versionCode = versionCodeProperty.toInt() + 1 // Wear OS gets +1 to avoid Play Store conflict
+        versionName = "$versionNameProperty-wear" // Append "-wear" to distinguish from phone app
     }
 
     signingConfigs {
@@ -72,7 +71,7 @@ android {
             resValue("string", "app_name", "One")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"

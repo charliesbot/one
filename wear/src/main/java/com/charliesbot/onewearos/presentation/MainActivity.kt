@@ -23,7 +23,6 @@ import com.charliesbot.onewearos.presentation.navigation.WearNavigation
 import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.shared.core.notifications.NotificationUtil
 
-
 class MainActivity : ComponentActivity() {
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -44,7 +43,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 if (ContextCompat.checkSelfPermission(
                         this@MainActivity,
-                        Manifest.permission.POST_NOTIFICATIONS
+                        Manifest.permission.POST_NOTIFICATIONS,
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
                     showNotificationPermission = true
@@ -59,12 +58,11 @@ class MainActivity : ComponentActivity() {
                     onConfirm = {
                         showNotificationPermission = false
                         requestNotificationPermission.launch(
-                            Manifest.permission.POST_NOTIFICATIONS
+                            Manifest.permission.POST_NOTIFICATIONS,
                         )
-                    }
+                    },
                 )
             }
         }
     }
 }
-

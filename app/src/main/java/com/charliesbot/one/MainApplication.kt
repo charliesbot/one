@@ -26,7 +26,7 @@ class MainApplication : Application() {
                 appModule,
                 dashboardModule,
                 profileModule,
-                settingsModule
+                settingsModule,
             )
         }
 

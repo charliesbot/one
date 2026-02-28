@@ -12,4 +12,3 @@ interface SmartReminderCallback {
      */
     fun onSmartReminderSettingsChanged()
 }
-

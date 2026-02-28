@@ -12,15 +12,16 @@ data class SuggestedFastingTime(
     val suggestedTimeMillis: Long,
     val suggestedTimeMinutes: Int,
     val reasoning: String,
-    val source: SuggestionSource
+    val source: SuggestionSource,
 )
 
 enum class SuggestionSource {
     /** Calculated from 7-day moving average of user's actual fast start times */
     MOVING_AVERAGE,
+
     /** Fallback: bedtime minus 4 hours */
     BEDTIME_BASED,
-    /** User-specified fixed time */
-    FIXED_TIME
-}
 
+    /** User-specified fixed time */
+    FIXED_TIME,
+}

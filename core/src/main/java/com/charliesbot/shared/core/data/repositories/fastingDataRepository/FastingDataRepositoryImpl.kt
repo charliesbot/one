@@ -12,7 +12,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataStoreConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import java.time.YearMonth
 
 /**
  * The concrete implementation of the [FastingDataRepository] interface, serving as the
@@ -41,10 +39,8 @@ import java.time.YearMonth
  * @property context The application context, needed to initialize the Wearable DataClient.
  * @property dataStore The Jetpack DataStore instance used for storing fasting preferences.
  */
-class FastingDataRepositoryImpl(
-    context: Context,
-    private val dataStore: DataStore<Preferences>
-) : FastingDataRepository {
+class FastingDataRepositoryImpl(context: Context, private val dataStore: DataStore<Preferences>) :
+    FastingDataRepository {
 
     private val dataClient: DataClient = Wearable.getDataClient(context.applicationContext)
 
@@ -53,7 +49,7 @@ class FastingDataRepositoryImpl(
         .map {
             Log.e(
                 LOG_TAG,
-                "IsFasting Flow: read from DataStore key ${PrefKeys.IS_FASTING}: ${it[PrefKeys.IS_FASTING]}"
+                "IsFasting Flow: read from DataStore key ${PrefKeys.IS_FASTING}: ${it[PrefKeys.IS_FASTING]}",
             )
             it[PrefKeys.IS_FASTING] == true
         }
@@ -68,7 +64,7 @@ class FastingDataRepositoryImpl(
             val currentGoalId = it[PrefKeys.FASTING_GOAL_ID]
             Log.e(
                 LOG_TAG,
-                "FastingGoalId Flow: read from DataStore key ${PrefKeys.FASTING_GOAL_ID}: $currentGoalId"
+                "FastingGoalId Flow: read from DataStore key ${PrefKeys.FASTING_GOAL_ID}: $currentGoalId",
             )
             currentGoalId ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
         }
@@ -79,57 +75,54 @@ class FastingDataRepositoryImpl(
         isFasting,
         startTimeInMillis,
         fastingGoalId,
-        lastUpdateTimestamp
+        lastUpdateTimestamp,
     ) { isFastingValue, startTimeValue, goalIdValue, timestampValue ->
         Log.d(
             LOG_TAG,
-            "Repo: fastingDataItemFlow emitted: isFasting=$isFastingValue, goal=$goalIdValue, startTime=$startTimeValue, timestamp=$timestampValue"
+            "Repo: fastingDataItemFlow emitted: isFasting=$isFastingValue, goal=$goalIdValue, startTime=$startTimeValue, timestamp=$timestampValue",
         )
         FastingDataItem(
             isFasting = isFastingValue,
             startTimeInMillis = startTimeValue,
             fastingGoalId = goalIdValue,
-            updateTimestamp = timestampValue
+            updateTimestamp = timestampValue,
         )
     }.catch { exception ->
         Log.e(LOG_TAG, "Repo: Error in fastingDataItemFlow", exception)
         emit(FastingDataItem())
     }
 
-
-    override suspend fun getCurrentFasting(): FastingDataItem {
-        return try {
-            Log.d(
-                LOG_TAG,
-                "getCurrentFasting (widget path): Attempting to read DataStore.data.first()"
-            )
-            val prefs = dataStore.data.first()
-            val isFasting = prefs[PrefKeys.IS_FASTING] == true
-            val startTime = prefs[PrefKeys.START_TIME] ?: -1
-            val timestamp = prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1
-            val fastingGoalId =
-                prefs[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
-            val item = FastingDataItem(isFasting, startTime, timestamp, fastingGoalId)
-            Log.d(
-                LOG_TAG,
-                "getCurrentFasting (widget path): Read item: $item, fastingGoalId from prefs: ${prefs[PrefKeys.FASTING_GOAL_ID]}"
-            )
-            item
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Repo: Error reading current state snapshot", e)
-            FastingDataItem() // Return default on error
-        }
+    override suspend fun getCurrentFasting(): FastingDataItem = try {
+        Log.d(
+            LOG_TAG,
+            "getCurrentFasting (widget path): Attempting to read DataStore.data.first()",
+        )
+        val prefs = dataStore.data.first()
+        val isFasting = prefs[PrefKeys.IS_FASTING] == true
+        val startTime = prefs[PrefKeys.START_TIME] ?: -1
+        val timestamp = prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1
+        val fastingGoalId =
+            prefs[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
+        val item = FastingDataItem(isFasting, startTime, timestamp, fastingGoalId)
+        Log.d(
+            LOG_TAG,
+            "getCurrentFasting (widget path): Read item: $item, fastingGoalId from prefs: ${prefs[PrefKeys.FASTING_GOAL_ID]}",
+        )
+        item
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "Repo: Error reading current state snapshot", e)
+        FastingDataItem() // Return default on error
     }
 
     override suspend fun startFasting(
         startTimeInMillis: Long,
-        fastingGoalId: String
+        fastingGoalId: String,
     ): Pair<FastingDataItem?, FastingDataItem> {
         val previousItem = getCurrentFasting()
         updateLocalAndRemoteStore(
             isFasting = true,
             startTimeInMillis = startTimeInMillis,
-            fastingGoalId = fastingGoalId
+            fastingGoalId = fastingGoalId,
         )
         val currentItem = getCurrentFasting()
         return Pair(previousItem, currentItem)
@@ -143,7 +136,7 @@ class FastingDataRepositoryImpl(
         updateLocalAndRemoteStore(
             isFasting = false,
             startTimeInMillis = startTimeInMillis.first(),
-            fastingGoalId = fastingGoalId
+            fastingGoalId = fastingGoalId,
         )
         val currentItem = getCurrentFasting()
         return Pair(previousItem, currentItem)
@@ -151,7 +144,7 @@ class FastingDataRepositoryImpl(
 
     override suspend fun updateFastingConfig(
         startTimeInMillis: Long?,
-        fastingGoalId: String?
+        fastingGoalId: String?,
     ): Pair<FastingDataItem, FastingDataItem> {
         val previousItem = getCurrentFasting()
         updateLocalAndRemoteStore(
@@ -168,13 +161,13 @@ class FastingDataRepositoryImpl(
         startTimeInMillis: Long,
         fastingGoalId: String,
         isFasting: Boolean,
-        lastUpdateTimestamp: Long
+        lastUpdateTimestamp: Long,
     ) {
         updateLocalStore(
             isFasting = isFasting,
             startTimeInMillis = startTimeInMillis,
             fastingGoalId = fastingGoalId,
-            lastUpdateTimestamp = lastUpdateTimestamp
+            lastUpdateTimestamp = lastUpdateTimestamp,
         )
     }
 
@@ -194,7 +187,7 @@ class FastingDataRepositoryImpl(
         isFasting: Boolean?,
         startTimeInMillis: Long?,
         fastingGoalId: String?,
-        lastUpdateTimestamp: Long = System.currentTimeMillis()
+        lastUpdateTimestamp: Long = System.currentTimeMillis(),
     ) {
         try {
             dataStore.edit { prefs ->
@@ -217,7 +210,7 @@ class FastingDataRepositoryImpl(
         isFasting: Boolean,
         startTimeInMillis: Long?,
         fastingGoalId: String,
-        lastUpdateTimestamp: Long = System.currentTimeMillis()
+        lastUpdateTimestamp: Long = System.currentTimeMillis(),
     ) {
         val request: PutDataRequest =
             PutDataMapRequest.create(DataStoreConstants.FASTING_PATH_KEY).apply {
@@ -233,7 +226,7 @@ class FastingDataRepositoryImpl(
             dataClient.putDataItem(request).await()
             Log.d(
                 LOG_TAG,
-                "State updated in Data Layer: isFasting=$isFasting, startTime=$startTimeInMillis, fastingGoalId=$fastingGoalId, timestamp=$lastUpdateTimestamp"
+                "State updated in Data Layer: isFasting=$isFasting, startTime=$startTimeInMillis, fastingGoalId=$fastingGoalId, timestamp=$lastUpdateTimestamp",
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error updating fasting state in Data Layer", e)
@@ -246,7 +239,7 @@ class FastingDataRepositoryImpl(
             Log.e(
                 LOG_TAG,
                 "Repo: IOException reading DataStore for $flowName",
-                exception
+                exception,
             )
             // Optionally emit a default value or let the flow complete
             // Depending on the context, re-throwing might be appropriate if it's unexpected
@@ -255,7 +248,7 @@ class FastingDataRepositoryImpl(
             Log.e(
                 LOG_TAG,
                 "Repo: Unexpected error reading DataStore for $flowName",
-                exception
+                exception,
             )
             throw exception
         }

@@ -30,7 +30,7 @@ class LocalFastingCallback(
                 startTimeEpochMillis = fastingDataItem.startTimeInMillis,
                 endTimeEpochMillis = fastingDataItem.updateTimestamp,
                 fastingGoalId = fastingDataItem.fastingGoalId,
-            )
+            ),
         )
     }
 }

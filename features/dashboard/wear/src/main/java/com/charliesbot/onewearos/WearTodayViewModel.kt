@@ -18,17 +18,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
 
-class WearTodayViewModel(
-    private val fastingUseCase: FastingUseCase,
-) : ViewModel() {
+class WearTodayViewModel(private val fastingUseCase: FastingUseCase) : ViewModel() {
 
     private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = null
+            initialValue = null,
         )
     val isFasting: StateFlow<Boolean> = currentFasting
         .map { it?.isFasting ?: false }
@@ -41,7 +38,7 @@ class WearTodayViewModel(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            PredefinedFastingGoals.SIXTEEN_EIGHT.id
+            PredefinedFastingGoals.SIXTEEN_EIGHT.id,
         )
 
     private val _temporalStartTime = MutableStateFlow<LocalDateTime?>(null)
@@ -54,7 +51,6 @@ class WearTodayViewModel(
             Log.e("TAG", "initializeTemporalTime: $temporalStartTime")
         }
     }
-
 
     fun onStartFasting() {
         viewModelScope.launch {

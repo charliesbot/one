@@ -39,10 +39,7 @@ import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.getHours
 
 @Composable
-fun OneWidgetContent(
-    fastingData: FastingDataItem,
-    context: Context
-) {
+fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
     val currentTime = System.currentTimeMillis()
     val startTimeInMillis = fastingData.startTimeInMillis
     val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
@@ -70,13 +67,19 @@ fun OneWidgetContent(
 
     // Dynamic padding - minimal for small widgets
     val horizontalPadding = if (isSmallSquare) 4.dp else 16.dp
-    val verticalPadding = if (isSmallSquare) 4.dp else if (useVerticalLayout) 24.dp else 8.dp
+    val verticalPadding = if (isSmallSquare) {
+        4.dp
+    } else if (useVerticalLayout) {
+        24.dp
+    } else {
+        8.dp
+    }
 
     GlanceTheme {
         Scaffold(
             modifier = GlanceModifier
                 .background(GlanceTheme.colors.widgetBackground)
-                .clickable(actionStartActivity<MainActivity>())
+                .clickable(actionStartActivity<MainActivity>()),
         ) {
             if (useVerticalLayout) {
                 // Vertical layout for tall widgets (2x2+)
@@ -93,14 +96,14 @@ fun OneWidgetContent(
                         isGoalMet = isGoalMet,
                         ringDp = ringDp,
                         strokeDp = strokeDp,
-                        alignEnd = true
+                        alignEnd = true,
                     )
                     Spacer(modifier = GlanceModifier.defaultWeight())
                     WidgetFooter(
                         context,
                         isFasting = fastingData.isFasting,
                         hours = hours,
-                        isWide = false
+                        isWide = false,
                     )
                 }
             } else {
@@ -110,14 +113,14 @@ fun OneWidgetContent(
                         .padding(vertical = verticalPadding, horizontal = horizontalPadding)
                         .fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     if (showText) {
                         WidgetFooter(
                             context,
                             isFasting = fastingData.isFasting,
                             hours = hours,
-                            isWide = true
+                            isWide = true,
                         )
                         Spacer(modifier = GlanceModifier.width(16.dp))
                     }
@@ -128,7 +131,7 @@ fun OneWidgetContent(
                         isGoalMet = isGoalMet,
                         ringDp = ringDp,
                         strokeDp = strokeDp,
-                        alignEnd = false
+                        alignEnd = false,
                     )
                 }
             }
@@ -144,7 +147,7 @@ private fun WidgetProgressBar(
     isGoalMet: Boolean,
     ringDp: Dp,
     strokeDp: Dp,
-    alignEnd: Boolean
+    alignEnd: Boolean,
 ) {
     val context = LocalContext.current
     val progress = calculateProgressFraction(elapsedTime, fastingGoalMillis)
@@ -171,7 +174,7 @@ private fun WidgetProgressBar(
             sizePx = sizePx,
             strokePx = strokePx,
             indicator = indicatorComposeColor.toArgb(),
-            track = trackComposeColor.toArgb()
+            track = trackComposeColor.toArgb(),
         )
     }
 
@@ -180,7 +183,7 @@ private fun WidgetProgressBar(
         context.getString(
             R.string.accessibility_fasting_status,
             (progress * 100).toInt(),
-            remainingHours
+            remainingHours,
         )
     } else {
         context.getString(R.string.widget_not_fasting)
@@ -188,23 +191,18 @@ private fun WidgetProgressBar(
 
     Row(
         horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
-        modifier = if (alignEnd) GlanceModifier.fillMaxWidth() else GlanceModifier
+        modifier = if (alignEnd) GlanceModifier.fillMaxWidth() else GlanceModifier,
     ) {
         Image(
             provider = ImageProvider(ringBitmap),
             contentDescription = contentDescription,
-            modifier = GlanceModifier.size(ringDp)
+            modifier = GlanceModifier.size(ringDp),
         )
     }
 }
 
 @Composable
-private fun WidgetFooter(
-    context: Context,
-    isFasting: Boolean,
-    hours: Long,
-    isWide: Boolean
-) {
+private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWide: Boolean) {
     val actualHours = hours.coerceAtLeast(0)
 
     val largeTextSize = if (isWide) 32.sp else 60.sp
@@ -218,7 +216,7 @@ private fun WidgetFooter(
                 style = TextStyle(
                     color = GlanceTheme.colors.onPrimaryContainer,
                     fontSize = goalMetTextSize,
-                )
+                ),
             )
             Spacer(modifier = GlanceModifier.width(6.dp))
             Text(
@@ -226,32 +224,32 @@ private fun WidgetFooter(
                 style = TextStyle(
                     color = GlanceTheme.colors.onTertiaryContainer,
                     fontSize = goalMetTextSize,
-                    fontWeight = FontWeight.Bold
-                )
+                    fontWeight = FontWeight.Bold,
+                ),
             )
         }
     }
 
     if (isFasting) {
-        return Column() {
+        return Column {
             Text(
                 text = actualHours.toString(),
                 style = TextStyle(
                     color = GlanceTheme.colors.primary,
                     fontSize = largeTextSize,
-                    fontWeight = FontWeight.Bold
-                )
+                    fontWeight = FontWeight.Bold,
+                ),
             )
             Text(
                 text = context.resources.getQuantityString(
                     R.plurals.widget_hours_left_plural,
-                    actualHours.toInt()
+                    actualHours.toInt(),
                 ),
                 style = TextStyle(
                     color = GlanceTheme.colors.secondary,
                     fontSize = smallTextSize,
-                    fontWeight = FontWeight.Bold
-                )
+                    fontWeight = FontWeight.Bold,
+                ),
             )
         }
     }
@@ -261,25 +259,25 @@ private fun WidgetFooter(
         style = TextStyle(
             color = GlanceTheme.colors.onSurface,
             fontSize = if (isWide) 18.sp else 24.sp,
-            fontWeight = FontWeight.Bold
-        )
+            fontWeight = FontWeight.Bold,
+        ),
     )
 }
 
 val widgetMockFastingData = FastingDataItem(
     fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
     isFasting = true,
-    startTimeInMillis = System.currentTimeMillis() - (12 * 60 * 60 * 1000L) // 12 hours ago
+    startTimeInMillis = System.currentTimeMillis() - (12 * 60 * 60 * 1000L), // 12 hours ago
 )
 
 @OptIn(ExperimentalGlancePreviewApi::class)
-@Preview(widthDp = 57, heightDp = 57)   // Small square (1x1)
-@Preview(widthDp = 130, heightDp = 57)  // Horizontal rectangle (Nx1)
+@Preview(widthDp = 57, heightDp = 57) // Small square (1x1)
+@Preview(widthDp = 130, heightDp = 57) // Horizontal rectangle (Nx1)
 @Preview(widthDp = 130, heightDp = 130) // Big square (2x2+)
 @Composable
 private fun OneWidgetContentPreview() {
     OneWidgetContent(
         fastingData = widgetMockFastingData,
-        context = LocalContext.current
+        context = LocalContext.current,
     )
 }

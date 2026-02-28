@@ -3,7 +3,6 @@ package com.charliesbot.onewearos
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -24,13 +23,12 @@ import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
-import com.google.android.horologist.compose.layout.ColumnItemType
-import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.utils.TimeFormat
 import com.charliesbot.shared.core.utils.convertLocalDateTimeToMillis
-import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatDate
+import com.google.android.horologist.compose.layout.ColumnItemType
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDateTime
@@ -53,11 +51,11 @@ fun WearStartDateScreen(
             onUpdateStartTime = { dateTime ->
                 scope.launch {
                     viewModel.updateStartTime(
-                        convertLocalDateTimeToMillis(dateTime)
+                        convertLocalDateTimeToMillis(dateTime),
                     )
                     navController.popBackStack()
                 }
-            }
+            },
         )
     }
 }
@@ -83,11 +81,11 @@ fun WearStartDateContent(
                 onClick = {
                     onUpdateStartTime(startTime)
                 },
-                buttonSize = EdgeButtonSize.Small
+                buttonSize = EdgeButtonSize.Small,
             ) {
                 Text(stringResource(R.string.label_save))
             }
-        }
+        },
     ) {
         ScalingLazyColumn(
             state = listState,
@@ -102,10 +100,10 @@ fun WearStartDateContent(
                     label = {
                         Text(
                             text = formatDate(startTime, TimeFormat.DATE),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     },
-                    colors = ChipDefaults.gradientBackgroundChipColors()
+                    colors = ChipDefaults.gradientBackgroundChipColors(),
                 )
             }
             item {
@@ -114,10 +112,10 @@ fun WearStartDateContent(
                     label = {
                         Text(
                             text = formatDate(startTime, TimeFormat.TIME),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     },
-                    colors = ChipDefaults.gradientBackgroundChipColors()
+                    colors = ChipDefaults.gradientBackgroundChipColors(),
                 )
             }
         }
@@ -131,6 +129,6 @@ private fun Preview() {
         startTime = LocalDateTime.now(),
         onNavigateToDatePicker = {},
         onNavigateToTimePicker = {},
-        onUpdateStartTime = {}
+        onUpdateStartTime = {},
     )
 }

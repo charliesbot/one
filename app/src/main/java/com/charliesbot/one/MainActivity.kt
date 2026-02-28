@@ -50,12 +50,11 @@ class MainActivity : ComponentActivity() {
 
                 if (ContextCompat.checkSelfPermission(
                         this@MainActivity,
-                        Manifest.permission.POST_NOTIFICATIONS
+                        Manifest.permission.POST_NOTIFICATIONS,
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
                     showNotificationPermission = true
                 }
-
             }
 
             OneTheme {
@@ -68,9 +67,9 @@ class MainActivity : ComponentActivity() {
                             onConfirm = {
                                 showNotificationPermission = false
                                 requestNotificationPermission.launch(
-                                    Manifest.permission.POST_NOTIFICATIONS
+                                    Manifest.permission.POST_NOTIFICATIONS,
                                 )
-                            }
+                            },
                         )
                     }
                 }

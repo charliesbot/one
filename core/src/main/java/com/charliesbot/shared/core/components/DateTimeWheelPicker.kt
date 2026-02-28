@@ -49,25 +49,21 @@ import java.util.Locale
  * AM/PM enum for 12-hour time format.
  */
 enum class AmPm {
-    AM, PM
+    AM,
+    PM,
 }
 
 /**
  * Data class representing a date item in the picker.
  */
-data class DateItem(
-    val date: LocalDate,
-    val daysAgo: Int
-)
+data class DateItem(val date: LocalDate, val daysAgo: Int)
 
 /**
  * State holder for DateTimeWheelPicker.
  * Hoists the selected date/time state for easy access and testing.
  */
 @Stable
-class DateTimeWheelPickerState(
-    initialDateTime: LocalDateTime
-) {
+class DateTimeWheelPickerState(initialDateTime: LocalDateTime) {
     // Generate date list once at init time (not lazily recomputed)
     private val referenceDate: LocalDate = LocalDate.now()
 
@@ -76,7 +72,7 @@ class DateTimeWheelPickerState(
     val dateItems: List<DateItem> = (29 downTo 0).map { daysAgo ->
         DateItem(
             date = referenceDate.minusDays(daysAgo.toLong()),
-            daysAgo = daysAgo
+            daysAgo = daysAgo,
         )
     }
 
@@ -157,15 +153,12 @@ fun rememberDateTimeWheelPickerState(initialMillis: Long): DateTimeWheelPickerSt
 private val ITEM_HEIGHT = 48.dp
 
 @Composable
-fun DateTimeWheelPicker(
-    state: DateTimeWheelPickerState,
-    modifier: Modifier = Modifier
-) {
+fun DateTimeWheelPicker(state: DateTimeWheelPickerState, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Box(
         modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         // Unified selection indicator (behind)
         Surface(
@@ -174,7 +167,7 @@ fun DateTimeWheelPicker(
                 .padding(horizontal = 8.dp)
                 .height(ITEM_HEIGHT),
             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
         ) {}
 
         // Wheel pickers row (on top)
@@ -183,7 +176,7 @@ fun DateTimeWheelPicker(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Date column (wider)
             WheelPicker(
@@ -191,13 +184,13 @@ fun DateTimeWheelPicker(
                 initialIndex = state.selectedDateIndex,
                 onSelectedIndexChange = { state.selectedDateIndex = it },
                 modifier = Modifier.weight(2f),
-                infiniteScroll = false
+                infiniteScroll = false,
             ) { dateItem ->
                 Text(
                     text = formatDateForDisplay(dateItem, context),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -207,13 +200,13 @@ fun DateTimeWheelPicker(
                 initialIndex = state.selectedHourIndex,
                 onSelectedIndexChange = { state.selectedHourIndex = it },
                 modifier = Modifier.weight(1f),
-                infiniteScroll = true
+                infiniteScroll = true,
             ) { hour ->
                 Text(
                     text = hour.toString().padStart(2, '0'),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -223,13 +216,13 @@ fun DateTimeWheelPicker(
                 initialIndex = state.selectedMinuteIndex,
                 onSelectedIndexChange = { state.selectedMinuteIndex = it },
                 modifier = Modifier.weight(1f),
-                infiniteScroll = true
+                infiniteScroll = true,
             ) { minute ->
                 Text(
                     text = minute.toString().padStart(2, '0'),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -239,13 +232,13 @@ fun DateTimeWheelPicker(
                 initialIndex = state.selectedAmPmIndex,
                 onSelectedIndexChange = { state.selectedAmPmIndex = it },
                 modifier = Modifier.weight(0.8f),
-                infiniteScroll = false
+                infiniteScroll = false,
             ) { amPm ->
                 Text(
                     text = amPm.name,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         }
@@ -256,8 +249,8 @@ fun DateTimeWheelPicker(
  * Format date for display in the wheel picker.
  * "Today", "Yesterday", or "EEE d MMM" format.
  */
-private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Context): String {
-    return when (dateItem.daysAgo) {
+private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Context): String =
+    when (dateItem.daysAgo) {
         0 -> context.getString(R.string.wheel_picker_today)
         1 -> context.getString(R.string.wheel_picker_yesterday)
         else -> {
@@ -265,7 +258,6 @@ private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Co
             dateItem.date.format(formatter)
         }
     }
-}
 
 /**
  * Dialog wrapper for DateTimeWheelPicker.
@@ -282,14 +274,14 @@ fun DateTimeWheelPickerDialog(
     onConfirm: (Long) -> Unit,
     onDismiss: () -> Unit,
     buttonText: String = stringResource(R.string.wheel_picker_update_start_time),
-    isValidSelection: (selectedMillis: Long) -> Boolean = { true }
+    isValidSelection: (selectedMillis: Long) -> Boolean = { true },
 ) {
     val state = rememberDateTimeWheelPickerState(initialDateTimeMillis)
     val isEnabled = !state.isFutureTime && isValidSelection(state.selectedMillis)
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
@@ -298,24 +290,24 @@ fun DateTimeWheelPickerDialog(
                 .width(IntrinsicSize.Min)
                 .background(
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface
-                )
+                    color = MaterialTheme.colorScheme.surface,
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Header with close button
                 Box(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.align(Alignment.TopEnd)
+                        modifier = Modifier.align(Alignment.TopEnd),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.close_24px),
-                            contentDescription = stringResource(R.string.time_picker_cancel)
+                            contentDescription = stringResource(R.string.time_picker_cancel),
                         )
                     }
                 }
@@ -325,7 +317,7 @@ fun DateTimeWheelPickerDialog(
                 // Date Time Wheel Picker
                 DateTimeWheelPicker(
                     state = state,
-                    modifier = Modifier.width(320.dp)
+                    modifier = Modifier.width(320.dp),
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -337,11 +329,11 @@ fun DateTimeWheelPickerDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
                 ) {
                     Text(
                         text = buttonText,
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
             }
@@ -364,6 +356,6 @@ private fun DateTimeWheelPickerDialogPreview() {
     DateTimeWheelPickerDialog(
         initialDateTimeMillis = System.currentTimeMillis(),
         onConfirm = {},
-        onDismiss = {}
+        onDismiss = {},
     )
 }

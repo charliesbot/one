@@ -14,9 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class CustomGoalRepositoryImpl(
-    private val dataStore: DataStore<Preferences>,
-) : CustomGoalRepository {
+class CustomGoalRepositoryImpl(private val dataStore: DataStore<Preferences>) : CustomGoalRepository {
 
     private val json = Json { ignoreUnknownKeys = true }
 

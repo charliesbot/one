@@ -37,7 +37,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import com.charliesbot.shared.core.components.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,22 +51,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.components.TimePickerDialog
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
-import com.charliesbot.shared.core.utils.formatMinutesAsTime
-import androidx.compose.ui.tooling.preview.Preview
 import com.charliesbot.shared.core.models.SuggestionSource
+import com.charliesbot.shared.core.utils.formatMinutesAsTime
 import org.koin.androidx.compose.koinViewModel
-import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
-    viewModel: SettingsViewModel = koinViewModel(),
-) {
+fun SettingsScreen(viewModel: SettingsViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val suggestedFastingTime by viewModel.suggestedFastingTime.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -103,7 +101,7 @@ fun SettingsScreen(
                 data = "market://details?id=${context.packageName}".toUri()
             }
             context.startActivity(intent)
-        }
+        },
     )
 
     // Bedtime Picker Dialog
@@ -115,7 +113,7 @@ fun SettingsScreen(
                 viewModel.setBedtimeMinutes(minutes)
                 showBedtimePicker = false
             },
-            onDismiss = { showBedtimePicker = false }
+            onDismiss = { showBedtimePicker = false },
         )
     }
 
@@ -128,7 +126,7 @@ fun SettingsScreen(
                 viewModel.setFixedFastingStartMinutes(minutes)
                 showFixedTimePicker = false
             },
-            onDismiss = { showFixedTimePicker = false }
+            onDismiss = { showFixedTimePicker = false },
         )
     }
 }
@@ -147,27 +145,27 @@ private fun SettingsScreenContent(
     onExportHistory: () -> Unit,
     onForceSyncToWatch: () -> Unit,
     onCopyVersionToClipboard: () -> Unit,
-    onRateAppClick: () -> Unit
+    onRateAppClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.settings_title)) },
-                windowInsets = WindowInsets(top = 0.dp)
+                windowInsets = WindowInsets(top = 0.dp),
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.TopCenter,
         ) {
             Column(
                 modifier = Modifier
                     .widthIn(max = 600.dp)
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Notifications Section
                 SettingsGroup(
@@ -179,7 +177,7 @@ private fun SettingsScreenContent(
                             checked = uiState.notificationsEnabled,
                             onCheckedChange = onNotificationsEnabledChange,
                         )
-                    })
+                    }),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -194,7 +192,7 @@ private fun SettingsScreenContent(
                     bedtimeMinutes = uiState.bedtimeMinutes,
                     onBedtimeClick = onBedtimeClick,
                     fixedStartMinutes = uiState.fixedFastingStartMinutes,
-                    onFixedTimeClick = onFixedTimeClick
+                    onFixedTimeClick = onFixedTimeClick,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -208,7 +206,7 @@ private fun SettingsScreenContent(
                                 label = stringResource(R.string.settings_export_history),
                                 description = stringResource(R.string.settings_export_history_desc),
                                 isLoading = uiState.isExporting,
-                                onClick = onExportHistory
+                                onClick = onExportHistory,
                             )
                         },
                         {
@@ -216,10 +214,10 @@ private fun SettingsScreenContent(
                                 label = stringResource(R.string.settings_force_sync),
                                 description = stringResource(R.string.settings_force_sync_desc),
                                 isLoading = uiState.isSyncing,
-                                onClick = onForceSyncToWatch
+                                onClick = onForceSyncToWatch,
                             )
-                        }
-                    )
+                        },
+                    ),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -236,19 +234,19 @@ private fun SettingsScreenContent(
                                     Text(
                                         text = uiState.versionName,
                                         style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
-                                }
+                                },
                             )
                         },
                         {
                             ActionSettingItem(
                                 label = stringResource(R.string.settings_rate_app),
                                 description = stringResource(R.string.settings_rate_app_desc),
-                                onClick = onRateAppClick
+                                onClick = onRateAppClick,
                             )
-                        }
-                    )
+                        },
+                    ),
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -268,44 +266,44 @@ private fun SmartRemindersCard(
     bedtimeMinutes: Int,
     onBedtimeClick: () -> Unit,
     fixedStartMinutes: Int,
-    onFixedTimeClick: () -> Unit
+    onFixedTimeClick: () -> Unit,
 ) {
     var isCustomizeExpanded by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         // Section Title
         Text(
             text = stringResource(R.string.settings_smart_reminders_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
         )
 
         Surface(
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surfaceContainer,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 // Header with toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                         Text(
                             text = stringResource(R.string.settings_smart_reminders_enabled),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             text = stringResource(R.string.settings_smart_reminders_enabled_desc),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Switch(
@@ -317,7 +315,7 @@ private fun SmartRemindersCard(
                                 contentDescription = null,
                                 modifier = Modifier.size(SwitchDefaults.IconSize),
                             )
-                        }
+                        },
                     )
                 }
 
@@ -330,11 +328,11 @@ private fun SmartRemindersCard(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                            .padding(vertical = 8.dp),
                     ) {
                         Text(
                             text = "🕐",
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
                         )
                         Spacer(modifier = Modifier.size(12.dp))
                         Column {
@@ -343,12 +341,12 @@ private fun SmartRemindersCard(
                             Text(
                                 text = stringResource(R.string.settings_start_fast_at, formattedTime),
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
                             )
                             Text(
                                 text = suggestedFastingTime.reasoning,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -362,7 +360,7 @@ private fun SmartRemindersCard(
                             .clickable { isCustomizeExpanded = !isCustomizeExpanded }
                             .padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(text = "⚙️", style = MaterialTheme.typography.bodyLarge)
@@ -370,16 +368,19 @@ private fun SmartRemindersCard(
                             Text(
                                 text = stringResource(R.string.settings_customize),
                                 style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                         Icon(
                             painter = painterResource(
-                                if (isCustomizeExpanded) R.drawable.keyboard_arrow_up_24px
-                                else R.drawable.keyboard_arrow_down_24px
+                                if (isCustomizeExpanded) {
+                                    R.drawable.keyboard_arrow_up_24px
+                                } else {
+                                    R.drawable.keyboard_arrow_down_24px
+                                },
                             ),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
@@ -387,19 +388,19 @@ private fun SmartRemindersCard(
                     AnimatedVisibility(
                         visible = isCustomizeExpanded,
                         enter = expandVertically(),
-                        exit = shrinkVertically()
+                        exit = shrinkVertically(),
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp)
+                                .padding(top = 8.dp),
                         ) {
                             // Mode selector with segmented buttons
                             Text(
                                 text = stringResource(R.string.settings_calculation_mode),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 8.dp),
                             )
 
                             val modeAutoLabel = stringResource(R.string.settings_mode_auto)
@@ -408,13 +409,13 @@ private fun SmartRemindersCard(
                             val modeFixedLabel = stringResource(R.string.settings_mode_fixed)
 
                             SingleChoiceSegmentedButtonRow(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 val modes = listOf(
                                     SmartReminderMode.AUTO to modeAutoLabel,
                                     SmartReminderMode.BEDTIME_ONLY to modeBedtimeLabel,
                                     SmartReminderMode.MOVING_AVERAGE_ONLY to modeHistoryLabel,
-                                    SmartReminderMode.FIXED_TIME to modeFixedLabel
+                                    SmartReminderMode.FIXED_TIME to modeFixedLabel,
                                 )
                                 modes.forEachIndexed { index, (mode, label) ->
                                     SegmentedButton(
@@ -422,8 +423,8 @@ private fun SmartRemindersCard(
                                         onClick = { onModeSelected(mode) },
                                         shape = SegmentedButtonDefaults.itemShape(
                                             index = index,
-                                            count = modes.size
-                                        )
+                                            count = modes.size,
+                                        ),
                                     ) {
                                         Text(label, style = MaterialTheme.typography.labelSmall)
                                     }
@@ -443,17 +444,17 @@ private fun SmartRemindersCard(
                                             .clickable { onFixedTimeClick() }
                                             .padding(vertical = 8.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
                                             text = stringResource(R.string.settings_fasting_start_time),
-                                            style = MaterialTheme.typography.bodyMedium
+                                            style = MaterialTheme.typography.bodyMedium,
                                         )
                                         Text(
                                             text = formattedFixed,
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
                                         )
                                     }
                                 }
@@ -467,17 +468,17 @@ private fun SmartRemindersCard(
                                             .clickable { onBedtimeClick() }
                                             .padding(vertical = 8.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
                                             text = stringResource(R.string.settings_bedtime),
-                                            style = MaterialTheme.typography.bodyMedium
+                                            style = MaterialTheme.typography.bodyMedium,
                                         )
                                         Text(
                                             text = formattedBedtime,
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
                                         )
                                     }
                                 }
@@ -487,7 +488,7 @@ private fun SmartRemindersCard(
                                         text = stringResource(R.string.settings_using_history),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(vertical = 8.dp)
+                                        modifier = Modifier.padding(vertical = 8.dp),
                                     )
                                 }
                             }
@@ -505,7 +506,7 @@ private fun SettingTile(
     title: String,
     description: String? = null,
     trailingContent: (@Composable () -> Unit)? = null,
-    onClick: (() -> Unit)
+    onClick: (() -> Unit),
 ) {
     ListItem(
         modifier = modifier
@@ -515,7 +516,7 @@ private fun SettingTile(
         headlineContent = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         },
         supportingContent = if (description != null) {
@@ -523,11 +524,13 @@ private fun SettingTile(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        } else null,
-        trailingContent = trailingContent
+        } else {
+            null
+        },
+        trailingContent = trailingContent,
     )
 }
 
@@ -554,9 +557,9 @@ private fun SwitchSettingItem(
                         contentDescription = null,
                         modifier = Modifier.size(SwitchDefaults.IconSize),
                     )
-                }
+                },
             )
-        }
+        },
     )
 }
 
@@ -566,7 +569,7 @@ private fun ActionSettingItem(
     description: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
 ) {
     SettingTile(
         title = label,
@@ -578,48 +581,48 @@ private fun ActionSettingItem(
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             } else {
                 null
             }
-        }
+        },
     )
 }
 
 @Composable
-fun SettingsGroup(
-    title: String,
-    items: List<@Composable () -> Unit>,
-    modifier: Modifier = Modifier
-) {
+fun SettingsGroup(title: String, items: List<@Composable () -> Unit>, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         // Title
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
         )
 
         // The Container
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             items.forEachIndexed { index, itemContent ->
                 val shape = when {
                     items.size == 1 -> RoundedCornerShape(24.dp)
                     index == 0 -> RoundedCornerShape(
-                        topStart = 24.dp, topEnd = 24.dp,
-                        bottomStart = 4.dp, bottomEnd = 4.dp
+                        topStart = 24.dp,
+                        topEnd = 24.dp,
+                        bottomStart = 4.dp,
+                        bottomEnd = 4.dp,
                     )
                     index == items.lastIndex -> RoundedCornerShape(
-                        topStart = 4.dp, topEnd = 4.dp,
-                        bottomStart = 24.dp, bottomEnd = 24.dp
+                        topStart = 4.dp,
+                        topEnd = 4.dp,
+                        bottomStart = 24.dp,
+                        bottomEnd = 24.dp,
                     )
                     else -> RoundedCornerShape(4.dp)
                 }
@@ -627,7 +630,7 @@ fun SettingsGroup(
                 Surface(
                     shape = shape,
                     color = MaterialTheme.colorScheme.surfaceContainer,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     itemContent()
                 }
@@ -646,13 +649,13 @@ private fun PreviewSettingsScreen() {
             smartReminderMode = SmartReminderMode.AUTO,
             bedtimeMinutes = 1320, // 10:00 PM
             fixedFastingStartMinutes = 1140, // 7:00 PM
-            versionName = "1.0.0"
+            versionName = "1.0.0",
         ),
         suggestedFastingTime = SuggestedFastingTime(
             suggestedTimeMillis = System.currentTimeMillis(),
             suggestedTimeMinutes = 1200, // 8:00 PM
             reasoning = "Based on your recent 7-day average",
-            source = SuggestionSource.MOVING_AVERAGE
+            source = SuggestionSource.MOVING_AVERAGE,
         ),
         snackbarHostState = remember { SnackbarHostState() },
         onNotificationsEnabledChange = {},
@@ -663,6 +666,6 @@ private fun PreviewSettingsScreen() {
         onExportHistory = {},
         onForceSyncToWatch = {},
         onCopyVersionToClipboard = {},
-        onRateAppClick = {}
+        onRateAppClick = {},
     )
 }

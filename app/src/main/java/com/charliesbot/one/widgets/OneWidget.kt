@@ -7,8 +7,6 @@ import android.graphics.Paint
 import android.graphics.RectF
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
@@ -39,12 +37,15 @@ object ProgressBitmap {
 
         val radius = sizePx / 2f - strokePx / 2f
         val rect = RectF(
-            strokePx / 2, strokePx / 2,
-            sizePx - strokePx / 2, sizePx - strokePx / 2
+            strokePx / 2,
+            strokePx / 2,
+            sizePx - strokePx / 2,
+            sizePx - strokePx / 2,
         )
 
         // track
-        paint.color = track; c.drawCircle(sizePx / 2f, sizePx / 2f, radius, paint)
+        paint.color = track
+        c.drawCircle(sizePx / 2f, sizePx / 2f, radius, paint)
 
         // progress
         paint.color = indicator
@@ -52,31 +53,31 @@ object ProgressBitmap {
     }
 }
 
-class OneWidget() : GlanceAppWidget(), KoinComponent {
+class OneWidget :
+    GlanceAppWidget(),
+    KoinComponent {
     private val fastingDataRepository: FastingDataRepository by inject()
 
     override val sizeMode: SizeMode = SizeMode.Responsive(
         setOf(
             OneWidgetSize.SMALL_SQUARE,
             OneWidgetSize.HORIZONTAL_RECTANGLE,
-            OneWidgetSize.BIG_SQUARE
-        )
+            OneWidgetSize.BIG_SQUARE,
+        ),
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             val fastingData by fastingDataRepository.fastingDataItem.collectAsState(
                 initial = FastingDataItem(
-                    fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id
-                )
+                    fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
+                ),
             )
 
             OneWidgetContent(
                 fastingData = fastingData,
-                context = context
+                context = context,
             )
         }
     }
 }
-
-

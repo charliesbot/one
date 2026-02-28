@@ -6,9 +6,7 @@ import com.charliesbot.shared.core.data.repositories.customGoalRepository.Custom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GoalResolver(
-    customGoalRepository: CustomGoalRepository,
-) {
+class GoalResolver(customGoalRepository: CustomGoalRepository) {
     val allGoals: Flow<List<FastGoal>> = customGoalRepository.customGoals
         .map { customGoals ->
             PredefinedFastingGoals.registerCustomGoals(customGoals)

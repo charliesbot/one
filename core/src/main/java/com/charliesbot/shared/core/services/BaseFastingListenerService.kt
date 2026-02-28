@@ -38,7 +38,9 @@ import org.koin.core.component.KoinComponent
  * @see com.charliesbot.shared.core.domain.usecase.FastingUseCase
  * @see FastingEventCallbacks
  */
-abstract class BaseFastingListenerService : WearableListenerService(), KoinComponent,
+abstract class BaseFastingListenerService :
+    WearableListenerService(),
+    KoinComponent,
     FastingEventCallbacks {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     protected val eventManager: FastingEventManager by inject()
@@ -50,21 +52,21 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
     protected open suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName}: onPlatformFastingStarted called, but no implementation."
+            "${this::class.java.simpleName}: onPlatformFastingStarted called, but no implementation.",
         )
     }
 
     protected open suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName}: onPlatformFastingCompleted called, but no implementation."
+            "${this::class.java.simpleName}: onPlatformFastingCompleted called, but no implementation.",
         )
     }
 
     protected open suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName}: onPlatformFastingUpdated called, but no implementation."
+            "${this::class.java.simpleName}: onPlatformFastingUpdated called, but no implementation.",
         )
     }
 
@@ -78,7 +80,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         // Default implementation does nothing.
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName} - onPlatformFastingStateSynced called (no-op by default)"
+            "${this::class.java.simpleName} - onPlatformFastingStateSynced called (no-op by default)",
         )
     }
 
@@ -94,14 +96,12 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         onPlatformFastingUpdated(fastingDataItem)
     }
 
-    private suspend fun getLocalNodeId(): String? {
-        return try {
-            val localNode = nodeClient.localNode.await()
-            localNode.id
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Failed to get local node ID", e)
-            null
-        }
+    private suspend fun getLocalNodeId(): String? = try {
+        val localNode = nodeClient.localNode.await()
+        localNode.id
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "Failed to get local node ID", e)
+        null
     }
 
     private fun isFromRemoteDevice(dataEvents: DataEventBuffer): Boolean {
@@ -125,7 +125,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         super.onCreate()
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName} init"
+            "${this::class.java.simpleName} init",
         )
         serviceScope.launch {
             localNodeId = getLocalNodeId()
@@ -133,7 +133,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                 ?.updateTimestamp ?: currentLastTimestamp
             Log.d(
                 LOG_TAG,
-                "${this::class.java.simpleName} created. Initial lastTimestamp: $currentLastTimestamp"
+                "${this::class.java.simpleName} created. Initial lastTimestamp: $currentLastTimestamp",
             )
         }
     }
@@ -151,7 +151,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
         if (!isFromRemoteDevice(dataEvents)) {
             Log.d(
                 LOG_TAG,
-                "${this::class.java.simpleName} - Ignoring local data change event (localNodeId: $localNodeId)"
+                "${this::class.java.simpleName} - Ignoring local data change event (localNodeId: $localNodeId)",
             )
             dataEvents.release()
             return
@@ -159,7 +159,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
 
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName} onDataChanged from REMOTE device. Comparing against lastTimestamp: $currentLastTimestamp"
+            "${this::class.java.simpleName} onDataChanged from REMOTE device. Comparing against lastTimestamp: $currentLastTimestamp",
         )
 
         var newestRemoteItem: FastingDataItem?
@@ -173,10 +173,9 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
 
             // if most recent remote item is older than local item, update local item
             if (newestRemoteItem.updateTimestamp > currentLastTimestamp) {
-
                 Log.i(
                     LOG_TAG,
-                    "Processing REMOTE event (Timestamp: ${newestRemoteItem.updateTimestamp} > $currentLastTimestamp)"
+                    "Processing REMOTE event (Timestamp: ${newestRemoteItem.updateTimestamp} > $currentLastTimestamp)",
                 )
 
                 currentLastTimestamp = newestRemoteItem.updateTimestamp
@@ -190,13 +189,13 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
                             startTimeInMillis = newestRemoteItem.startTimeInMillis,
                             fastingGoalId = newestRemoteItem.fastingGoalId,
                             isFasting = newestRemoteItem.isFasting,
-                            lastUpdateTimestamp = newestRemoteItem.updateTimestamp
+                            lastUpdateTimestamp = newestRemoteItem.updateTimestamp,
                         )
                         onPlatformFastingStateSynced()
                         eventManager.processStateChange(
                             previousItem = previousItem,
                             currentItem = newestRemoteItem,
-                            callbacks = this@BaseFastingListenerService
+                            callbacks = this@BaseFastingListenerService,
                         )
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "Failed to update repository from remote", e)
@@ -206,7 +205,7 @@ abstract class BaseFastingListenerService : WearableListenerService(), KoinCompo
             } else {
                 Log.d(
                     LOG_TAG,
-                    "Remote event timestamp ${newestRemoteItem.updateTimestamp} is not newer than current $currentLastTimestamp, skipping"
+                    "Remote event timestamp ${newestRemoteItem.updateTimestamp} is not newer than current $currentLastTimestamp, skipping",
                 )
             }
         } catch (e: Exception) {

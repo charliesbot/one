@@ -5,7 +5,6 @@ import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.Fa
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestionSource
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -16,7 +15,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 
@@ -103,7 +101,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         val records = listOf(
             createFastingRecordAtTime(19, 0, now - 1 * 24 * 60 * 60 * 1000L), // 19:00 yesterday
             createFastingRecordAtTime(20, 0, now - 2 * 24 * 60 * 60 * 1000L), // 20:00 2 days ago
-            createFastingRecordAtTime(21, 0, now - 3 * 24 * 60 * 60 * 1000L)  // 21:00 3 days ago
+            createFastingRecordAtTime(21, 0, now - 3 * 24 * 60 * 60 * 1000L), // 21:00 3 days ago
         )
 
         every { settingsRepository.smartReminderMode } returns flowOf(SmartReminderMode.MOVING_AVERAGE_ONLY)
@@ -125,7 +123,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         val now = System.currentTimeMillis()
         val records = listOf(
             createFastingRecordAtTime(19, 0, now - 1 * 24 * 60 * 60 * 1000L),
-            createFastingRecordAtTime(20, 0, now - 2 * 24 * 60 * 60 * 1000L)
+            createFastingRecordAtTime(20, 0, now - 2 * 24 * 60 * 60 * 1000L),
         )
 
         every { settingsRepository.smartReminderMode } returns flowOf(SmartReminderMode.MOVING_AVERAGE_ONLY)
@@ -149,7 +147,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         val records = listOf(
             createFastingRecordAtTime(18, 0, now - 1 * 24 * 60 * 60 * 1000L),
             createFastingRecordAtTime(18, 0, now - 2 * 24 * 60 * 60 * 1000L),
-            createFastingRecordAtTime(18, 0, now - 3 * 24 * 60 * 60 * 1000L)
+            createFastingRecordAtTime(18, 0, now - 3 * 24 * 60 * 60 * 1000L),
         )
 
         every { settingsRepository.smartReminderMode } returns flowOf(SmartReminderMode.AUTO)
@@ -168,7 +166,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         // Arrange: Only 1 record
         val now = System.currentTimeMillis()
         val records = listOf(
-            createFastingRecordAtTime(18, 0, now - 1 * 24 * 60 * 60 * 1000L)
+            createFastingRecordAtTime(18, 0, now - 1 * 24 * 60 * 60 * 1000L),
         )
 
         every { settingsRepository.smartReminderMode } returns flowOf(SmartReminderMode.AUTO)
@@ -191,8 +189,8 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         val now = System.currentTimeMillis()
         val records = listOf(
             createFastingRecordAtTime(23, 0, now - 1 * 24 * 60 * 60 * 1000L), // 23:00
-            createFastingRecordAtTime(1, 0, now - 2 * 24 * 60 * 60 * 1000L),  // 01:00
-            createFastingRecordAtTime(0, 0, now - 3 * 24 * 60 * 60 * 1000L)   // 00:00
+            createFastingRecordAtTime(1, 0, now - 2 * 24 * 60 * 60 * 1000L), // 01:00
+            createFastingRecordAtTime(0, 0, now - 3 * 24 * 60 * 60 * 1000L), // 00:00
         )
 
         every { settingsRepository.smartReminderMode } returns flowOf(SmartReminderMode.MOVING_AVERAGE_ONLY)
@@ -207,7 +205,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         val avgMinutes = result.suggestedTimeMinutes
         assertTrue(
             "Expected average near midnight but got $avgMinutes",
-            avgMinutes < 60 || avgMinutes > 1380
+            avgMinutes < 60 || avgMinutes > 1380,
         )
     }
 
@@ -216,9 +214,9 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         // Arrange: One recent record and one old record (older than 14 days)
         val now = System.currentTimeMillis()
         val records = listOf(
-            createFastingRecordAtTime(18, 0, now - 1 * 24 * 60 * 60 * 1000L),   // 1 day ago (recent)
-            createFastingRecordAtTime(18, 0, now - 2 * 24 * 60 * 60 * 1000L),   // 2 days ago (recent)
-            createFastingRecordAtTime(12, 0, now - 20 * 24 * 60 * 60 * 1000L)   // 20 days ago (old, should be filtered)
+            createFastingRecordAtTime(18, 0, now - 1 * 24 * 60 * 60 * 1000L), // 1 day ago (recent)
+            createFastingRecordAtTime(18, 0, now - 2 * 24 * 60 * 60 * 1000L), // 2 days ago (recent)
+            createFastingRecordAtTime(12, 0, now - 20 * 24 * 60 * 60 * 1000L), // 20 days ago (old, should be filtered)
         )
 
         every { settingsRepository.smartReminderMode } returns flowOf(SmartReminderMode.AUTO)
@@ -245,7 +243,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
         return FastingRecord(
             startTimeEpochMillis = startTimeMillis,
             endTimeEpochMillis = startTimeMillis + 16 * 60 * 60 * 1000L, // 16 hours later
-            fastingGoalId = "16:8"
+            fastingGoalId = "16:8",
         )
     }
 }

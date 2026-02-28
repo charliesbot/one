@@ -22,14 +22,11 @@ interface FastingRecordDao {
      * Note: startTimestamp is inclusive, endExclusiveTimestamp is exclusive.
      */
     @Query(
-    "SELECT * FROM fasting_history " +
-    "WHERE endTimeEpochMillis >= :startTimestamp AND endTimeEpochMillis < :endExclusiveTimestamp " +
-    "ORDER BY endTimeEpochMillis DESC"
+        "SELECT * FROM fasting_history " +
+            "WHERE endTimeEpochMillis >= :startTimestamp AND endTimeEpochMillis < :endExclusiveTimestamp " +
+            "ORDER BY endTimeEpochMillis DESC",
     )
-    fun getFastingsForPeriod(
-        startTimestamp: Long,
-        endExclusiveTimestamp: Long
-    ): Flow<List<FastingRecord>>
+    fun getFastingsForPeriod(startTimestamp: Long, endExclusiveTimestamp: Long): Flow<List<FastingRecord>>
 
     @Query("DELETE FROM fasting_history WHERE startTimeEpochMillis = :startTimeEpochMillis")
     suspend fun deleteByStartTime(startTimeEpochMillis: Long)

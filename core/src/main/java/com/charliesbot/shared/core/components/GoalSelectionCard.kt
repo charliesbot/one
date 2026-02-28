@@ -1,8 +1,6 @@
 package com.charliesbot.shared.core.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +12,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
@@ -30,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.FastGoal
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SelectionCard(
@@ -44,17 +40,21 @@ private fun SelectionCard(
 ) {
     Card(
         onClick = onClick,
-        border = if (isSelected) BorderStroke(
-            3.dp,
-            MaterialTheme.colorScheme.onBackground
-        ) else null,
+        border = if (isSelected) {
+            BorderStroke(
+                3.dp,
+                MaterialTheme.colorScheme.onBackground,
+            )
+        } else {
+            null
+        },
         colors = CardDefaults.cardColors(
-            containerColor = color
+            containerColor = color,
         ),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
         ) {
             Text(
                 text = title,
@@ -65,17 +65,17 @@ private fun SelectionCard(
             Text(
                 text = description,
                 style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = stringResource(R.string.hours))
                 Spacer(modifier = Modifier.weight(1f))
                 if (onEdit != null) {
                     OutlinedIconButton(
                         onClick = onEdit,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.edit_24px),
@@ -111,10 +111,7 @@ fun GoalSelectionCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomGoalCard(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
+fun CustomGoalCard(modifier: Modifier = Modifier, onClick: () -> Unit) {
     SelectionCard(
         modifier = modifier,
         onClick = onClick,

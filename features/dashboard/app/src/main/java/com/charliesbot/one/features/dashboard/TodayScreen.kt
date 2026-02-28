@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
@@ -31,6 +29,8 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -49,9 +49,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.features.dashboard.components.CurrentFastingProgress
 import com.charliesbot.one.features.dashboard.components.GoalBottomSheet
 import com.charliesbot.one.features.dashboard.components.TimeDisplay
-import com.charliesbot.shared.core.components.TimePickerDialog
 import com.charliesbot.one.features.dashboard.components.WeeklyProgress
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.components.TimePickerDialog
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.TimePeriodProgress
@@ -190,7 +190,7 @@ private fun TodayScreenContent(
                     onCloseGoalBottomSheet()
                     scope.launch {
                         snackbarHostState.showSnackbar(
-                            if (isUpdate) customGoalUpdatedMessage else customGoalSavedMessage
+                            if (isUpdate) customGoalUpdatedMessage else customGoalSavedMessage,
                         )
                     }
                 },
@@ -209,28 +209,28 @@ private fun TodayScreenContent(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.TopCenter,
         ) {
             Column(
                 modifier = Modifier
                     .widthIn(max = maxWidth)
                     .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 WeeklyProgress(
                     weeklyProgress = weeklyProgress,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = screenPadding + 24.dp)
+                        .padding(horizontal = screenPadding + 24.dp),
                 )
 
                 // Smart Suggestion Card - shown when not fasting and reminders are enabled
                 AnimatedVisibility(
                     visible = smartRemindersEnabled && !isFasting && suggestedTimeMinutes != null,
                     enter = fadeIn(animationSpec = tween(durationMillis = 300)) +
-                            expandVertically(animationSpec = tween(durationMillis = 300)),
+                        expandVertically(animationSpec = tween(durationMillis = 300)),
                     exit = fadeOut(animationSpec = tween(durationMillis = 150)) +
-                            shrinkVertically(animationSpec = tween(durationMillis = 200))
+                        shrinkVertically(animationSpec = tween(durationMillis = 200)),
                 ) {
                     suggestedTimeMinutes?.let { minutes ->
                         SmartSuggestionCard(
@@ -239,7 +239,7 @@ private fun TodayScreenContent(
                             source = suggestedTimeSource,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = screenPadding, end = screenPadding, top = 30.dp)
+                                .padding(start = screenPadding, end = screenPadding, top = 30.dp),
                         )
                     }
                 }
@@ -248,7 +248,7 @@ private fun TodayScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = screenPadding, end = screenPadding, top = 30.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
                 ) {
                     val progressContent: @Composable () -> Unit = {
                         CurrentFastingProgress(
@@ -263,10 +263,10 @@ private fun TodayScreenContent(
                         AnimatedVisibility(
                             visible = isFasting,
                             enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
-                                    expandVertically(animationSpec = tween(durationMillis = 350)),
+                                expandVertically(animationSpec = tween(durationMillis = 350)),
                             exit =
-                                fadeOut(animationSpec = tween(durationMillis = 150)) +
-                                        shrinkVertically(animationSpec = tween(durationMillis = 350))
+                            fadeOut(animationSpec = tween(durationMillis = 150)) +
+                                shrinkVertically(animationSpec = tween(durationMillis = 350)),
                         ) {
                             ButtonGroup(
                                 overflowIndicator = {},
@@ -283,29 +283,29 @@ private fun TodayScreenContent(
                                                 pressedShape = RoundedCornerShape(60.dp),
                                             ),
                                             onClick = { onOpenTimePickerDialog() },
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f),
                                         )
                                     },
-                                    menuContent = {}
+                                    menuContent = {},
                                 )
                                 customItem(
                                     buttonGroupContent = {
                                         TimeDisplay(
                                             title = stringResource(
                                                 R.string.goal_with_duration,
-                                                "${currentGoal.durationDisplay}H"
+                                                "${currentGoal.durationDisplay}H",
                                             ),
                                             date = startTimeInLocalDateTime.plusHours(
-                                                getHours(currentGoal.durationMillis)
+                                                getHours(currentGoal.durationMillis),
                                             ),
                                             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
                                                 pressedShape = RoundedCornerShape(60.dp),
                                             ),
                                             onClick = { onOpenGoalBottomSheet() },
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f),
                                         )
                                     },
-                                    menuContent = {}
+                                    menuContent = {},
                                 )
                             }
                         }
@@ -314,7 +314,7 @@ private fun TodayScreenContent(
                             onClick = if (isFasting) onStopFasting else onStartFasting,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(50.dp),
                         ) {
                             Text(text = fastButtonLabel)
                         }
@@ -355,47 +355,51 @@ private fun SmartSuggestionCard(
     suggestedTimeMinutes: Int,
     reasoning: String,
     source: com.charliesbot.shared.core.models.SuggestionSource?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val formattedTime = formatMinutesAsTime(suggestedTimeMinutes)
     val sourceText = when (source) {
-        com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> stringResource(R.string.smart_suggestion_based_on_average)
-        com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> stringResource(R.string.smart_suggestion_based_on_bedtime)
+        com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> stringResource(
+            R.string.smart_suggestion_based_on_average,
+        )
+        com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> stringResource(
+            R.string.smart_suggestion_based_on_bedtime,
+        )
         else -> null
     }
 
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.upcoming_fast),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = formattedTime,
                 style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = reasoning,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
             )
             if (sourceText != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = sourceText,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
                 )
             }
         }
@@ -488,4 +492,3 @@ private fun PreviewTodayScreenWithUpcomingFast() {
         onDeleteCustomGoal = {},
     )
 }
-

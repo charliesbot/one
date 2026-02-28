@@ -13,12 +13,14 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 
-class MainApplication : Application(), Configuration.Provider {
+class MainApplication :
+    Application(),
+    Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
         disableNotificationBridge()
-        
+
         // Create notification channel early so smart reminders can use it
         NotificationUtil.createNotificationChannel(this)
 
@@ -43,5 +45,4 @@ class MainApplication : Application(), Configuration.Provider {
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().build()
-
 }

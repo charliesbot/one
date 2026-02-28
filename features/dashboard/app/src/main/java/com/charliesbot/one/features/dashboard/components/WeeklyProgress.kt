@@ -31,24 +31,24 @@ fun WeeklyProgress(modifier: Modifier = Modifier, weeklyProgress: List<TimePerio
         R.string.thursday,
         R.string.friday,
         R.string.saturday,
-        R.string.sunday
+        R.string.sunday,
     )
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier
+        modifier = modifier,
     ) {
         daysOfWeek.forEachIndexed { index, dayResId ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(dayResId).uppercase(),
                     fontSize = 10.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 FastingProgressBar(
                     progress = weeklyProgress.getOrNull(index)?.progress ?: 0f,
                     modifier = Modifier.size(25.dp),
-                    strokeWidth = 5.dp
+                    strokeWidth = 5.dp,
                 )
             }
         }

@@ -35,9 +35,8 @@ import androidx.wear.compose.material3.TextButton
 import androidx.wear.compose.material3.TextToggleButton
 import androidx.wear.compose.material3.TextToggleButtonDefaults
 import androidx.wear.tooling.preview.devices.WearDevices
-import com.charliesbot.shared.R
-import com.charliesbot.one.features.dashboard.wear.R as WearR
 import com.charliesbot.onewearos.components.TimeButtonActions
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.calculateProgressFraction
@@ -45,6 +44,7 @@ import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import com.charliesbot.one.features.dashboard.wear.R as WearR
 
 @Composable
 fun rememberIsLargeScreen(): Boolean {
@@ -54,12 +54,11 @@ fun rememberIsLargeScreen(): Boolean {
     }
 }
 
-
 @Composable
 fun WearTodayScreen(
     viewModel: WearTodayViewModel = koinViewModel(),
     onNavigateToStartDateSelection: () -> Unit,
-    onNavigateToGoalSelection: () -> Unit
+    onNavigateToGoalSelection: () -> Unit,
 ) {
     val startTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
     val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
@@ -73,7 +72,7 @@ fun WearTodayScreen(
         onStartFasting = viewModel::onStartFasting,
         onStopFasting = viewModel::onStopFasting,
         onNavigateToGoalSelection = onNavigateToGoalSelection,
-        onNavigateToStartDateSelection = onNavigateToStartDateSelection
+        onNavigateToStartDateSelection = onNavigateToStartDateSelection,
     )
 }
 
@@ -86,7 +85,7 @@ fun WearTodayContent(
     onStartFasting: () -> Unit,
     onStopFasting: () -> Unit,
     onNavigateToStartDateSelection: () -> Unit,
-    onNavigateToGoalSelection: () -> Unit
+    onNavigateToGoalSelection: () -> Unit,
 ) {
     var elapsedTime by remember { mutableLongStateOf(0L) }
     val isLargeScreen = rememberIsLargeScreen()
@@ -100,7 +99,7 @@ fun WearTodayContent(
     } else {
         stringResource(
             WearR.string.target_duration_hours,
-            currentGoal?.durationDisplay.toString()
+            currentGoal?.durationDisplay.toString(),
         )
     }
 
@@ -141,20 +140,24 @@ fun WearTodayContent(
                         .padding(horizontal = 40.dp),
                     onClick = {
                         onNavigateToGoalSelection()
-                    }
+                    },
                 ) {
                     Text(
                         text = timeLabel,
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = if (isLargeScreen) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        style = if (isLargeScreen) {
+                            MaterialTheme.typography.titleLarge
+                        } else {
+                            MaterialTheme.typography.titleMedium
+                        },
+                        fontWeight = FontWeight.Bold,
                     )
                 }
                 if (!isFasting) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 AnimatedVisibility(
-                    visible = isFasting
+                    visible = isFasting,
                 ) {
                     TimeButtonActions(
                         startTime = startTimeInLocalDateTime,
@@ -165,7 +168,7 @@ fun WearTodayContent(
                         },
                         onGoalTimeClick = {
                             onNavigateToGoalSelection()
-                        }
+                        },
                     )
                 }
                 TextToggleButton(
@@ -176,11 +179,15 @@ fun WearTodayContent(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 50.dp)
+                        .padding(horizontal = 50.dp),
                 ) {
                     Text(
                         text = fastButtonLabel,
-                        style = if (isLargeScreen) MaterialTheme.typography.labelLarge else MaterialTheme.typography.labelMedium
+                        style = if (isLargeScreen) {
+                            MaterialTheme.typography.labelLarge
+                        } else {
+                            MaterialTheme.typography.labelMedium
+                        },
                     )
                 }
             }
@@ -199,6 +206,6 @@ private fun DefaultPreview() {
         onStartFasting = { },
         onStopFasting = { },
         onNavigateToGoalSelection = { },
-        onNavigateToStartDateSelection = { }
+        onNavigateToStartDateSelection = { },
     )
 }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class ComplicationUpdateManager(
     private val applicationContext: Context,
     private val timeWindow: Long = 1000L,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
@@ -29,7 +29,7 @@ class ComplicationUpdateManager(
     init {
         Log.d(
             AppConstants.LOG_TAG,
-            "WidgetUpdateManager: Initializing and starting debounce collector."
+            "WidgetUpdateManager: Initializing and starting debounce collector.",
         )
         startDebounceCollector()
     }
@@ -41,7 +41,7 @@ class ComplicationUpdateManager(
                 runCatching {
                     ComplicationDataSourceUpdateRequester.create(
                         applicationContext,
-                        ComponentName(applicationContext, MainComplicationService::class.java)
+                        ComponentName(applicationContext, MainComplicationService::class.java),
                     )
                         .requestUpdateAll()
                 }.onFailure {

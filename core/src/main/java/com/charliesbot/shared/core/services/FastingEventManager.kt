@@ -21,14 +21,14 @@ class FastingEventManager : KoinComponent {
     suspend fun processStateChange(
         previousItem: FastingDataItem?,
         currentItem: FastingDataItem,
-        callbacks: FastingEventCallbacks
+        callbacks: FastingEventCallbacks,
     ) {
         val wasFasting = previousItem?.isFasting == true
         val isNowFasting = currentItem.isFasting
 
         Log.d(
             LOG_TAG,
-            "EventManager: Processing state change. Was Fasting: $wasFasting, Is Now Fasting: $isNowFasting"
+            "EventManager: Processing state change. Was Fasting: $wasFasting, Is Now Fasting: $isNowFasting",
         )
 
         when {
@@ -37,7 +37,7 @@ class FastingEventManager : KoinComponent {
                 Log.d(LOG_TAG, "EventManager: Firing onFastingStarted.")
                 notificationScheduler.scheduleNotifications(
                     currentItem.startTimeInMillis,
-                    currentItem.fastingGoalId
+                    currentItem.fastingGoalId,
                 )
                 callbacks.onFastingStarted(currentItem)
             }
@@ -54,7 +54,7 @@ class FastingEventManager : KoinComponent {
                 notificationScheduler.cancelAllNotifications()
                 notificationScheduler.scheduleNotifications(
                     currentItem.startTimeInMillis,
-                    currentItem.fastingGoalId
+                    currentItem.fastingGoalId,
                 )
                 callbacks.onFastingUpdated(currentItem)
             }
@@ -66,5 +66,4 @@ class FastingEventManager : KoinComponent {
             }
         }
     }
-
 }

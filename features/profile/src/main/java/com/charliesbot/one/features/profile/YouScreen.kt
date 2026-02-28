@@ -3,7 +3,6 @@ package com.charliesbot.one.features.profile
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -23,14 +22,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.features.profile.components.FastingDetailsBottomSheet
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingMonthCalendar
-import com.charliesbot.shared.core.utils.isWidthAtLeastMedium
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun YouScreen(
-    viewModel: YouViewModel = koinViewModel(),
-) {
+fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -39,14 +35,14 @@ fun YouScreen(
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text(stringResource(R.string.nav_you)) },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
                 .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Card(modifier = Modifier.padding(vertical = 12.dp, horizontal = 20.dp).widthIn(max = 600.dp)) {
                 FastingMonthCalendar(
@@ -64,7 +60,7 @@ fun YouScreen(
                     },
                     onPreviousMonth = {
                         viewModel.onPreviousMonth()
-                    }
+                    },
                 )
             }
         }
@@ -88,7 +84,7 @@ fun YouScreen(
                                 originalStartTime = originalStart,
                                 newStartTime = newStartTime,
                                 newEndTime = endTime,
-                                goalId = selectedDay.goalId ?: "16:8"
+                                goalId = selectedDay.goalId ?: "16:8",
                             )
                         }
                     }
@@ -99,10 +95,10 @@ fun YouScreen(
                             originalStartTime = startTime,
                             newStartTime = startTime,
                             newEndTime = newEndTime,
-                            goalId = selectedDay.goalId ?: "16:8"
+                            goalId = selectedDay.goalId ?: "16:8",
                         )
                     }
-                }
+                },
             )
         }
     }

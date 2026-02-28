@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class WidgetUpdateManager(
     private val applicationContext: Context,
     private val timeWindow: Long = 1000L,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
@@ -28,7 +28,7 @@ class WidgetUpdateManager(
     init {
         Log.d(
             AppConstants.LOG_TAG,
-            "WidgetUpdateManager: Initializing and starting debounce collector."
+            "WidgetUpdateManager: Initializing and starting debounce collector.",
         )
         startDebounceCollector()
     }

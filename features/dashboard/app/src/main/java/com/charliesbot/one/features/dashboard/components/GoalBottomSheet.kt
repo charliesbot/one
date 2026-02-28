@@ -84,13 +84,13 @@ fun GoalBottomSheet(
                 val forward = targetState !is SheetView.GoalSelection
                 if (forward) {
                     (slideInHorizontally { it } + fadeIn()) togetherWith
-                            (slideOutHorizontally { -it } + fadeOut())
+                        (slideOutHorizontally { -it } + fadeOut())
                 } else {
                     (slideInHorizontally { -it } + fadeIn()) togetherWith
-                            (slideOutHorizontally { it } + fadeOut())
+                        (slideOutHorizontally { it } + fadeOut())
                 }
             },
-            label = "GoalSheetNavigation"
+            label = "GoalSheetNavigation",
         ) { view ->
             when (view) {
                 SheetView.GoalSelection -> GoalSelectionView(
@@ -144,7 +144,7 @@ private fun GoalSelectionView(
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(24.dp))
         LazyVerticalGrid(
@@ -168,7 +168,7 @@ private fun GoalSelectionView(
         Spacer(modifier = Modifier.height(24.dp))
         FilledTonalButton(
             onClick = { onSave(temporarilySelectedId) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.save))
         }
@@ -176,11 +176,7 @@ private fun GoalSelectionView(
 }
 
 @Composable
-private fun CustomGoalFormView(
-    editingGoal: FastGoal?,
-    onSave: (FastGoal) -> Unit,
-    onDelete: ((String) -> Unit)?,
-) {
+private fun CustomGoalFormView(editingGoal: FastGoal?, onSave: (FastGoal) -> Unit, onDelete: ((String) -> Unit)?) {
     val isEditing = editingGoal != null
     val days = remember { (0..7).toList() }
     val hours = remember { (0..23).toList() }
@@ -208,7 +204,7 @@ private fun CustomGoalFormView(
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         // Duration pickers
@@ -286,12 +282,16 @@ private fun CustomGoalFormView(
                         .clip(CircleShape)
                         .background(color.copy(alpha = 0.8f), CircleShape)
                         .then(
-                            if (isColorSelected) Modifier.border(
-                                BorderStroke(3.dp, MaterialTheme.colorScheme.onBackground),
-                                CircleShape
-                            ) else Modifier
+                            if (isColorSelected) {
+                                Modifier.border(
+                                    BorderStroke(3.dp, MaterialTheme.colorScheme.onBackground),
+                                    CircleShape,
+                                )
+                            } else {
+                                Modifier
+                            },
                         )
-                        .clickable { selectedColor = color }
+                        .clickable { selectedColor = color },
                 )
             }
         }

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
@@ -18,7 +19,6 @@ import com.charliesbot.shared.core.constants.NotificationConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationUtil
-import android.os.SystemClock
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -28,10 +28,7 @@ import kotlinx.coroutines.runBlocking
  * Uses Status.StopwatchPart for auto-updating elapsed time display.
  * The system handles ticking the timer automatically - no periodic updates needed.
  */
-class OngoingActivityManager(
-    private val context: Context,
-    private val fastingDataRepository: FastingDataRepository
-) {
+class OngoingActivityManager(private val context: Context, private val fastingDataRepository: FastingDataRepository) {
 
     /**
      * Starts the ongoing activity with a stopwatch that auto-updates.
@@ -40,7 +37,10 @@ class OngoingActivityManager(
      */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun startOngoingActivity(startTimeMillis: Long, fastingGoalId: String) {
-        Log.d(LOG_TAG, "OngoingActivityManager: Starting ongoing activity. startTime=$startTimeMillis, goalId=$fastingGoalId")
+        Log.d(
+            LOG_TAG,
+            "OngoingActivityManager: Starting ongoing activity. startTime=$startTimeMillis, goalId=$fastingGoalId",
+        )
 
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
         val pendingIntent = createTouchIntent()
@@ -65,7 +65,7 @@ class OngoingActivityManager(
         val ongoingActivity = OngoingActivity.Builder(
             context,
             NotificationConstants.ONGOING_NOTIFICATION_ID,
-            notificationBuilder
+            notificationBuilder,
         )
             .setAnimatedIcon(R.drawable.ic_notification_status)
             .setStaticIcon(R.drawable.ic_notification_status)
@@ -112,7 +112,7 @@ class OngoingActivityManager(
             context,
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 
@@ -120,21 +120,19 @@ class OngoingActivityManager(
         startTimeMillis: Long,
         goalDuration: String,
         pendingIntent: PendingIntent,
-    ): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, NotificationUtil.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_status)
-            .setContentTitle(context.getString(R.string.ongoing_activity_title))
-            .setContentText(context.getString(R.string.target_duration_short, goalDuration))
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setWhen(startTimeMillis)
-            .setUsesChronometer(true)  // System auto-updates elapsed time
-            .setSilent(true)
-            .setLocusId(LocusIdCompat(ONGOING_ACTIVITY_LOCUS_ID))
-    }
+    ): NotificationCompat.Builder = NotificationCompat.Builder(context, NotificationUtil.CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_notification_status)
+        .setContentTitle(context.getString(R.string.ongoing_activity_title))
+        .setContentText(context.getString(R.string.target_duration_short, goalDuration))
+        .setContentIntent(pendingIntent)
+        .setOngoing(true)
+        .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        .setWhen(startTimeMillis)
+        .setUsesChronometer(true) // System auto-updates elapsed time
+        .setSilent(true)
+        .setLocusId(LocusIdCompat(ONGOING_ACTIVITY_LOCUS_ID))
 
     companion object {
         private const val ONGOING_ACTIVITY_LOCUS_ID = "ongoing_fasting_activity"

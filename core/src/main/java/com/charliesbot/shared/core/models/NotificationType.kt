@@ -8,6 +8,7 @@ enum class NotificationType {
     // Smart Reminder notifications (pre-fast)
     /** "One hour left to eat!" - triggers 1 hour before suggested start */
     SMART_REMINDER_1H_BEFORE,
+
     /** "Time to start your fast!" - triggers at suggested start time */
-    SMART_REMINDER_START
+    SMART_REMINDER_START,
 }
