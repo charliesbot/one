@@ -11,14 +11,11 @@ interface FastingDataRepository {
     val fastingDataItem: Flow<FastingDataItem>
 
     suspend fun getCurrentFasting(): FastingDataItem?
-    suspend fun startFasting(
-        startTimeInMillis: Long,
-        fastingGoalId: String
-    ): Pair<FastingDataItem?, FastingDataItem>
+    suspend fun startFasting(startTimeInMillis: Long, fastingGoalId: String): Pair<FastingDataItem?, FastingDataItem>
 
     suspend fun updateFastingConfig(
         startTimeInMillis: Long? = null,
-        fastingGoalId: String? = null
+        fastingGoalId: String? = null,
     ): Pair<FastingDataItem, FastingDataItem>
 
     suspend fun stopFasting(fastingGoalId: String): Pair<FastingDataItem, FastingDataItem>
@@ -26,6 +23,6 @@ interface FastingDataRepository {
         startTimeInMillis: Long,
         fastingGoalId: String,
         isFasting: Boolean,
-        lastUpdateTimestamp: Long
+        lastUpdateTimestamp: Long,
     )
 }

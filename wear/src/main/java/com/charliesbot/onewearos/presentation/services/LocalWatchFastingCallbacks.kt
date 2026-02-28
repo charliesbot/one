@@ -18,7 +18,7 @@ import com.charliesbot.shared.core.services.FastingEventCallbacks
 class LocalWatchFastingCallbacks(
     private val context: Context,
     private val complicationUpdateManager: ComplicationUpdateManager,
-    private val ongoingActivityManager: OngoingActivityManager
+    private val ongoingActivityManager: OngoingActivityManager,
 ) : FastingEventCallbacks {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
@@ -26,7 +26,7 @@ class LocalWatchFastingCallbacks(
         val intent = OngoingActivityService.createStartIntent(
             context,
             fastingDataItem.startTimeInMillis,
-            fastingDataItem.fastingGoalId
+            fastingDataItem.fastingGoalId,
         )
         ContextCompat.startForegroundService(context, intent)
         complicationUpdateManager.requestUpdate()
@@ -36,7 +36,7 @@ class LocalWatchFastingCallbacks(
     override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
         Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
         val intent = OngoingActivityService.createStopIntent(context)
-        context.startService(intent)  // Send stop action to the service
+        context.startService(intent) // Send stop action to the service
         complicationUpdateManager.requestUpdate()
         Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
     }

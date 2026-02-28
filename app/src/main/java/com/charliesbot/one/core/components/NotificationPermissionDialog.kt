@@ -11,7 +11,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 
-
 @Composable
 fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
@@ -20,7 +19,7 @@ fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
         icon = {
             Icon(
                 painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
-                contentDescription = stringResource(R.string.notification_permission_icon_desc)
+                contentDescription = stringResource(R.string.notification_permission_icon_desc),
             )
         },
         text = {
@@ -35,7 +34,7 @@ fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.notification_permission_not_now))
             }
-        }
+        },
     )
 }
 

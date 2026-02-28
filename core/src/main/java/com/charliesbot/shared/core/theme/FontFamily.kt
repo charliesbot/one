@@ -22,13 +22,9 @@ fun grade(grade: Float): FontVariation.Setting {
     return FontVariation.Setting("GRAD", grade)
 }
 
-fun thickStroke(value: Float): FontVariation.Setting {
-    return FontVariation.Setting("XTRA", value)
-}
+fun thickStroke(value: Float): FontVariation.Setting = FontVariation.Setting("XTRA", value)
 
-fun thinStroke(value: Float): FontVariation.Setting {
-    return FontVariation.Setting("YOPQ", value)
-}
+fun thinStroke(value: Float): FontVariation.Setting = FontVariation.Setting("YOPQ", value)
 
 @OptIn(ExperimentalTextApi::class)
 val GoogleSans =
@@ -39,8 +35,8 @@ val GoogleSans =
                 FontVariation.weight(FontWeight.Normal.weight),
                 FontVariation.width(100f),
                 FontVariation.slant(0f),
-            )
-        )
+            ),
+        ),
     )
 
 @OptIn(ExperimentalTextApi::class)
@@ -52,9 +48,9 @@ val GoogleSansWide =
                 FontVariation.weight(FontWeight.Normal.weight),
                 FontVariation.width(125f),
                 FontVariation.slant(0f),
-                counterWidth(405)
-            )
-        )
+                counterWidth(405),
+            ),
+        ),
     )
 
 @OptIn(ExperimentalTextApi::class)
@@ -68,7 +64,7 @@ val GoogleSansTitleLargeSpecific =
                 FontVariation.slant(0f),
                 grade(-108f),
                 thickStroke(146f),
-                thinStroke(57f)
-            )
-        )
+                thinStroke(57f),
+            ),
+        ),
     )

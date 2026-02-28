@@ -9,9 +9,7 @@ import com.google.android.gms.wearable.DataMapItem
 // Data Layer can have multiple entries for the same path.
 // We need to find the most recent one, otherwise we might overwrite state
 // before it's committed.
-fun getLatestFastingState(
-    dataEvents: DataEventBuffer,
-): FastingDataItem? {
+fun getLatestFastingState(dataEvents: DataEventBuffer): FastingDataItem? {
     var newestItem: FastingDataItem? = null
     var mostRecentTimestamp = Long.MIN_VALUE
 

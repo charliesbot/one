@@ -21,7 +21,7 @@ object FastingProgressCalculator {
             Calendar.THURSDAY,
             Calendar.FRIDAY,
             Calendar.SATURDAY,
-            Calendar.SUNDAY
+            Calendar.SUNDAY,
         ).map { dayOfWeek ->
             val dayRecords = recordsByDay[dayOfWeek] ?: emptyList()
             // Find longest fast for this day
@@ -39,7 +39,7 @@ object FastingProgressCalculator {
                 periodType = TimePeriodType.DAY_OF_WEEK,
                 progress = progress,
                 completedFasts = dayRecords.size,
-                totalFastingHours = longestFastHours
+                totalFastingHours = longestFastHours,
             )
         }
     }

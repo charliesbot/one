@@ -16,8 +16,8 @@ import com.charliesbot.shared.core.data.repositories.settingsRepository.Settings
 import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
 import com.charliesbot.shared.core.domain.usecase.FastingUseCase
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
-import com.charliesbot.shared.core.services.SmartReminderCallback
 import com.charliesbot.shared.core.models.SuggestedFastingTime
+import com.charliesbot.shared.core.services.SmartReminderCallback
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -85,7 +85,7 @@ class SettingsViewModel(
             notifyOneHourBefore = oneHour,
             smartRemindersEnabled = smartReminders,
             bedtimeMinutes = bedtime,
-            versionName = versionName
+            versionName = versionName,
         )
     }.combine(settingsRepository.smartReminderMode) { state, mode ->
         state.copy(smartReminderMode = mode)
@@ -98,7 +98,7 @@ class SettingsViewModel(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = SettingsUiState()
+        initialValue = SettingsUiState(),
     )
 
     init {
@@ -184,7 +184,9 @@ class SettingsViewModel(
                 val records = fastingHistoryRepository.getAllHistory().first()
                 if (records.isEmpty()) {
                     Log.d(LOG_TAG, "SettingsViewModel: No records to export")
-                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)))
+                    _sideEffects.send(
+                        SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)),
+                    )
                     return@launch
                 }
 
@@ -205,7 +207,9 @@ class SettingsViewModel(
 
                 if (uri == null) {
                     Log.e(LOG_TAG, "SettingsViewModel: Failed to create file in Downloads")
-                    _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)))
+                    _sideEffects.send(
+                        SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)),
+                    )
                     return@launch
                 }
 
@@ -214,16 +218,17 @@ class SettingsViewModel(
                     outputStream.bufferedWriter().use { writer ->
                         // Write header
                         writer.append("Start Time,End Time,Duration (hours),Goal\n")
-                        
+
                         // Date formatter for human-readable timestamps
                         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                        
+
                         // Write records
                         records.forEach { record ->
                             val startDate = dateFormat.format(Date(record.startTimeEpochMillis))
                             val endDate = dateFormat.format(Date(record.endTimeEpochMillis))
-                            val durationHours = (record.endTimeEpochMillis - record.startTimeEpochMillis) / (1000 * 60 * 60)
-                            
+                            val durationHours =
+                                (record.endTimeEpochMillis - record.startTimeEpochMillis) / (1000 * 60 * 60)
+
                             writer.append("$startDate,$endDate,$durationHours,${record.fastingGoalId}\n")
                         }
                     }
@@ -234,11 +239,15 @@ class SettingsViewModel(
                 contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
                 resolver.update(uri, contentValues, null, null)
 
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_SUCCESS)))
+                _sideEffects.send(
+                    SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_SUCCESS)),
+                )
                 Log.d(LOG_TAG, "SettingsViewModel: Export successful - saved to Downloads/$fileName")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Export failed", e)
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)))
+                _sideEffects.send(
+                    SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR)),
+                )
             } finally {
                 _isExporting.value = false
             }
@@ -250,7 +259,9 @@ class SettingsViewModel(
             _isSyncing.value = true
             try {
                 fastingUseCase.syncCurrentState()
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_SUCCESS)))
+                _sideEffects.send(
+                    SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_SUCCESS)),
+                )
                 Log.d(LOG_TAG, "SettingsViewModel: Force sync successful")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Force sync failed", e)
@@ -268,7 +279,9 @@ class SettingsViewModel(
                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clipData = ClipData.newPlainText("App Version", versionName)
                 clipboard.setPrimaryClip(clipData)
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.VERSION_COPIED)))
+                _sideEffects.send(
+                    SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.VERSION_COPIED)),
+                )
                 Log.d(LOG_TAG, "SettingsViewModel: Version copied to clipboard")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SettingsViewModel: Failed to copy version to clipboard", e)
@@ -286,4 +299,3 @@ class SettingsViewModel(
         }
     }
 }
-

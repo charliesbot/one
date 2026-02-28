@@ -52,7 +52,7 @@ class OneWidgetPreview : GlanceAppWidget() {
             GlanceTheme {
                 OneWidgetContent(
                     fastingData = widgetMockFastingData,
-                    context = LocalContext.current
+                    context = LocalContext.current,
                 )
             }
         }
@@ -65,6 +65,6 @@ class OneWidgetPreview : GlanceAppWidget() {
 private fun OneWidgetPreviewPreview() {
     OneWidgetContent(
         fastingData = widgetMockFastingData,
-        context = LocalContext.current
+        context = LocalContext.current,
     )
 }

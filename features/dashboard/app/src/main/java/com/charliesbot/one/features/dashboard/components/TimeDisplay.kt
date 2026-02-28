@@ -37,7 +37,7 @@ fun TimeDisplay(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Text(
             text = title.uppercase(),
@@ -46,17 +46,17 @@ fun TimeDisplay(
                 .padding(0.dp),
             style = TextStyle(
                 platformStyle = PlatformTextStyle(
-                    includeFontPadding = false
+                    includeFontPadding = false,
                 ),
                 textAlign = TextAlign.Center,
                 lineHeightStyle = LineHeightStyle(
                     alignment = LineHeightStyle.Alignment.Center,
-                    trim = LineHeightStyle.Trim.Both
-                )
+                    trim = LineHeightStyle.Trim.Both,
+                ),
             ),
             fontSize = 10.sp,
             fontWeight = FontWeight.W500,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
         OutlinedToggleButton(
             checked = false,
@@ -64,7 +64,7 @@ fun TimeDisplay(
             shapes = shapes,
             interactionSource = interactionSource,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Text(
                 text = formatDate(date, TimeFormat.DATE_TIME),
@@ -84,6 +84,6 @@ private fun TimeDisplayPreview() {
         title = "Started",
         date = LocalDateTime.now(),
         onClick = {},
-        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes()
+        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
     )
 }

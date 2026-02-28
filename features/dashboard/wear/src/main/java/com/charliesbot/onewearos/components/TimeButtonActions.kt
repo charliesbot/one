@@ -4,7 +4,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -14,9 +13,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.ButtonGroup
 import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TextButton
 import com.charliesbot.one.features.dashboard.wear.R
 import com.charliesbot.shared.core.constants.FastGoal
@@ -27,9 +26,7 @@ import com.charliesbot.shared.core.utils.getHours
 import java.time.LocalDateTime
 
 @Composable
-private fun TimeInfoDisplay(
-    title: String, date: LocalDateTime, onClick: (() -> Unit)
-) {
+private fun TimeInfoDisplay(title: String, date: LocalDateTime, onClick: (() -> Unit)) {
     val interactionSource = remember { MutableInteractionSource() }
     val verticalSpace = 2.dp
     val textColor =
@@ -44,19 +41,19 @@ private fun TimeInfoDisplay(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(verticalSpace)
+            verticalArrangement = Arrangement.spacedBy(verticalSpace),
         ) {
             Text(
                 text = title.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.W500,
-                color = textColor
+                color = textColor,
             )
             Text(
                 text = formatDate(date, dateFormat),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = textColor
+                color = textColor,
             )
         }
     }
@@ -67,7 +64,7 @@ fun TimeButtonActions(
     startTime: LocalDateTime,
     goal: FastGoal?,
     onStartTimeClick: () -> Unit,
-    onGoalTimeClick: () -> Unit
+    onGoalTimeClick: () -> Unit,
 ) {
     ButtonGroup(modifier = Modifier.fillMaxWidth()) {
         TimeInfoDisplay(
@@ -94,6 +91,6 @@ private fun TimeButtonActionsPreview() {
         startTime = LocalDateTime.now(),
         goal = PredefinedFastingGoals.goalsById["16:8"],
         onStartTimeClick = {},
-        onGoalTimeClick = {}
+        onGoalTimeClick = {},
     )
 }

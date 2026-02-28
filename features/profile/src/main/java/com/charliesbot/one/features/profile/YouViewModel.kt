@@ -23,14 +23,14 @@ data class CalendarUiState(
     val selectedMonth: YearMonth = YearMonth.now(),
     val firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
     val fastingData: Map<LocalDate, FastingDayData> = emptyMap(),
-    val selectedDay: FastingDayData? = null
+    val selectedDay: FastingDayData? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class YouViewModel(
     application: Application,
     getMonthlyFastingMapUseCase: GetMonthlyFastingMapUseCase,
-    private val fastingHistoryRepository: FastingHistoryRepository
+    private val fastingHistoryRepository: FastingHistoryRepository,
 ) : AndroidViewModel(application) {
     private val _selectedMonth = MutableStateFlow(YearMonth.now())
     val selectedMonth: StateFlow<YearMonth> = _selectedMonth
@@ -45,17 +45,17 @@ class YouViewModel(
     val uiState: StateFlow<CalendarUiState> = combine(
         _selectedMonth,
         fastingDataFlow,
-        _selectedDay
+        _selectedDay,
     ) { month, data, selectedDay ->
         CalendarUiState(
             selectedMonth = month,
             fastingData = data,
-            selectedDay = selectedDay
+            selectedDay = selectedDay,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = CalendarUiState()
+        initialValue = CalendarUiState(),
     )
 
     fun onNextMonth() {
@@ -77,18 +77,13 @@ class YouViewModel(
         }
     }
 
-    fun onUpdateFastingEntry(
-        originalStartTime: Long,
-        newStartTime: Long,
-        newEndTime: Long,
-        goalId: String
-    ) {
+    fun onUpdateFastingEntry(originalStartTime: Long, newStartTime: Long, newEndTime: Long, goalId: String) {
         viewModelScope.launch {
             fastingHistoryRepository.updateFastingRecord(
                 originalStartTime = originalStartTime,
                 newStartTime = newStartTime,
                 newEndTime = newEndTime,
-                goalId = goalId
+                goalId = goalId,
             )
             // Update selected day with new times so the bottom sheet reflects the change
             val durationMillis = newEndTime - newStartTime
@@ -96,7 +91,7 @@ class YouViewModel(
             _selectedDay.value = _selectedDay.value?.copy(
                 startTimeEpochMillis = newStartTime,
                 endTimeEpochMillis = newEndTime,
-                durationHours = newDurationHours
+                durationHours = newDurationHours,
             )
         }
     }

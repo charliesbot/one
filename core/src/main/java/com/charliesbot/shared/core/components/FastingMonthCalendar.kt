@@ -5,18 +5,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import com.charliesbot.shared.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.charliesbot.shared.R
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -46,7 +46,7 @@ data class FastingDayData(
     val isGoalMet: Boolean = false,
     val startTimeEpochMillis: Long? = null,
     val endTimeEpochMillis: Long? = null,
-    val goalId: String? = null
+    val goalId: String? = null,
 )
 
 @Composable
@@ -57,17 +57,17 @@ fun FastingMonthCalendar(
     firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
     onDayClick: (LocalDate) -> Unit = {},
     onPreviousMonth: () -> Unit = {},
-    onNextMonth: () -> Unit = {}
+    onNextMonth: () -> Unit = {},
 ) {
     val monthName = yearMonth.format(DateTimeFormatter.ofPattern("MMM ''yy"))
 
     Column(
-        modifier = modifier.padding(16.dp)
+        modifier = modifier.padding(16.dp),
     ) {
         MonthHeader(
             monthName = monthName,
             onPreviousMonth = onPreviousMonth,
-            onNextMonth = onNextMonth
+            onNextMonth = onNextMonth,
         )
 
         Spacer(modifier = Modifier.height(28.dp))
@@ -82,28 +82,24 @@ fun FastingMonthCalendar(
             yearMonth = yearMonth,
             fastingData = fastingData,
             firstDayOfWeek = firstDayOfWeek,
-            onDayClick = onDayClick
+            onDayClick = onDayClick,
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun MonthHeader(
-    monthName: String,
-    onPreviousMonth: () -> Unit = {},
-    onNextMonth: () -> Unit = {},
-) {
+private fun MonthHeader(monthName: String, onPreviousMonth: () -> Unit = {}, onNextMonth: () -> Unit = {}) {
     val interactionSources = List(size = 2) { MutableInteractionSource() }
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = monthName,
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         ButtonGroup(
             overflowIndicator = {},
@@ -113,14 +109,14 @@ private fun MonthHeader(
             customItem(
                 buttonGroupContent = {
                     FilledIconButton(
-                        onClick = {onPreviousMonth()},
+                        onClick = { onPreviousMonth() },
                         modifier = Modifier.animateWidth(interactionSource = interactionSources[0]),
                         shapes = IconButtonDefaults.shapes(),
                         colors =
-                            IconButtonDefaults.filledIconButtonColors(
-                                containerColor =
-                                    MaterialTheme.colorScheme.tertiary,
-                            ),
+                        IconButtonDefaults.filledIconButtonColors(
+                            containerColor =
+                            MaterialTheme.colorScheme.tertiary,
+                        ),
                         interactionSource = interactionSources[0],
                     ) {
                         Icon(
@@ -129,20 +125,20 @@ private fun MonthHeader(
                         )
                     }
                 },
-                menuContent = {}
+                menuContent = {},
             )
             customItem(
                 buttonGroupContent = {
                     FilledIconButton(
-                        onClick = {onNextMonth()},
+                        onClick = { onNextMonth() },
                         modifier = Modifier.animateWidth(interactionSource = interactionSources[1]),
                         shapes = IconButtonDefaults.shapes(),
                         interactionSource = interactionSources[1],
                         colors =
-                            IconButtonDefaults.filledIconButtonColors(
-                                containerColor =
-                                    MaterialTheme.colorScheme.tertiary,
-                            ),
+                        IconButtonDefaults.filledIconButtonColors(
+                            containerColor =
+                            MaterialTheme.colorScheme.tertiary,
+                        ),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.chevron_right_24px),
@@ -150,7 +146,7 @@ private fun MonthHeader(
                         )
                     }
                 },
-                menuContent = {}
+                menuContent = {},
             )
         }
     }
@@ -162,7 +158,7 @@ private fun WeekDaysHeader(firstDayOfWeek: DayOfWeek) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         weekDays.forEach { day ->
             Text(
@@ -171,7 +167,7 @@ private fun WeekDaysHeader(firstDayOfWeek: DayOfWeek) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -201,7 +197,7 @@ private fun DayGrid(
     yearMonth: YearMonth,
     fastingData: Map<LocalDate, FastingDayData>,
     firstDayOfWeek: DayOfWeek,
-    onDayClick: (LocalDate) -> Unit
+    onDayClick: (LocalDate) -> Unit,
 ) {
     val firstDayOfMonth = yearMonth.atDay(1)
     val startOffset = calculateStartOffset(firstDayOfMonth.dayOfWeek, firstDayOfWeek)
@@ -213,7 +209,7 @@ private fun DayGrid(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 2.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             repeat(7) { dayOfWeek ->
                 val dayNumber = week * 7 + dayOfWeek - startOffset + 1
@@ -226,7 +222,7 @@ private fun DayGrid(
                         dayNumber = dayNumber,
                         fastingData = fastingDayData,
                         onClick = { onDayClick(date) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                 } else {
                     // Empty cell for padding
@@ -237,9 +233,8 @@ private fun DayGrid(
     }
 }
 
-private fun calculateStartOffset(firstDayOfMonth: DayOfWeek, calendarFirstDay: DayOfWeek): Int {
-    return (firstDayOfMonth.value - calendarFirstDay.value + 7) % 7
-}
+private fun calculateStartOffset(firstDayOfMonth: DayOfWeek, calendarFirstDay: DayOfWeek): Int =
+    (firstDayOfMonth.value - calendarFirstDay.value + 7) % 7
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -247,7 +242,7 @@ private fun FastingDayCell(
     dayNumber: Int,
     fastingData: FastingDayData?,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val backgroundColor = when {
         fastingData?.durationHours != null && fastingData.isGoalMet -> MaterialTheme.colorScheme.primary
@@ -268,10 +263,10 @@ private fun FastingDayCell(
             .clip(MaterialShapes.Square.toShape())
             .background(backgroundColor)
             .clickable { onClick() },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = dayNumber.toString(),
@@ -284,7 +279,7 @@ private fun FastingDayCell(
                     text = "${hours}h",
                     style = MaterialTheme.typography.labelMediumEmphasized,
                     color = contentColor,
-                    fontWeight = if (fastingData.isGoalMet) FontWeight.Bold else FontWeight.Normal
+                    fontWeight = if (fastingData.isGoalMet) FontWeight.Bold else FontWeight.Normal,
                 )
             }
         }
@@ -306,7 +301,7 @@ fun createMockFastingData(yearMonth: YearMonth): Map<LocalDate, FastingDayData> 
             data[date] = FastingDayData(
                 date = date,
                 durationHours = randomHours,
-                isGoalMet = isGoalMet
+                isGoalMet = isGoalMet,
             )
         }
     }
@@ -322,7 +317,7 @@ private fun FastingMonthCalendarSundayPreview() {
             FastingMonthCalendar(
                 yearMonth = YearMonth.of(2025, 9),
                 fastingData = createMockFastingData(YearMonth.of(2025, 9)),
-                firstDayOfWeek = DayOfWeek.SUNDAY
+                firstDayOfWeek = DayOfWeek.SUNDAY,
             )
         }
     }
@@ -336,7 +331,7 @@ private fun FastingMonthCalendarMondayPreview() {
             FastingMonthCalendar(
                 yearMonth = YearMonth.of(2025, 9),
                 fastingData = createMockFastingData(YearMonth.of(2025, 9)),
-                firstDayOfWeek = DayOfWeek.MONDAY
+                firstDayOfWeek = DayOfWeek.MONDAY,
             )
         }
     }

@@ -8,9 +8,7 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +49,7 @@ fun <T> WheelPicker(
     visibleItemCount: Int = 5,
     itemHeight: Dp = 48.dp,
     infiniteScroll: Boolean = false,
-    itemContent: @Composable (item: T) -> Unit
+    itemContent: @Composable (item: T) -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -64,7 +62,7 @@ fun <T> WheelPicker(
 
     val pagerState = rememberPagerState(
         initialPage = initialPage,
-        pageCount = { pageCount }
+        pageCount = { pageCount },
     )
 
     // Haptic feedback on page change
@@ -88,7 +86,7 @@ fun <T> WheelPicker(
 
     Box(
         modifier = modifier,
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         // VerticalPager
         VerticalPager(
@@ -96,7 +94,7 @@ fun <T> WheelPicker(
             pageSize = PageSize.Fixed(itemHeight),
             contentPadding = PaddingValues(vertical = itemHeight * (visibleItemCount / 2)),
             modifier = Modifier.height(itemHeight * visibleItemCount),
-            beyondViewportPageCount = visibleItemCount / 2
+            beyondViewportPageCount = visibleItemCount / 2,
         ) { page ->
             val actualIndex = if (infiniteScroll) page % items.size else page
             val item = items[actualIndex]
@@ -104,7 +102,7 @@ fun <T> WheelPicker(
             WheelPickerItem(
                 pagerState = pagerState,
                 page = page,
-                itemHeight = itemHeight
+                itemHeight = itemHeight,
             ) {
                 itemContent(item)
             }
@@ -113,12 +111,7 @@ fun <T> WheelPicker(
 }
 
 @Composable
-private fun WheelPickerItem(
-    pagerState: PagerState,
-    page: Int,
-    itemHeight: Dp,
-    content: @Composable () -> Unit
-) {
+private fun WheelPickerItem(pagerState: PagerState, page: Int, itemHeight: Dp, content: @Composable () -> Unit) {
     val pageOffset = pagerState.calculatePageOffset(page)
 
     // iOS-style fisheye effect: scale and alpha based on distance from center
@@ -134,7 +127,7 @@ private fun WheelPickerItem(
                 scaleY = scale
                 this.alpha = alpha
             },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         content()
     }
@@ -144,9 +137,7 @@ private fun WheelPickerItem(
  * Calculate the offset of the page from the current page.
  * Returns 0f when the page is exactly centered, positive/negative based on direction.
  */
-private fun PagerState.calculatePageOffset(page: Int): Float {
-    return (currentPage - page) + currentPageOffsetFraction
-}
+private fun PagerState.calculatePageOffset(page: Int): Float = (currentPage - page) + currentPageOffsetFraction
 
 @Preview(showBackground = true)
 @Composable
@@ -156,11 +147,11 @@ private fun WheelPickerPreview() {
         items = items,
         initialIndex = 5,
         onSelectedIndexChange = {},
-        infiniteScroll = true
+        infiniteScroll = true,
     ) { item ->
         Text(
             text = item.toString(),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
         )
     }
 }
@@ -173,11 +164,11 @@ private fun WheelPickerDatePreview() {
         items = items,
         initialIndex = 0,
         onSelectedIndexChange = {},
-        infiniteScroll = false
+        infiniteScroll = false,
     ) { item ->
         Text(
             text = item,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
         )
     }
 }

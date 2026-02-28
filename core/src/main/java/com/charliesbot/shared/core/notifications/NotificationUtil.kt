@@ -22,7 +22,9 @@ object NotificationUtil {
             .build()
 
         val channel = NotificationChannel(
-            CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH
+            CHANNEL_ID,
+            name,
+            NotificationManager.IMPORTANCE_HIGH,
         ).apply {
             description = "Notifications for your fasting schedule"
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC

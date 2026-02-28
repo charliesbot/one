@@ -27,10 +27,9 @@ import java.util.concurrent.TimeUnit
  *
  * This worker runs once daily, typically in the morning, to set up reminders for the day.
  */
-class SmartReminderWorker(
-    context: Context,
-    workerParameters: WorkerParameters
-) : CoroutineWorker(context, workerParameters), KoinComponent {
+class SmartReminderWorker(context: Context, workerParameters: WorkerParameters) :
+    CoroutineWorker(context, workerParameters),
+    KoinComponent {
 
     private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase by inject()
     private val notificationScheduler: NotificationScheduler by inject()
@@ -50,7 +49,10 @@ class SmartReminderWorker(
         return try {
             // 1. Calculate the suggested start time
             val suggestion = getSuggestedFastingStartTimeUseCase.execute()
-            Log.d(LOG_TAG, "SmartReminderWorker: Suggested time calculated - ${suggestion.suggestedTimeMinutes} minutes, reason: ${suggestion.reasoning}")
+            Log.d(
+                LOG_TAG,
+                "SmartReminderWorker: Suggested time calculated - ${suggestion.suggestedTimeMinutes} minutes, reason: ${suggestion.reasoning}",
+            )
 
             // 2. Schedule local notifications on the phone
             notificationScheduler.scheduleSmartReminderNotifications(suggestion.suggestedTimeMillis)
@@ -92,7 +94,7 @@ class SmartReminderWorker(
         fun scheduleDailyWorker(context: Context) {
             val workRequest = PeriodicWorkRequestBuilder<SmartReminderWorker>(
                 repeatInterval = 24,
-                repeatIntervalTimeUnit = TimeUnit.HOURS
+                repeatIntervalTimeUnit = TimeUnit.HOURS,
             )
                 .addTag(WORK_NAME)
                 .build()
@@ -100,7 +102,7 @@ class SmartReminderWorker(
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
-                workRequest
+                workRequest,
             )
             Log.d(LOG_TAG, "SmartReminderWorker: Daily worker scheduled")
         }
@@ -127,4 +129,3 @@ class SmartReminderWorker(
         }
     }
 }
-

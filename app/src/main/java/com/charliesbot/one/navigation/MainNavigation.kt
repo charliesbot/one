@@ -34,7 +34,7 @@ fun MainNavigation() {
                     icon = {
                         Icon(
                             painter = painterResource(R.drawable.today_24px),
-                            contentDescription = stringResource(R.string.nav_today)
+                            contentDescription = stringResource(R.string.nav_today),
                         )
                     },
                     label = { Text(stringResource(R.string.nav_today)) },
@@ -44,13 +44,13 @@ fun MainNavigation() {
                             backStack.clear()
                             backStack.add(Today)
                         }
-                    }
+                    },
                 )
                 NavigationBarItem(
                     icon = {
                         Icon(
                             painterResource(R.drawable.person_24px),
-                            contentDescription = stringResource(R.string.nav_you)
+                            contentDescription = stringResource(R.string.nav_you),
                         )
                     },
                     label = { Text(stringResource(R.string.nav_you)) },
@@ -60,13 +60,13 @@ fun MainNavigation() {
                             backStack.clear()
                             backStack.add(You)
                         }
-                    }
+                    },
                 )
                 NavigationBarItem(
                     icon = {
                         Icon(
                             painterResource(R.drawable.settings_24px),
-                            contentDescription = stringResource(R.string.settings_title)
+                            contentDescription = stringResource(R.string.settings_title),
                         )
                     },
                     label = { Text(stringResource(R.string.settings_title)) },
@@ -76,10 +76,10 @@ fun MainNavigation() {
                             backStack.clear()
                             backStack.add(Settings)
                         }
-                    }
+                    },
                 )
             }
-        }
+        },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavDisplay(
@@ -95,7 +95,7 @@ fun MainNavigation() {
                     entry<Settings> {
                         SettingsScreen()
                     }
-                }
+                },
             )
         }
     }

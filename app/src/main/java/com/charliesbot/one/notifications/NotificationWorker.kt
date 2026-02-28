@@ -13,24 +13,26 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.charliesbot.one.MainActivity
 import com.charliesbot.one.R
-import com.charliesbot.shared.core.notifications.NotificationUtil
+import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_ID
 import com.charliesbot.shared.core.models.NotificationWorkerInput
+import com.charliesbot.shared.core.notifications.NotificationUtil
 import com.charliesbot.shared.core.utils.generateDismissalId
 import com.charliesbot.shared.core.utils.getNotificationText
 import com.charliesbot.shared.core.utils.parseWorkerInput
-import com.charliesbot.shared.core.abstraction.StringProvider
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
-    CoroutineWorker(context, workerParameters), KoinComponent {
+    CoroutineWorker(context, workerParameters),
+    KoinComponent {
 
     private val stringProvider: StringProvider by inject()
 
     override suspend fun doWork(): Result {
         if (ActivityCompat.checkSelfPermission(
-                applicationContext, Manifest.permission.POST_NOTIFICATIONS
+                applicationContext,
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             with(NotificationManagerCompat.from(applicationContext)) {
@@ -41,9 +43,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
         return Result.success()
     }
 
-    private fun createNotification(
-        notificationWorkerInput: NotificationWorkerInput
-    ): Notification {
+    private fun createNotification(notificationWorkerInput: NotificationWorkerInput): Notification {
         val notificationContent = getNotificationText(notificationWorkerInput.notificationType, stringProvider)
 
         val mobileIntent = Intent(applicationContext, MainActivity::class.java).apply {
@@ -55,7 +55,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
                 applicationContext,
                 0,
                 mobileIntent,
-                PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_IMMUTABLE,
             )
 
         val wearableExtender = NotificationCompat.WearableExtender()
@@ -63,8 +63,8 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
             .setDismissalId(
                 generateDismissalId(
                     notificationWorkerInput.fastingStartMillis,
-                    notificationWorkerInput.notificationType
-                )
+                    notificationWorkerInput.notificationType,
+                ),
             )
 
         return NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)

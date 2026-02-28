@@ -28,17 +28,17 @@ import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-
 const val MOCKED_TARGET_HOURS = 16f
 
 class MainComplicationService :
-    SuspendingComplicationDataSourceService(), KoinComponent {
+    SuspendingComplicationDataSourceService(),
+    KoinComponent {
 
     private val repository: FastingDataRepository by inject()
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         val icon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_notification_status)
+            Icon.createWithResource(this, R.drawable.ic_notification_status),
         ).build()
         val contentDescription =
             PlainComplicationText.Builder(getString(R.string.cd_fasting_preview)).build()
@@ -50,7 +50,7 @@ class MainComplicationService :
             ComplicationType.GOAL_PROGRESS -> GoalProgressComplicationData.Builder(
                 value = MOCKED_TARGET_HOURS / 2f, // Example: 8 hours towards 16h goal
                 targetValue = MOCKED_TARGET_HOURS,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setMonochromaticImage(icon)
                 .setText(title)
@@ -58,7 +58,7 @@ class MainComplicationService :
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = title,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setMonochromaticImage(icon)
                 .setTitle(title)
@@ -67,7 +67,7 @@ class MainComplicationService :
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                 text = PlainComplicationText.Builder("8h / ${MOCKED_TARGET_HOURS.toInt()}h")
                     .build(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setTitle(title)
                 .setMonochromaticImage(icon)
@@ -77,7 +77,7 @@ class MainComplicationService :
                 value = MOCKED_TARGET_HOURS / 2f,
                 min = 0f,
                 max = MOCKED_TARGET_HOURS,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setText(title)
                 .setMonochromaticImage(icon)
@@ -85,13 +85,12 @@ class MainComplicationService :
 
             ComplicationType.MONOCHROMATIC_IMAGE -> MonochromaticImageComplicationData.Builder(
                 monochromaticImage = icon,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             ).build()
 
             else -> null
         }
     }
-
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
         val fastingData = repository.fastingDataItem.first()
@@ -105,21 +104,18 @@ class MainComplicationService :
         }
     }
 
-    private fun createNotFastingComplicationData(
-        type: ComplicationType,
-        tapAction: PendingIntent?
-    ): ComplicationData? {
+    private fun createNotFastingComplicationData(type: ComplicationType, tapAction: PendingIntent?): ComplicationData? {
         val contentDescription =
             PlainComplicationText.Builder(getString(R.string.complication_text_not_fasting))
                 .build()
         val icon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_notification_status)
+            Icon.createWithResource(this, R.drawable.ic_notification_status),
         ).build()
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder("--").build(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
@@ -128,11 +124,11 @@ class MainComplicationService :
             ComplicationType.GOAL_PROGRESS -> GoalProgressComplicationData.Builder(
                 value = 0f,
                 targetValue = 1f, // Avoid division by zero
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setText(
                     PlainComplicationText.Builder("-")
-                        .build()
+                        .build(),
                 )
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
@@ -141,7 +137,7 @@ class MainComplicationService :
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(getString(R.string.complication_text_not_fasting))
                     .build(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
@@ -151,7 +147,7 @@ class MainComplicationService :
                 value = 0f,
                 min = 0f,
                 max = 1f,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setMonochromaticImage(icon)
                 .setTapAction(tapAction)
@@ -159,7 +155,7 @@ class MainComplicationService :
 
             ComplicationType.MONOCHROMATIC_IMAGE -> MonochromaticImageComplicationData.Builder(
                 monochromaticImage = icon,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setTapAction(tapAction)
                 .build()
@@ -171,31 +167,31 @@ class MainComplicationService :
     private fun createFastingComplicationData(
         type: ComplicationType,
         fastingData: FastingDataItem,
-        tapAction: PendingIntent?
+        tapAction: PendingIntent?,
     ): ComplicationData? {
         val fastingProgress = FastingProgressUtil.calculateFastingProgress(
             fastingData,
-            currentTimeMillis = System.currentTimeMillis()
+            currentTimeMillis = System.currentTimeMillis(),
         )
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
         val contentDescription = createContentDescription(fastingProgress, fastingGoal)
         val icon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_notification_status)
+            Icon.createWithResource(this, R.drawable.ic_notification_status),
         ).build()
         val elapsedHours = fastingProgress.elapsedHours.toInt()
         val title =
             PlainComplicationText.Builder(
                 getString(
                     R.string.complication_title_hours_format,
-                    elapsedHours
-                )
+                    elapsedHours,
+                ),
             )
                 .build()
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder("${elapsedHours}h").build(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setTitle(PlainComplicationText.Builder(fastingGoal.durationDisplay).build())
                 .setMonochromaticImage(icon)
@@ -206,7 +202,7 @@ class MainComplicationService :
                 value = fastingProgress.elapsedHours.toFloat()
                     .coerceAtMost(fastingProgress.targetHours.toFloat()),
                 targetValue = fastingProgress.targetHours.toFloat(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setText(title)
                 .setMonochromaticImage(icon)
@@ -216,7 +212,7 @@ class MainComplicationService :
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                 text = PlainComplicationText.Builder("${elapsedHours}h / ${fastingGoal.durationDisplay}")
                     .build(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setTitle(title)
                 .setMonochromaticImage(icon)
@@ -228,7 +224,7 @@ class MainComplicationService :
                     .coerceAtMost(fastingProgress.targetHours.toFloat()),
                 min = 0f,
                 max = fastingProgress.targetHours.toFloat(),
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setText(title)
                 .setMonochromaticImage(icon)
@@ -237,7 +233,7 @@ class MainComplicationService :
 
             ComplicationType.MONOCHROMATIC_IMAGE -> MonochromaticImageComplicationData.Builder(
                 monochromaticImage = icon,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
                 .setTapAction(tapAction)
                 .build()
@@ -246,17 +242,15 @@ class MainComplicationService :
         }
     }
 
-    private fun createContentDescription(
-        fastingProgress: FastingProgress,
-        fastingGoal: FastGoal
-    ) = PlainComplicationText.Builder(
-        getString(
-            R.string.complication_text_fasting_format,
-            fastingProgress.progressPercentage,
-            fastingProgress.elapsedHours.toInt().toString(),
-            getString(R.string.target_duration_short, fastingGoal.durationDisplay)
-        )
-    ).build()
+    private fun createContentDescription(fastingProgress: FastingProgress, fastingGoal: FastGoal) =
+        PlainComplicationText.Builder(
+            getString(
+                R.string.complication_text_fasting_format,
+                fastingProgress.progressPercentage,
+                fastingProgress.elapsedHours.toInt().toString(),
+                getString(R.string.target_duration_short, fastingGoal.durationDisplay),
+            ),
+        ).build()
 
     private fun createTapIntent(): PendingIntent {
         val intent = Intent(this, MainActivity::class.java)
@@ -266,7 +260,7 @@ class MainComplicationService :
             this,
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 }

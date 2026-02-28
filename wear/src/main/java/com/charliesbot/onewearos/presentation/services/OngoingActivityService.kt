@@ -26,7 +26,9 @@ import org.koin.core.component.inject
  * Required for showing the timer in the Wear OS Recents list.
  * Uses StopwatchPart so the system auto-updates the timer - no periodic wake-ups needed.
  */
-class OngoingActivityService : Service(), KoinComponent {
+class OngoingActivityService :
+    Service(),
+    KoinComponent {
 
     private val fastingDataRepository: FastingDataRepository by inject()
     private lateinit var ongoingActivityManager: OngoingActivityManager
@@ -56,7 +58,10 @@ class OngoingActivityService : Service(), KoinComponent {
                 val fastingGoalId = intent?.getStringExtra(EXTRA_FASTING_GOAL_ID) ?: ""
 
                 if (startTimeMillis == 0L || fastingGoalId.isEmpty()) {
-                    Log.e(LOG_TAG, "$serviceTag missing required extras. startTime=$startTimeMillis, goalId=$fastingGoalId")
+                    Log.e(
+                        LOG_TAG,
+                        "$serviceTag missing required extras. startTime=$startTimeMillis, goalId=$fastingGoalId",
+                    )
                     stopSelf()
                     return START_NOT_STICKY
                 }
@@ -67,7 +72,7 @@ class OngoingActivityService : Service(), KoinComponent {
                     startForeground(
                         NotificationConstants.ONGOING_NOTIFICATION_ID,
                         initialNotification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH,
                     )
                 } catch (e: ForegroundServiceStartNotAllowedException) {
                     // This can happen when:
@@ -82,7 +87,7 @@ class OngoingActivityService : Service(), KoinComponent {
                 // Now create the real ongoing activity with auto-updating stopwatch
                 ongoingActivityManager.startOngoingActivity(startTimeMillis, fastingGoalId)
 
-                return START_NOT_STICKY  // Don't restart if killed - state may be stale
+                return START_NOT_STICKY // Don't restart if killed - state may be stale
             }
             else -> {
                 Log.w(LOG_TAG, "$serviceTag received unknown action: $action")
@@ -115,18 +120,15 @@ class OngoingActivityService : Service(), KoinComponent {
         const val EXTRA_START_TIME = "extra_start_time"
         const val EXTRA_FASTING_GOAL_ID = "extra_fasting_goal_id"
 
-        fun createStartIntent(context: Context, startTimeMillis: Long, fastingGoalId: String): Intent {
-            return Intent(context, OngoingActivityService::class.java).apply {
+        fun createStartIntent(context: Context, startTimeMillis: Long, fastingGoalId: String): Intent =
+            Intent(context, OngoingActivityService::class.java).apply {
                 action = ACTION_START
                 putExtra(EXTRA_START_TIME, startTimeMillis)
                 putExtra(EXTRA_FASTING_GOAL_ID, fastingGoalId)
             }
-        }
 
-        fun createStopIntent(context: Context): Intent {
-            return Intent(context, OngoingActivityService::class.java).apply {
-                action = ACTION_STOP
-            }
+        fun createStopIntent(context: Context): Intent = Intent(context, OngoingActivityService::class.java).apply {
+            action = ACTION_STOP
         }
     }
 }

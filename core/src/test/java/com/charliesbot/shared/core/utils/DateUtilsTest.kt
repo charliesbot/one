@@ -64,8 +64,7 @@ class DateUtilsTest {
         // Should be within 1 second (millisecond precision may differ)
         assertTrue(
             "Expected times to be close but diff was ${kotlin.math.abs(original - converted)}",
-            kotlin.math.abs(original - converted) < 1000
+            kotlin.math.abs(original - converted) < 1000,
         )
     }
-
 }

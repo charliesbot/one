@@ -20,10 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
-class SettingsRepositoryImpl(
-    context: Context,
-    private val dataStore: DataStore<Preferences>
-) : SettingsRepository {
+class SettingsRepositoryImpl(context: Context, private val dataStore: DataStore<Preferences>) : SettingsRepository {
 
     private val dataClient: DataClient = Wearable.getDataClient(context.applicationContext)
 
@@ -153,7 +150,8 @@ class SettingsRepositoryImpl(
             val smartRemindersEnabled = prefs[PrefKeys.SMART_REMINDERS_ENABLED] ?: false
             val bedtimeMinutes = prefs[PrefKeys.BEDTIME_MINUTES] ?: DEFAULT_BEDTIME_MINUTES
             val smartReminderMode = prefs[PrefKeys.SMART_REMINDER_MODE] ?: SmartReminderMode.AUTO.name
-            val fixedFastingStartMinutes = prefs[PrefKeys.FIXED_FASTING_START_MINUTES] ?: DEFAULT_FIXED_FASTING_START_MINUTES
+            val fixedFastingStartMinutes =
+                prefs[PrefKeys.FIXED_FASTING_START_MINUTES] ?: DEFAULT_FIXED_FASTING_START_MINUTES
 
             val request: PutDataRequest =
                 PutDataMapRequest.create(SETTINGS_PATH_KEY).apply {
@@ -170,7 +168,7 @@ class SettingsRepositoryImpl(
             dataClient.putDataItem(request).await()
             Log.d(
                 LOG_TAG,
-                "SettingsRepo: Settings synced to Data Layer - notifications: $notificationsEnabled, completion: $notifyCompletion, oneHour: $notifyOneHourBefore, smartReminders: $smartRemindersEnabled, bedtime: $bedtimeMinutes, mode: $smartReminderMode, fixedStart: $fixedFastingStartMinutes"
+                "SettingsRepo: Settings synced to Data Layer - notifications: $notificationsEnabled, completion: $notifyCompletion, oneHour: $notifyOneHourBefore, smartReminders: $smartRemindersEnabled, bedtime: $bedtimeMinutes, mode: $smartReminderMode, fixedStart: $fixedFastingStartMinutes",
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "SettingsRepo: Error syncing settings to Data Layer", e)
@@ -209,8 +207,8 @@ class SettingsRepositoryImpl(
 
         // 10:00 PM = 22 * 60 = 1320 minutes from midnight
         const val DEFAULT_BEDTIME_MINUTES = 1320
+
         // 7:00 PM = 19 * 60 = 1140 minutes from midnight
         const val DEFAULT_FIXED_FASTING_START_MINUTES = 1140
     }
 }
-

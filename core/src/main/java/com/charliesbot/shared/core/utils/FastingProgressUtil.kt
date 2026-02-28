@@ -10,13 +10,13 @@ data class FastingProgress(
     val progressPercentage: Int,
     val isComplete: Boolean,
     val remainingTimeMillis: Long,
-    val remainingHours: Long
+    val remainingHours: Long,
 )
 
 object FastingProgressUtil {
     fun calculateFastingProgress(
         fastingDataItem: FastingDataItem,
-        currentTimeMillis: Long = System.currentTimeMillis()
+        currentTimeMillis: Long = System.currentTimeMillis(),
     ): FastingProgress {
         val goal = PredefinedFastingGoals.getGoalById(fastingDataItem.fastingGoalId)
         val elapsedTimeMillis =
@@ -36,7 +36,7 @@ object FastingProgressUtil {
             progressPercentage = progressPercentage,
             isComplete = isComplete,
             remainingTimeMillis = remainingTimeMillis,
-            remainingHours = remainingHours
+            remainingHours = remainingHours,
         )
     }
 }

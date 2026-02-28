@@ -2,11 +2,11 @@ package com.charliesbot.one.services
 
 import android.util.Log
 import com.charliesbot.one.widgets.WidgetUpdateManager
-import com.charliesbot.shared.core.services.BaseFastingListenerService
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.services.BaseFastingListenerService
 import org.koin.core.component.inject
 
 class FastingStateListenerService : BaseFastingListenerService() {
@@ -21,7 +21,7 @@ class FastingStateListenerService : BaseFastingListenerService() {
                 startTimeEpochMillis = fastingDataItem.startTimeInMillis,
                 endTimeEpochMillis = fastingDataItem.updateTimestamp,
                 fastingGoalId = fastingDataItem.fastingGoalId,
-            )
+            ),
         )
     }
 
@@ -30,7 +30,7 @@ class FastingStateListenerService : BaseFastingListenerService() {
         val uniqueCallId = System.nanoTime()
         Log.d(
             LOG_TAG,
-            "${this::class.java.simpleName} - onFastingStateSynced: PRE-updateAll (Call ID: $uniqueCallId)"
+            "${this::class.java.simpleName} - onFastingStateSynced: PRE-updateAll (Call ID: $uniqueCallId)",
         )
         widgetUpdateManager.requestUpdate()
     }

@@ -18,21 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingProgressBar
+import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.calculateProgressPercentage
 import com.charliesbot.shared.core.utils.formatTimestamp
-import com.charliesbot.shared.R
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun FastingStatusIndicator(
-    isFasting: Boolean,
-    elapsedTime: Long,
-    fastingGoalId: String,
-    onClick: () -> Unit
-) {
+fun FastingStatusIndicator(isFasting: Boolean, elapsedTime: Long, fastingGoalId: String, onClick: () -> Unit) {
     val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
     val headerLabel = if (isFasting) {
         val progress = calculateProgressPercentage(elapsedTime, fastingGoal.durationMillis)
@@ -45,16 +40,16 @@ fun FastingStatusIndicator(
     } else {
         stringResource(
             R.string.fasting_duration_hours,
-            PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay
+            PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay,
         )
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = headerLabel, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
         TextButton(
-            onClick = onClick
+            onClick = onClick,
         ) {
             Text(
                 text = timeLabel,
@@ -82,7 +77,7 @@ fun CurrentFastingProgress(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
-                .heightIn(max = 300.dp)
+                .heightIn(max = 300.dp),
         )
         FastingStatusIndicator(isFasting, elapsedTime, fastingGoalId, onFastingStatusClick)
     }
@@ -96,7 +91,8 @@ fun CurrentFastingProgressPreview() {
             isFasting = false,
             elapsedTime = 0L,
             fastingGoalId = "circadian",
-            onFastingStatusClick = {})
+            onFastingStatusClick = {},
+        )
         CurrentFastingProgress(
             isFasting = true,
             elapsedTime = 7 * 1000 * 60 * 60,

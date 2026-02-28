@@ -24,13 +24,15 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
-    CoroutineWorker(context, workerParameters), KoinComponent {
+    CoroutineWorker(context, workerParameters),
+    KoinComponent {
 
     private val stringProvider: StringProvider by inject()
 
     override suspend fun doWork(): Result {
         if (ActivityCompat.checkSelfPermission(
-                applicationContext, Manifest.permission.POST_NOTIFICATIONS
+                applicationContext,
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             with(NotificationManagerCompat.from(applicationContext)) {
@@ -41,9 +43,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
         return Result.success()
     }
 
-    private fun createNotification(
-        notificationWorkerInput: NotificationWorkerInput
-    ): Notification {
+    private fun createNotification(notificationWorkerInput: NotificationWorkerInput): Notification {
         val notificationContent =
             getNotificationText(notificationWorkerInput.notificationType, stringProvider)
 
@@ -55,7 +55,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
             applicationContext,
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         val wearableExtender = NotificationCompat.WearableExtender()
@@ -63,8 +63,8 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
             .setDismissalId(
                 generateDismissalId(
                     notificationWorkerInput.fastingStartMillis,
-                    notificationWorkerInput.notificationType
-                )
+                    notificationWorkerInput.notificationType,
+                ),
             )
 
         val notificationBuilder =

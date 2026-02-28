@@ -1,8 +1,8 @@
-import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -37,7 +37,7 @@ android {
         minSdk = 31
         targetSdk = 36
         versionCode = versionCodeProperty.toInt()
-        versionName = "$versionNameProperty-mobile"  // Append "-mobile" to distinguish from Wear OS app
+        versionName = "$versionNameProperty-mobile" // Append "-mobile" to distinguish from Wear OS app
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -74,7 +74,7 @@ android {
             resValue("string", "app_name", "One")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"

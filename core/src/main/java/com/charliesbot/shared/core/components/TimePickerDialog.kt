@@ -32,9 +32,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
-private fun convertTimePickerStateToMillis(
-    timePickerState: TimePickerState
-): Long {
+private fun convertTimePickerStateToMillis(timePickerState: TimePickerState): Long {
     val zoneId = ZoneId.systemDefault()
     val today = LocalDate.now(zoneId)
     val newDate =
@@ -72,25 +70,25 @@ fun TimePickerDialog(
                 .height(IntrinsicSize.Min)
                 .background(
                     shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface
+                    color = MaterialTheme.colorScheme.surface,
                 ),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
                     text = title,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
                 )
                 TimePicker(state = timePickerState)
                 Row(
                     modifier = Modifier
                         .height(40.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(onClick = onDismiss) {
@@ -130,7 +128,7 @@ fun TimePickerDialog(
         onConfirm = onConfirm,
         onDismiss = onDismiss,
         buttonText = buttonText ?: stringResource(R.string.wheel_picker_update_start_time),
-        isValidSelection = isValidSelection ?: { true }
+        isValidSelection = isValidSelection ?: { true },
     )
 }
 
@@ -138,12 +136,7 @@ fun TimePickerDialog(
  * TimePickerDialog overload that works with minutes from midnight (for time-of-day selection).
  */
 @Composable
-fun TimePickerDialog(
-    title: String,
-    currentMinutes: Int,
-    onConfirm: (Int) -> Unit,
-    onDismiss: () -> Unit
-) {
+fun TimePickerDialog(title: String, currentMinutes: Int, onConfirm: (Int) -> Unit, onDismiss: () -> Unit) {
     val initialHour = currentMinutes / 60
     val initialMinute = currentMinutes % 60
 
@@ -165,6 +158,6 @@ private fun TimePickerDialogPreview() {
         initialHour = 10,
         initialMinute = 30,
         onConfirm = { _, _ -> },
-        onDismiss = {}
+        onDismiss = {},
     )
 }

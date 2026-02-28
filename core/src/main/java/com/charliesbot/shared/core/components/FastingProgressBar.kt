@@ -25,7 +25,7 @@ fun FastingProgressBar(
 ) {
     Canvas(
         modifier = modifier
-            .aspectRatio(1f)
+            .aspectRatio(1f),
     ) {
         val canvasSize = size.minDimension
         val radius = (canvasSize / 2) - (strokeWidth.toPx() / 2)
@@ -33,7 +33,7 @@ fun FastingProgressBar(
         drawCircle(
             color = trackColor,
             radius = radius,
-            style = Stroke(width = strokeWidth.toPx())
+            style = Stroke(width = strokeWidth.toPx()),
         )
 
         val sweepAngle = progress * 360f
@@ -45,7 +45,7 @@ fun FastingProgressBar(
             useCenter = false,
             topLeft = Offset(center.x - radius, center.y - radius),
             size = Size(radius * 2, radius * 2),
-            style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
+            style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt),
         )
     }
 }

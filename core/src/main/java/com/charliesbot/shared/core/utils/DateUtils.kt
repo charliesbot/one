@@ -14,7 +14,7 @@ enum class TimeFormat(val pattern: String) {
     DATE("MMMM d yyyy"),
     MONTH_DAY("MMMM d"),
     TIME("h:mm a"),
-    DURATION("HH:mm:ss")
+    DURATION("HH:mm:ss"),
 }
 
 fun formatDate(date: LocalDateTime, format: TimeFormat = TimeFormat.DATE_TIME): String {
@@ -33,27 +33,25 @@ fun formatTimestamp(millis: Long): String {
     val hours = getHours(millis)
     return String.format(
         Locale.getDefault(),
-        "%02d:%02d:%02d", hours, minutes, seconds
+        "%02d:%02d:%02d",
+        hours,
+        minutes,
+        seconds,
     )
 }
 
-fun convertLocalDateTimeToMillis(dateTime: LocalDateTime): Long {
-    return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-}
+fun convertLocalDateTimeToMillis(dateTime: LocalDateTime): Long =
+    dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
 fun formatTimestamp(millis: Long, format: TimeFormat = TimeFormat.DURATION): String {
     val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
     return formatDate(dateTime, format)
 }
 
-fun convertMillisToLocalDateTime(millis: Long): LocalDateTime {
-    return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
-}
+fun convertMillisToLocalDateTime(millis: Long): LocalDateTime =
+    LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
 
-
-fun getFormattedRelativeTime(
-    startTimeMillis: Long
-): String {
+fun getFormattedRelativeTime(startTimeMillis: Long): String {
     val nowMillis = System.currentTimeMillis()
     val minResolution = DateUtils.MINUTE_IN_MILLIS
 
@@ -64,7 +62,7 @@ fun getFormattedRelativeTime(
         startTimeMillis,
         nowMillis,
         minResolution,
-        flags
+        flags,
     ).toString()
 }
 

@@ -32,12 +32,8 @@ import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadd
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-
 @Composable
-fun WearGoalOptionsScreen(
-    viewModel: WearTodayViewModel = koinViewModel(),
-    navController: NavController,
-) {
+fun WearGoalOptionsScreen(viewModel: WearTodayViewModel = koinViewModel(), navController: NavController) {
     val scope = rememberCoroutineScope()
     val fastGoals = remember {
         PredefinedFastingGoals.allGoals
@@ -55,12 +51,12 @@ fun WearGoalOptionsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .transformedHeight(this, transformationSpec),
-                    transformation = SurfaceTransformation(transformationSpec)
+                    transformation = SurfaceTransformation(transformationSpec),
                 ) {
                     Text(
                         text = stringResource(R.string.select_goal),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
@@ -68,7 +64,7 @@ fun WearGoalOptionsScreen(
                 Button(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = goal.color.copy(alpha = 0.8f),
-                        contentColor = MaterialTheme.colorScheme.onBackground
+                        contentColor = MaterialTheme.colorScheme.onBackground,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -84,7 +80,7 @@ fun WearGoalOptionsScreen(
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
                             text = goal.durationDisplay,
@@ -99,14 +95,13 @@ fun WearGoalOptionsScreen(
                 }
             }
         }
-
     }
 }
 
-//@Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
-//@Composable
-//private fun DefaultPreview() {
+// @Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
+// @Composable
+// private fun DefaultPreview() {
 //    WearGoalOptionsScreen(
 //
 //    )
-//}
+// }

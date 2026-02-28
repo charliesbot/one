@@ -8,12 +8,15 @@ import kotlinx.coroutines.flow.Flow
 enum class SmartReminderMode {
     /** Automatically choose: use moving average if enough data, otherwise bedtime */
     AUTO,
+
     /** Always use bedtime minus 4 hours */
     BEDTIME_ONLY,
+
     /** Always use moving average (falls back to bedtime if not enough data) */
     MOVING_AVERAGE_ONLY,
+
     /** Use a fixed time set by the user */
-    FIXED_TIME
+    FIXED_TIME,
 }
 
 interface SettingsRepository {
@@ -23,16 +26,19 @@ interface SettingsRepository {
 
     // Smart Reminders
     val smartRemindersEnabled: Flow<Boolean>
+
     /**
      * Bedtime stored as minutes from midnight.
      * For times after midnight (e.g., 12:30 AM), we store as next-day value (e.g., 30 for 00:30).
      * Default is 1320 (10:00 PM).
      */
     val bedtimeMinutes: Flow<Int>
+
     /**
      * Mode for calculating smart reminder time.
      */
     val smartReminderMode: Flow<SmartReminderMode>
+
     /**
      * Fixed fasting start time stored as minutes from midnight.
      * Default is 1140 (7:00 PM).
@@ -49,4 +55,3 @@ interface SettingsRepository {
     suspend fun setSmartReminderMode(mode: SmartReminderMode, syncToRemote: Boolean = true)
     suspend fun setFixedFastingStartMinutes(minutes: Int, syncToRemote: Boolean = true)
 }
-

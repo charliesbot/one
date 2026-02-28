@@ -54,7 +54,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
         val intent = OngoingActivityService.createStartIntent(
             this,
             fastingDataItem.startTimeInMillis,
-            fastingDataItem.fastingGoalId
+            fastingDataItem.fastingGoalId,
         )
         ContextCompat.startForegroundService(this, intent)
         Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast started from REMOTE")
@@ -65,7 +65,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
         super.onPlatformFastingCompleted(fastingDataItem)
         Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast completed from REMOTE")
         val intent = OngoingActivityService.createStopIntent(this)
-        startService(intent)  // Send stop action to the service
+        startService(intent) // Send stop action to the service
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -86,7 +86,10 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 val suggestedTimeMillis = dataMap.getLong(DataLayerConstants.SMART_REMINDER_SUGGESTED_TIME_KEY, 0L)
                 val reasoning = dataMap.getString(DataLayerConstants.SMART_REMINDER_REASONING_KEY, "")
 
-                Log.d(LOG_TAG, "WatchListener: Received smart reminder update - time: $suggestedTimeMillis, reason: $reasoning")
+                Log.d(
+                    LOG_TAG,
+                    "WatchListener: Received smart reminder update - time: $suggestedTimeMillis, reason: $reasoning",
+                )
 
                 if (suggestedTimeMillis > System.currentTimeMillis()) {
                     watchServiceScope.launch {
@@ -94,7 +97,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                             // Ensure notification channel exists (safe to call multiple times)
                             // This guarantees notifications work even after app updates
                             NotificationUtil.createNotificationChannel(this@WatchFastingStateListenerService)
-                            
+
                             // Schedule local notifications on the watch
                             notificationScheduler.scheduleSmartReminderNotifications(suggestedTimeMillis)
                             Log.d(LOG_TAG, "WatchListener: Smart reminder notifications scheduled on watch")
@@ -129,7 +132,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 Log.d(
                     LOG_TAG,
                     "WatchListener: Received settings update from phone " +
-                            "(notifications=$notificationsEnabled, completion=$notifyCompletion, oneHour=$notifyOneHourBefore, smartReminders=$smartRemindersEnabled, bedtime=$bedtimeMinutes, fixedStart=$fixedFastingStartMinutes, mode=$smartReminderMode)"
+                        "(notifications=$notificationsEnabled, completion=$notifyCompletion, oneHour=$notifyOneHourBefore, smartReminders=$smartRemindersEnabled, bedtime=$bedtimeMinutes, fixedStart=$fixedFastingStartMinutes, mode=$smartReminderMode)",
                 )
                 watchServiceScope.launch {
                     try {
