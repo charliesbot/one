@@ -1,6 +1,7 @@
 package com.charliesbot.onewearos.presentation.services
 
 import android.Manifest
+import android.app.ForegroundServiceStartNotAllowedException
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
@@ -58,7 +59,11 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
             fastingDataItem.startTimeInMillis,
             fastingDataItem.fastingGoalId,
         )
-        ContextCompat.startForegroundService(this, intent)
+        try {
+            ContextCompat.startForegroundService(this, intent)
+        } catch (e: ForegroundServiceStartNotAllowedException) {
+            Log.w(LOG_TAG, "${this::class.java.simpleName} - Cannot start ongoing activity — app is in background", e)
+        }
         Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast started from REMOTE")
     }
 
