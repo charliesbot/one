@@ -76,17 +76,25 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-        // First, handle settings sync
-        handleSettingsSync(dataEvents)
-        // Handle smart reminder sync
-        handleSmartReminderSync(dataEvents)
+        // First, handle settings sync and capture the smart reminders setting if present
+        val smartRemindersEnabled = handleSettingsSync(dataEvents)
+        // Handle smart reminder sync, threading the settings value to avoid race condition
+        handleSmartReminderSync(dataEvents, smartRemindersEnabled)
         // Handle custom goals sync
         handleCustomGoalsSync(dataEvents)
         // Then, call parent to handle fasting state
         super.onDataChanged(dataEvents)
     }
 
-    private fun handleSmartReminderSync(dataEvents: DataEventBuffer) {
+    /**
+     * @param smartRemindersEnabledOverride When non-null, comes from the same onDataChanged batch
+     *   (settings were synced alongside the reminder). This avoids a race condition where the
+     *   DataStore hasn't persisted the setting yet when we try to read it.
+     *   - true → schedule using forced variant (skip DataStore check)
+     *   - false → skip scheduling (reminders were just disabled)
+     *   - null → no settings in this batch, fall back to reading DataStore
+     */
+    private fun handleSmartReminderSync(dataEvents: DataEventBuffer, smartRemindersEnabledOverride: Boolean?) {
         for (event in dataEvents) {
             if (event.type == DataEvent.TYPE_CHANGED &&
                 event.dataItem.uri.path == DataLayerConstants.SMART_REMINDER_PATH
@@ -101,17 +109,29 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 )
 
                 if (suggestedTimeMillis > System.currentTimeMillis()) {
-                    watchServiceScope.launch {
-                        try {
-                            // Ensure notification channel exists (safe to call multiple times)
-                            // This guarantees notifications work even after app updates
-                            NotificationUtil.createNotificationChannel(this@WatchFastingStateListenerService)
+                    when (smartRemindersEnabledOverride) {
+                        false -> {
+                            Log.d(LOG_TAG, "WatchListener: Smart reminders disabled in this batch, skipping")
+                        }
 
-                            // Schedule local notifications on the watch
-                            notificationScheduler.scheduleSmartReminderNotifications(suggestedTimeMillis)
-                            Log.d(LOG_TAG, "WatchListener: Smart reminder notifications scheduled on watch")
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "WatchListener: Failed to schedule smart reminder notifications", e)
+                        true -> {
+                            // Settings arrived in the same batch — use forced variant to skip DataStore read
+                            NotificationUtil.createNotificationChannel(this@WatchFastingStateListenerService)
+                            notificationScheduler.scheduleSmartReminderNotificationsForced(suggestedTimeMillis)
+                            Log.d(LOG_TAG, "WatchListener: Smart reminder notifications scheduled on watch (forced)")
+                        }
+
+                        null -> {
+                            // No settings in this batch — safe to read DataStore (it's already persisted)
+                            watchServiceScope.launch {
+                                try {
+                                    NotificationUtil.createNotificationChannel(this@WatchFastingStateListenerService)
+                                    notificationScheduler.scheduleSmartReminderNotifications(suggestedTimeMillis)
+                                    Log.d(LOG_TAG, "WatchListener: Smart reminder notifications scheduled on watch")
+                                } catch (e: Exception) {
+                                    Log.e(LOG_TAG, "WatchListener: Failed to schedule smart reminder notifications", e)
+                                }
+                            }
                         }
                     }
                 } else {
@@ -143,7 +163,14 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
         }
     }
 
-    private fun handleSettingsSync(dataEvents: DataEventBuffer) {
+    /**
+     * @return The value of `smart_reminders_enabled` parsed from the batch, or `null` if no
+     *   `/settings` event was present. This is threaded to [handleSmartReminderSync] so it can
+     *   decide whether to use the forced scheduling path.
+     */
+    private fun handleSettingsSync(dataEvents: DataEventBuffer): Boolean? {
+        var smartRemindersEnabledResult: Boolean? = null
+
         for (event in dataEvents) {
             if (event.type == DataEvent.TYPE_CHANGED && event.dataItem.uri.path == "/settings") {
                 val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
@@ -159,6 +186,8 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 } catch (e: IllegalArgumentException) {
                     SmartReminderMode.AUTO
                 }
+
+                smartRemindersEnabledResult = smartRemindersEnabled
 
                 Log.d(
                     LOG_TAG,
@@ -182,5 +211,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
                 }
             }
         }
+
+        return smartRemindersEnabledResult
     }
 }

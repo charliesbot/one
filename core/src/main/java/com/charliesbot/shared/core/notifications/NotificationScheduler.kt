@@ -20,6 +20,7 @@ class NotificationScheduler(
     private val context: Context,
     private val workerClass: Class<out ListenableWorker>,
     private val settingsRepository: SettingsRepository,
+    private val workManager: WorkManager = WorkManager.getInstance(context),
 ) {
     companion object {
         private const val SMART_REMINDER_TAG = "smart_reminder_notification"
@@ -45,7 +46,7 @@ class NotificationScheduler(
             .addTag("notification_work_${type.name}")
             .build()
 
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        workManager.enqueueUniqueWork(
             "notification-${type.name}",
             ExistingWorkPolicy.REPLACE,
             notificationWork,
@@ -92,6 +93,7 @@ class NotificationScheduler(
 
     /**
      * Schedule smart reminder notifications for when to start fasting.
+     * Checks DataStore for whether smart reminders are enabled before scheduling.
      *
      * @param suggestedStartTimeMillis The absolute timestamp when the fast should start.
      */
@@ -104,6 +106,23 @@ class NotificationScheduler(
             Log.d(AppConstants.LOG_TAG, "NotificationScheduler: Smart reminders disabled, skipping scheduling")
             return
         }
+
+        scheduleSmartReminderWork(suggestedStartTimeMillis)
+    }
+
+    /**
+     * Schedule smart reminder notifications without checking DataStore settings.
+     * Use this when the caller has already verified that smart reminders are enabled
+     * (e.g., from a sync event that includes the setting alongside the reminder data).
+     *
+     * @param suggestedStartTimeMillis The absolute timestamp when the fast should start.
+     */
+    fun scheduleSmartReminderNotificationsForced(suggestedStartTimeMillis: Long) {
+        cancelSmartReminderNotifications()
+        scheduleSmartReminderWork(suggestedStartTimeMillis)
+    }
+
+    private fun scheduleSmartReminderWork(suggestedStartTimeMillis: Long) {
         Log.d(
             AppConstants.LOG_TAG,
             "NotificationScheduler: Smart reminders enabled, scheduling for $suggestedStartTimeMillis",
@@ -143,17 +162,17 @@ class NotificationScheduler(
      * Cancel only fasting progress notifications (not smart reminders).
      */
     fun cancelFastingNotifications() {
-        WorkManager.getInstance(context).cancelAllWorkByTag(FASTING_NOTIFICATION_TAG)
+        workManager.cancelAllWorkByTag(FASTING_NOTIFICATION_TAG)
     }
 
     /**
      * Cancel only smart reminder notifications.
      */
     fun cancelSmartReminderNotifications() {
-        WorkManager.getInstance(context).cancelAllWorkByTag(SMART_REMINDER_TAG)
+        workManager.cancelAllWorkByTag(SMART_REMINDER_TAG)
     }
 
     fun cancelAllNotifications() {
-        WorkManager.getInstance(context).cancelAllWork()
+        workManager.cancelAllWork()
     }
 }
