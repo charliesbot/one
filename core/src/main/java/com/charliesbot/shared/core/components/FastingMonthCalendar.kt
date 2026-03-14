@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -90,7 +91,7 @@ fun FastingMonthCalendar(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MonthHeader(monthName: String, onPreviousMonth: () -> Unit = {}, onNextMonth: () -> Unit = {}) {
-    val interactionSources = List(size = 2) { MutableInteractionSource() }
+    val interactionSources = remember { List(size = 2) { MutableInteractionSource() } }
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -110,7 +111,6 @@ private fun MonthHeader(monthName: String, onPreviousMonth: () -> Unit = {}, onN
                 buttonGroupContent = {
                     FilledIconButton(
                         onClick = { onPreviousMonth() },
-                        modifier = Modifier.animateWidth(interactionSource = interactionSources[0]),
                         shapes = IconButtonDefaults.shapes(),
                         colors =
                         IconButtonDefaults.filledIconButtonColors(
@@ -131,7 +131,6 @@ private fun MonthHeader(monthName: String, onPreviousMonth: () -> Unit = {}, onN
                 buttonGroupContent = {
                     FilledIconButton(
                         onClick = { onNextMonth() },
-                        modifier = Modifier.animateWidth(interactionSource = interactionSources[1]),
                         shapes = IconButtonDefaults.shapes(),
                         interactionSource = interactionSources[1],
                         colors =
