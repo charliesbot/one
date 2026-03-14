@@ -1,0 +1,16 @@
+<resources>
+    <string name="notification_one_hour_title">1 Hour Remaining!</string>
+    <string name="notification_one_hour_message">You\'re doing great! Just one more hour until your fast is complete.</string>
+    <string name="notification_completion_title">Fasting Completed!</string>
+    <string name="notification_completion_message">Congratulations! You have completed your fast.</string>
+    <string name="notification_smart_reminder_1h_title">Last Call! 🍽️</string>
+    <string name="notification_smart_reminder_1h_message">Your eating window closes in 1 hour. Time to wrap up!</string>
+    <string name="notification_smart_reminder_start_title">Fast Mode: On ⚡</string>
+    <string name="notification_smart_reminder_start_message">Eating window closed. You\'ve got this!</string>
+    <string name="notification_permission_title">Enable Notifications</string>
+    <string name="notification_permission_icon_desc">Notification Permission</string>
+    <string name="notification_permission_text">To keep track of your fasting progress, we\'ll need
+        to send you notifications.\n\nWould you like to enable notifications?</string>
+    <string name="notification_permission_enable">Enable</string>
+    <string name="notification_permission_not_now">Not Now</string>
+</resources>

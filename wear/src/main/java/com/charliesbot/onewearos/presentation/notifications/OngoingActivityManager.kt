@@ -21,6 +21,7 @@ import com.charliesbot.shared.core.data.repositories.fastingDataRepository.Fasti
 import com.charliesbot.shared.core.notifications.NotificationUtil
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import com.charliesbot.shared.R as SharedR
 
 /**
  * Manages the OngoingActivity for fasting sessions on Wear OS.
@@ -54,8 +55,8 @@ class OngoingActivityManager(private val context: Context, private val fastingDa
 
         // Use StopwatchPart - system auto-updates the elapsed time, no periodic loop needed
         // Build template from localized string, replacing format args with Status placeholders
-        val statusTemplate = context.getString(R.string.ongoing_status_format, "#time#", "#goal#")
-        val goalText = context.getString(R.string.target_duration_short, fastingGoal.durationDisplay)
+        val statusTemplate = context.getString(SharedR.string.ongoing_status_format, "#time#", "#goal#")
+        val goalText = context.getString(SharedR.string.target_duration_short, fastingGoal.durationDisplay)
         val status = Status.Builder()
             .addTemplate(statusTemplate)
             .addPart("time", Status.StopwatchPart(stopwatchStartTime))
@@ -122,8 +123,8 @@ class OngoingActivityManager(private val context: Context, private val fastingDa
         pendingIntent: PendingIntent,
     ): NotificationCompat.Builder = NotificationCompat.Builder(context, NotificationUtil.CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_notification_status)
-        .setContentTitle(context.getString(R.string.ongoing_activity_title))
-        .setContentText(context.getString(R.string.target_duration_short, goalDuration))
+        .setContentTitle(context.getString(SharedR.string.ongoing_activity_title))
+        .setContentText(context.getString(SharedR.string.target_duration_short, goalDuration))
         .setContentIntent(pendingIntent)
         .setOngoing(true)
         .setCategory(NotificationCompat.CATEGORY_STOPWATCH)

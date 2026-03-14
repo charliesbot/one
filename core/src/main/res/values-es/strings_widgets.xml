@@ -1,0 +1,15 @@
+<resources>
+    <string name="widget_goal_met_part_1">Meta</string>
+    <string name="widget_goal_met_part_2">Lograda!</string>
+    <string name="widget_time_since_last_fast">Último ayuno</string>
+    <string name="widget_not_fasting">Sin ayunar</string>
+    <plurals name="widget_hours_left_plural">
+        <item quantity="one">hora restante!</item>
+        <item quantity="many">horas restantes!</item>
+        <item quantity="other">horas restantes!</item>
+    </plurals>
+    <string name="progress_ring_desc">Anillo de Progreso</string>
+    <string name="accessibility_fasting_status">Ayuno %1$d%%, %2$d horas restantes</string>
+    <string name="widget_preview_hours">16</string>
+    <string name="widget_preview_hours_left">horas restantes!</string>
+</resources>

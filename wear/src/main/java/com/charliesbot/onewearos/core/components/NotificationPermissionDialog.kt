@@ -12,6 +12,7 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.theme.OneTheme
+import com.charliesbot.shared.R as SharedR
 
 @Composable
 fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, isVisible: Boolean = true) {
@@ -24,10 +25,10 @@ fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, i
                 contentDescription = "Notification Permission",
             )
         },
-        title = { Text(stringResource(R.string.dialog_title_enable_notifications)) },
+        title = { Text(stringResource(SharedR.string.dialog_title_enable_notifications)) },
         text = {
             Text(
-                text = stringResource(R.string.dialog_message_enable_notifications),
+                text = stringResource(SharedR.string.dialog_message_enable_notifications),
                 textAlign = TextAlign.Center,
             )
         },

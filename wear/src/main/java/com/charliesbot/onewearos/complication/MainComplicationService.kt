@@ -27,6 +27,7 @@ import com.charliesbot.shared.core.utils.FastingProgressUtil
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import com.charliesbot.shared.R as SharedR
 
 const val MOCKED_TARGET_HOURS = 16f
 
@@ -41,9 +42,9 @@ class MainComplicationService :
             Icon.createWithResource(this, R.drawable.ic_notification_status),
         ).build()
         val contentDescription =
-            PlainComplicationText.Builder(getString(R.string.cd_fasting_preview)).build()
+            PlainComplicationText.Builder(getString(SharedR.string.cd_fasting_preview)).build()
         val title =
-            PlainComplicationText.Builder(getString(R.string.complication_title_hours_format, 8))
+            PlainComplicationText.Builder(getString(SharedR.string.complication_title_hours_format, 8))
                 .build()
 
         return when (type) {
@@ -106,7 +107,7 @@ class MainComplicationService :
 
     private fun createNotFastingComplicationData(type: ComplicationType, tapAction: PendingIntent?): ComplicationData? {
         val contentDescription =
-            PlainComplicationText.Builder(getString(R.string.complication_text_not_fasting))
+            PlainComplicationText.Builder(getString(SharedR.string.complication_text_not_fasting))
                 .build()
         val icon = MonochromaticImage.Builder(
             Icon.createWithResource(this, R.drawable.ic_notification_status),
@@ -135,7 +136,7 @@ class MainComplicationService :
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(getString(R.string.complication_text_not_fasting))
+                text = PlainComplicationText.Builder(getString(SharedR.string.complication_text_not_fasting))
                     .build(),
                 contentDescription = contentDescription,
             )
@@ -182,7 +183,7 @@ class MainComplicationService :
         val title =
             PlainComplicationText.Builder(
                 getString(
-                    R.string.complication_title_hours_format,
+                    SharedR.string.complication_title_hours_format,
                     elapsedHours,
                 ),
             )
@@ -245,10 +246,10 @@ class MainComplicationService :
     private fun createContentDescription(fastingProgress: FastingProgress, fastingGoal: FastGoal) =
         PlainComplicationText.Builder(
             getString(
-                R.string.complication_text_fasting_format,
+                SharedR.string.complication_text_fasting_format,
                 fastingProgress.progressPercentage,
                 fastingProgress.elapsedHours.toInt().toString(),
-                getString(R.string.target_duration_short, fastingGoal.durationDisplay),
+                getString(SharedR.string.target_duration_short, fastingGoal.durationDisplay),
             ),
         ).build()
 
