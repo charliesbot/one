@@ -10,29 +10,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.shared.R as SharedR
 
 @Composable
 fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.notification_permission_title)) },
+        title = { Text(stringResource(SharedR.string.notification_permission_title)) },
         icon = {
             Icon(
-                painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
-                contentDescription = stringResource(R.string.notification_permission_icon_desc),
+                painter = painterResource(SharedR.drawable.notifications_24px),
+                contentDescription = stringResource(SharedR.string.notification_permission_icon_desc),
             )
         },
         text = {
-            Text(stringResource(R.string.notification_permission_text))
+            Text(stringResource(SharedR.string.notification_permission_text))
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.notification_permission_enable))
+                Text(stringResource(SharedR.string.notification_permission_enable))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.notification_permission_not_now))
+                Text(stringResource(SharedR.string.notification_permission_not_now))
             }
         },
     )

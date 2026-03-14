@@ -37,6 +37,7 @@ import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.calculateProgressFraction
 import com.charliesbot.shared.core.utils.getHours
+import com.charliesbot.shared.R as SharedR
 
 @Composable
 fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
@@ -181,12 +182,12 @@ private fun WidgetProgressBar(
     val remainingHours = (getHours(fastingGoalMillis) - getHours(elapsedTime)).coerceAtLeast(0)
     val contentDescription = if (isFasting) {
         context.getString(
-            R.string.accessibility_fasting_status,
+            SharedR.string.accessibility_fasting_status,
             (progress * 100).toInt(),
             remainingHours,
         )
     } else {
-        context.getString(R.string.widget_not_fasting)
+        context.getString(SharedR.string.widget_not_fasting)
     }
 
     Row(
@@ -212,7 +213,7 @@ private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWi
     if (isFasting && actualHours <= 0) {
         return Row {
             Text(
-                text = context.getString(R.string.widget_goal_met_part_1),
+                text = context.getString(SharedR.string.widget_goal_met_part_1),
                 style = TextStyle(
                     color = GlanceTheme.colors.onPrimaryContainer,
                     fontSize = goalMetTextSize,
@@ -220,7 +221,7 @@ private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWi
             )
             Spacer(modifier = GlanceModifier.width(6.dp))
             Text(
-                text = context.getString(R.string.widget_goal_met_part_2),
+                text = context.getString(SharedR.string.widget_goal_met_part_2),
                 style = TextStyle(
                     color = GlanceTheme.colors.onTertiaryContainer,
                     fontSize = goalMetTextSize,
@@ -242,7 +243,7 @@ private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWi
             )
             Text(
                 text = context.resources.getQuantityString(
-                    R.plurals.widget_hours_left_plural,
+                    SharedR.plurals.widget_hours_left_plural,
                     actualHours.toInt(),
                 ),
                 style = TextStyle(
@@ -255,7 +256,7 @@ private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWi
     }
 
     return Text(
-        text = context.getString(R.string.widget_not_fasting),
+        text = context.getString(SharedR.string.widget_not_fasting),
         style = TextStyle(
             color = GlanceTheme.colors.onSurface,
             fontSize = if (isWide) 18.sp else 24.sp,

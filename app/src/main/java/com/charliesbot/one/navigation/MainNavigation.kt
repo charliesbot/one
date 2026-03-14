@@ -16,10 +16,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.charliesbot.one.R
 import com.charliesbot.one.features.dashboard.TodayScreen
 import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
-import com.charliesbot.shared.R
+import com.charliesbot.shared.R as SharedR
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -33,11 +34,11 @@ fun MainNavigation() {
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            painter = painterResource(R.drawable.today_24px),
-                            contentDescription = stringResource(R.string.nav_today),
+                            painter = painterResource(SharedR.drawable.today_24px),
+                            contentDescription = stringResource(SharedR.string.nav_today),
                         )
                     },
-                    label = { Text(stringResource(R.string.nav_today)) },
+                    label = { Text(stringResource(SharedR.string.nav_today)) },
                     selected = currentDestination == Today,
                     onClick = {
                         if (currentDestination != Today) {
@@ -49,11 +50,11 @@ fun MainNavigation() {
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            painterResource(R.drawable.person_24px),
-                            contentDescription = stringResource(R.string.nav_you),
+                            painterResource(SharedR.drawable.person_24px),
+                            contentDescription = stringResource(SharedR.string.nav_you),
                         )
                     },
-                    label = { Text(stringResource(R.string.nav_you)) },
+                    label = { Text(stringResource(SharedR.string.nav_you)) },
                     selected = currentDestination == You,
                     onClick = {
                         if (currentDestination != You) {
@@ -65,11 +66,11 @@ fun MainNavigation() {
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            painterResource(R.drawable.settings_24px),
-                            contentDescription = stringResource(R.string.settings_title),
+                            painterResource(SharedR.drawable.settings_24px),
+                            contentDescription = stringResource(SharedR.string.settings_title),
                         )
                     },
-                    label = { Text(stringResource(R.string.settings_title)) },
+                    label = { Text(stringResource(SharedR.string.settings_title)) },
                     selected = currentDestination == Settings,
                     onClick = {
                         if (currentDestination != Settings) {

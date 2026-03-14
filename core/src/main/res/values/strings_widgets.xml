@@ -1,0 +1,15 @@
+<resources>
+    <string name="widget_goal_met_part_1">Goal</string>
+    <string name="widget_goal_met_part_2">Met!</string>
+    <string name="widget_not_fasting">Not fasting</string>
+    <string name="widget_time_since_last_fast">Last Fast</string>
+    <plurals name="widget_hours_left_plural">
+        <item quantity="one">hour left!</item>
+        <item quantity="many">hours left!</item>
+        <item quantity="other">hours left!</item>
+    </plurals>
+    <string name="progress_ring_desc">Progress Ring</string>
+    <string name="accessibility_fasting_status">Fasting %1$d%%, %2$d hours remaining</string>
+    <string name="widget_preview_hours">16</string>
+    <string name="widget_preview_hours_left">hours left!</string>
+</resources>

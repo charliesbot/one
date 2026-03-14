@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">One</string>
+    <string name="hours">horas</string>
+    <string name="label_save">Guardar</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="navigate_back">Volver</string>
+    <string name="nav_today">Hoy</string>
+    <string name="nav_you">Tú</string>
+</resources>
