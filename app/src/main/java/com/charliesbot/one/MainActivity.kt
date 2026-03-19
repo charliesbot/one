@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat
 import com.charliesbot.one.core.components.NotificationPermissionDialog
 import com.charliesbot.one.navigation.MainNavigation
 import com.charliesbot.one.ui.theme.OneTheme
-import com.charliesbot.one.widgets.updateWidgetPreview
+import com.charliesbot.one.widget.updateWidgetPreview
 import com.charliesbot.shared.core.notifications.NotificationUtil
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

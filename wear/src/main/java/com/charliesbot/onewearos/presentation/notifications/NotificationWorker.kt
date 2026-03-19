@@ -69,7 +69,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
 
         val notificationBuilder =
             NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification_status)
+                .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
                 .setContentTitle(notificationContent.title)
                 .setContentText(notificationContent.message)
                 .setContentIntent(watchPendingIntent)

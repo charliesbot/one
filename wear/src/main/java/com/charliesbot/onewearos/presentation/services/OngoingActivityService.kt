@@ -108,7 +108,7 @@ class OngoingActivityService :
         NotificationUtil.createNotificationChannel(this)
 
         return NotificationCompat.Builder(this, NotificationUtil.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_status)
+            .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
             .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()

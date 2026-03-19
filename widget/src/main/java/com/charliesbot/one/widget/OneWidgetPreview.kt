@@ -1,4 +1,4 @@
-package com.charliesbot.one.widgets
+package com.charliesbot.one.widget
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo

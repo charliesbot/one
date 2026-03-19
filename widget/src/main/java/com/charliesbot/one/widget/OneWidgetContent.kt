@@ -1,5 +1,6 @@
-package com.charliesbot.one.widgets
+package com.charliesbot.one.widget
 
+import android.content.ComponentName
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -31,8 +32,6 @@ import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.charliesbot.one.MainActivity
-import com.charliesbot.one.R
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.calculateProgressFraction
@@ -80,7 +79,14 @@ fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
         Scaffold(
             modifier = GlanceModifier
                 .background(GlanceTheme.colors.widgetBackground)
-                .clickable(actionStartActivity<MainActivity>()),
+                .clickable(
+                    actionStartActivity(
+                        ComponentName(
+                            "com.charliesbot.one",
+                            "com.charliesbot.one.MainActivity",
+                        ),
+                    ),
+                ),
         ) {
             if (useVerticalLayout) {
                 // Vertical layout for tall widgets (2x2+)

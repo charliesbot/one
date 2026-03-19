@@ -68,8 +68,8 @@ class OngoingActivityManager(private val context: Context, private val fastingDa
             NotificationConstants.ONGOING_NOTIFICATION_ID,
             notificationBuilder,
         )
-            .setAnimatedIcon(R.drawable.ic_notification_status)
-            .setStaticIcon(R.drawable.ic_notification_status)
+            .setAnimatedIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
+            .setStaticIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
             .setTouchIntent(pendingIntent)
             .setStatus(status)
             .setLocusId(LocusIdCompat(ONGOING_ACTIVITY_LOCUS_ID))
@@ -122,7 +122,7 @@ class OngoingActivityManager(private val context: Context, private val fastingDa
         goalDuration: String,
         pendingIntent: PendingIntent,
     ): NotificationCompat.Builder = NotificationCompat.Builder(context, NotificationUtil.CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_notification_status)
+        .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
         .setContentTitle(context.getString(SharedR.string.ongoing_activity_title))
         .setContentText(context.getString(SharedR.string.target_duration_short, goalDuration))
         .setContentIntent(pendingIntent)
