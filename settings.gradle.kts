@@ -26,6 +26,8 @@ rootProject.name = "One"
 include(":app")
 include(":wear")
 include(":core")
+include(":widget")
+include(":complications")
 
 file("features")
     .listFiles()

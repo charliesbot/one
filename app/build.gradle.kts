@@ -127,8 +127,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.glance.preview)
-    implementation(libs.androidx.glance.appwidget.preview)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
 
@@ -145,6 +143,7 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
     implementation(project(":core"))
+    implementation(project(":widget"))
     implementation(project(":features:dashboard:app"))
     implementation(project(":features:profile:app"))
     implementation(project(":features:settings:app"))

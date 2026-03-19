@@ -68,7 +68,7 @@ class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
             )
 
         return NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_status)
+            .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
             .setAutoCancel(true)
             .setContentTitle(notificationContent.title)
             .setContentText(notificationContent.message)

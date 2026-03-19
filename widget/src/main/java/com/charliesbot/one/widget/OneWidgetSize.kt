@@ -1,4 +1,4 @@
-package com.charliesbot.one.widgets
+package com.charliesbot.one.widget
 
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp

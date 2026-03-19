@@ -1,6 +1,7 @@
-package com.charliesbot.onewearos.complication
+package com.charliesbot.onewearos.complications
 
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.util.Log
@@ -15,8 +16,6 @@ import androidx.wear.watchface.complications.data.RangedValueComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import com.charliesbot.onewearos.R
-import com.charliesbot.onewearos.presentation.MainActivity
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
@@ -39,7 +38,7 @@ class MainComplicationService :
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         val icon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_notification_status),
+            Icon.createWithResource(this, SharedR.drawable.ic_notification_status),
         ).build()
         val contentDescription =
             PlainComplicationText.Builder(getString(SharedR.string.cd_fasting_preview)).build()
@@ -110,7 +109,7 @@ class MainComplicationService :
             PlainComplicationText.Builder(getString(SharedR.string.complication_text_not_fasting))
                 .build()
         val icon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_notification_status),
+            Icon.createWithResource(this, SharedR.drawable.ic_notification_status),
         ).build()
 
         return when (type) {
@@ -177,7 +176,7 @@ class MainComplicationService :
         val fastingGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
         val contentDescription = createContentDescription(fastingProgress, fastingGoal)
         val icon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_notification_status),
+            Icon.createWithResource(this, SharedR.drawable.ic_notification_status),
         ).build()
         val elapsedHours = fastingProgress.elapsedHours.toInt()
         val title =
@@ -254,8 +253,10 @@ class MainComplicationService :
         ).build()
 
     private fun createTapIntent(): PendingIntent {
-        val intent = Intent(this, MainActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = Intent().apply {
+            component = ComponentName("com.charliesbot.one", "com.charliesbot.onewearos.presentation.MainActivity")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
 
         return PendingIntent.getActivity(
             this,

@@ -9,7 +9,7 @@ import com.charliesbot.one.data.FastingHistoryRepositoryImpl
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
-import com.charliesbot.one.widgets.WidgetUpdateManager
+import com.charliesbot.one.widget.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase
 import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository

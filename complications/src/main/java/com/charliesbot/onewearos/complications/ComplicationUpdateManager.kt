@@ -1,4 +1,4 @@
-package com.charliesbot.onewearos.complication
+package com.charliesbot.onewearos.complications
 
 import android.content.ComponentName
 import android.content.Context
@@ -29,7 +29,7 @@ class ComplicationUpdateManager(
     init {
         Log.d(
             AppConstants.LOG_TAG,
-            "WidgetUpdateManager: Initializing and starting debounce collector.",
+            "ComplicationUpdateManager: Initializing and starting debounce collector.",
         )
         startDebounceCollector()
     }
@@ -45,7 +45,7 @@ class ComplicationUpdateManager(
                     )
                         .requestUpdateAll()
                 }.onFailure {
-                    Log.e(AppConstants.LOG_TAG, "WidgetUpdateManager: Error in updateAll", it)
+                    Log.e(AppConstants.LOG_TAG, "ComplicationUpdateManager: Error in updateAll", it)
                 }
             }
         }
