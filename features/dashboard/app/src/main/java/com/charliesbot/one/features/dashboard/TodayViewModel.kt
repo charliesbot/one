@@ -1,8 +1,7 @@
 package com.charliesbot.one.features.dashboard
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TodayViewModel(
-  application: Application,
   fastingHistoryRepository: FastingHistoryRepository,
   private val observeFastingStateUseCase: ObserveFastingStateUseCase,
   private val startFastingUseCase: StartFastingUseCase,
@@ -39,7 +37,7 @@ class TodayViewModel(
   private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
   private val customGoalRepository: CustomGoalRepository,
   goalResolver: GoalResolver,
-) : AndroidViewModel(application) {
+) : ViewModel() {
   private val currentFasting: StateFlow<FastingDataItem?> =
     observeFastingStateUseCase()
       .stateIn(
