@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.data.repositories.customGoalRepository
+package com.charliesbot.shared.core.data.repository
 
 import android.content.Context
 import android.util.Log
@@ -9,6 +9,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataLayerConstants
 import com.charliesbot.shared.core.constants.FastGoal
+import com.charliesbot.shared.core.domain.model.CustomGoalData
+import com.charliesbot.shared.core.domain.model.toData
+import com.charliesbot.shared.core.domain.model.toFastGoal
+import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.Flow

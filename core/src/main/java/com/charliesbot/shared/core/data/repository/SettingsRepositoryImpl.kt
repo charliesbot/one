@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.data.repositories.settingsRepository
+package com.charliesbot.shared.core.data.repository
 
 import android.content.Context
 import android.util.Log
@@ -10,6 +10,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.PutDataRequest

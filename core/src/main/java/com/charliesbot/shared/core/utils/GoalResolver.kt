@@ -2,7 +2,7 @@ package com.charliesbot.shared.core.utils
 
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.customGoalRepository.CustomGoalRepository
+import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

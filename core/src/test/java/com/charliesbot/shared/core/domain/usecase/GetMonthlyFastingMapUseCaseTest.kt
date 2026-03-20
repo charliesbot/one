@@ -1,7 +1,7 @@
 package com.charliesbot.shared.core.domain.usecase
 
 import com.charliesbot.shared.core.data.db.FastingRecord
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first

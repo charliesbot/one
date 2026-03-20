@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.domain.usecase.ObserveFastingStateUseCase
+import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
+import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
+import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.GoalResolver
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
@@ -21,7 +24,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-class WearTodayViewModel(private val fastingUseCase: FastingUseCase, goalResolver: GoalResolver) : ViewModel() {
+class WearTodayViewModel(
+    private val observeFastingStateUseCase: ObserveFastingStateUseCase,
+    private val startFastingUseCase: StartFastingUseCase,
+    private val stopFastingUseCase: StopFastingUseCase,
+    private val updateFastingConfigUseCase: UpdateFastingConfigUseCase,
+    goalResolver: GoalResolver,
+) : ViewModel() {
 
     val allGoals: StateFlow<List<FastGoal>> = goalResolver.allGoals
         .stateIn(
@@ -30,7 +39,7 @@ class WearTodayViewModel(private val fastingUseCase: FastingUseCase, goalResolve
             PredefinedFastingGoals.allGoals,
         )
 
-    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
+    private val currentFasting: StateFlow<FastingDataItem?> = observeFastingStateUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -63,13 +72,13 @@ class WearTodayViewModel(private val fastingUseCase: FastingUseCase, goalResolve
 
     fun onStartFasting() {
         viewModelScope.launch {
-            fastingUseCase.startFasting(fastingGoalId.value)
+            startFastingUseCase(fastingGoalId.value)
         }
     }
 
     fun onStopFasting() {
         viewModelScope.launch {
-            fastingUseCase.stopFasting()
+            stopFastingUseCase()
         }
     }
 
@@ -84,10 +93,10 @@ class WearTodayViewModel(private val fastingUseCase: FastingUseCase, goalResolve
     }
 
     suspend fun updateStartTime(timeInMillis: Long) {
-        fastingUseCase.updateFastingConfig(startTimeMillis = timeInMillis)
+        updateFastingConfigUseCase(startTimeMillis = timeInMillis)
     }
 
     suspend fun updateFastingGoal(fastingGoalId: String) {
-        fastingUseCase.updateFastingConfig(goalId = fastingGoalId)
+        updateFastingConfigUseCase(goalId = fastingGoalId)
     }
 }

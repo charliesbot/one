@@ -8,9 +8,9 @@ import androidx.core.content.ContextCompat
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataLayerConstants
-import com.charliesbot.shared.core.data.repositories.customGoalRepository.CustomGoalRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
+import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.notifications.NotificationUtil

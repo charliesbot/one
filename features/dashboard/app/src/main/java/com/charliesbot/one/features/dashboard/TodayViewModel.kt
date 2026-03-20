@@ -7,11 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.customGoalRepository.CustomGoalRepository
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
-import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
+import com.charliesbot.shared.core.domain.usecase.ObserveFastingStateUseCase
+import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
+import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
+import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.TimePeriodProgress
@@ -28,13 +31,16 @@ import kotlinx.coroutines.launch
 class TodayViewModel(
     application: Application,
     fastingHistoryRepository: FastingHistoryRepository,
-    private val fastingUseCase: FastingUseCase,
+    private val observeFastingStateUseCase: ObserveFastingStateUseCase,
+    private val startFastingUseCase: StartFastingUseCase,
+    private val stopFastingUseCase: StopFastingUseCase,
+    private val updateFastingConfigUseCase: UpdateFastingConfigUseCase,
     private val settingsRepository: SettingsRepository,
     private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
     private val customGoalRepository: CustomGoalRepository,
     goalResolver: GoalResolver,
 ) : AndroidViewModel(application) {
-    private val currentFasting: StateFlow<FastingDataItem?> = fastingUseCase.getCurrentFastingFlow()
+    private val currentFasting: StateFlow<FastingDataItem?> = observeFastingStateUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -135,32 +141,32 @@ class TodayViewModel(
 
     fun onStopFasting() {
         viewModelScope.launch {
-            fastingUseCase.stopFasting()
+            stopFastingUseCase()
         }
     }
 
     fun onStartFasting() {
         viewModelScope.launch {
-            fastingUseCase.startFasting(fastingGoalId.value)
+            startFastingUseCase(fastingGoalId.value)
         }
     }
 
     fun updateStartTime(timeInMillis: Long) {
         viewModelScope.launch {
-            fastingUseCase.updateFastingConfig(startTimeMillis = timeInMillis)
+            updateFastingConfigUseCase(startTimeMillis = timeInMillis)
         }
     }
 
     fun updateFastingGoal(fastingGoalId: String) {
         viewModelScope.launch {
-            fastingUseCase.updateFastingConfig(goalId = fastingGoalId)
+            updateFastingConfigUseCase(goalId = fastingGoalId)
         }
     }
 
     fun saveCustomGoal(goal: FastGoal) {
         viewModelScope.launch {
             customGoalRepository.saveCustomGoal(goal)
-            fastingUseCase.updateFastingConfig(goalId = goal.id)
+            updateFastingConfigUseCase(goalId = goal.id)
         }
     }
 
@@ -169,7 +175,7 @@ class TodayViewModel(
             customGoalRepository.deleteCustomGoal(goalId)
             // If the deleted goal was active, fall back to 16:8
             if (fastingGoalId.value == goalId) {
-                fastingUseCase.updateFastingConfig(goalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id)
+                updateFastingConfigUseCase(goalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id)
             }
         }
     }

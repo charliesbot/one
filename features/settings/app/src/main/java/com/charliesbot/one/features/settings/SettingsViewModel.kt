@@ -11,11 +11,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
-import com.charliesbot.shared.core.domain.usecase.FastingUseCase
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
+import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.services.SmartReminderCallback
 import kotlinx.coroutines.channels.Channel
@@ -48,7 +48,7 @@ class SettingsViewModel(
     application: Application,
     private val settingsRepository: SettingsRepository,
     private val fastingHistoryRepository: FastingHistoryRepository,
-    private val fastingUseCase: FastingUseCase,
+    private val syncFastingStateUseCase: SyncFastingStateUseCase,
     private val smartReminderCallback: SmartReminderCallback,
     private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
     private val stringProvider: StringProvider,
@@ -257,18 +257,20 @@ class SettingsViewModel(
     fun forceSyncToWatch() {
         viewModelScope.launch {
             _isSyncing.value = true
-            try {
-                fastingUseCase.syncCurrentState()
-                _sideEffects.send(
-                    SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_SUCCESS)),
-                )
-                Log.d(LOG_TAG, "SettingsViewModel: Force sync successful")
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "SettingsViewModel: Force sync failed", e)
-                _sideEffects.send(SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_ERROR)))
-            } finally {
-                _isSyncing.value = false
-            }
+            syncFastingStateUseCase()
+                .onSuccess {
+                    _sideEffects.send(
+                        SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_SUCCESS)),
+                    )
+                    Log.d(LOG_TAG, "SettingsViewModel: Force sync successful")
+                }
+                .onFailure { e ->
+                    Log.e(LOG_TAG, "SettingsViewModel: Force sync failed", e)
+                    _sideEffects.send(
+                        SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_ERROR)),
+                    )
+                }
+            _isSyncing.value = false
         }
     }
 

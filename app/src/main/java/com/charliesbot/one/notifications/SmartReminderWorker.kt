@@ -9,7 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataLayerConstants
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.google.android.gms.wearable.DataClient

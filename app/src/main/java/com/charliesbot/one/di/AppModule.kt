@@ -12,7 +12,7 @@ import com.charliesbot.one.services.SmartReminderCallbackImpl
 import com.charliesbot.one.widget.WidgetUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventCallbacks

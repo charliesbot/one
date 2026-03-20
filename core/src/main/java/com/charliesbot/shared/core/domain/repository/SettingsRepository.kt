@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.data.repositories.settingsRepository
+package com.charliesbot.shared.core.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 

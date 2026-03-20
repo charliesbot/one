@@ -1,9 +1,9 @@
 package com.charliesbot.shared.core.domain.usecase
 
 import com.charliesbot.shared.core.data.db.FastingRecord
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestionSource
 import io.mockk.every
 import io.mockk.mockk

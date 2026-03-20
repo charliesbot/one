@@ -57,7 +57,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.TimePickerDialog
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SmartReminderMode
+import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
 import com.charliesbot.shared.core.utils.formatMinutesAsTime

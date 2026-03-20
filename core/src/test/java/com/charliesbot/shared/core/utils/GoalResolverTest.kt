@@ -3,7 +3,7 @@ package com.charliesbot.shared.core.utils
 import androidx.compose.ui.graphics.Color
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.customGoalRepository.CustomGoalRepository
+import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
