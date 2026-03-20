@@ -1,14 +1,11 @@
 package com.charliesbot.one.features.settings
 
-import android.app.Application
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.ContentValues
-import android.content.Context
-import android.provider.MediaStore
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charliesbot.shared.core.abstraction.AppVersionProvider
+import com.charliesbot.shared.core.abstraction.ClipboardHelper
+import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
@@ -18,9 +15,6 @@ import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUs
 import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.services.SmartReminderCallback
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -45,14 +39,16 @@ data class SettingsUiState(
 )
 
 class SettingsViewModel(
-  application: Application,
   private val settingsRepository: SettingsRepository,
   private val fastingHistoryRepository: FastingHistoryRepository,
   private val syncFastingStateUseCase: SyncFastingStateUseCase,
   private val smartReminderCallback: SmartReminderCallback,
   private val getSuggestedFastingStartTimeUseCase: GetSuggestedFastingStartTimeUseCase,
   private val stringProvider: StringProvider,
-) : AndroidViewModel(application) {
+  private val appVersionProvider: AppVersionProvider,
+  private val historyExporter: HistoryExporter,
+  private val clipboardHelper: ClipboardHelper,
+) : ViewModel() {
 
   private val _isSyncing = MutableStateFlow(false)
   private val _isExporting = MutableStateFlow(false)
@@ -62,16 +58,6 @@ class SettingsViewModel(
 
   private val _suggestedFastingTime = MutableStateFlow<SuggestedFastingTime?>(null)
   val suggestedFastingTime: StateFlow<SuggestedFastingTime?> = _suggestedFastingTime
-
-  // Get version from package manager
-  private val versionName: String =
-    try {
-      val context = getApplication<Application>()
-      context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknown"
-    } catch (e: Exception) {
-      Log.e(LOG_TAG, "SettingsViewModel: Failed to get version name", e)
-      "Unknown"
-    }
 
   val uiState: StateFlow<SettingsUiState> =
     combine(
@@ -87,7 +73,7 @@ class SettingsViewModel(
           notifyOneHourBefore = oneHour,
           smartRemindersEnabled = smartReminders,
           bedtimeMinutes = bedtime,
-          versionName = versionName,
+          versionName = appVersionProvider.versionName,
         )
       }
       .combine(settingsRepository.smartReminderMode) { state, mode ->
@@ -183,59 +169,22 @@ class SettingsViewModel(
           return@launch
         }
 
-        // Create filename with timestamp
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "fasting_history_$timestamp.csv"
-
-        // Use MediaStore to save to Downloads folder (Android 10+)
-        val contentValues =
-          ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
-            put(MediaStore.Downloads.MIME_TYPE, "text/csv")
-            put(MediaStore.Downloads.IS_PENDING, 1)
+        historyExporter
+          .export(records)
+          .onSuccess {
+            _sideEffects.send(
+              SettingsSideEffect.ShowSnackbar(
+                stringProvider.getString(SettingsStrings.EXPORT_SUCCESS)
+              )
+            )
           }
-
-        val resolver = getApplication<Application>().contentResolver
-        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-
-        if (uri == null) {
-          Log.e(LOG_TAG, "SettingsViewModel: Failed to create file in Downloads")
-          _sideEffects.send(
-            SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR))
-          )
-          return@launch
-        }
-
-        // Write CSV data with human-readable dates
-        resolver.openOutputStream(uri)?.use { outputStream ->
-          outputStream.bufferedWriter().use { writer ->
-            // Write header
-            writer.append("Start Time,End Time,Duration (hours),Goal\n")
-
-            // Date formatter for human-readable timestamps
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-
-            // Write records
-            records.forEach { record ->
-              val startDate = dateFormat.format(Date(record.startTimeEpochMillis))
-              val endDate = dateFormat.format(Date(record.endTimeEpochMillis))
-              val durationHours =
-                (record.endTimeEpochMillis - record.startTimeEpochMillis) / (1000 * 60 * 60)
-
-              writer.append("$startDate,$endDate,$durationHours,${record.fastingGoalId}\n")
-            }
+          .onFailure {
+            _sideEffects.send(
+              SettingsSideEffect.ShowSnackbar(
+                stringProvider.getString(SettingsStrings.EXPORT_ERROR)
+              )
+            )
           }
-        }
-
-        // Mark file as complete (no longer pending)
-        contentValues.clear()
-        contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
-        resolver.update(uri, contentValues, null, null)
-
-        _sideEffects.send(
-          SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_SUCCESS))
-        )
-        Log.d(LOG_TAG, "SettingsViewModel: Export successful - saved to Downloads/$fileName")
       } catch (e: Exception) {
         Log.e(LOG_TAG, "SettingsViewModel: Export failed", e)
         _sideEffects.send(
@@ -270,10 +219,7 @@ class SettingsViewModel(
   fun copyVersionToClipboard() {
     viewModelScope.launch {
       try {
-        val context = getApplication<Application>()
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = ClipData.newPlainText("App Version", versionName)
-        clipboard.setPrimaryClip(clipData)
+        clipboardHelper.copy("App Version", appVersionProvider.versionName)
         _sideEffects.send(
           SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.VERSION_COPIED))
         )
