@@ -22,3 +22,4 @@ google-services.json
 .idea/
 play-store-service-account.json
 service-account.json
+firebase-debug.log
