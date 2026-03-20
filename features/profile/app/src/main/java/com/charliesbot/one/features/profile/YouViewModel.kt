@@ -1,7 +1,6 @@
 package com.charliesbot.one.features.profile
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.components.FastingDayData
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
@@ -28,10 +27,9 @@ data class CalendarUiState(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class YouViewModel(
-  application: Application,
   getMonthlyFastingMapUseCase: GetMonthlyFastingMapUseCase,
   private val fastingHistoryRepository: FastingHistoryRepository,
-) : AndroidViewModel(application) {
+) : ViewModel() {
   private val _selectedMonth = MutableStateFlow(YearMonth.now())
   val selectedMonth: StateFlow<YearMonth> = _selectedMonth
 
