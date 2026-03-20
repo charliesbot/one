@@ -45,221 +45,199 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
-/**
- * AM/PM enum for 12-hour time format.
- */
+/** AM/PM enum for 12-hour time format. */
 enum class AmPm {
-    AM,
-    PM,
+  AM,
+  PM,
 }
 
-/**
- * Data class representing a date item in the picker.
- */
+/** Data class representing a date item in the picker. */
 data class DateItem(val date: LocalDate, val daysAgo: Int)
 
 /**
- * State holder for DateTimeWheelPicker.
- * Hoists the selected date/time state for easy access and testing.
+ * State holder for DateTimeWheelPicker. Hoists the selected date/time state for easy access and
+ * testing.
  */
 @Stable
 class DateTimeWheelPickerState(initialDateTime: LocalDateTime) {
-    // Generate date list once at init time (not lazily recomputed)
-    private val referenceDate: LocalDate = LocalDate.now()
+  // Generate date list once at init time (not lazily recomputed)
+  private val referenceDate: LocalDate = LocalDate.now()
 
-    // Dates ordered oldest first (top) to newest (bottom)
-    // So scrolling UP goes back in time
-    val dateItems: List<DateItem> = (29 downTo 0).map { daysAgo ->
-        DateItem(
-            date = referenceDate.minusDays(daysAgo.toLong()),
-            daysAgo = daysAgo,
-        )
+  // Dates ordered oldest first (top) to newest (bottom)
+  // So scrolling UP goes back in time
+  val dateItems: List<DateItem> =
+    (29 downTo 0).map { daysAgo ->
+      DateItem(date = referenceDate.minusDays(daysAgo.toLong()), daysAgo = daysAgo)
     }
 
-    val hourItems: List<Int> = (1..12).toList()
-    val minuteItems: List<Int> = (0..59).toList()
-    val amPmItems: List<AmPm> = listOf(AmPm.AM, AmPm.PM)
+  val hourItems: List<Int> = (1..12).toList()
+  val minuteItems: List<Int> = (0..59).toList()
+  val amPmItems: List<AmPm> = listOf(AmPm.AM, AmPm.PM)
 
-    var selectedDateIndex by mutableIntStateOf(findInitialDateIndex(initialDateTime.toLocalDate()))
-    var selectedHourIndex by mutableIntStateOf(to12HourIndex(initialDateTime.hour))
-    var selectedMinuteIndex by mutableIntStateOf(initialDateTime.minute)
-    var selectedAmPmIndex by mutableIntStateOf(if (initialDateTime.hour >= 12) 1 else 0)
+  var selectedDateIndex by mutableIntStateOf(findInitialDateIndex(initialDateTime.toLocalDate()))
+  var selectedHourIndex by mutableIntStateOf(to12HourIndex(initialDateTime.hour))
+  var selectedMinuteIndex by mutableIntStateOf(initialDateTime.minute)
+  var selectedAmPmIndex by mutableIntStateOf(if (initialDateTime.hour >= 12) 1 else 0)
 
-    val selectedDate: LocalDate
-        get() = dateItems[selectedDateIndex].date
+  val selectedDate: LocalDate
+    get() = dateItems[selectedDateIndex].date
 
-    val selectedHour: Int
-        get() = hourItems[selectedHourIndex]
+  val selectedHour: Int
+    get() = hourItems[selectedHourIndex]
 
-    val selectedMinute: Int
-        get() = minuteItems[selectedMinuteIndex]
+  val selectedMinute: Int
+    get() = minuteItems[selectedMinuteIndex]
 
-    val selectedAmPm: AmPm
-        get() = amPmItems[selectedAmPmIndex]
+  val selectedAmPm: AmPm
+    get() = amPmItems[selectedAmPmIndex]
 
-    val selectedDateTime: LocalDateTime
-        get() {
-            val hour24 = to24Hour(selectedHour, selectedAmPm)
-            return LocalDateTime.of(selectedDate, LocalTime.of(hour24, selectedMinute))
-        }
-
-    val selectedMillis: Long
-        get() = selectedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-    private fun findInitialDateIndex(date: LocalDate): Int {
-        val daysAgo = ChronoUnit.DAYS.between(date, referenceDate).toInt().coerceIn(0, 29)
-        // Index 0 = 29 days ago, Index 29 = Today
-        return 29 - daysAgo
+  val selectedDateTime: LocalDateTime
+    get() {
+      val hour24 = to24Hour(selectedHour, selectedAmPm)
+      return LocalDateTime.of(selectedDate, LocalTime.of(hour24, selectedMinute))
     }
 
-    private fun to12HourIndex(hour24: Int): Int {
-        val hour12 = when {
-            hour24 == 0 -> 12
-            hour24 > 12 -> hour24 - 12
-            else -> hour24
-        }
-        return hour12 - 1 // Convert to 0-indexed
-    }
+  val selectedMillis: Long
+    get() = selectedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-    /**
-     * Returns true if the selected time is in the future.
-     */
-    val isFutureTime: Boolean
-        get() = selectedMillis > System.currentTimeMillis()
+  private fun findInitialDateIndex(date: LocalDate): Int {
+    val daysAgo = ChronoUnit.DAYS.between(date, referenceDate).toInt().coerceIn(0, 29)
+    // Index 0 = 29 days ago, Index 29 = Today
+    return 29 - daysAgo
+  }
 
-    companion object {
-        fun to24Hour(hour12: Int, amPm: AmPm): Int = when {
-            amPm == AmPm.AM && hour12 == 12 -> 0
-            amPm == AmPm.PM && hour12 == 12 -> 12
-            amPm == AmPm.PM -> hour12 + 12
-            else -> hour12
-        }
-    }
+  private fun to12HourIndex(hour24: Int): Int {
+    val hour12 =
+      when {
+        hour24 == 0 -> 12
+        hour24 > 12 -> hour24 - 12
+        else -> hour24
+      }
+    return hour12 - 1 // Convert to 0-indexed
+  }
+
+  /** Returns true if the selected time is in the future. */
+  val isFutureTime: Boolean
+    get() = selectedMillis > System.currentTimeMillis()
+
+  companion object {
+    fun to24Hour(hour12: Int, amPm: AmPm): Int =
+      when {
+        amPm == AmPm.AM && hour12 == 12 -> 0
+        amPm == AmPm.PM && hour12 == 12 -> 12
+        amPm == AmPm.PM -> hour12 + 12
+        else -> hour12
+      }
+  }
 }
 
-/**
- * Remember a DateTimeWheelPickerState initialized with the given milliseconds.
- */
+/** Remember a DateTimeWheelPickerState initialized with the given milliseconds. */
 @Composable
 fun rememberDateTimeWheelPickerState(initialMillis: Long): DateTimeWheelPickerState {
-    val initialDateTime = convertMillisToLocalDateTime(initialMillis)
-    return remember(initialMillis) { DateTimeWheelPickerState(initialDateTime) }
+  val initialDateTime = convertMillisToLocalDateTime(initialMillis)
+  return remember(initialMillis) { DateTimeWheelPickerState(initialDateTime) }
 }
 
-/**
- * A combined date and time wheel picker with 4 columns:
- * Date | Hour | Minute | AM/PM
- */
+/** A combined date and time wheel picker with 4 columns: Date | Hour | Minute | AM/PM */
 private val ITEM_HEIGHT = 48.dp
 
 @Composable
 fun DateTimeWheelPicker(state: DateTimeWheelPickerState, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center,
+  Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+    // Unified selection indicator (behind)
+    Surface(
+      modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).height(ITEM_HEIGHT),
+      color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+      shape = RoundedCornerShape(12.dp),
+    ) {}
+
+    // Wheel pickers row (on top)
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+      horizontalArrangement = Arrangement.Center,
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Unified selection indicator (behind)
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .height(ITEM_HEIGHT),
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-            shape = RoundedCornerShape(12.dp),
-        ) {}
+      // Date column (wider)
+      WheelPicker(
+        items = state.dateItems,
+        initialIndex = state.selectedDateIndex,
+        onSelectedIndexChange = { state.selectedDateIndex = it },
+        modifier = Modifier.weight(2f),
+        infiniteScroll = false,
+      ) { dateItem ->
+        Text(
+          text = formatDateForDisplay(dateItem, context),
+          style = MaterialTheme.typography.headlineSmall,
+          fontWeight = FontWeight.Medium,
+          textAlign = TextAlign.Center,
+        )
+      }
 
-        // Wheel pickers row (on top)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // Date column (wider)
-            WheelPicker(
-                items = state.dateItems,
-                initialIndex = state.selectedDateIndex,
-                onSelectedIndexChange = { state.selectedDateIndex = it },
-                modifier = Modifier.weight(2f),
-                infiniteScroll = false,
-            ) { dateItem ->
-                Text(
-                    text = formatDateForDisplay(dateItem, context),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                )
-            }
+      // Hour column
+      WheelPicker(
+        items = state.hourItems,
+        initialIndex = state.selectedHourIndex,
+        onSelectedIndexChange = { state.selectedHourIndex = it },
+        modifier = Modifier.weight(1f),
+        infiniteScroll = true,
+      ) { hour ->
+        Text(
+          text = hour.toString().padStart(2, '0'),
+          style = MaterialTheme.typography.headlineSmall,
+          fontWeight = FontWeight.Medium,
+          textAlign = TextAlign.Center,
+        )
+      }
 
-            // Hour column
-            WheelPicker(
-                items = state.hourItems,
-                initialIndex = state.selectedHourIndex,
-                onSelectedIndexChange = { state.selectedHourIndex = it },
-                modifier = Modifier.weight(1f),
-                infiniteScroll = true,
-            ) { hour ->
-                Text(
-                    text = hour.toString().padStart(2, '0'),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                )
-            }
+      // Minute column
+      WheelPicker(
+        items = state.minuteItems,
+        initialIndex = state.selectedMinuteIndex,
+        onSelectedIndexChange = { state.selectedMinuteIndex = it },
+        modifier = Modifier.weight(1f),
+        infiniteScroll = true,
+      ) { minute ->
+        Text(
+          text = minute.toString().padStart(2, '0'),
+          style = MaterialTheme.typography.headlineSmall,
+          fontWeight = FontWeight.Medium,
+          textAlign = TextAlign.Center,
+        )
+      }
 
-            // Minute column
-            WheelPicker(
-                items = state.minuteItems,
-                initialIndex = state.selectedMinuteIndex,
-                onSelectedIndexChange = { state.selectedMinuteIndex = it },
-                modifier = Modifier.weight(1f),
-                infiniteScroll = true,
-            ) { minute ->
-                Text(
-                    text = minute.toString().padStart(2, '0'),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                )
-            }
-
-            // AM/PM column
-            WheelPicker(
-                items = state.amPmItems,
-                initialIndex = state.selectedAmPmIndex,
-                onSelectedIndexChange = { state.selectedAmPmIndex = it },
-                modifier = Modifier.weight(0.8f),
-                infiniteScroll = false,
-            ) { amPm ->
-                Text(
-                    text = amPm.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                )
-            }
-        }
+      // AM/PM column
+      WheelPicker(
+        items = state.amPmItems,
+        initialIndex = state.selectedAmPmIndex,
+        onSelectedIndexChange = { state.selectedAmPmIndex = it },
+        modifier = Modifier.weight(0.8f),
+        infiniteScroll = false,
+      ) { amPm ->
+        Text(
+          text = amPm.name,
+          style = MaterialTheme.typography.headlineSmall,
+          fontWeight = FontWeight.Medium,
+          textAlign = TextAlign.Center,
+        )
+      }
     }
+  }
 }
 
-/**
- * Format date for display in the wheel picker.
- * "Today", "Yesterday", or "EEE d MMM" format.
- */
+/** Format date for display in the wheel picker. "Today", "Yesterday", or "EEE d MMM" format. */
 private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Context): String =
-    when (dateItem.daysAgo) {
-        0 -> context.getString(R.string.wheel_picker_today)
+  when (dateItem.daysAgo) {
+    0 -> context.getString(R.string.wheel_picker_today)
 
-        1 -> context.getString(R.string.wheel_picker_yesterday)
+    1 -> context.getString(R.string.wheel_picker_yesterday)
 
-        else -> {
-            val formatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale.getDefault())
-            dateItem.date.format(formatter)
-        }
+    else -> {
+      val formatter = DateTimeFormatter.ofPattern("EEE d MMM", Locale.getDefault())
+      dateItem.date.format(formatter)
     }
+  }
 
 /**
  * Dialog wrapper for DateTimeWheelPicker.
@@ -268,96 +246,82 @@ private fun formatDateForDisplay(dateItem: DateItem, context: android.content.Co
  * @param onConfirm Called when user confirms the selection
  * @param onDismiss Called when user dismisses the dialog
  * @param buttonText Custom text for the confirm button (defaults to "Update starting time")
- * @param isValidSelection Additional validation for the selected time. Combined with future time check.
+ * @param isValidSelection Additional validation for the selected time. Combined with future time
+ *   check.
  */
 @Composable
 fun DateTimeWheelPickerDialog(
-    initialDateTimeMillis: Long,
-    onConfirm: (Long) -> Unit,
-    onDismiss: () -> Unit,
-    buttonText: String = stringResource(R.string.wheel_picker_update_start_time),
-    isValidSelection: (selectedMillis: Long) -> Boolean = { true },
+  initialDateTimeMillis: Long,
+  onConfirm: (Long) -> Unit,
+  onDismiss: () -> Unit,
+  buttonText: String = stringResource(R.string.wheel_picker_update_start_time),
+  isValidSelection: (selectedMillis: Long) -> Boolean = { true },
 ) {
-    val state = rememberDateTimeWheelPickerState(initialDateTimeMillis)
-    val isEnabled = !state.isFutureTime && isValidSelection(state.selectedMillis)
+  val state = rememberDateTimeWheelPickerState(initialDateTimeMillis)
+  val isEnabled = !state.isFutureTime && isValidSelection(state.selectedMillis)
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        Surface(
+  Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+  ) {
+    Surface(
+      shape = MaterialTheme.shapes.extraLarge,
+      tonalElevation = 6.dp,
+      modifier =
+        Modifier.width(IntrinsicSize.Min)
+          .background(
             shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = 6.dp,
-            modifier = Modifier
-                .width(IntrinsicSize.Min)
-                .background(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface,
-                ),
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // Header with close button
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.align(Alignment.TopEnd),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.close_24px),
-                            contentDescription = stringResource(R.string.time_picker_cancel),
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Date Time Wheel Picker
-                DateTimeWheelPicker(
-                    state = state,
-                    modifier = Modifier.width(320.dp),
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Confirm button (disabled for future times or invalid selection)
-                FilledTonalButton(
-                    onClick = { onConfirm(state.selectedMillis) },
-                    enabled = isEnabled,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
-                    shape = RoundedCornerShape(24.dp),
-                ) {
-                    Text(
-                        text = buttonText,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
+            color = MaterialTheme.colorScheme.surface,
+          ),
+    ) {
+      Column(
+        modifier = Modifier.padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+        // Header with close button
+        Box(modifier = Modifier.fillMaxWidth()) {
+          IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd)) {
+            Icon(
+              painter = painterResource(id = R.drawable.close_24px),
+              contentDescription = stringResource(R.string.time_picker_cancel),
+            )
+          }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Date Time Wheel Picker
+        DateTimeWheelPicker(state = state, modifier = Modifier.width(320.dp))
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Confirm button (disabled for future times or invalid selection)
+        FilledTonalButton(
+          onClick = { onConfirm(state.selectedMillis) },
+          enabled = isEnabled,
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+          shape = RoundedCornerShape(24.dp),
+        ) {
+          Text(text = buttonText, style = MaterialTheme.typography.labelLarge)
+        }
+      }
     }
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DateTimeWheelPickerPreview() {
-    val state = remember {
-        DateTimeWheelPickerState(LocalDateTime.now())
-    }
-    DateTimeWheelPicker(state = state)
+  val state = remember { DateTimeWheelPickerState(LocalDateTime.now()) }
+  DateTimeWheelPicker(state = state)
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DateTimeWheelPickerDialogPreview() {
-    DateTimeWheelPickerDialog(
-        initialDateTimeMillis = System.currentTimeMillis(),
-        onConfirm = {},
-        onDismiss = {},
-    )
+  DateTimeWheelPickerDialog(
+    initialDateTimeMillis = System.currentTimeMillis(),
+    onConfirm = {},
+    onDismiss = {},
+  )
 }

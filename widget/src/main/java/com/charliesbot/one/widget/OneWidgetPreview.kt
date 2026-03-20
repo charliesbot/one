@@ -23,48 +23,39 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 fun updateWidgetPreview(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val appwidgetManager = AppWidgetManager.getInstance(context)
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val appwidgetManager = AppWidgetManager.getInstance(context)
 
-                appwidgetManager.setWidgetPreview(
-                    ComponentName(context, OneWidgetReceiver::class.java),
-                    AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN,
-                    OneWidgetPreview().compose(
-                        context,
-                        size = DpSize(200.dp, 200.dp),
-                    ),
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
-            }
-        }
+        appwidgetManager.setWidgetPreview(
+          ComponentName(context, OneWidgetReceiver::class.java),
+          AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN,
+          OneWidgetPreview().compose(context, size = DpSize(200.dp, 200.dp)),
+        )
+      } catch (e: Exception) {
+        Log.e(TAG, e.message, e)
+      }
     }
+  }
 }
 
 class OneWidgetPreview : GlanceAppWidget() {
-    override val sizeMode: SizeMode
-        get() = SizeMode.Exact
+  override val sizeMode: SizeMode
+    get() = SizeMode.Exact
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent {
-            GlanceTheme {
-                OneWidgetContent(
-                    fastingData = widgetMockFastingData,
-                    context = LocalContext.current,
-                )
-            }
-        }
+  override suspend fun provideGlance(context: Context, id: GlanceId) {
+    provideContent {
+      GlanceTheme {
+        OneWidgetContent(fastingData = widgetMockFastingData, context = LocalContext.current)
+      }
     }
+  }
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 200, heightDp = 200) // Max size
 @Composable
 private fun OneWidgetPreviewPreview() {
-    OneWidgetContent(
-        fastingData = widgetMockFastingData,
-        context = LocalContext.current,
-    )
+  OneWidgetContent(fastingData = widgetMockFastingData, context = LocalContext.current)
 }

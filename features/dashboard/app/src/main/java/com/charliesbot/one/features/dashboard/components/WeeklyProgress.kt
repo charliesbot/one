@@ -24,44 +24,42 @@ import com.charliesbot.shared.core.testing.MockDataUtils
 
 @Composable
 fun WeeklyProgress(modifier: Modifier = Modifier, weeklyProgress: List<TimePeriodProgress>) {
-    val daysOfWeek: List<Int> = listOf(
-        R.string.monday,
-        R.string.tuesday,
-        R.string.wednesday,
-        R.string.thursday,
-        R.string.friday,
-        R.string.saturday,
-        R.string.sunday,
+  val daysOfWeek: List<Int> =
+    listOf(
+      R.string.monday,
+      R.string.tuesday,
+      R.string.wednesday,
+      R.string.thursday,
+      R.string.friday,
+      R.string.saturday,
+      R.string.sunday,
     )
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier,
-    ) {
-        daysOfWeek.forEachIndexed { index, dayResId ->
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(dayResId).uppercase(),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(modifier = Modifier.size(4.dp))
-                FastingProgressBar(
-                    progress = weeklyProgress.getOrNull(index)?.progress ?: 0f,
-                    modifier = Modifier.size(25.dp),
-                    strokeWidth = 5.dp,
-                )
-            }
-        }
+  Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = modifier) {
+    daysOfWeek.forEachIndexed { index, dayResId ->
+      Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+          text = stringResource(dayResId).uppercase(),
+          fontSize = 10.sp,
+          fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.size(4.dp))
+        FastingProgressBar(
+          progress = weeklyProgress.getOrNull(index)?.progress ?: 0f,
+          modifier = Modifier.size(25.dp),
+          strokeWidth = 5.dp,
+        )
+      }
     }
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WeeklyProgressPreview() {
-    Box(modifier = Modifier.width(300.dp)) {
-        WeeklyProgress(
-            modifier = Modifier.fillMaxWidth(),
-            weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-        )
-    }
+  Box(modifier = Modifier.width(300.dp)) {
+    WeeklyProgress(
+      modifier = Modifier.fillMaxWidth(),
+      weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+    )
+  }
 }

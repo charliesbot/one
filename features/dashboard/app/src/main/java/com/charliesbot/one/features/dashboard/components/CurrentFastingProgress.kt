@@ -27,77 +27,80 @@ import com.charliesbot.shared.core.utils.formatTimestamp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun FastingStatusIndicator(isFasting: Boolean, elapsedTime: Long, fastingGoalId: String, onClick: () -> Unit) {
-    val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
-    val headerLabel = if (isFasting) {
-        val progress = calculateProgressPercentage(elapsedTime, fastingGoal.durationMillis)
-        stringResource(R.string.elapsed_percentage, progress)
+fun FastingStatusIndicator(
+  isFasting: Boolean,
+  elapsedTime: Long,
+  fastingGoalId: String,
+  onClick: () -> Unit,
+) {
+  val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
+  val headerLabel =
+    if (isFasting) {
+      val progress = calculateProgressPercentage(elapsedTime, fastingGoal.durationMillis)
+      stringResource(R.string.elapsed_percentage, progress)
     } else {
-        stringResource(R.string.upcoming_fast).uppercase()
+      stringResource(R.string.upcoming_fast).uppercase()
     }
-    val timeLabel = if (isFasting) {
-        formatTimestamp(elapsedTime)
+  val timeLabel =
+    if (isFasting) {
+      formatTimestamp(elapsedTime)
     } else {
-        stringResource(
-            R.string.fasting_duration_hours,
-            PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay,
-        )
+      stringResource(
+        R.string.fasting_duration_hours,
+        PredefinedFastingGoals.getGoalById(fastingGoalId).durationDisplay,
+      )
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(text = headerLabel, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-        TextButton(
-            onClick = onClick,
-        ) {
-            Text(
-                text = timeLabel,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 38.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Text(text = headerLabel, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+    TextButton(onClick = onClick) {
+      Text(
+        text = timeLabel,
+        color = MaterialTheme.colorScheme.onSurface,
+        fontSize = 38.sp,
+        fontWeight = FontWeight.Bold,
+      )
     }
+  }
 }
 
 @Composable
 fun CurrentFastingProgress(
-    elapsedTime: Long,
-    fastingGoalId: String,
-    onFastingStatusClick: () -> Unit,
-    isFasting: Boolean = false,
+  elapsedTime: Long,
+  fastingGoalId: String,
+  onFastingStatusClick: () -> Unit,
+  isFasting: Boolean = false,
 ) {
-    val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
-    val progress = calculateProgressFraction(elapsedTime, fastingGoal.durationMillis)
-    Box(contentAlignment = Alignment.Center) {
-        FastingProgressBar(
-            progress = progress,
-            strokeWidth = 35.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f, matchHeightConstraintsFirst = true)
-                .heightIn(max = 300.dp),
-        )
-        FastingStatusIndicator(isFasting, elapsedTime, fastingGoalId, onFastingStatusClick)
-    }
+  val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
+  val progress = calculateProgressFraction(elapsedTime, fastingGoal.durationMillis)
+  Box(contentAlignment = Alignment.Center) {
+    FastingProgressBar(
+      progress = progress,
+      strokeWidth = 35.dp,
+      modifier =
+        Modifier.fillMaxWidth()
+          .aspectRatio(1f, matchHeightConstraintsFirst = true)
+          .heightIn(max = 300.dp),
+    )
+    FastingStatusIndicator(isFasting, elapsedTime, fastingGoalId, onFastingStatusClick)
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun CurrentFastingProgressPreview() {
-    Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
-        CurrentFastingProgress(
-            isFasting = false,
-            elapsedTime = 0L,
-            fastingGoalId = "circadian",
-            onFastingStatusClick = {},
-        )
-        CurrentFastingProgress(
-            isFasting = true,
-            elapsedTime = 7 * 1000 * 60 * 60,
-            fastingGoalId = "circadian",
-            onFastingStatusClick = {},
-        )
-    }
+  Column(verticalArrangement = Arrangement.spacedBy(50.dp)) {
+    CurrentFastingProgress(
+      isFasting = false,
+      elapsedTime = 0L,
+      fastingGoalId = "circadian",
+      onFastingStatusClick = {},
+    )
+    CurrentFastingProgress(
+      isFasting = true,
+      elapsedTime = 7 * 1000 * 60 * 60,
+      fastingGoalId = "circadian",
+      onFastingStatusClick = {},
+    )
+  }
 }

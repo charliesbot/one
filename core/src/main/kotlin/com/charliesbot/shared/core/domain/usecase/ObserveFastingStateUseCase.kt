@@ -5,5 +5,5 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import kotlinx.coroutines.flow.Flow
 
 class ObserveFastingStateUseCase(private val fastingRepository: FastingDataRepository) {
-    operator fun invoke(): Flow<FastingDataItem?> = fastingRepository.fastingDataItem
+  operator fun invoke(): Flow<FastingDataItem?> = fastingRepository.fastingDataItem
 }

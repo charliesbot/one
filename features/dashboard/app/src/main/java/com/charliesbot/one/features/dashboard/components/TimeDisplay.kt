@@ -29,61 +29,56 @@ import java.time.LocalDateTime
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TimeDisplay(
-    title: String,
-    shapes: ToggleButtonShapes,
-    date: LocalDateTime,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit) = {},
+  title: String,
+  shapes: ToggleButtonShapes,
+  date: LocalDateTime,
+  modifier: Modifier = Modifier,
+  onClick: (() -> Unit) = {},
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    Column(
-        modifier = modifier,
-    ) {
-        Text(
-            text = title.uppercase(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp),
-            style = TextStyle(
-                platformStyle = PlatformTextStyle(
-                    includeFontPadding = false,
-                ),
-                textAlign = TextAlign.Center,
-                lineHeightStyle = LineHeightStyle(
-                    alignment = LineHeightStyle.Alignment.Center,
-                    trim = LineHeightStyle.Trim.Both,
-                ),
+  val interactionSource = remember { MutableInteractionSource() }
+  Column(modifier = modifier) {
+    Text(
+      text = title.uppercase(),
+      modifier = Modifier.fillMaxWidth().padding(0.dp),
+      style =
+        TextStyle(
+          platformStyle = PlatformTextStyle(includeFontPadding = false),
+          textAlign = TextAlign.Center,
+          lineHeightStyle =
+            LineHeightStyle(
+              alignment = LineHeightStyle.Alignment.Center,
+              trim = LineHeightStyle.Trim.Both,
             ),
-            fontSize = 10.sp,
-            fontWeight = FontWeight.W500,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        OutlinedToggleButton(
-            checked = false,
-            onCheckedChange = { onClick() },
-            shapes = shapes,
-            interactionSource = interactionSource,
-            modifier = Modifier
-                .fillMaxWidth(),
-        ) {
-            Text(
-                text = formatDate(date, TimeFormat.DATE_TIME),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        ),
+      fontSize = 10.sp,
+      fontWeight = FontWeight.W500,
+      color = MaterialTheme.colorScheme.onSurface,
+    )
+    OutlinedToggleButton(
+      checked = false,
+      onCheckedChange = { onClick() },
+      shapes = shapes,
+      interactionSource = interactionSource,
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Text(
+        text = formatDate(date, TimeFormat.DATE_TIME),
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface,
+      )
     }
+  }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
 private fun TimeDisplayPreview() {
-    TimeDisplay(
-        title = "Started",
-        date = LocalDateTime.now(),
-        onClick = {},
-        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-    )
+  TimeDisplay(
+    title = "Started",
+    date = LocalDateTime.now(),
+    onClick = {},
+    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+  )
 }

@@ -13,21 +13,21 @@ import org.junit.Test
 
 class ObserveFastingStateUseCaseTest {
 
-    private val repository: FastingDataRepository = mockk()
-    private lateinit var useCase: ObserveFastingStateUseCase
+  private val repository: FastingDataRepository = mockk()
+  private lateinit var useCase: ObserveFastingStateUseCase
 
-    @Before
-    fun setup() {
-        useCase = ObserveFastingStateUseCase(repository)
-    }
+  @Before
+  fun setup() {
+    useCase = ObserveFastingStateUseCase(repository)
+  }
 
-    @Test
-    fun `returns fasting flow from repository`() = runTest {
-        val item = FastingDataItem(isFasting = true)
-        every { repository.fastingDataItem } returns flowOf(item)
+  @Test
+  fun `returns fasting flow from repository`() = runTest {
+    val item = FastingDataItem(isFasting = true)
+    every { repository.fastingDataItem } returns flowOf(item)
 
-        val result = useCase().first()
+    val result = useCase().first()
 
-        assertEquals(item, result)
-    }
+    assertEquals(item, result)
+  }
 }

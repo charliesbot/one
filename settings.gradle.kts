@@ -1,45 +1,48 @@
 pluginManagement {
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-        gradlePluginPortal()
+  repositories {
+    google {
+      content {
+        includeGroupByRegex("com\\.android.*")
+        includeGroupByRegex("com\\.google.*")
+        includeGroupByRegex("androidx.*")
+      }
     }
+    mavenCentral()
+    gradlePluginPortal()
+  }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
+
+plugins { id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0" }
+
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    google()
+    mavenCentral()
+  }
 }
 
 rootProject.name = "One"
+
 include(":app")
+
 include(":wear")
+
 include(":core")
+
 include(":widget")
+
 include(":complications")
 
 file("features")
-    .listFiles()
-    ?.filter { it.isDirectory }
-    ?.forEach { featureDir ->
-        val submodules =
-            featureDir
-                .listFiles()
-                ?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
-        if (submodules != null && submodules.isNotEmpty()) {
-            submodules.forEach { include(":features:${featureDir.name}:${it.name}") }
-        } else if (File(featureDir, "build.gradle.kts").exists()) {
-            include(":features:${featureDir.name}")
-        }
+  .listFiles()
+  ?.filter { it.isDirectory }
+  ?.forEach { featureDir ->
+    val submodules =
+      featureDir.listFiles()?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
+    if (submodules != null && submodules.isNotEmpty()) {
+      submodules.forEach { include(":features:${featureDir.name}:${it.name}") }
+    } else if (File(featureDir, "build.gradle.kts").exists()) {
+      include(":features:${featureDir.name}")
     }
+  }

@@ -13,44 +13,45 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.services.FastingEventCallbacks
 
 /**
- * Handles fasting events that originate locally ONLY on the watch (user actions).
- * Notifications are handled by [com.charliesbot.shared.core.services.FastingEventManager].
+ * Handles fasting events that originate locally ONLY on the watch (user actions). Notifications are
+ * handled by [com.charliesbot.shared.core.services.FastingEventManager].
  */
 class LocalWatchFastingCallbacks(
-    private val context: Context,
-    private val complicationUpdateManager: ComplicationUpdateManager,
-    private val ongoingActivityManager: OngoingActivityManager,
+  private val context: Context,
+  private val complicationUpdateManager: ComplicationUpdateManager,
+  private val ongoingActivityManager: OngoingActivityManager,
 ) : FastingEventCallbacks {
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
-        Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting start")
-        val intent = OngoingActivityService.createStartIntent(
-            context,
-            fastingDataItem.startTimeInMillis,
-            fastingDataItem.fastingGoalId,
-        )
-        try {
-            ContextCompat.startForegroundService(context, intent)
-        } catch (e: ForegroundServiceStartNotAllowedException) {
-            Log.w(LOG_TAG, "LocalWatch: Cannot start ongoing activity — app is in background", e)
-        }
-        complicationUpdateManager.requestUpdate()
-        Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
+  @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+  override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
+    Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting start")
+    val intent =
+      OngoingActivityService.createStartIntent(
+        context,
+        fastingDataItem.startTimeInMillis,
+        fastingDataItem.fastingGoalId,
+      )
+    try {
+      ContextCompat.startForegroundService(context, intent)
+    } catch (e: ForegroundServiceStartNotAllowedException) {
+      Log.w(LOG_TAG, "LocalWatch: Cannot start ongoing activity — app is in background", e)
     }
+    complicationUpdateManager.requestUpdate()
+    Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
+  }
 
-    override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
-        Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
-        val intent = OngoingActivityService.createStopIntent(context)
-        context.startService(intent) // Send stop action to the service
-        complicationUpdateManager.requestUpdate()
-        Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
-    }
+  override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
+    Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
+    val intent = OngoingActivityService.createStopIntent(context)
+    context.startService(intent) // Send stop action to the service
+    complicationUpdateManager.requestUpdate()
+    Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
+  }
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
-        Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
-        complicationUpdateManager.requestUpdate()
-        ongoingActivityManager.requestUpdate()
-        Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
-    }
+  @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+  override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
+    Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
+    complicationUpdateManager.requestUpdate()
+    ongoingActivityManager.requestUpdate()
+    Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
+  }
 }

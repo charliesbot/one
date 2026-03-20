@@ -15,38 +15,35 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
 class WidgetUpdateManager(
-    private val applicationContext: Context,
-    private val timeWindow: Long = 1000L,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
+  private val applicationContext: Context,
+  private val timeWindow: Long = 1000L,
+  coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
+  private val scope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
-    // "Fire and forget" bus. extraBufferCapacity = 1 keeps only the latest signal
-    // if multiple tryEmit calls happen before debounce processes them.
-    private val requests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+  // "Fire and forget" bus. extraBufferCapacity = 1 keeps only the latest signal
+  // if multiple tryEmit calls happen before debounce processes them.
+  private val requests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    init {
-        Log.d(
-            AppConstants.LOG_TAG,
-            "WidgetUpdateManager: Initializing and starting debounce collector.",
-        )
-        startDebounceCollector()
+  init {
+    Log.d(
+      AppConstants.LOG_TAG,
+      "WidgetUpdateManager: Initializing and starting debounce collector.",
+    )
+    startDebounceCollector()
+  }
+
+  @OptIn(FlowPreview::class)
+  private fun startDebounceCollector() {
+    scope.launch {
+      requests.debounce(timeWindow).collect {
+        runCatching { OneWidget().updateAll(applicationContext) }
+          .onFailure { Log.e(AppConstants.LOG_TAG, "WidgetUpdateManager: Error in updateAll", it) }
+      }
     }
+  }
 
-    @OptIn(FlowPreview::class)
-    private fun startDebounceCollector() {
-        scope.launch {
-            requests.debounce(timeWindow).collect {
-                runCatching {
-                    OneWidget().updateAll(applicationContext)
-                }.onFailure {
-                    Log.e(AppConstants.LOG_TAG, "WidgetUpdateManager: Error in updateAll", it)
-                }
-            }
-        }
-    }
+  fun requestUpdate() = requests.tryEmit(Unit)
 
-    fun requestUpdate() = requests.tryEmit(Unit)
-
-    fun cancel() = scope.cancel()
+  fun cancel() = scope.cancel()
 }

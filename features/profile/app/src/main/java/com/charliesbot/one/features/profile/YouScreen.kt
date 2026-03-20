@@ -27,79 +27,72 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                windowInsets = WindowInsets(top = 0.dp),
-                title = { Text(stringResource(R.string.nav_you)) },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Card(modifier = Modifier.padding(vertical = 12.dp, horizontal = 20.dp).widthIn(max = 600.dp)) {
-                FastingMonthCalendar(
-                    yearMonth = uiState.selectedMonth,
-                    fastingData = uiState.fastingData,
-                    firstDayOfWeek = uiState.firstDayOfWeek,
-                    onDayClick = { date ->
-                        val fastingData = uiState.fastingData[date]
-                        if (fastingData != null) {
-                            viewModel.onDaySelected(fastingData)
-                        }
-                    },
-                    onNextMonth = {
-                        viewModel.onNextMonth()
-                    },
-                    onPreviousMonth = {
-                        viewModel.onPreviousMonth()
-                    },
-                )
-            }
-        }
-
-        // Show bottom sheet when a day is selected
-        uiState.selectedDay?.let { selectedDay ->
-            FastingDetailsBottomSheet(
-                fastingData = selectedDay,
-                onDismiss = {
-                    viewModel.onDaySelected(null)
-                },
-                onDelete = {
-                    selectedDay.startTimeEpochMillis?.let { startTime ->
-                        viewModel.onDeleteFastingEntry(startTime)
-                    }
-                },
-                onUpdateStartTime = { newStartTime ->
-                    selectedDay.startTimeEpochMillis?.let { originalStart ->
-                        selectedDay.endTimeEpochMillis?.let { endTime ->
-                            viewModel.onUpdateFastingEntry(
-                                originalStartTime = originalStart,
-                                newStartTime = newStartTime,
-                                newEndTime = endTime,
-                                goalId = selectedDay.goalId ?: "16:8",
-                            )
-                        }
-                    }
-                },
-                onUpdateEndTime = { newEndTime ->
-                    selectedDay.startTimeEpochMillis?.let { startTime ->
-                        viewModel.onUpdateFastingEntry(
-                            originalStartTime = startTime,
-                            newStartTime = startTime,
-                            newEndTime = newEndTime,
-                            goalId = selectedDay.goalId ?: "16:8",
-                        )
-                    }
-                },
-            )
-        }
+  Scaffold(
+    topBar = {
+      TopAppBar(
+        windowInsets = WindowInsets(top = 0.dp),
+        title = { Text(stringResource(R.string.nav_you)) },
+      )
     }
+  ) { innerPadding ->
+    Column(
+      modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(innerPadding),
+      horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Card(
+        modifier = Modifier.padding(vertical = 12.dp, horizontal = 20.dp).widthIn(max = 600.dp)
+      ) {
+        FastingMonthCalendar(
+          yearMonth = uiState.selectedMonth,
+          fastingData = uiState.fastingData,
+          firstDayOfWeek = uiState.firstDayOfWeek,
+          onDayClick = { date ->
+            val fastingData = uiState.fastingData[date]
+            if (fastingData != null) {
+              viewModel.onDaySelected(fastingData)
+            }
+          },
+          onNextMonth = { viewModel.onNextMonth() },
+          onPreviousMonth = { viewModel.onPreviousMonth() },
+        )
+      }
+    }
+
+    // Show bottom sheet when a day is selected
+    uiState.selectedDay?.let { selectedDay ->
+      FastingDetailsBottomSheet(
+        fastingData = selectedDay,
+        onDismiss = { viewModel.onDaySelected(null) },
+        onDelete = {
+          selectedDay.startTimeEpochMillis?.let { startTime ->
+            viewModel.onDeleteFastingEntry(startTime)
+          }
+        },
+        onUpdateStartTime = { newStartTime ->
+          selectedDay.startTimeEpochMillis?.let { originalStart ->
+            selectedDay.endTimeEpochMillis?.let { endTime ->
+              viewModel.onUpdateFastingEntry(
+                originalStartTime = originalStart,
+                newStartTime = newStartTime,
+                newEndTime = endTime,
+                goalId = selectedDay.goalId ?: "16:8",
+              )
+            }
+          }
+        },
+        onUpdateEndTime = { newEndTime ->
+          selectedDay.startTimeEpochMillis?.let { startTime ->
+            viewModel.onUpdateFastingEntry(
+              originalStartTime = startTime,
+              newStartTime = startTime,
+              newEndTime = newEndTime,
+              goalId = selectedDay.goalId ?: "16:8",
+            )
+          }
+        },
+      )
+    }
+  }
 }

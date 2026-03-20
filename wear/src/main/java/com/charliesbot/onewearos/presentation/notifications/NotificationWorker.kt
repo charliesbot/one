@@ -24,57 +24,60 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
-    CoroutineWorker(context, workerParameters),
-    KoinComponent {
+  CoroutineWorker(context, workerParameters), KoinComponent {
 
-    private val stringProvider: StringProvider by inject()
+  private val stringProvider: StringProvider by inject()
 
-    override suspend fun doWork(): Result {
-        if (ActivityCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.POST_NOTIFICATIONS,
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            with(NotificationManagerCompat.from(applicationContext)) {
-                notify(NOTIFICATION_ID, createNotification(parseWorkerInput(inputData)))
-            }
-        }
-
-        return Result.success()
+  override suspend fun doWork(): Result {
+    if (
+      ActivityCompat.checkSelfPermission(
+        applicationContext,
+        Manifest.permission.POST_NOTIFICATIONS,
+      ) == PackageManager.PERMISSION_GRANTED
+    ) {
+      with(NotificationManagerCompat.from(applicationContext)) {
+        notify(NOTIFICATION_ID, createNotification(parseWorkerInput(inputData)))
+      }
     }
 
-    private fun createNotification(notificationWorkerInput: NotificationWorkerInput): Notification {
-        val notificationContent =
-            getNotificationText(notificationWorkerInput.notificationType, stringProvider)
+    return Result.success()
+  }
 
-        val intent = Intent(applicationContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+  private fun createNotification(notificationWorkerInput: NotificationWorkerInput): Notification {
+    val notificationContent =
+      getNotificationText(notificationWorkerInput.notificationType, stringProvider)
 
-        val watchPendingIntent = PendingIntent.getActivity(
-            applicationContext,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    val intent =
+      Intent(applicationContext, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+      }
+
+    val watchPendingIntent =
+      PendingIntent.getActivity(
+        applicationContext,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+      )
+
+    val wearableExtender =
+      NotificationCompat.WearableExtender()
+        .setHintContentIntentLaunchesActivity(true)
+        .setDismissalId(
+          generateDismissalId(
+            notificationWorkerInput.fastingStartMillis,
+            notificationWorkerInput.notificationType,
+          )
         )
 
-        val wearableExtender = NotificationCompat.WearableExtender()
-            .setHintContentIntentLaunchesActivity(true)
-            .setDismissalId(
-                generateDismissalId(
-                    notificationWorkerInput.fastingStartMillis,
-                    notificationWorkerInput.notificationType,
-                ),
-            )
+    val notificationBuilder =
+      NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
+        .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
+        .setContentTitle(notificationContent.title)
+        .setContentText(notificationContent.message)
+        .setContentIntent(watchPendingIntent)
+        .extend(wearableExtender)
 
-        val notificationBuilder =
-            NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
-                .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
-                .setContentTitle(notificationContent.title)
-                .setContentText(notificationContent.message)
-                .setContentIntent(watchPendingIntent)
-                .extend(wearableExtender)
-
-        return notificationBuilder.build()
-    }
+    return notificationBuilder.build()
+  }
 }

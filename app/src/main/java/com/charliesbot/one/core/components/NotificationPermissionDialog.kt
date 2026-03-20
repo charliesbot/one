@@ -8,41 +8,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.charliesbot.one.R
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.R as SharedR
 
 @Composable
 fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(SharedR.string.notification_permission_title)) },
-        icon = {
-            Icon(
-                painter = painterResource(SharedR.drawable.notifications_24px),
-                contentDescription = stringResource(SharedR.string.notification_permission_icon_desc),
-            )
-        },
-        text = {
-            Text(stringResource(SharedR.string.notification_permission_text))
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(SharedR.string.notification_permission_enable))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(SharedR.string.notification_permission_not_now))
-            }
-        },
-    )
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = { Text(stringResource(SharedR.string.notification_permission_title)) },
+    icon = {
+      Icon(
+        painter = painterResource(SharedR.drawable.notifications_24px),
+        contentDescription = stringResource(SharedR.string.notification_permission_icon_desc),
+      )
+    },
+    text = { Text(stringResource(SharedR.string.notification_permission_text)) },
+    confirmButton = {
+      TextButton(onClick = onConfirm) {
+        Text(stringResource(SharedR.string.notification_permission_enable))
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onDismiss) {
+        Text(stringResource(SharedR.string.notification_permission_not_now))
+      }
+    },
+  )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun NotificationPermissionDialogPreview() {
-    OneTheme {
-        NotificationPermissionDialog(onConfirm = {}, onDismiss = {})
-    }
+  OneTheme { NotificationPermissionDialog(onConfirm = {}, onDismiss = {}) }
 }

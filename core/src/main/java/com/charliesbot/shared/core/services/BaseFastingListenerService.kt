@@ -26,192 +26,187 @@ import org.koin.core.component.KoinComponent
  * 2. The event is verified to be from a remote node via `isFromRemoteDevice`.
  * 3. The local repository is updated with the new data.
  * 4. `onPlatformFastingStateSynced()` is called for UI refreshes (like complications).
- * 5. The core business logic is delegated to the central [FastingEventManager], which in turn
- * calls the `onPlatformFastingStarted/Completed` hooks for state transition actions.
+ * 5. The core business logic is delegated to the central [FastingEventManager], which in turn calls
+ *    the `onPlatformFastingStarted/Completed` hooks for state transition actions.
  *
  * **ARCHITECTURAL NOTE**: This service is intentionally designed to **ONLY** process remote events.
- * All fasting state changes initiated by the user on the local device should be handled by
- * the domain use cases (e.g., [com.charliesbot.shared.core.domain.usecase.StartFastingUseCase]) to ensure consistent logic and immediate UI feedback. This clear
- * separation of concerns is critical to the app's architecture.
+ * All fasting state changes initiated by the user on the local device should be handled by the
+ * domain use cases (e.g., [com.charliesbot.shared.core.domain.usecase.StartFastingUseCase]) to
+ * ensure consistent logic and immediate UI feedback. This clear separation of concerns is critical
+ * to the app's architecture.
  *
  * @see FastingEventManager
  * @see com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
  * @see FastingEventCallbacks
  */
 abstract class BaseFastingListenerService :
-    WearableListenerService(),
-    KoinComponent,
-    FastingEventCallbacks {
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    protected val eventManager: FastingEventManager by inject()
-    protected val fastingRepository: FastingDataRepository by inject()
-    private val nodeClient: NodeClient by inject()
-    private var currentLastTimestamp = 0L
-    private var localNodeId: String? = null
+  WearableListenerService(), KoinComponent, FastingEventCallbacks {
+  private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+  protected val eventManager: FastingEventManager by inject()
+  protected val fastingRepository: FastingDataRepository by inject()
+  private val nodeClient: NodeClient by inject()
+  private var currentLastTimestamp = 0L
+  private var localNodeId: String? = null
 
-    protected open suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
-        Log.d(
-            LOG_TAG,
-            "${this::class.java.simpleName}: onPlatformFastingStarted called, but no implementation.",
-        )
-    }
+  protected open suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
+    Log.d(
+      LOG_TAG,
+      "${this::class.java.simpleName}: onPlatformFastingStarted called, but no implementation.",
+    )
+  }
 
-    protected open suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
-        Log.d(
-            LOG_TAG,
-            "${this::class.java.simpleName}: onPlatformFastingCompleted called, but no implementation.",
-        )
-    }
+  protected open suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
+    Log.d(
+      LOG_TAG,
+      "${this::class.java.simpleName}: onPlatformFastingCompleted called, but no implementation.",
+    )
+  }
 
-    protected open suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
-        Log.d(
-            LOG_TAG,
-            "${this::class.java.simpleName}: onPlatformFastingUpdated called, but no implementation.",
-        )
-    }
+  protected open suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
+    Log.d(
+      LOG_TAG,
+      "${this::class.java.simpleName}: onPlatformFastingUpdated called, but no implementation.",
+    )
+  }
 
-    /**
-     * Called after the local fasting data has been successfully updated
-     * with new information received from a wearable device.
-     * Subclasses can override this to perform platform-specific actions,
-     * such as updating UI elements (e.g., widgets on the phone).
-     */
-    protected open suspend fun onPlatformFastingStateSynced() {
-        // Default implementation does nothing.
-        Log.d(
-            LOG_TAG,
-            "${this::class.java.simpleName} - onPlatformFastingStateSynced called (no-op by default)",
-        )
-    }
+  /**
+   * Called after the local fasting data has been successfully updated with new information received
+   * from a wearable device. Subclasses can override this to perform platform-specific actions, such
+   * as updating UI elements (e.g., widgets on the phone).
+   */
+  protected open suspend fun onPlatformFastingStateSynced() {
+    // Default implementation does nothing.
+    Log.d(
+      LOG_TAG,
+      "${this::class.java.simpleName} - onPlatformFastingStateSynced called (no-op by default)",
+    )
+  }
 
-    override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
-        onPlatformFastingStarted(fastingDataItem)
-    }
+  override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
+    onPlatformFastingStarted(fastingDataItem)
+  }
 
-    override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
-        onPlatformFastingCompleted(fastingDataItem)
-    }
+  override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
+    onPlatformFastingCompleted(fastingDataItem)
+  }
 
-    override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
-        onPlatformFastingUpdated(fastingDataItem)
-    }
+  override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
+    onPlatformFastingUpdated(fastingDataItem)
+  }
 
-    private suspend fun getLocalNodeId(): String? = try {
-        val localNode = nodeClient.localNode.await()
-        localNode.id
+  private suspend fun getLocalNodeId(): String? =
+    try {
+      val localNode = nodeClient.localNode.await()
+      localNode.id
     } catch (e: Exception) {
-        Log.e(LOG_TAG, "Failed to get local node ID", e)
-        null
+      Log.e(LOG_TAG, "Failed to get local node ID", e)
+      null
     }
 
-    private fun isFromRemoteDevice(dataEvents: DataEventBuffer): Boolean {
-        if (localNodeId == null) {
-            Log.w(LOG_TAG, "Local node ID not available, cannot filter local events")
-            return true // Process all events if we can't determine the source
-        }
-
-        // Check if any event in the buffer is from a remote device
-        for (event in dataEvents) {
-            val sourceNodeId = event.dataItem.uri.host
-            if (sourceNodeId != null && sourceNodeId != localNodeId) {
-                Log.d(LOG_TAG, "Found remote event from node: $sourceNodeId")
-                return true
-            }
-        }
-        return false
+  private fun isFromRemoteDevice(dataEvents: DataEventBuffer): Boolean {
+    if (localNodeId == null) {
+      Log.w(LOG_TAG, "Local node ID not available, cannot filter local events")
+      return true // Process all events if we can't determine the source
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        Log.d(
-            LOG_TAG,
-            "${this::class.java.simpleName} init",
+    // Check if any event in the buffer is from a remote device
+    for (event in dataEvents) {
+      val sourceNodeId = event.dataItem.uri.host
+      if (sourceNodeId != null && sourceNodeId != localNodeId) {
+        Log.d(LOG_TAG, "Found remote event from node: $sourceNodeId")
+        return true
+      }
+    }
+    return false
+  }
+
+  override fun onCreate() {
+    super.onCreate()
+    Log.d(LOG_TAG, "${this::class.java.simpleName} init")
+    serviceScope.launch {
+      localNodeId = getLocalNodeId()
+      currentLastTimestamp =
+        fastingRepository.getCurrentFasting()?.updateTimestamp ?: currentLastTimestamp
+      Log.d(
+        LOG_TAG,
+        "${this::class.java.simpleName} created. Initial lastTimestamp: $currentLastTimestamp",
+      )
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    serviceScope.cancel()
+    Log.d(LOG_TAG, "${this::class.java.simpleName} destroyed")
+  }
+
+  override fun onDataChanged(dataEvents: DataEventBuffer) {
+    super.onDataChanged(dataEvents)
+
+    // This service should only process data from remote nodes.
+    if (!isFromRemoteDevice(dataEvents)) {
+      Log.d(
+        LOG_TAG,
+        "${this::class.java.simpleName} - Ignoring local data change event (localNodeId: $localNodeId)",
+      )
+      dataEvents.release()
+      return
+    }
+
+    Log.d(
+      LOG_TAG,
+      "${this::class.java.simpleName} onDataChanged from REMOTE device. Comparing against lastTimestamp: $currentLastTimestamp",
+    )
+
+    var newestRemoteItem: FastingDataItem?
+    try {
+      newestRemoteItem = getLatestFastingState(dataEvents)
+      if (newestRemoteItem == null) {
+        Log.d(LOG_TAG, "No relevant fasting state change found in this buffer.")
+        return
+      }
+
+      // if most recent remote item is older than local item, update local item
+      if (newestRemoteItem.updateTimestamp > currentLastTimestamp) {
+        Log.i(
+          LOG_TAG,
+          "Processing REMOTE event (Timestamp: ${newestRemoteItem.updateTimestamp} > $currentLastTimestamp)",
         )
+
+        currentLastTimestamp = newestRemoteItem.updateTimestamp
+
+        // Update local repository from remote source
         serviceScope.launch {
-            localNodeId = getLocalNodeId()
-            currentLastTimestamp = fastingRepository.getCurrentFasting()
-                ?.updateTimestamp ?: currentLastTimestamp
-            Log.d(
-                LOG_TAG,
-                "${this::class.java.simpleName} created. Initial lastTimestamp: $currentLastTimestamp",
+          val previousItem = fastingRepository.getCurrentFasting()
+
+          try {
+            fastingRepository.updateFastingStatusFromRemote(
+              startTimeInMillis = newestRemoteItem.startTimeInMillis,
+              fastingGoalId = newestRemoteItem.fastingGoalId,
+              isFasting = newestRemoteItem.isFasting,
+              lastUpdateTimestamp = newestRemoteItem.updateTimestamp,
             )
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        serviceScope.cancel()
-        Log.d(LOG_TAG, "${this::class.java.simpleName} destroyed")
-    }
-
-    override fun onDataChanged(dataEvents: DataEventBuffer) {
-        super.onDataChanged(dataEvents)
-
-        // This service should only process data from remote nodes.
-        if (!isFromRemoteDevice(dataEvents)) {
-            Log.d(
-                LOG_TAG,
-                "${this::class.java.simpleName} - Ignoring local data change event (localNodeId: $localNodeId)",
+            onPlatformFastingStateSynced()
+            eventManager.processStateChange(
+              previousItem = previousItem,
+              currentItem = newestRemoteItem,
+              callbacks = this@BaseFastingListenerService,
             )
-            dataEvents.release()
-            return
+          } catch (e: Exception) {
+            Log.e(LOG_TAG, "Failed to update repository from remote", e)
+            throw e
+          }
         }
-
+      } else {
         Log.d(
-            LOG_TAG,
-            "${this::class.java.simpleName} onDataChanged from REMOTE device. Comparing against lastTimestamp: $currentLastTimestamp",
+          LOG_TAG,
+          "Remote event timestamp ${newestRemoteItem.updateTimestamp} is not newer than current $currentLastTimestamp, skipping",
         )
-
-        var newestRemoteItem: FastingDataItem?
-        try {
-            newestRemoteItem =
-                getLatestFastingState(dataEvents)
-            if (newestRemoteItem == null) {
-                Log.d(LOG_TAG, "No relevant fasting state change found in this buffer.")
-                return
-            }
-
-            // if most recent remote item is older than local item, update local item
-            if (newestRemoteItem.updateTimestamp > currentLastTimestamp) {
-                Log.i(
-                    LOG_TAG,
-                    "Processing REMOTE event (Timestamp: ${newestRemoteItem.updateTimestamp} > $currentLastTimestamp)",
-                )
-
-                currentLastTimestamp = newestRemoteItem.updateTimestamp
-
-                // Update local repository from remote source
-                serviceScope.launch {
-                    val previousItem = fastingRepository.getCurrentFasting()
-
-                    try {
-                        fastingRepository.updateFastingStatusFromRemote(
-                            startTimeInMillis = newestRemoteItem.startTimeInMillis,
-                            fastingGoalId = newestRemoteItem.fastingGoalId,
-                            isFasting = newestRemoteItem.isFasting,
-                            lastUpdateTimestamp = newestRemoteItem.updateTimestamp,
-                        )
-                        onPlatformFastingStateSynced()
-                        eventManager.processStateChange(
-                            previousItem = previousItem,
-                            currentItem = newestRemoteItem,
-                            callbacks = this@BaseFastingListenerService,
-                        )
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Failed to update repository from remote", e)
-                        throw e
-                    }
-                }
-            } else {
-                Log.d(
-                    LOG_TAG,
-                    "Remote event timestamp ${newestRemoteItem.updateTimestamp} is not newer than current $currentLastTimestamp, skipping",
-                )
-            }
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "onDataChanged couldn't process data: $e")
-        } finally {
-            dataEvents.release()
-        }
+      }
+    } catch (e: Exception) {
+      Log.e(LOG_TAG, "onDataChanged couldn't process data: $e")
+    } finally {
+      dataEvents.release()
     }
+  }
 }

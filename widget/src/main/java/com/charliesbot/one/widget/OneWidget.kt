@@ -21,63 +21,55 @@ import org.koin.core.component.inject
 internal val TAG = "OneWidget"
 
 object ProgressBitmap {
-    fun draw(
-        progress: Float,
-        sizePx: Int,
-        strokePx: Float,
-        indicator: Int = 0xFFFF6A4E.toInt(),
-        track: Int = 0xFF2B2B2B.toInt(),
-    ): Bitmap = createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888).apply {
-        val c = Canvas(this)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeWidth = strokePx
-            strokeCap = Paint.Cap.ROUND
+  fun draw(
+    progress: Float,
+    sizePx: Int,
+    strokePx: Float,
+    indicator: Int = 0xFFFF6A4E.toInt(),
+    track: Int = 0xFF2B2B2B.toInt(),
+  ): Bitmap =
+    createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888).apply {
+      val c = Canvas(this)
+      val paint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+          style = Paint.Style.STROKE
+          strokeWidth = strokePx
+          strokeCap = Paint.Cap.ROUND
         }
 
-        val radius = sizePx / 2f - strokePx / 2f
-        val rect = RectF(
-            strokePx / 2,
-            strokePx / 2,
-            sizePx - strokePx / 2,
-            sizePx - strokePx / 2,
-        )
+      val radius = sizePx / 2f - strokePx / 2f
+      val rect = RectF(strokePx / 2, strokePx / 2, sizePx - strokePx / 2, sizePx - strokePx / 2)
 
-        // track
-        paint.color = track
-        c.drawCircle(sizePx / 2f, sizePx / 2f, radius, paint)
+      // track
+      paint.color = track
+      c.drawCircle(sizePx / 2f, sizePx / 2f, radius, paint)
 
-        // progress
-        paint.color = indicator
-        c.drawArc(rect, -90f, progress.coerceIn(0f, 1f) * 360f, false, paint)
+      // progress
+      paint.color = indicator
+      c.drawArc(rect, -90f, progress.coerceIn(0f, 1f) * 360f, false, paint)
     }
 }
 
-class OneWidget :
-    GlanceAppWidget(),
-    KoinComponent {
-    private val fastingDataRepository: FastingDataRepository by inject()
+class OneWidget : GlanceAppWidget(), KoinComponent {
+  private val fastingDataRepository: FastingDataRepository by inject()
 
-    override val sizeMode: SizeMode = SizeMode.Responsive(
-        setOf(
-            OneWidgetSize.SMALL_SQUARE,
-            OneWidgetSize.HORIZONTAL_RECTANGLE,
-            OneWidgetSize.BIG_SQUARE,
-        ),
+  override val sizeMode: SizeMode =
+    SizeMode.Responsive(
+      setOf(
+        OneWidgetSize.SMALL_SQUARE,
+        OneWidgetSize.HORIZONTAL_RECTANGLE,
+        OneWidgetSize.BIG_SQUARE,
+      )
     )
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent {
-            val fastingData by fastingDataRepository.fastingDataItem.collectAsState(
-                initial = FastingDataItem(
-                    fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
-                ),
-            )
+  override suspend fun provideGlance(context: Context, id: GlanceId) {
+    provideContent {
+      val fastingData by
+        fastingDataRepository.fastingDataItem.collectAsState(
+          initial = FastingDataItem(fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id)
+        )
 
-            OneWidgetContent(
-                fastingData = fastingData,
-                context = context,
-            )
-        }
+      OneWidgetContent(fastingData = fastingData, context = context)
     }
+  }
 }

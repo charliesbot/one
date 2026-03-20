@@ -30,94 +30,79 @@ import com.charliesbot.shared.core.constants.FastGoal
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SelectionCard(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    isSelected: Boolean,
-    title: String,
-    description: String,
-    color: Color,
-    onEdit: (() -> Unit)? = null,
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit,
+  isSelected: Boolean,
+  title: String,
+  description: String,
+  color: Color,
+  onEdit: (() -> Unit)? = null,
 ) {
-    Card(
-        onClick = onClick,
-        border = if (isSelected) {
-            BorderStroke(
-                3.dp,
-                MaterialTheme.colorScheme.onBackground,
+  Card(
+    onClick = onClick,
+    border =
+      if (isSelected) {
+        BorderStroke(3.dp, MaterialTheme.colorScheme.onBackground)
+      } else {
+        null
+      },
+    colors = CardDefaults.cardColors(containerColor = color),
+    modifier = modifier,
+  ) {
+    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
+      Text(text = title, style = MaterialTheme.typography.labelMedium, minLines = 2)
+      Spacer(modifier = Modifier.height(16.dp))
+      Text(
+        text = description,
+        style = MaterialTheme.typography.displaySmall,
+        fontWeight = FontWeight.Bold,
+      )
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = stringResource(R.string.hours))
+        Spacer(modifier = Modifier.weight(1f))
+        if (onEdit != null) {
+          OutlinedIconButton(onClick = onEdit, modifier = Modifier.size(24.dp)) {
+            Icon(
+              painter = painterResource(R.drawable.edit_24px),
+              contentDescription = "",
+              modifier = Modifier.size(14.dp),
             )
-        } else {
-            null
-        },
-        colors = CardDefaults.cardColors(
-            containerColor = color,
-        ),
-        modifier = modifier,
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelMedium,
-                minLines = 2,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = description,
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(text = stringResource(R.string.hours))
-                Spacer(modifier = Modifier.weight(1f))
-                if (onEdit != null) {
-                    OutlinedIconButton(
-                        onClick = onEdit,
-                        modifier = Modifier.size(24.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.edit_24px),
-                            contentDescription = "",
-                            modifier = Modifier.size(14.dp),
-                        )
-                    }
-                }
-            }
+          }
         }
+      }
     }
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalSelectionCard(
-    modifier: Modifier = Modifier,
-    goal: FastGoal,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    onEdit: (() -> Unit)? = null,
+  modifier: Modifier = Modifier,
+  goal: FastGoal,
+  isSelected: Boolean,
+  onClick: () -> Unit,
+  onEdit: (() -> Unit)? = null,
 ) {
-    SelectionCard(
-        modifier = modifier,
-        onClick = onClick,
-        isSelected = isSelected,
-        title = goal.getTitle(LocalContext.current),
-        description = goal.durationDisplay,
-        color = goal.color.copy(alpha = 0.8f),
-        onEdit = if (goal.isCustom) onEdit else null,
-    )
+  SelectionCard(
+    modifier = modifier,
+    onClick = onClick,
+    isSelected = isSelected,
+    title = goal.getTitle(LocalContext.current),
+    description = goal.durationDisplay,
+    color = goal.color.copy(alpha = 0.8f),
+    onEdit = if (goal.isCustom) onEdit else null,
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomGoalCard(modifier: Modifier = Modifier, onClick: () -> Unit) {
-    SelectionCard(
-        modifier = modifier,
-        onClick = onClick,
-        isSelected = false,
-        title = stringResource(R.string.custom_fast),
-        description = "+",
-        color = MaterialTheme.colorScheme.surfaceContainerHighest,
-    )
+  SelectionCard(
+    modifier = modifier,
+    onClick = onClick,
+    isSelected = false,
+    title = stringResource(R.string.custom_fast),
+    description = "+",
+    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+  )
 }

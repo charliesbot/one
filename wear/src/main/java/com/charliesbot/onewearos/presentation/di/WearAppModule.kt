@@ -12,25 +12,18 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val wearAppModule = module {
-    single<NotificationScheduler> {
-        NotificationScheduler(
-            context = androidContext(),
-            workerClass = NotificationWorker::class.java,
-            settingsRepository = get(),
-        )
-    }
-    single<StringProvider> {
-        WearStringProvider(androidContext())
-    }
-    single<ComplicationUpdateManager> {
-        ComplicationUpdateManager(androidContext())
-    }
-    single<OngoingActivityManager> {
-        OngoingActivityManager(
-            context = androidContext(),
-            fastingDataRepository = get(),
-        )
-    }
-    single { LocalWatchFastingCallbacks(get(), get(), get()) }
-    single<FastingEventCallbacks> { get<LocalWatchFastingCallbacks>() }
+  single<NotificationScheduler> {
+    NotificationScheduler(
+      context = androidContext(),
+      workerClass = NotificationWorker::class.java,
+      settingsRepository = get(),
+    )
+  }
+  single<StringProvider> { WearStringProvider(androidContext()) }
+  single<ComplicationUpdateManager> { ComplicationUpdateManager(androidContext()) }
+  single<OngoingActivityManager> {
+    OngoingActivityManager(context = androidContext(), fastingDataRepository = get())
+  }
+  single { LocalWatchFastingCallbacks(get(), get(), get()) }
+  single<FastingEventCallbacks> { get<LocalWatchFastingCallbacks>() }
 }

@@ -22,33 +22,23 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val sharedModule = module {
-    single<DataStore<Preferences>> { androidContext().fastingDataStore }
-    single<FastingDataRepository> {
-        FastingDataRepositoryImpl(
-            androidContext(),
-            dataStore = get(),
-        )
-    }
-    single<SettingsRepository> {
-        SettingsRepositoryImpl(
-            androidContext(),
-            dataStore = get(),
-        )
-    }
-    single<FastingEventManager> { FastingEventManager() }
-    single { GetSuggestedFastingStartTimeUseCase(get(), get()) }
+  single<DataStore<Preferences>> { androidContext().fastingDataStore }
+  single<FastingDataRepository> { FastingDataRepositoryImpl(androidContext(), dataStore = get()) }
+  single<SettingsRepository> { SettingsRepositoryImpl(androidContext(), dataStore = get()) }
+  single<FastingEventManager> { FastingEventManager() }
+  single { GetSuggestedFastingStartTimeUseCase(get(), get()) }
 
-    factory { ObserveFastingStateUseCase(get()) }
-    factory { StartFastingUseCase(get(), get(), get()) }
-    factory { StopFastingUseCase(get(), get(), get()) }
-    factory { UpdateFastingConfigUseCase(get(), get(), get()) }
-    factory { SyncFastingStateUseCase(get()) }
+  factory { ObserveFastingStateUseCase(get()) }
+  factory { StartFastingUseCase(get(), get(), get()) }
+  factory { StopFastingUseCase(get(), get(), get()) }
+  factory { UpdateFastingConfigUseCase(get(), get(), get()) }
+  factory { SyncFastingStateUseCase(get()) }
 
-    single<CustomGoalRepository> { CustomGoalRepositoryImpl(androidContext(), dataStore = get()) }
-    single { GoalResolver(get()) }
+  single<CustomGoalRepository> { CustomGoalRepositoryImpl(androidContext(), dataStore = get()) }
+  single { GoalResolver(get()) }
 
-    single { Wearable.getDataClient(androidContext()) }
-    single { Wearable.getMessageClient(androidContext()) }
-    single { Wearable.getCapabilityClient(androidContext()) }
-    single { Wearable.getNodeClient(androidContext()) }
+  single { Wearable.getDataClient(androidContext()) }
+  single { Wearable.getMessageClient(androidContext()) }
+  single { Wearable.getCapabilityClient(androidContext()) }
+  single { Wearable.getNodeClient(androidContext()) }
 }

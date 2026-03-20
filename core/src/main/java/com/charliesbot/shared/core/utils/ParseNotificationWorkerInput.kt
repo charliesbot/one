@@ -7,8 +7,8 @@ import com.charliesbot.shared.core.models.NotificationType
 import com.charliesbot.shared.core.models.NotificationWorkerInput
 
 fun parseWorkerInput(inputData: Data): NotificationWorkerInput {
-    val notificationTypeEnum = inputData.getString(NOTIFICATION_TYPE_KEY) ?: ""
-    val notificationType = NotificationType.valueOf(notificationTypeEnum)
-    val fastingStartMillis = inputData.getLong(NOTIFICATION_FASTING_START_MILLIS_KEY, 0L)
-    return NotificationWorkerInput(notificationType, fastingStartMillis)
+  val notificationTypeEnum = inputData.getString(NOTIFICATION_TYPE_KEY) ?: ""
+  val notificationType = NotificationType.valueOf(notificationTypeEnum)
+  val fastingStartMillis = inputData.getLong(NOTIFICATION_FASTING_START_MILLIS_KEY, 0L)
+  return NotificationWorkerInput(notificationType, fastingStartMillis)
 }

@@ -15,43 +15,34 @@ import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.shared.R as SharedR
 
 @Composable
-fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, isVisible: Boolean = true) {
-    AlertDialog(
-        visible = isVisible,
-        onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
-                contentDescription = "Notification Permission",
-            )
-        },
-        title = { Text(stringResource(SharedR.string.dialog_title_enable_notifications)) },
-        text = {
-            Text(
-                text = stringResource(SharedR.string.dialog_message_enable_notifications),
-                textAlign = TextAlign.Center,
-            )
-        },
-        confirmButton = {
-            AlertDialogDefaults.ConfirmButton(
-                onClick = onConfirm,
-            )
-        },
-        dismissButton = {
-            AlertDialogDefaults.DismissButton(
-                onClick = onDismiss,
-            )
-        },
-    )
+fun NotificationPermissionDialog(
+  onDismiss: () -> Unit,
+  onConfirm: () -> Unit,
+  isVisible: Boolean = true,
+) {
+  AlertDialog(
+    visible = isVisible,
+    onDismissRequest = onDismiss,
+    icon = {
+      Icon(
+        painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
+        contentDescription = "Notification Permission",
+      )
+    },
+    title = { Text(stringResource(SharedR.string.dialog_title_enable_notifications)) },
+    text = {
+      Text(
+        text = stringResource(SharedR.string.dialog_message_enable_notifications),
+        textAlign = TextAlign.Center,
+      )
+    },
+    confirmButton = { AlertDialogDefaults.ConfirmButton(onClick = onConfirm) },
+    dismissButton = { AlertDialogDefaults.DismissButton(onClick = onDismiss) },
+  )
 }
 
 @Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)
 @Composable
 private fun NotificationPermissionDialogPreview() {
-    OneTheme {
-        NotificationPermissionDialog(
-            onConfirm = {},
-            onDismiss = {},
-        )
-    }
+  OneTheme { NotificationPermissionDialog(onConfirm = {}, onDismiss = {}) }
 }
