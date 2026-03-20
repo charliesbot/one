@@ -19,7 +19,7 @@ import androidx.wear.watchface.complications.datasource.SuspendingComplicationDa
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.FastingProgress
 import com.charliesbot.shared.core.utils.FastingProgressUtil

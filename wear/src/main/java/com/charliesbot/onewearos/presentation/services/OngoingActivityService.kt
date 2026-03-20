@@ -15,7 +15,7 @@ import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.NotificationConstants
-import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.notifications.NotificationUtil
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

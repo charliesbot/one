@@ -11,7 +11,7 @@ import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.models.NotificationType
 import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit

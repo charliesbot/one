@@ -2,7 +2,7 @@ package com.charliesbot.one.data
 
 import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.data.db.FastingRecordDao
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
 import kotlinx.coroutines.flow.Flow
 import java.time.YearMonth

@@ -2,7 +2,7 @@ package com.charliesbot.shared.core.domain.usecase
 
 import com.charliesbot.shared.core.components.FastingDayData
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.repositories.fastingHistoryRepository.FastingHistoryRepository
+import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Instant

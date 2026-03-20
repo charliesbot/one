@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.data.repositories.customGoalRepository
+package com.charliesbot.shared.core.domain.repository
 
 import com.charliesbot.shared.core.constants.FastGoal
 import kotlinx.coroutines.flow.Flow

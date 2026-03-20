@@ -6,7 +6,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.charliesbot.shared.core.data.repositories.settingsRepository.SettingsRepository
+import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

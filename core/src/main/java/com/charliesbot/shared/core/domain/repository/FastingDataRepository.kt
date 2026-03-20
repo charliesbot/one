@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.data.repositories.fastingDataRepository
+package com.charliesbot.shared.core.domain.repository
 
 import com.charliesbot.shared.core.models.FastingDataItem
 import kotlinx.coroutines.flow.Flow

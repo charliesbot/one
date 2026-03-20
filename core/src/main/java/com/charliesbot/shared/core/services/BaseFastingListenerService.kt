@@ -2,7 +2,7 @@ package com.charliesbot.shared.core.services
 
 import android.util.Log
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.data.repositories.fastingDataRepository.FastingDataRepository
+import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.getLatestFastingState
 import com.google.android.gms.wearable.DataEventBuffer
@@ -31,11 +31,11 @@ import org.koin.core.component.KoinComponent
  *
  * **ARCHITECTURAL NOTE**: This service is intentionally designed to **ONLY** process remote events.
  * All fasting state changes initiated by the user on the local device should be handled by
- * the [com.charliesbot.shared.core.domain.usecase.FastingUseCase] to ensure consistent logic and immediate UI feedback. This clear
+ * the domain use cases (e.g., [com.charliesbot.shared.core.domain.usecase.StartFastingUseCase]) to ensure consistent logic and immediate UI feedback. This clear
  * separation of concerns is critical to the app's architecture.
  *
  * @see FastingEventManager
- * @see com.charliesbot.shared.core.domain.usecase.FastingUseCase
+ * @see com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
  * @see FastingEventCallbacks
  */
 abstract class BaseFastingListenerService :
