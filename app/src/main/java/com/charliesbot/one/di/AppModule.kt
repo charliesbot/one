@@ -4,12 +4,18 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.charliesbot.one.BuildConfig
+import com.charliesbot.one.data.AndroidAppVersionProvider
+import com.charliesbot.one.data.AndroidClipboardHelper
+import com.charliesbot.one.data.AndroidHistoryExporter
 import com.charliesbot.one.data.AndroidStringProvider
 import com.charliesbot.one.data.FastingHistoryRepositoryImpl
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
 import com.charliesbot.one.widget.WidgetUpdateManager
+import com.charliesbot.shared.core.abstraction.AppVersionProvider
+import com.charliesbot.shared.core.abstraction.ClipboardHelper
+import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.abstraction.StringProvider
 import com.charliesbot.shared.core.data.db.AppDatabase
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
@@ -50,6 +56,12 @@ val appModule = module {
   single<FastingHistoryRepository> { FastingHistoryRepositoryImpl(fastingRecordDao = get()) }
 
   single<StringProvider> { AndroidStringProvider(androidContext()) }
+
+  single<AppVersionProvider> { AndroidAppVersionProvider(androidContext()) }
+
+  single<HistoryExporter> { AndroidHistoryExporter(androidContext()) }
+
+  single<ClipboardHelper> { AndroidClipboardHelper(androidContext()) }
 
   factory { GetMonthlyFastingMapUseCase(get()) }
 
