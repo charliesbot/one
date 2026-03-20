@@ -29,106 +29,91 @@ import com.charliesbot.shared.core.utils.convertLocalDateTimeToMillis
 import com.charliesbot.shared.core.utils.formatDate
 import com.google.android.horologist.compose.layout.ColumnItemType
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
+import java.time.LocalDateTime
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import java.time.LocalDateTime
 
 @Composable
 fun WearStartDateScreen(
-    navController: NavController,
-    viewModel: WearTodayViewModel = koinViewModel(),
-    onNavigateToDatePicker: () -> Unit,
-    onNavigateToTimePicker: () -> Unit,
+  navController: NavController,
+  viewModel: WearTodayViewModel = koinViewModel(),
+  onNavigateToDatePicker: () -> Unit,
+  onNavigateToTimePicker: () -> Unit,
 ) {
-    val temporalStartTime by viewModel.temporalStartTime.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
+  val temporalStartTime by viewModel.temporalStartTime.collectAsStateWithLifecycle()
+  val scope = rememberCoroutineScope()
 
-    temporalStartTime?.let {
-        WearStartDateContent(
-            startTime = it,
-            onNavigateToDatePicker = onNavigateToDatePicker,
-            onNavigateToTimePicker = onNavigateToTimePicker,
-            onUpdateStartTime = { dateTime ->
-                scope.launch {
-                    viewModel.updateStartTime(
-                        convertLocalDateTimeToMillis(dateTime),
-                    )
-                    navController.popBackStack()
-                }
-            },
-        )
-    }
+  temporalStartTime?.let {
+    WearStartDateContent(
+      startTime = it,
+      onNavigateToDatePicker = onNavigateToDatePicker,
+      onNavigateToTimePicker = onNavigateToTimePicker,
+      onUpdateStartTime = { dateTime ->
+        scope.launch {
+          viewModel.updateStartTime(convertLocalDateTimeToMillis(dateTime))
+          navController.popBackStack()
+        }
+      },
+    )
+  }
 }
 
 @Composable
 fun WearStartDateContent(
-    startTime: LocalDateTime,
-    onNavigateToDatePicker: () -> Unit,
-    onNavigateToTimePicker: () -> Unit,
-    onUpdateStartTime: (LocalDateTime) -> Unit,
+  startTime: LocalDateTime,
+  onNavigateToDatePicker: () -> Unit,
+  onNavigateToTimePicker: () -> Unit,
+  onUpdateStartTime: (LocalDateTime) -> Unit,
 ) {
-    val listState = rememberScalingLazyListState()
-    val contentPadding = rememberResponsiveColumnPadding(
-        first = ColumnItemType.Button,
-        last = ColumnItemType.Button,
-    )
-    ScreenScaffold(
-        scrollState = listState,
-        edgeButtonSpacing = 0.dp,
-        contentPadding = contentPadding,
-        edgeButton = {
-            EdgeButton(
-                onClick = {
-                    onUpdateStartTime(startTime)
-                },
-                buttonSize = EdgeButtonSize.Small,
-            ) {
-                Text(stringResource(R.string.label_save))
-            }
-        },
+  val listState = rememberScalingLazyListState()
+  val contentPadding =
+    rememberResponsiveColumnPadding(first = ColumnItemType.Button, last = ColumnItemType.Button)
+  ScreenScaffold(
+    scrollState = listState,
+    edgeButtonSpacing = 0.dp,
+    contentPadding = contentPadding,
+    edgeButton = {
+      EdgeButton(onClick = { onUpdateStartTime(startTime) }, buttonSize = EdgeButtonSize.Small) {
+        Text(stringResource(R.string.label_save))
+      }
+    },
+  ) {
+    ScalingLazyColumn(
+      state = listState,
+      modifier = Modifier.fillMaxSize(),
+      contentPadding = contentPadding,
+      autoCentering = null,
+      verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
     ) {
-        ScalingLazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = contentPadding,
-            autoCentering = null,
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-        ) {
-            item {
-                Chip(
-                    onClick = onNavigateToDatePicker,
-                    label = {
-                        Text(
-                            text = formatDate(startTime, TimeFormat.DATE),
-                            textAlign = TextAlign.Center,
-                        )
-                    },
-                    colors = ChipDefaults.gradientBackgroundChipColors(),
-                )
-            }
-            item {
-                Chip(
-                    onClick = onNavigateToTimePicker,
-                    label = {
-                        Text(
-                            text = formatDate(startTime, TimeFormat.TIME),
-                            textAlign = TextAlign.Center,
-                        )
-                    },
-                    colors = ChipDefaults.gradientBackgroundChipColors(),
-                )
-            }
-        }
+      item {
+        Chip(
+          onClick = onNavigateToDatePicker,
+          label = {
+            Text(text = formatDate(startTime, TimeFormat.DATE), textAlign = TextAlign.Center)
+          },
+          colors = ChipDefaults.gradientBackgroundChipColors(),
+        )
+      }
+      item {
+        Chip(
+          onClick = onNavigateToTimePicker,
+          label = {
+            Text(text = formatDate(startTime, TimeFormat.TIME), textAlign = TextAlign.Center)
+          },
+          colors = ChipDefaults.gradientBackgroundChipColors(),
+        )
+      }
     }
+  }
 }
 
 @Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
 private fun Preview() {
-    WearStartDateContent(
-        startTime = LocalDateTime.now(),
-        onNavigateToDatePicker = {},
-        onNavigateToTimePicker = {},
-        onUpdateStartTime = {},
-    )
+  WearStartDateContent(
+    startTime = LocalDateTime.now(),
+    onNavigateToDatePicker = {},
+    onNavigateToTimePicker = {},
+    onUpdateStartTime = {},
+  )
 }

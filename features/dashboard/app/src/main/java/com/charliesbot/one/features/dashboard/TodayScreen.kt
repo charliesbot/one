@@ -67,430 +67,418 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
-    val isTimePickerDialogOpen by viewModel.isTimePickerDialogOpen.collectAsStateWithLifecycle()
-    val isGoalBottomSheetOpen by viewModel.isGoalBottomSheetOpen.collectAsStateWithLifecycle()
-    val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
-    val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
-    val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
-    val weeklyProgress by viewModel.weeklyProgress.collectAsStateWithLifecycle()
-    val smartRemindersEnabled by viewModel.smartRemindersEnabled.collectAsStateWithLifecycle()
-    val suggestedFastingTime by viewModel.suggestedFastingTime.collectAsStateWithLifecycle()
-    val allGoals by viewModel.allGoals.collectAsStateWithLifecycle()
-    val isWidthAtLeastMedium = isWidthAtLeastMedium()
+  val isTimePickerDialogOpen by viewModel.isTimePickerDialogOpen.collectAsStateWithLifecycle()
+  val isGoalBottomSheetOpen by viewModel.isGoalBottomSheetOpen.collectAsStateWithLifecycle()
+  val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
+  val starTimeInMillis by viewModel.startTimeInMillis.collectAsStateWithLifecycle()
+  val fastingGoalId by viewModel.fastingGoalId.collectAsStateWithLifecycle()
+  val weeklyProgress by viewModel.weeklyProgress.collectAsStateWithLifecycle()
+  val smartRemindersEnabled by viewModel.smartRemindersEnabled.collectAsStateWithLifecycle()
+  val suggestedFastingTime by viewModel.suggestedFastingTime.collectAsStateWithLifecycle()
+  val allGoals by viewModel.allGoals.collectAsStateWithLifecycle()
+  val isWidthAtLeastMedium = isWidthAtLeastMedium()
 
-    TodayScreenContent(
-        isTimePickerDialogOpen = isTimePickerDialogOpen,
-        isGoalBottomSheetOpen = isGoalBottomSheetOpen,
-        isFasting = isFasting,
-        startTimeInMillis = starTimeInMillis,
-        fastingGoalId = fastingGoalId,
-        weeklyProgress = weeklyProgress,
-        smartRemindersEnabled = smartRemindersEnabled,
-        suggestedTimeMinutes = suggestedFastingTime?.suggestedTimeMinutes,
-        suggestedTimeReasoning = suggestedFastingTime?.reasoning,
-        suggestedTimeSource = suggestedFastingTime?.source,
-        allGoals = allGoals,
-        isWidthAtLeastMedium = isWidthAtLeastMedium,
-        onStartFasting = viewModel::onStartFasting,
-        onStopFasting = viewModel::onStopFasting,
-        onOpenTimePickerDialog = viewModel::openTimePickerDialog,
-        onCloseTimePickerDialog = viewModel::closeTimePickerDialog,
-        onUpdateStartTime = viewModel::updateStartTime,
-        onOpenGoalBottomSheet = viewModel::openGoalBottomSheet,
-        onCloseGoalBottomSheet = viewModel::closeGoalBottomSheet,
-        onUpdateFastingGoal = viewModel::updateFastingGoal,
-        onSaveCustomGoal = viewModel::saveCustomGoal,
-        onDeleteCustomGoal = viewModel::deleteCustomGoal,
-    )
+  TodayScreenContent(
+    isTimePickerDialogOpen = isTimePickerDialogOpen,
+    isGoalBottomSheetOpen = isGoalBottomSheetOpen,
+    isFasting = isFasting,
+    startTimeInMillis = starTimeInMillis,
+    fastingGoalId = fastingGoalId,
+    weeklyProgress = weeklyProgress,
+    smartRemindersEnabled = smartRemindersEnabled,
+    suggestedTimeMinutes = suggestedFastingTime?.suggestedTimeMinutes,
+    suggestedTimeReasoning = suggestedFastingTime?.reasoning,
+    suggestedTimeSource = suggestedFastingTime?.source,
+    allGoals = allGoals,
+    isWidthAtLeastMedium = isWidthAtLeastMedium,
+    onStartFasting = viewModel::onStartFasting,
+    onStopFasting = viewModel::onStopFasting,
+    onOpenTimePickerDialog = viewModel::openTimePickerDialog,
+    onCloseTimePickerDialog = viewModel::closeTimePickerDialog,
+    onUpdateStartTime = viewModel::updateStartTime,
+    onOpenGoalBottomSheet = viewModel::openGoalBottomSheet,
+    onCloseGoalBottomSheet = viewModel::closeGoalBottomSheet,
+    onUpdateFastingGoal = viewModel::updateFastingGoal,
+    onSaveCustomGoal = viewModel::saveCustomGoal,
+    onDeleteCustomGoal = viewModel::deleteCustomGoal,
+  )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TodayScreenContent(
-    isTimePickerDialogOpen: Boolean,
-    isGoalBottomSheetOpen: Boolean,
-    isFasting: Boolean,
-    startTimeInMillis: Long,
-    fastingGoalId: String,
-    weeklyProgress: List<TimePeriodProgress>,
-    smartRemindersEnabled: Boolean,
-    suggestedTimeMinutes: Int?,
-    suggestedTimeReasoning: String?,
-    suggestedTimeSource: com.charliesbot.shared.core.models.SuggestionSource?,
-    allGoals: List<FastGoal>,
-    isWidthAtLeastMedium: Boolean,
-    onStartFasting: () -> Unit,
-    onStopFasting: () -> Unit,
-    onOpenTimePickerDialog: () -> Unit,
-    onCloseTimePickerDialog: () -> Unit,
-    onUpdateStartTime: (Long) -> Unit,
-    onOpenGoalBottomSheet: () -> Unit,
-    onCloseGoalBottomSheet: () -> Unit,
-    onUpdateFastingGoal: (String) -> Unit,
-    onSaveCustomGoal: (FastGoal) -> Unit,
-    onDeleteCustomGoal: (String) -> Unit,
+  isTimePickerDialogOpen: Boolean,
+  isGoalBottomSheetOpen: Boolean,
+  isFasting: Boolean,
+  startTimeInMillis: Long,
+  fastingGoalId: String,
+  weeklyProgress: List<TimePeriodProgress>,
+  smartRemindersEnabled: Boolean,
+  suggestedTimeMinutes: Int?,
+  suggestedTimeReasoning: String?,
+  suggestedTimeSource: com.charliesbot.shared.core.models.SuggestionSource?,
+  allGoals: List<FastGoal>,
+  isWidthAtLeastMedium: Boolean,
+  onStartFasting: () -> Unit,
+  onStopFasting: () -> Unit,
+  onOpenTimePickerDialog: () -> Unit,
+  onCloseTimePickerDialog: () -> Unit,
+  onUpdateStartTime: (Long) -> Unit,
+  onOpenGoalBottomSheet: () -> Unit,
+  onCloseGoalBottomSheet: () -> Unit,
+  onUpdateFastingGoal: (String) -> Unit,
+  onSaveCustomGoal: (FastGoal) -> Unit,
+  onDeleteCustomGoal: (String) -> Unit,
 ) {
-    val screenPadding = 32.dp
-    val startTimeInLocalDateTime =
-        convertMillisToLocalDateTime(startTimeInMillis)
-    var elapsedTime by remember { mutableLongStateOf(0L) }
-    val fastButtonLabel =
-        stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
-    val scrollState = rememberScrollState()
-    val currentGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val customGoalSavedMessage = stringResource(R.string.custom_goal_saved)
-    val customGoalUpdatedMessage = stringResource(R.string.custom_goal_updated)
-    val customGoalDeletedMessage = stringResource(R.string.custom_goal_deleted)
+  val screenPadding = 32.dp
+  val startTimeInLocalDateTime = convertMillisToLocalDateTime(startTimeInMillis)
+  var elapsedTime by remember { mutableLongStateOf(0L) }
+  val fastButtonLabel = stringResource(if (isFasting) R.string.end_fast else R.string.start_fasting)
+  val scrollState = rememberScrollState()
+  val currentGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
+  val snackbarHostState = remember { SnackbarHostState() }
+  val scope = rememberCoroutineScope()
+  val customGoalSavedMessage = stringResource(R.string.custom_goal_saved)
+  val customGoalUpdatedMessage = stringResource(R.string.custom_goal_updated)
+  val customGoalDeletedMessage = stringResource(R.string.custom_goal_deleted)
 
-    LaunchedEffect(isFasting, startTimeInMillis) {
-        if (isFasting) {
-            while (true) {
-                elapsedTime = System.currentTimeMillis() - startTimeInMillis
-                delay(1000L) // refresh timer every second
-            }
-        } else {
-            elapsedTime = 0L
-        }
+  LaunchedEffect(isFasting, startTimeInMillis) {
+    if (isFasting) {
+      while (true) {
+        elapsedTime = System.currentTimeMillis() - startTimeInMillis
+        delay(1000L) // refresh timer every second
+      }
+    } else {
+      elapsedTime = 0L
     }
+  }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                windowInsets = WindowInsets(top = 0.dp),
-                title = { Text(stringResource(R.string.nav_today)) },
-            )
+  Scaffold(
+    topBar = {
+      TopAppBar(
+        windowInsets = WindowInsets(top = 0.dp),
+        title = { Text(stringResource(R.string.nav_today)) },
+      )
+    },
+    snackbarHost = { SnackbarHost(snackbarHostState) },
+  ) { innerPadding ->
+    val maxWidth = if (isWidthAtLeastMedium) 800.dp else 600.dp
+    if (isTimePickerDialogOpen) {
+      TimePickerDialog(
+        startTimeInMillis,
+        onConfirm = { updatedStartTime ->
+          onUpdateStartTime(updatedStartTime)
+          onCloseTimePickerDialog()
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { innerPadding ->
-        val maxWidth = if (isWidthAtLeastMedium) 800.dp else 600.dp
-        if (isTimePickerDialogOpen) {
-            TimePickerDialog(
-                startTimeInMillis,
-                onConfirm = { updatedStartTime ->
-                    onUpdateStartTime(updatedStartTime)
-                    onCloseTimePickerDialog()
-                },
-                onDismiss = {
-                    onCloseTimePickerDialog()
-                },
-            )
-        }
-        if (isGoalBottomSheetOpen) {
-            GoalBottomSheet(
-                onDismiss = onCloseGoalBottomSheet,
-                onSave = { id ->
-                    onUpdateFastingGoal(id)
-                    onCloseGoalBottomSheet()
-                },
-                onSaveCustomGoal = { goal ->
-                    val isUpdate = allGoals.any { it.id == goal.id }
-                    onSaveCustomGoal(goal)
-                    onCloseGoalBottomSheet()
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            if (isUpdate) customGoalUpdatedMessage else customGoalSavedMessage,
-                        )
-                    }
-                },
-                onDeleteCustomGoal = { goalId ->
-                    onDeleteCustomGoal(goalId)
-                    onCloseGoalBottomSheet()
-                    scope.launch {
-                        snackbarHostState.showSnackbar(customGoalDeletedMessage)
-                    }
-                },
-                initialSelectedGoalId = fastingGoalId,
-                allGoals = allGoals,
-            )
-        }
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            contentAlignment = Alignment.TopCenter,
-        ) {
-            Column(
-                modifier = Modifier
-                    .widthIn(max = maxWidth)
-                    .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                WeeklyProgress(
-                    weeklyProgress = weeklyProgress,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = screenPadding + 24.dp),
-                )
-
-                // Smart Suggestion Card - shown when not fasting and reminders are enabled
-                AnimatedVisibility(
-                    visible = smartRemindersEnabled && !isFasting && suggestedTimeMinutes != null,
-                    enter = fadeIn(animationSpec = tween(durationMillis = 300)) +
-                        expandVertically(animationSpec = tween(durationMillis = 300)),
-                    exit = fadeOut(animationSpec = tween(durationMillis = 150)) +
-                        shrinkVertically(animationSpec = tween(durationMillis = 200)),
-                ) {
-                    suggestedTimeMinutes?.let { minutes ->
-                        SmartSuggestionCard(
-                            suggestedTimeMinutes = minutes,
-                            reasoning = suggestedTimeReasoning ?: "",
-                            source = suggestedTimeSource,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = screenPadding, end = screenPadding, top = 30.dp),
-                        )
-                    }
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = screenPadding, end = screenPadding, top = 30.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-                ) {
-                    val progressContent: @Composable () -> Unit = {
-                        CurrentFastingProgress(
-                            isFasting = isFasting,
-                            elapsedTime = elapsedTime,
-                            fastingGoalId = fastingGoalId,
-                            onFastingStatusClick = onOpenGoalBottomSheet,
-                        )
-                    }
-
-                    val buttonsContent: @Composable () -> Unit = {
-                        AnimatedVisibility(
-                            visible = isFasting,
-                            enter = fadeIn(animationSpec = tween(durationMillis = 600)) +
-                                expandVertically(animationSpec = tween(durationMillis = 350)),
-                            exit =
-                            fadeOut(animationSpec = tween(durationMillis = 150)) +
-                                shrinkVertically(animationSpec = tween(durationMillis = 350)),
-                        ) {
-                            ButtonGroup(
-                                overflowIndicator = {},
-                                expandedRatio = 0f,
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-                            ) {
-                                customItem(
-                                    buttonGroupContent = {
-                                        TimeDisplay(
-                                            title = stringResource(R.string.started),
-                                            date = startTimeInLocalDateTime,
-                                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(
-                                                pressedShape = RoundedCornerShape(60.dp),
-                                            ),
-                                            onClick = { onOpenTimePickerDialog() },
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                    },
-                                    menuContent = {},
-                                )
-                                customItem(
-                                    buttonGroupContent = {
-                                        TimeDisplay(
-                                            title = stringResource(
-                                                R.string.goal_with_duration,
-                                                "${currentGoal.durationDisplay}H",
-                                            ),
-                                            date = startTimeInLocalDateTime.plusHours(
-                                                getHours(currentGoal.durationMillis),
-                                            ),
-                                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(
-                                                pressedShape = RoundedCornerShape(60.dp),
-                                            ),
-                                            onClick = { onOpenGoalBottomSheet() },
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                    },
-                                    menuContent = {},
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        FilledTonalButton(
-                            onClick = if (isFasting) onStopFasting else onStartFasting,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                        ) {
-                            Text(text = fastButtonLabel)
-                        }
-                    }
-
-                    if (isWidthAtLeastMedium) {
-                        Row(
-                            modifier = Modifier
-                                .padding(all = screenPadding)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(32.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Box(modifier = Modifier.weight(1f)) { progressContent() }
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) { buttonsContent() }
-                        }
-                    } else {
-                        Column(
-                            modifier = Modifier.padding(all = screenPadding),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            progressContent()
-                            Spacer(modifier = Modifier.height(40.dp))
-                            buttonsContent()
-                        }
-                    }
-                }
-            }
-        }
+        onDismiss = { onCloseTimePickerDialog() },
+      )
     }
+    if (isGoalBottomSheetOpen) {
+      GoalBottomSheet(
+        onDismiss = onCloseGoalBottomSheet,
+        onSave = { id ->
+          onUpdateFastingGoal(id)
+          onCloseGoalBottomSheet()
+        },
+        onSaveCustomGoal = { goal ->
+          val isUpdate = allGoals.any { it.id == goal.id }
+          onSaveCustomGoal(goal)
+          onCloseGoalBottomSheet()
+          scope.launch {
+            snackbarHostState.showSnackbar(
+              if (isUpdate) customGoalUpdatedMessage else customGoalSavedMessage
+            )
+          }
+        },
+        onDeleteCustomGoal = { goalId ->
+          onDeleteCustomGoal(goalId)
+          onCloseGoalBottomSheet()
+          scope.launch { snackbarHostState.showSnackbar(customGoalDeletedMessage) }
+        },
+        initialSelectedGoalId = fastingGoalId,
+        allGoals = allGoals,
+      )
+    }
+    Box(
+      modifier = Modifier.padding(innerPadding).fillMaxSize(),
+      contentAlignment = Alignment.TopCenter,
+    ) {
+      Column(
+        modifier = Modifier.widthIn(max = maxWidth).verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+        WeeklyProgress(
+          weeklyProgress = weeklyProgress,
+          modifier = Modifier.fillMaxWidth().padding(horizontal = screenPadding + 24.dp),
+        )
+
+        // Smart Suggestion Card - shown when not fasting and reminders are enabled
+        AnimatedVisibility(
+          visible = smartRemindersEnabled && !isFasting && suggestedTimeMinutes != null,
+          enter =
+            fadeIn(animationSpec = tween(durationMillis = 300)) +
+              expandVertically(animationSpec = tween(durationMillis = 300)),
+          exit =
+            fadeOut(animationSpec = tween(durationMillis = 150)) +
+              shrinkVertically(animationSpec = tween(durationMillis = 200)),
+        ) {
+          suggestedTimeMinutes?.let { minutes ->
+            SmartSuggestionCard(
+              suggestedTimeMinutes = minutes,
+              reasoning = suggestedTimeReasoning ?: "",
+              source = suggestedTimeSource,
+              modifier =
+                Modifier.fillMaxWidth()
+                  .padding(start = screenPadding, end = screenPadding, top = 30.dp),
+            )
+          }
+        }
+
+        Card(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(start = screenPadding, end = screenPadding, top = 30.dp),
+          colors =
+            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        ) {
+          val progressContent: @Composable () -> Unit = {
+            CurrentFastingProgress(
+              isFasting = isFasting,
+              elapsedTime = elapsedTime,
+              fastingGoalId = fastingGoalId,
+              onFastingStatusClick = onOpenGoalBottomSheet,
+            )
+          }
+
+          val buttonsContent: @Composable () -> Unit = {
+            AnimatedVisibility(
+              visible = isFasting,
+              enter =
+                fadeIn(animationSpec = tween(durationMillis = 600)) +
+                  expandVertically(animationSpec = tween(durationMillis = 350)),
+              exit =
+                fadeOut(animationSpec = tween(durationMillis = 150)) +
+                  shrinkVertically(animationSpec = tween(durationMillis = 350)),
+            ) {
+              ButtonGroup(
+                overflowIndicator = {},
+                expandedRatio = 0f,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                  Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+              ) {
+                customItem(
+                  buttonGroupContent = {
+                    TimeDisplay(
+                      title = stringResource(R.string.started),
+                      date = startTimeInLocalDateTime,
+                      shapes =
+                        ButtonGroupDefaults.connectedLeadingButtonShapes(
+                          pressedShape = RoundedCornerShape(60.dp)
+                        ),
+                      onClick = { onOpenTimePickerDialog() },
+                      modifier = Modifier.weight(1f),
+                    )
+                  },
+                  menuContent = {},
+                )
+                customItem(
+                  buttonGroupContent = {
+                    TimeDisplay(
+                      title =
+                        stringResource(
+                          R.string.goal_with_duration,
+                          "${currentGoal.durationDisplay}H",
+                        ),
+                      date =
+                        startTimeInLocalDateTime.plusHours(getHours(currentGoal.durationMillis)),
+                      shapes =
+                        ButtonGroupDefaults.connectedTrailingButtonShapes(
+                          pressedShape = RoundedCornerShape(60.dp)
+                        ),
+                      onClick = { onOpenGoalBottomSheet() },
+                      modifier = Modifier.weight(1f),
+                    )
+                  },
+                  menuContent = {},
+                )
+              }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            FilledTonalButton(
+              onClick = if (isFasting) onStopFasting else onStartFasting,
+              modifier = Modifier.fillMaxWidth().height(50.dp),
+            ) {
+              Text(text = fastButtonLabel)
+            }
+          }
+
+          if (isWidthAtLeastMedium) {
+            Row(
+              modifier = Modifier.padding(all = screenPadding).fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(32.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Box(modifier = Modifier.weight(1f)) { progressContent() }
+              Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+              ) {
+                buttonsContent()
+              }
+            }
+          } else {
+            Column(
+              modifier = Modifier.padding(all = screenPadding),
+              horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+              progressContent()
+              Spacer(modifier = Modifier.height(40.dp))
+              buttonsContent()
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 @Composable
 private fun SmartSuggestionCard(
-    suggestedTimeMinutes: Int,
-    reasoning: String,
-    source: com.charliesbot.shared.core.models.SuggestionSource?,
-    modifier: Modifier = Modifier,
+  suggestedTimeMinutes: Int,
+  reasoning: String,
+  source: com.charliesbot.shared.core.models.SuggestionSource?,
+  modifier: Modifier = Modifier,
 ) {
-    val formattedTime = formatMinutesAsTime(suggestedTimeMinutes)
-    val sourceText = when (source) {
-        com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE -> stringResource(
-            R.string.smart_suggestion_based_on_average,
-        )
+  val formattedTime = formatMinutesAsTime(suggestedTimeMinutes)
+  val sourceText =
+    when (source) {
+      com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE ->
+        stringResource(R.string.smart_suggestion_based_on_average)
 
-        com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED -> stringResource(
-            R.string.smart_suggestion_based_on_bedtime,
-        )
+      com.charliesbot.shared.core.models.SuggestionSource.BEDTIME_BASED ->
+        stringResource(R.string.smart_suggestion_based_on_bedtime)
 
-        else -> null
+      else -> null
     }
 
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.upcoming_fast),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = formattedTime,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = reasoning,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-            )
-            if (sourceText != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = sourceText,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-                )
-            }
-        }
+  Card(
+    modifier = modifier,
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+  ) {
+    Column(modifier = Modifier.padding(16.dp)) {
+      Text(
+        text = stringResource(R.string.upcoming_fast),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+      )
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(
+        text = formattedTime,
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+      )
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(
+        text = reasoning,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+      )
+      if (sourceText != null) {
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+          text = sourceText,
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+        )
+      }
     }
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PreviewTodayScreen() {
-    TodayScreenContent(
-        isTimePickerDialogOpen = false,
-        isGoalBottomSheetOpen = false,
-        isFasting = true,
-        startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
-        fastingGoalId = "16:8",
-        weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-        smartRemindersEnabled = true,
-        suggestedTimeMinutes = 1200, // 8:00 PM
-        suggestedTimeReasoning = "Based on your recent 7-day average",
-        suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
-        allGoals = PredefinedFastingGoals.allGoals,
-        isWidthAtLeastMedium = false,
-        onStartFasting = {},
-        onStopFasting = {},
-        onOpenTimePickerDialog = {},
-        onCloseTimePickerDialog = {},
-        onUpdateStartTime = {},
-        onOpenGoalBottomSheet = {},
-        onCloseGoalBottomSheet = {},
-        onUpdateFastingGoal = {},
-        onSaveCustomGoal = {},
-        onDeleteCustomGoal = {},
-    )
+  TodayScreenContent(
+    isTimePickerDialogOpen = false,
+    isGoalBottomSheetOpen = false,
+    isFasting = true,
+    startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
+    fastingGoalId = "16:8",
+    weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+    smartRemindersEnabled = true,
+    suggestedTimeMinutes = 1200, // 8:00 PM
+    suggestedTimeReasoning = "Based on your recent 7-day average",
+    suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+    allGoals = PredefinedFastingGoals.allGoals,
+    isWidthAtLeastMedium = false,
+    onStartFasting = {},
+    onStopFasting = {},
+    onOpenTimePickerDialog = {},
+    onCloseTimePickerDialog = {},
+    onUpdateStartTime = {},
+    onOpenGoalBottomSheet = {},
+    onCloseGoalBottomSheet = {},
+    onUpdateFastingGoal = {},
+    onSaveCustomGoal = {},
+    onDeleteCustomGoal = {},
+  )
 }
 
 @Preview(heightDp = 360, widthDp = 800)
 @Composable
 private fun PreviewTodayScreenLandscape() {
-    TodayScreenContent(
-        isTimePickerDialogOpen = false,
-        isGoalBottomSheetOpen = false,
-        isFasting = true,
-        startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
-        fastingGoalId = "16:8",
-        weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-        smartRemindersEnabled = true,
-        suggestedTimeMinutes = 1200,
-        suggestedTimeReasoning = "Based on your recent 7-day average",
-        suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
-        allGoals = PredefinedFastingGoals.allGoals,
-        isWidthAtLeastMedium = true,
-        onStartFasting = {},
-        onStopFasting = {},
-        onOpenTimePickerDialog = {},
-        onCloseTimePickerDialog = {},
-        onUpdateStartTime = {},
-        onOpenGoalBottomSheet = {},
-        onCloseGoalBottomSheet = {},
-        onUpdateFastingGoal = {},
-        onSaveCustomGoal = {},
-        onDeleteCustomGoal = {},
-    )
+  TodayScreenContent(
+    isTimePickerDialogOpen = false,
+    isGoalBottomSheetOpen = false,
+    isFasting = true,
+    startTimeInMillis = System.currentTimeMillis() - 3600000, // 1 hour ago
+    fastingGoalId = "16:8",
+    weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+    smartRemindersEnabled = true,
+    suggestedTimeMinutes = 1200,
+    suggestedTimeReasoning = "Based on your recent 7-day average",
+    suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+    allGoals = PredefinedFastingGoals.allGoals,
+    isWidthAtLeastMedium = true,
+    onStartFasting = {},
+    onStopFasting = {},
+    onOpenTimePickerDialog = {},
+    onCloseTimePickerDialog = {},
+    onUpdateStartTime = {},
+    onOpenGoalBottomSheet = {},
+    onCloseGoalBottomSheet = {},
+    onUpdateFastingGoal = {},
+    onSaveCustomGoal = {},
+    onDeleteCustomGoal = {},
+  )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PreviewTodayScreenWithUpcomingFast() {
-    TodayScreenContent(
-        isTimePickerDialogOpen = false,
-        isGoalBottomSheetOpen = false,
-        isFasting = false,
-        startTimeInMillis = System.currentTimeMillis(),
-        fastingGoalId = "16:8",
-        weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
-        smartRemindersEnabled = true,
-        suggestedTimeMinutes = 1200, // 8:00 PM
-        suggestedTimeReasoning = "Based on your recent 7-day average",
-        suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
-        allGoals = PredefinedFastingGoals.allGoals,
-        isWidthAtLeastMedium = false,
-        onStartFasting = {},
-        onStopFasting = {},
-        onOpenTimePickerDialog = {},
-        onCloseTimePickerDialog = {},
-        onUpdateStartTime = {},
-        onOpenGoalBottomSheet = {},
-        onCloseGoalBottomSheet = {},
-        onUpdateFastingGoal = {},
-        onSaveCustomGoal = {},
-        onDeleteCustomGoal = {},
-    )
+  TodayScreenContent(
+    isTimePickerDialogOpen = false,
+    isGoalBottomSheetOpen = false,
+    isFasting = false,
+    startTimeInMillis = System.currentTimeMillis(),
+    fastingGoalId = "16:8",
+    weeklyProgress = MockDataUtils.createMockWeeklyProgress(),
+    smartRemindersEnabled = true,
+    suggestedTimeMinutes = 1200, // 8:00 PM
+    suggestedTimeReasoning = "Based on your recent 7-day average",
+    suggestedTimeSource = com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE,
+    allGoals = PredefinedFastingGoals.allGoals,
+    isWidthAtLeastMedium = false,
+    onStartFasting = {},
+    onStopFasting = {},
+    onOpenTimePickerDialog = {},
+    onCloseTimePickerDialog = {},
+    onUpdateStartTime = {},
+    onOpenGoalBottomSheet = {},
+    onCloseGoalBottomSheet = {},
+    onUpdateFastingGoal = {},
+    onSaveCustomGoal = {},
+    onDeleteCustomGoal = {},
+  )
 }

@@ -38,6 +38,7 @@ googleFirebaseCrashlytics = "3.0.6"
 room = "2.8.4"
 room-plugin = "2.8.4"
 spotless = "8.2.1"
+ktfmt = "0.54"
 # navigation compose 3
 nav3Core = "1.0.1"
 lifecycleViewmodelNav3 = "2.10.0"

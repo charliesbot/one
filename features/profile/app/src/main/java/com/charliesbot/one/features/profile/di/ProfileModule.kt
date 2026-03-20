@@ -4,6 +4,4 @@ import com.charliesbot.one.features.profile.YouViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-val profileModule = module {
-    viewModelOf(::YouViewModel)
-}
+val profileModule = module { viewModelOf(::YouViewModel) }

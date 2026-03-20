@@ -17,41 +17,34 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun FastingProgressBar(
-    progress: Float,
-    modifier: Modifier = Modifier,
-    indicatorColor: Color = MaterialTheme.colorScheme.primary,
-    trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
-    strokeWidth: Dp = 45.dp,
+  progress: Float,
+  modifier: Modifier = Modifier,
+  indicatorColor: Color = MaterialTheme.colorScheme.primary,
+  trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+  strokeWidth: Dp = 45.dp,
 ) {
-    Canvas(
-        modifier = modifier
-            .aspectRatio(1f),
-    ) {
-        val canvasSize = size.minDimension
-        val radius = (canvasSize / 2) - (strokeWidth.toPx() / 2)
+  Canvas(modifier = modifier.aspectRatio(1f)) {
+    val canvasSize = size.minDimension
+    val radius = (canvasSize / 2) - (strokeWidth.toPx() / 2)
 
-        drawCircle(
-            color = trackColor,
-            radius = radius,
-            style = Stroke(width = strokeWidth.toPx()),
-        )
+    drawCircle(color = trackColor, radius = radius, style = Stroke(width = strokeWidth.toPx()))
 
-        val sweepAngle = progress * 360f
+    val sweepAngle = progress * 360f
 
-        drawArc(
-            color = indicatorColor,
-            startAngle = -90f, // Start from top
-            sweepAngle = sweepAngle,
-            useCenter = false,
-            topLeft = Offset(center.x - radius, center.y - radius),
-            size = Size(radius * 2, radius * 2),
-            style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt),
-        )
-    }
+    drawArc(
+      color = indicatorColor,
+      startAngle = -90f, // Start from top
+      sweepAngle = sweepAngle,
+      useCenter = false,
+      topLeft = Offset(center.x - radius, center.y - radius),
+      size = Size(radius * 2, radius * 2),
+      style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt),
+    )
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun FastingProgressBarPreview() {
-    FastingProgressBar(0.8f, modifier = Modifier.size(200.dp))
+  FastingProgressBar(0.8f, modifier = Modifier.size(200.dp))
 }

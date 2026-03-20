@@ -10,21 +10,21 @@ import com.google.android.gms.wearable.DataMapItem
 // We need to find the most recent one, otherwise we might overwrite state
 // before it's committed.
 fun getLatestFastingState(dataEvents: DataEventBuffer): FastingDataItem? {
-    var newestItem: FastingDataItem? = null
-    var mostRecentTimestamp = Long.MIN_VALUE
+  var newestItem: FastingDataItem? = null
+  var mostRecentTimestamp = Long.MIN_VALUE
 
-    for (event in dataEvents) {
-        if (event.type != DataEvent.TYPE_CHANGED ||
-            event.dataItem.uri.path != DataLayerConstants.FASTING_PATH
-        ) {
-            continue
-        }
-        val currentItem =
-            getFastingItemFromDataLayer(DataMapItem.fromDataItem(event.dataItem).dataMap)
-        if (currentItem.updateTimestamp > mostRecentTimestamp) {
-            newestItem = currentItem
-            mostRecentTimestamp = currentItem.updateTimestamp
-        }
+  for (event in dataEvents) {
+    if (
+      event.type != DataEvent.TYPE_CHANGED ||
+        event.dataItem.uri.path != DataLayerConstants.FASTING_PATH
+    ) {
+      continue
     }
-    return newestItem
+    val currentItem = getFastingItemFromDataLayer(DataMapItem.fromDataItem(event.dataItem).dataMap)
+    if (currentItem.updateTimestamp > mostRecentTimestamp) {
+      newestItem = currentItem
+      mostRecentTimestamp = currentItem.updateTimestamp
+    }
+  }
+  return newestItem
 }

@@ -21,53 +21,40 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val appModule = module {
-    single {
-        Room.databaseBuilder(
-            androidContext(),
-            AppDatabase::class.java,
-            "fasting_history.db",
-        ).apply {
-            if (BuildConfig.DEBUG) {
-                fallbackToDestructiveMigration(true)
-            }
-        }.build()
-    }
+  single {
+    Room.databaseBuilder(androidContext(), AppDatabase::class.java, "fasting_history.db")
+      .apply {
+        if (BuildConfig.DEBUG) {
+          fallbackToDestructiveMigration(true)
+        }
+      }
+      .build()
+  }
 
-    single {
-        get<AppDatabase>().fastingRecordDao()
-    }
+  single { get<AppDatabase>().fastingRecordDao() }
 
-    single<SharedPreferences> {
-        androidContext().getSharedPreferences(
-            "one_fasting_prefs",
-            Context.MODE_PRIVATE,
-        )
-    }
+  single<SharedPreferences> {
+    androidContext().getSharedPreferences("one_fasting_prefs", Context.MODE_PRIVATE)
+  }
 
-    single<WidgetUpdateManager> {
-        WidgetUpdateManager(androidContext())
-    }
+  single<WidgetUpdateManager> { WidgetUpdateManager(androidContext()) }
 
-    single<NotificationScheduler> {
-        NotificationScheduler(
-            context = androidContext(),
-            workerClass = NotificationWorker::class.java,
-            settingsRepository = get(),
-        )
-    }
+  single<NotificationScheduler> {
+    NotificationScheduler(
+      context = androidContext(),
+      workerClass = NotificationWorker::class.java,
+      settingsRepository = get(),
+    )
+  }
 
-    single<FastingHistoryRepository> {
-        FastingHistoryRepositoryImpl(fastingRecordDao = get())
-    }
+  single<FastingHistoryRepository> { FastingHistoryRepositoryImpl(fastingRecordDao = get()) }
 
-    single<StringProvider> {
-        AndroidStringProvider(androidContext())
-    }
+  single<StringProvider> { AndroidStringProvider(androidContext()) }
 
-    factory { GetMonthlyFastingMapUseCase(get()) }
+  factory { GetMonthlyFastingMapUseCase(get()) }
 
-    single { LocalFastingCallback(get(), get()) }
-    single<FastingEventCallbacks> { get<LocalFastingCallback>() }
+  single { LocalFastingCallback(get(), get()) }
+  single<FastingEventCallbacks> { get<LocalFastingCallback>() }
 
-    single<SmartReminderCallback> { SmartReminderCallbackImpl(androidContext()) }
+  single<SmartReminderCallback> { SmartReminderCallbackImpl(androidContext()) }
 }

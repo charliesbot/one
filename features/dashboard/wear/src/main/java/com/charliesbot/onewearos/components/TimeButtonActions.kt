@@ -27,70 +27,65 @@ import java.time.LocalDateTime
 
 @Composable
 private fun TimeInfoDisplay(title: String, date: LocalDateTime, onClick: (() -> Unit)) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val verticalSpace = 2.dp
-    val textColor =
-        MaterialTheme.colorScheme.onSurface
-    val dateFormat = TimeFormat.TIME
+  val interactionSource = remember { MutableInteractionSource() }
+  val verticalSpace = 2.dp
+  val textColor = MaterialTheme.colorScheme.onSurface
+  val dateFormat = TimeFormat.TIME
 
-    TextButton(
-        onClick = onClick,
-        interactionSource = interactionSource,
-        modifier = Modifier.fillMaxWidth(),
+  TextButton(
+    onClick = onClick,
+    interactionSource = interactionSource,
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    Column(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(verticalSpace),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(verticalSpace),
-        ) {
-            Text(
-                text = title.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.W500,
-                color = textColor,
-            )
-            Text(
-                text = formatDate(date, dateFormat),
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
-                color = textColor,
-            )
-        }
+      Text(
+        text = title.uppercase(),
+        style = MaterialTheme.typography.labelSmall,
+        fontWeight = FontWeight.W500,
+        color = textColor,
+      )
+      Text(
+        text = formatDate(date, dateFormat),
+        style = MaterialTheme.typography.bodySmall,
+        fontWeight = FontWeight.Bold,
+        color = textColor,
+      )
     }
+  }
 }
 
 @Composable
 fun TimeButtonActions(
-    startTime: LocalDateTime,
-    goal: FastGoal?,
-    onStartTimeClick: () -> Unit,
-    onGoalTimeClick: () -> Unit,
+  startTime: LocalDateTime,
+  goal: FastGoal?,
+  onStartTimeClick: () -> Unit,
+  onGoalTimeClick: () -> Unit,
 ) {
-    ButtonGroup(modifier = Modifier.fillMaxWidth()) {
-        TimeInfoDisplay(
-            title = stringResource(R.string.label_started),
-            date = startTime,
-            onClick = {
-                onStartTimeClick()
-            },
-        )
-        TimeInfoDisplay(
-            title = stringResource(R.string.label_goal),
-            date = startTime.plusHours(getHours(goal?.durationMillis)),
-            onClick = {
-                onGoalTimeClick()
-            },
-        )
-    }
+  ButtonGroup(modifier = Modifier.fillMaxWidth()) {
+    TimeInfoDisplay(
+      title = stringResource(R.string.label_started),
+      date = startTime,
+      onClick = { onStartTimeClick() },
+    )
+    TimeInfoDisplay(
+      title = stringResource(R.string.label_goal),
+      date = startTime.plusHours(getHours(goal?.durationMillis)),
+      onClick = { onGoalTimeClick() },
+    )
+  }
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL)
 @Composable
 private fun TimeButtonActionsPreview() {
-    TimeButtonActions(
-        startTime = LocalDateTime.now(),
-        goal = PredefinedFastingGoals.goalsById["16:8"],
-        onStartTimeClick = {},
-        onGoalTimeClick = {},
-    )
+  TimeButtonActions(
+    startTime = LocalDateTime.now(),
+    goal = PredefinedFastingGoals.goalsById["16:8"],
+    onStartTimeClick = {},
+    onGoalTimeClick = {},
+  )
 }

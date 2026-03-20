@@ -16,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.charliesbot.one.R
 import com.charliesbot.one.features.dashboard.TodayScreen
 import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
@@ -25,79 +24,74 @@ import com.charliesbot.shared.R as SharedR
 @ExperimentalMaterial3ExpressiveApi
 @Composable
 fun MainNavigation() {
-    val backStack = remember { mutableStateListOf<Any>(Today) }
-    val currentDestination = backStack.lastOrNull() ?: Today
+  val backStack = remember { mutableStateListOf<Any>(Today) }
+  val currentDestination = backStack.lastOrNull() ?: Today
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(SharedR.drawable.today_24px),
-                            contentDescription = stringResource(SharedR.string.nav_today),
-                        )
-                    },
-                    label = { Text(stringResource(SharedR.string.nav_today)) },
-                    selected = currentDestination == Today,
-                    onClick = {
-                        if (currentDestination != Today) {
-                            backStack.clear()
-                            backStack.add(Today)
-                        }
-                    },
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painterResource(SharedR.drawable.person_24px),
-                            contentDescription = stringResource(SharedR.string.nav_you),
-                        )
-                    },
-                    label = { Text(stringResource(SharedR.string.nav_you)) },
-                    selected = currentDestination == You,
-                    onClick = {
-                        if (currentDestination != You) {
-                            backStack.clear()
-                            backStack.add(You)
-                        }
-                    },
-                )
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painterResource(SharedR.drawable.settings_24px),
-                            contentDescription = stringResource(SharedR.string.settings_title),
-                        )
-                    },
-                    label = { Text(stringResource(SharedR.string.settings_title)) },
-                    selected = currentDestination == Settings,
-                    onClick = {
-                        if (currentDestination != Settings) {
-                            backStack.clear()
-                            backStack.add(Settings)
-                        }
-                    },
-                )
-            }
-        },
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            NavDisplay(
-                backStack = backStack,
-                onBack = { backStack.removeLastOrNull() },
-                entryProvider = entryProvider {
-                    entry<Today> {
-                        TodayScreen()
-                    }
-                    entry<You> {
-                        YouScreen()
-                    }
-                    entry<Settings> {
-                        SettingsScreen()
-                    }
-                },
+  Scaffold(
+    bottomBar = {
+      NavigationBar {
+        NavigationBarItem(
+          icon = {
+            Icon(
+              painter = painterResource(SharedR.drawable.today_24px),
+              contentDescription = stringResource(SharedR.string.nav_today),
             )
-        }
+          },
+          label = { Text(stringResource(SharedR.string.nav_today)) },
+          selected = currentDestination == Today,
+          onClick = {
+            if (currentDestination != Today) {
+              backStack.clear()
+              backStack.add(Today)
+            }
+          },
+        )
+        NavigationBarItem(
+          icon = {
+            Icon(
+              painterResource(SharedR.drawable.person_24px),
+              contentDescription = stringResource(SharedR.string.nav_you),
+            )
+          },
+          label = { Text(stringResource(SharedR.string.nav_you)) },
+          selected = currentDestination == You,
+          onClick = {
+            if (currentDestination != You) {
+              backStack.clear()
+              backStack.add(You)
+            }
+          },
+        )
+        NavigationBarItem(
+          icon = {
+            Icon(
+              painterResource(SharedR.drawable.settings_24px),
+              contentDescription = stringResource(SharedR.string.settings_title),
+            )
+          },
+          label = { Text(stringResource(SharedR.string.settings_title)) },
+          selected = currentDestination == Settings,
+          onClick = {
+            if (currentDestination != Settings) {
+              backStack.clear()
+              backStack.add(Settings)
+            }
+          },
+        )
+      }
     }
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding)) {
+      NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryProvider =
+          entryProvider {
+            entry<Today> { TodayScreen() }
+            entry<You> { YouScreen() }
+            entry<Settings> { SettingsScreen() }
+          },
+      )
+    }
+  }
 }

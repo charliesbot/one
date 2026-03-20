@@ -6,8 +6,8 @@ import com.charliesbot.shared.core.services.SmartReminderCallback
 
 class SmartReminderCallbackImpl(private val context: Context) : SmartReminderCallback {
 
-    override fun onSmartReminderSettingsChanged() {
-        // Trigger an immediate recalculation and sync
-        SmartReminderWorker.triggerImmediateRun(context)
-    }
+  override fun onSmartReminderSettingsChanged() {
+    // Trigger an immediate recalculation and sync
+    SmartReminderWorker.triggerImmediateRun(context)
+  }
 }

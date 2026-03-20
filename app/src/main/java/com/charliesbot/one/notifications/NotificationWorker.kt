@@ -24,56 +24,54 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class NotificationWorker(context: Context, workerParameters: WorkerParameters) :
-    CoroutineWorker(context, workerParameters),
-    KoinComponent {
+  CoroutineWorker(context, workerParameters), KoinComponent {
 
-    private val stringProvider: StringProvider by inject()
+  private val stringProvider: StringProvider by inject()
 
-    override suspend fun doWork(): Result {
-        if (ActivityCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.POST_NOTIFICATIONS,
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            with(NotificationManagerCompat.from(applicationContext)) {
-                notify(NOTIFICATION_ID, createNotification(parseWorkerInput(inputData)))
-            }
-        }
-
-        return Result.success()
+  override suspend fun doWork(): Result {
+    if (
+      ActivityCompat.checkSelfPermission(
+        applicationContext,
+        Manifest.permission.POST_NOTIFICATIONS,
+      ) == PackageManager.PERMISSION_GRANTED
+    ) {
+      with(NotificationManagerCompat.from(applicationContext)) {
+        notify(NOTIFICATION_ID, createNotification(parseWorkerInput(inputData)))
+      }
     }
 
-    private fun createNotification(notificationWorkerInput: NotificationWorkerInput): Notification {
-        val notificationContent = getNotificationText(notificationWorkerInput.notificationType, stringProvider)
+    return Result.success()
+  }
 
-        val mobileIntent = Intent(applicationContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+  private fun createNotification(notificationWorkerInput: NotificationWorkerInput): Notification {
+    val notificationContent =
+      getNotificationText(notificationWorkerInput.notificationType, stringProvider)
 
-        val mobilePendingIntent =
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                mobileIntent,
-                PendingIntent.FLAG_IMMUTABLE,
-            )
+    val mobileIntent =
+      Intent(applicationContext, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+      }
 
-        val wearableExtender = NotificationCompat.WearableExtender()
-            .setHintContentIntentLaunchesActivity(true)
-            .setDismissalId(
-                generateDismissalId(
-                    notificationWorkerInput.fastingStartMillis,
-                    notificationWorkerInput.notificationType,
-                ),
-            )
+    val mobilePendingIntent =
+      PendingIntent.getActivity(applicationContext, 0, mobileIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        return NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
-            .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
-            .setAutoCancel(true)
-            .setContentTitle(notificationContent.title)
-            .setContentText(notificationContent.message)
-            .setContentIntent(mobilePendingIntent)
-            .extend(wearableExtender)
-            .build()
-    }
+    val wearableExtender =
+      NotificationCompat.WearableExtender()
+        .setHintContentIntentLaunchesActivity(true)
+        .setDismissalId(
+          generateDismissalId(
+            notificationWorkerInput.fastingStartMillis,
+            notificationWorkerInput.notificationType,
+          )
+        )
+
+    return NotificationCompat.Builder(applicationContext, NotificationUtil.CHANNEL_ID)
+      .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
+      .setAutoCancel(true)
+      .setContentTitle(notificationContent.title)
+      .setContentText(notificationContent.message)
+      .setContentIntent(mobilePendingIntent)
+      .extend(wearableExtender)
+      .build()
+  }
 }

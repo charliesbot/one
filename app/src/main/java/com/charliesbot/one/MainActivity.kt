@@ -27,53 +27,52 @@ import com.charliesbot.shared.core.notifications.NotificationUtil
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MainActivity : ComponentActivity() {
-    private val requestNotificationPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                NotificationUtil.createNotificationChannel(this)
-            }
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        updateWidgetPreview(this)
-        setContent {
-            var showNotificationPermission by remember { mutableStateOf(false) }
-            var selectedItem by remember { mutableIntStateOf(0) }
-
-            LaunchedEffect(Unit) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    NotificationUtil.createNotificationChannel(this@MainActivity)
-                    return@LaunchedEffect
-                }
-
-                if (ContextCompat.checkSelfPermission(
-                        this@MainActivity,
-                        Manifest.permission.POST_NOTIFICATIONS,
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    showNotificationPermission = true
-                }
-            }
-
-            OneTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    MainNavigation()
-
-                    if (showNotificationPermission) {
-                        NotificationPermissionDialog(
-                            onDismiss = { showNotificationPermission = false },
-                            onConfirm = {
-                                showNotificationPermission = false
-                                requestNotificationPermission.launch(
-                                    Manifest.permission.POST_NOTIFICATIONS,
-                                )
-                            },
-                        )
-                    }
-                }
-            }
-        }
+  private val requestNotificationPermission =
+    registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+      if (isGranted) {
+        NotificationUtil.createNotificationChannel(this)
+      }
     }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
+    updateWidgetPreview(this)
+    setContent {
+      var showNotificationPermission by remember { mutableStateOf(false) }
+      var selectedItem by remember { mutableIntStateOf(0) }
+
+      LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+          NotificationUtil.createNotificationChannel(this@MainActivity)
+          return@LaunchedEffect
+        }
+
+        if (
+          ContextCompat.checkSelfPermission(
+            this@MainActivity,
+            Manifest.permission.POST_NOTIFICATIONS,
+          ) != PackageManager.PERMISSION_GRANTED
+        ) {
+          showNotificationPermission = true
+        }
+      }
+
+      OneTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+          MainNavigation()
+
+          if (showNotificationPermission) {
+            NotificationPermissionDialog(
+              onDismiss = { showNotificationPermission = false },
+              onConfirm = {
+                showNotificationPermission = false
+                requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+              },
+            )
+          }
+        }
+      }
+    }
+  }
 }

@@ -24,45 +24,44 @@ import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.shared.core.notifications.NotificationUtil
 
 class MainActivity : ComponentActivity() {
-    private val requestNotificationPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                NotificationUtil.createNotificationChannel(this)
-            }
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-
-        super.onCreate(savedInstanceState)
-
-        setTheme(android.R.style.Theme_DeviceDefault)
-
-        setContent {
-            var showNotificationPermission by remember { mutableStateOf(false) }
-            LaunchedEffect(Unit) {
-                if (ContextCompat.checkSelfPermission(
-                        this@MainActivity,
-                        Manifest.permission.POST_NOTIFICATIONS,
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    showNotificationPermission = true
-                }
-            }
-
-            OneTheme {
-                WearNavigation()
-                NotificationPermissionDialog(
-                    isVisible = showNotificationPermission,
-                    onDismiss = { showNotificationPermission = false },
-                    onConfirm = {
-                        showNotificationPermission = false
-                        requestNotificationPermission.launch(
-                            Manifest.permission.POST_NOTIFICATIONS,
-                        )
-                    },
-                )
-            }
-        }
+  private val requestNotificationPermission =
+    registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+      if (isGranted) {
+        NotificationUtil.createNotificationChannel(this)
+      }
     }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    installSplashScreen()
+
+    super.onCreate(savedInstanceState)
+
+    setTheme(android.R.style.Theme_DeviceDefault)
+
+    setContent {
+      var showNotificationPermission by remember { mutableStateOf(false) }
+      LaunchedEffect(Unit) {
+        if (
+          ContextCompat.checkSelfPermission(
+            this@MainActivity,
+            Manifest.permission.POST_NOTIFICATIONS,
+          ) != PackageManager.PERMISSION_GRANTED
+        ) {
+          showNotificationPermission = true
+        }
+      }
+
+      OneTheme {
+        WearNavigation()
+        NotificationPermissionDialog(
+          isVisible = showNotificationPermission,
+          onDismiss = { showNotificationPermission = false },
+          onConfirm = {
+            showNotificationPermission = false
+            requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+          },
+        )
+      }
+    }
+  }
 }

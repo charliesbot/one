@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class GoalResolver(customGoalRepository: CustomGoalRepository) {
-    val allGoals: Flow<List<FastGoal>> = customGoalRepository.customGoals
-        .map { customGoals ->
-            PredefinedFastingGoals.registerCustomGoals(customGoals)
-            PredefinedFastingGoals.allGoals + customGoals
-        }
+  val allGoals: Flow<List<FastGoal>> =
+    customGoalRepository.customGoals.map { customGoals ->
+      PredefinedFastingGoals.registerCustomGoals(customGoals)
+      PredefinedFastingGoals.allGoals + customGoals
+    }
 }

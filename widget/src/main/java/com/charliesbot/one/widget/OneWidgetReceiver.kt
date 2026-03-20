@@ -8,14 +8,18 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 
 class OneWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget
-        get() = OneWidget()
+  override val glanceAppWidget: GlanceAppWidget
+    get() = OneWidget()
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        Log.d(
-            LOG_TAG,
-            "OneWidgetReceiver: onUpdate CALLED by system. AppWidgetIds: ${appWidgetIds.joinToString()}",
-        )
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
-    }
+  override fun onUpdate(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetIds: IntArray,
+  ) {
+    Log.d(
+      LOG_TAG,
+      "OneWidgetReceiver: onUpdate CALLED by system. AppWidgetIds: ${appWidgetIds.joinToString()}",
+    )
+    super.onUpdate(context, appWidgetManager, appWidgetIds)
+  }
 }

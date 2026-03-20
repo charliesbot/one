@@ -29,65 +29,63 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun WearGoalOptionsScreen(viewModel: WearTodayViewModel = koinViewModel(), navController: NavController) {
-    val scope = rememberCoroutineScope()
-    val fastGoals by viewModel.allGoals.collectAsStateWithLifecycle()
-    val columnState = rememberTransformingLazyColumnState()
-    val contentPadding = rememberResponsiveColumnPadding(
-        first = ColumnItemType.ListHeader,
-        last = ColumnItemType.Button,
-    )
-    val transformationSpec = rememberTransformationSpec()
-    ScreenScaffold(scrollState = columnState, contentPadding = contentPadding) {
-        TransformingLazyColumn(state = columnState, contentPadding = contentPadding) {
-            item {
-                ListHeader(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .transformedHeight(this, transformationSpec),
-                    transformation = SurfaceTransformation(transformationSpec),
-                ) {
-                    Text(
-                        text = stringResource(R.string.select_goal),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-            items(items = fastGoals) { goal ->
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = goal.color.copy(alpha = 0.8f),
-                        contentColor = MaterialTheme.colorScheme.onBackground,
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .transformedHeight(this, transformationSpec),
-                    transformation = SurfaceTransformation(transformationSpec),
-
-                    onClick = {
-                        scope.launch {
-                            viewModel.updateFastingGoal(goal.id)
-                            navController.popBackStack()
-                        }
-                    },
-                ) {
-                    val hours = stringResource(R.string.hours)
-                    val label = if (goal.titleText != null) {
-                        "${goal.titleText} ${goal.durationDisplay} $hours"
-                    } else {
-                        "${goal.durationDisplay} $hours"
-                    }
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
+fun WearGoalOptionsScreen(
+  viewModel: WearTodayViewModel = koinViewModel(),
+  navController: NavController,
+) {
+  val scope = rememberCoroutineScope()
+  val fastGoals by viewModel.allGoals.collectAsStateWithLifecycle()
+  val columnState = rememberTransformingLazyColumnState()
+  val contentPadding =
+    rememberResponsiveColumnPadding(first = ColumnItemType.ListHeader, last = ColumnItemType.Button)
+  val transformationSpec = rememberTransformationSpec()
+  ScreenScaffold(scrollState = columnState, contentPadding = contentPadding) {
+    TransformingLazyColumn(state = columnState, contentPadding = contentPadding) {
+      item {
+        ListHeader(
+          modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+          transformation = SurfaceTransformation(transformationSpec),
+        ) {
+          Text(
+            text = stringResource(R.string.select_goal),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+          )
         }
+      }
+      items(items = fastGoals) { goal ->
+        Button(
+          colors =
+            ButtonDefaults.buttonColors(
+              containerColor = goal.color.copy(alpha = 0.8f),
+              contentColor = MaterialTheme.colorScheme.onBackground,
+            ),
+          modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+          transformation = SurfaceTransformation(transformationSpec),
+          onClick = {
+            scope.launch {
+              viewModel.updateFastingGoal(goal.id)
+              navController.popBackStack()
+            }
+          },
+        ) {
+          val hours = stringResource(R.string.hours)
+          val label =
+            if (goal.titleText != null) {
+              "${goal.titleText} ${goal.durationDisplay} $hours"
+            } else {
+              "${goal.durationDisplay} $hours"
+            }
+          Text(
+            text = label,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+        }
+      }
     }
+  }
 }
 
 // @Preview(device = WearDevices.LARGE_ROUND, showSystemUi = true)

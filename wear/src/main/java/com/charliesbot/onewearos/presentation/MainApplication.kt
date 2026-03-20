@@ -13,36 +13,32 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 
-class MainApplication :
-    Application(),
-    Configuration.Provider {
-    override fun onCreate() {
-        super.onCreate()
+class MainApplication : Application(), Configuration.Provider {
+  override fun onCreate() {
+    super.onCreate()
 
-        disableNotificationBridge()
+    disableNotificationBridge()
 
-        // Create notification channel early so smart reminders can use it
-        NotificationUtil.createNotificationChannel(this)
+    // Create notification channel early so smart reminders can use it
+    NotificationUtil.createNotificationChannel(this)
 
-        startKoin {
-            androidLogger()
-            androidContext(this@MainApplication)
-            modules(sharedModule, wearAppModule, wearDashboardModule)
-        }
+    startKoin {
+      androidLogger()
+      androidContext(this@MainApplication)
+      modules(sharedModule, wearAppModule, wearDashboardModule)
     }
+  }
 
-    private fun disableNotificationBridge() {
-        try {
-            val config =
-                BridgingConfig.Builder(this, false)
-                    .build()
-            BridgingManager.fromContext(this).setConfig(config)
-            Log.d("WatchApplication", "Notification bridging disabled successfully.")
-        } catch (e: Exception) {
-            Log.e("WatchApplication", "Failed to disable notification bridging", e)
-        }
+  private fun disableNotificationBridge() {
+    try {
+      val config = BridgingConfig.Builder(this, false).build()
+      BridgingManager.fromContext(this).setConfig(config)
+      Log.d("WatchApplication", "Notification bridging disabled successfully.")
+    } catch (e: Exception) {
+      Log.e("WatchApplication", "Failed to disable notification bridging", e)
     }
+  }
 
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder().build()
+  override val workManagerConfiguration: Configuration
+    get() = Configuration.Builder().build()
 }

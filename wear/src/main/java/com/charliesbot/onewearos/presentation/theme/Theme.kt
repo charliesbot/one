@@ -7,9 +7,9 @@ import androidx.wear.compose.material3.dynamicColorScheme
 
 @Composable
 fun OneTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = dynamicColorScheme(LocalContext.current) ?: MaterialTheme.colorScheme,
-        typography = Typography,
-        content = content,
-    )
+  MaterialTheme(
+    colorScheme = dynamicColorScheme(LocalContext.current) ?: MaterialTheme.colorScheme,
+    typography = Typography,
+    content = content,
+  )
 }
