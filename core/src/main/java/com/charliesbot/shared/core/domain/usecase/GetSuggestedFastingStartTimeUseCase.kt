@@ -32,12 +32,7 @@ class GetSuggestedFastingStartTimeUseCase(
     private const val MINUTES_IN_DAY = 1440
   }
 
-  /**
-   * Execute the use case to get a suggested fasting start time for today.
-   *
-   * @return [SuggestedFastingTime] containing the suggested time and reasoning.
-   */
-  suspend fun execute(): SuggestedFastingTime {
+  suspend operator fun invoke(): SuggestedFastingTime {
     val mode = settingsRepository.smartReminderMode.first()
     val now = System.currentTimeMillis()
     val cutoffTime = now - (HISTORY_DAYS * 24 * 60 * 60 * 1000L)
