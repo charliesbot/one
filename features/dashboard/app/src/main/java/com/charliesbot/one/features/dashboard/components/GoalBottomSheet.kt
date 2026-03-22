@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.CustomGoalCard
@@ -314,4 +315,22 @@ private fun CustomGoalFormView(
       }
     }
   }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewGoalSelectionView() {
+  GoalSelectionView(
+    initialSelectedGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
+    allGoals = PredefinedFastingGoals.allGoals,
+    onSave = {},
+    onCustomClick = {},
+    onEditCustomGoal = {},
+  )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewCustomGoalFormView() {
+  CustomGoalFormView(editingGoal = null, onSave = {}, onDelete = null)
 }
