@@ -106,7 +106,7 @@ class TodayViewModel(
   private fun loadSuggestedFastingTime() {
     viewModelScope.launch {
       try {
-        val suggestion = getSuggestedFastingStartTimeUseCase.execute()
+        val suggestion = getSuggestedFastingStartTimeUseCase()
         _suggestedFastingTime.value = suggestion
         Log.d(
           LOG_TAG,

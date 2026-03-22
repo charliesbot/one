@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.features.profile.components.FastingDetailsBottomSheet
@@ -24,11 +25,32 @@ import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingMonthCalendar
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+  YouScreenContent(
+    uiState = uiState,
+    onDaySelected = { viewModel.onDaySelected(it) },
+    onNextMonth = { viewModel.onNextMonth() },
+    onPreviousMonth = { viewModel.onPreviousMonth() },
+    onDeleteFastingEntry = { viewModel.onDeleteFastingEntry(it) },
+    onUpdateFastingEntry = { original, newStart, newEnd, goalId ->
+      viewModel.onUpdateFastingEntry(original, newStart, newEnd, goalId)
+    },
+  )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun YouScreenContent(
+  uiState: CalendarUiState,
+  onDaySelected: (com.charliesbot.shared.core.components.FastingDayData?) -> Unit,
+  onNextMonth: () -> Unit,
+  onPreviousMonth: () -> Unit,
+  onDeleteFastingEntry: (Long) -> Unit,
+  onUpdateFastingEntry: (Long, Long, Long, String) -> Unit,
+) {
   Scaffold(
     topBar = {
       TopAppBar(
@@ -51,11 +73,11 @@ fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
           onDayClick = { date ->
             val fastingData = uiState.fastingData[date]
             if (fastingData != null) {
-              viewModel.onDaySelected(fastingData)
+              onDaySelected(fastingData)
             }
           },
-          onNextMonth = { viewModel.onNextMonth() },
-          onPreviousMonth = { viewModel.onPreviousMonth() },
+          onNextMonth = onNextMonth,
+          onPreviousMonth = onPreviousMonth,
         )
       }
     }
@@ -64,35 +86,41 @@ fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
     uiState.selectedDay?.let { selectedDay ->
       FastingDetailsBottomSheet(
         fastingData = selectedDay,
-        onDismiss = { viewModel.onDaySelected(null) },
+        onDismiss = { onDaySelected(null) },
         onDelete = {
-          selectedDay.startTimeEpochMillis?.let { startTime ->
-            viewModel.onDeleteFastingEntry(startTime)
-          }
+          selectedDay.startTimeEpochMillis?.let { startTime -> onDeleteFastingEntry(startTime) }
         },
         onUpdateStartTime = { newStartTime ->
           selectedDay.startTimeEpochMillis?.let { originalStart ->
             selectedDay.endTimeEpochMillis?.let { endTime ->
-              viewModel.onUpdateFastingEntry(
-                originalStartTime = originalStart,
-                newStartTime = newStartTime,
-                newEndTime = endTime,
-                goalId = selectedDay.goalId ?: "16:8",
+              onUpdateFastingEntry(
+                originalStart,
+                newStartTime,
+                endTime,
+                selectedDay.goalId ?: "16:8",
               )
             }
           }
         },
         onUpdateEndTime = { newEndTime ->
           selectedDay.startTimeEpochMillis?.let { startTime ->
-            viewModel.onUpdateFastingEntry(
-              originalStartTime = startTime,
-              newStartTime = startTime,
-              newEndTime = newEndTime,
-              goalId = selectedDay.goalId ?: "16:8",
-            )
+            onUpdateFastingEntry(startTime, startTime, newEndTime, selectedDay.goalId ?: "16:8")
           }
         },
       )
     }
   }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewYouScreen() {
+  YouScreenContent(
+    uiState = CalendarUiState(),
+    onDaySelected = {},
+    onNextMonth = {},
+    onPreviousMonth = {},
+    onDeleteFastingEntry = {},
+    onUpdateFastingEntry = { _, _, _, _ -> },
+  )
 }

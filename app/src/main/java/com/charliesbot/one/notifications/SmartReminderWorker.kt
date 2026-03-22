@@ -47,7 +47,7 @@ class SmartReminderWorker(context: Context, workerParameters: WorkerParameters) 
 
     return try {
       // 1. Calculate the suggested start time
-      val suggestion = getSuggestedFastingStartTimeUseCase.execute()
+      val suggestion = getSuggestedFastingStartTimeUseCase()
       Log.d(
         LOG_TAG,
         "SmartReminderWorker: Suggested time calculated - ${suggestion.suggestedTimeMinutes} minutes, reason: ${suggestion.reasoning}",

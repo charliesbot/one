@@ -233,7 +233,7 @@ class SettingsViewModel(
   private fun refreshSuggestion() {
     viewModelScope.launch {
       try {
-        _suggestedFastingTime.value = getSuggestedFastingStartTimeUseCase.execute()
+        _suggestedFastingTime.value = getSuggestedFastingStartTimeUseCase()
       } catch (e: Exception) {
         Log.e(LOG_TAG, "SettingsViewModel: Failed to load suggestion", e)
       }

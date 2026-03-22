@@ -48,7 +48,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(emptyList())
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.BEDTIME_BASED, result.source)
@@ -66,7 +66,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(emptyList())
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.BEDTIME_BASED, result.source)
@@ -84,7 +84,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(emptyList())
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.FIXED_TIME, result.source)
@@ -110,7 +110,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(records)
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.MOVING_AVERAGE, result.source)
@@ -136,7 +136,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
       every { historyRepository.getAllHistory() } returns flowOf(records)
 
       // Act
-      val result = useCase.execute()
+      val result = useCase()
 
       // Assert
       assertEquals(SuggestionSource.BEDTIME_BASED, result.source)
@@ -160,7 +160,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(records)
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.MOVING_AVERAGE, result.source)
@@ -178,7 +178,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(records)
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.BEDTIME_BASED, result.source)
@@ -203,7 +203,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(records)
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert
     assertEquals(SuggestionSource.MOVING_AVERAGE, result.source)
@@ -235,7 +235,7 @@ class GetSuggestedFastingStartTimeUseCaseTest {
     every { historyRepository.getAllHistory() } returns flowOf(records)
 
     // Act
-    val result = useCase.execute()
+    val result = useCase()
 
     // Assert: Only 2 recent records, so should fall back to bedtime
     assertEquals(SuggestionSource.BEDTIME_BASED, result.source)
