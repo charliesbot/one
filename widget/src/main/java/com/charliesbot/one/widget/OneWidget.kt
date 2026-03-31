@@ -53,14 +53,7 @@ object ProgressBitmap {
 class OneWidget : GlanceAppWidget(), KoinComponent {
   private val fastingDataRepository: FastingDataRepository by inject()
 
-  override val sizeMode: SizeMode =
-    SizeMode.Responsive(
-      setOf(
-        OneWidgetSize.SMALL_SQUARE,
-        OneWidgetSize.HORIZONTAL_RECTANGLE,
-        OneWidgetSize.BIG_SQUARE,
-      )
-    )
+  override val sizeMode: SizeMode = SizeMode.Exact
 
   override suspend fun provideGlance(context: Context, id: GlanceId) {
     provideContent {
