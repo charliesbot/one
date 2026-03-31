@@ -85,8 +85,6 @@ android {
 
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
-ksp { arg("KOIN_CONFIG_CHECK", "true") }
-
 dependencies {
   implementation(platform(libs.firebase.bom))
   implementation(platform(libs.koin.bom))
@@ -94,7 +92,6 @@ dependencies {
   implementation(libs.koin.core.coroutines)
   implementation(libs.koin.androidx.workmanager)
   implementation(libs.koin.androidx.compose)
-  implementation(libs.koin.annotations)
   implementation(libs.play.services.wearable)
   implementation(libs.androidx.compose.navigation)
   implementation(platform(libs.androidx.compose.bom))
