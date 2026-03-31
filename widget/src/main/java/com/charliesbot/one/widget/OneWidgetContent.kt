@@ -58,41 +58,40 @@ fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
-          modifier =
-            GlanceModifier.size(squareSide)
-              .cornerRadius(16.dp)
-              .background(GlanceTheme.colors.widgetBackground)
-              .clickable(
-                actionStartActivity(
-                  ComponentName(context.packageName, "com.charliesbot.one.MainActivity")
-                )
-              ),
-          horizontalAlignment = Alignment.CenterHorizontally,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          WidgetProgressBar(
+      Column(
+        modifier =
+          GlanceModifier.size(squareSide)
+            .cornerRadius(16.dp)
+            .background(GlanceTheme.colors.widgetBackground)
+            .clickable(
+              actionStartActivity(
+                ComponentName(context.packageName, "com.charliesbot.one.MainActivity")
+              )
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        WidgetProgressBar(
+          isFasting = fastingData.isFasting,
+          elapsedTime = elapsedMillis,
+          fastingGoalMillis = selectedGoal.durationMillis,
+          isGoalMet = isGoalMet,
+          ringDp = ringDp,
+          strokeDp = strokeDp,
+        )
+        if (showText) {
+          Spacer(modifier = GlanceModifier.height((squareSide.value * 0.04f).dp))
+          WidgetFooter(
+            context = context,
             isFasting = fastingData.isFasting,
-            elapsedTime = elapsedMillis,
-            fastingGoalMillis = selectedGoal.durationMillis,
-            isGoalMet = isGoalMet,
-            ringDp = ringDp,
-            strokeDp = strokeDp,
+            hours = hours,
+            squareSide = squareSide,
           )
-          if (showText) {
-            Spacer(modifier = GlanceModifier.height((squareSide.value * 0.04f).dp))
-            WidgetFooter(
-              context = context,
-              isFasting = fastingData.isFasting,
-              hours = hours,
-              squareSide = squareSide,
-            )
-          }
         }
       }
     }
   }
-
+}
 
 @Composable
 private fun WidgetProgressBar(
