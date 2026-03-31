@@ -16,17 +16,15 @@ import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.components.Scaffold
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.padding
+import androidx.glance.layout.height
 import androidx.glance.layout.size
-import androidx.glance.layout.width
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
@@ -48,88 +46,46 @@ fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
   val isGoalMet = fastingData.isFasting && hours <= 0
 
   val size = LocalSize.current
-  val isSmallSquare =
-    size.width <= OneWidgetSize.SMALL_SQUARE.width &&
-      size.height <= OneWidgetSize.SMALL_SQUARE.height
-  val showText = size.width >= OneWidgetSize.HORIZONTAL_RECTANGLE.width
-  val useVerticalLayout = size.height >= OneWidgetSize.BIG_SQUARE.height
+  val squareSide = minOf(size.width, size.height)
+  val showText = squareSide >= OneWidgetSize.TEXT_THRESHOLD
 
-  // Scale ring size based on available space
-  val ringDp =
-    when {
-      isSmallSquare -> 36.dp
-      size.height <= OneWidgetSize.HORIZONTAL_RECTANGLE.height -> 48.dp
-      else -> 60.dp
-    }
-  val strokeDp =
-    when {
-      isSmallSquare -> 5.dp
-      size.height <= OneWidgetSize.HORIZONTAL_RECTANGLE.height -> 6.dp
-      else -> 10.dp
-    }
-
-  // Dynamic padding - minimal for small widgets
-  val horizontalPadding = if (isSmallSquare) 4.dp else 16.dp
-  val verticalPadding =
-    if (isSmallSquare) {
-      4.dp
-    } else if (useVerticalLayout) {
-      24.dp
-    } else {
-      8.dp
-    }
+  val ringDp = (squareSide.value * if (showText) 0.35f else 0.65f).dp
+  val strokeDp = (squareSide.value * 0.07f).dp
 
   GlanceTheme {
-    Scaffold(
-      modifier =
-        GlanceModifier.background(GlanceTheme.colors.widgetBackground)
-          .clickable(
-            actionStartActivity(
-              ComponentName("com.charliesbot.one", "com.charliesbot.one.MainActivity")
-            )
-          )
+    Row(
+      modifier = GlanceModifier.fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-      if (useVerticalLayout) {
-        // Vertical layout for tall widgets (2x2+)
-        Column(
-          modifier =
-            GlanceModifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)
-              .fillMaxSize(),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          WidgetProgressBar(
+      Column(
+        modifier =
+          GlanceModifier.size(squareSide)
+            .cornerRadius(16.dp)
+            .background(GlanceTheme.colors.widgetBackground)
+            .clickable(
+              actionStartActivity(
+                ComponentName(context.packageName, "com.charliesbot.one.MainActivity")
+              )
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        WidgetProgressBar(
+          isFasting = fastingData.isFasting,
+          elapsedTime = elapsedMillis,
+          fastingGoalMillis = selectedGoal.durationMillis,
+          isGoalMet = isGoalMet,
+          ringDp = ringDp,
+          strokeDp = strokeDp,
+        )
+        if (showText) {
+          Spacer(modifier = GlanceModifier.height((squareSide.value * 0.04f).dp))
+          WidgetFooter(
+            context = context,
             isFasting = fastingData.isFasting,
-            elapsedTime = elapsedMillis,
-            fastingGoalMillis = selectedGoal.durationMillis,
-            isGoalMet = isGoalMet,
-            ringDp = ringDp,
-            strokeDp = strokeDp,
-            alignEnd = true,
-          )
-          Spacer(modifier = GlanceModifier.defaultWeight())
-          WidgetFooter(context, isFasting = fastingData.isFasting, hours = hours, isWide = false)
-        }
-      } else {
-        // Horizontal layout for short widgets
-        Row(
-          modifier =
-            GlanceModifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)
-              .fillMaxSize(),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-          if (showText) {
-            WidgetFooter(context, isFasting = fastingData.isFasting, hours = hours, isWide = true)
-            Spacer(modifier = GlanceModifier.width(16.dp))
-          }
-          WidgetProgressBar(
-            isFasting = fastingData.isFasting,
-            elapsedTime = elapsedMillis,
-            fastingGoalMillis = selectedGoal.durationMillis,
-            isGoalMet = isGoalMet,
-            ringDp = ringDp,
-            strokeDp = strokeDp,
-            alignEnd = false,
+            hours = hours,
+            squareSide = squareSide,
           )
         }
       }
@@ -145,7 +101,6 @@ private fun WidgetProgressBar(
   isGoalMet: Boolean,
   ringDp: Dp,
   strokeDp: Dp,
-  alignEnd: Boolean,
 ) {
   val context = LocalContext.current
   val progress = calculateProgressFraction(elapsedTime, fastingGoalMillis)
@@ -160,10 +115,8 @@ private fun WidgetProgressBar(
       trackComposeColor
     }
 
-  // Use density for crisp rendering
   val density = context.resources.displayMetrics.density
 
-  // Create bitmap synchronously for preview - this will work in both preview and runtime
   val ringBitmap =
     remember(progress, indicatorComposeColor, trackComposeColor, density) {
       val sizePx = (ringDp.value * density).toInt()
@@ -190,33 +143,30 @@ private fun WidgetProgressBar(
       context.getString(SharedR.string.widget_not_fasting)
     }
 
-  Row(
-    horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
-    modifier = if (alignEnd) GlanceModifier.fillMaxWidth() else GlanceModifier,
-  ) {
-    Image(
-      provider = ImageProvider(ringBitmap),
-      contentDescription = contentDescription,
-      modifier = GlanceModifier.size(ringDp),
-    )
-  }
+  Image(
+    provider = ImageProvider(ringBitmap),
+    contentDescription = contentDescription,
+    modifier = GlanceModifier.size(ringDp),
+  )
 }
 
 @Composable
-private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWide: Boolean) {
+private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, squareSide: Dp) {
   val actualHours = hours.coerceAtLeast(0)
 
-  val largeTextSize = if (isWide) 32.sp else 60.sp
-  val smallTextSize = if (isWide) 12.sp else 20.sp
-  val goalMetTextSize = if (isWide) 14.sp else 30.sp
+  // Convert dp-based sizes to sp to cancel out font scaling.
+  // dp_value / fontScale gives sp that renders at the intended dp size.
+  val fontScale = context.resources.configuration.fontScale
+  val largeTextSize = ((squareSide.value * 0.22f).coerceIn(20f, 60f) / fontScale).sp
+  val smallTextSize = ((squareSide.value * 0.09f).coerceIn(8f, 24f) / fontScale).sp
+  val goalMetTextSize = ((squareSide.value * 0.12f).coerceIn(10f, 30f) / fontScale).sp
 
   if (isFasting && actualHours <= 0) {
-    return Row {
+    return Column(horizontalAlignment = Alignment.CenterHorizontally) {
       Text(
         text = context.getString(SharedR.string.widget_goal_met_part_1),
         style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = goalMetTextSize),
       )
-      Spacer(modifier = GlanceModifier.width(6.dp))
       Text(
         text = context.getString(SharedR.string.widget_goal_met_part_2),
         style =
@@ -230,7 +180,7 @@ private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWi
   }
 
   if (isFasting) {
-    return Column {
+    return Column(horizontalAlignment = Alignment.CenterHorizontally) {
       Text(
         text = actualHours.toString(),
         style =
@@ -261,7 +211,7 @@ private fun WidgetFooter(context: Context, isFasting: Boolean, hours: Long, isWi
     style =
       TextStyle(
         color = GlanceTheme.colors.onSurface,
-        fontSize = if (isWide) 18.sp else 24.sp,
+        fontSize = goalMetTextSize,
         fontWeight = FontWeight.Bold,
       ),
   )
@@ -271,13 +221,14 @@ val widgetMockFastingData =
   FastingDataItem(
     fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
     isFasting = true,
-    startTimeInMillis = System.currentTimeMillis() - (12 * 60 * 60 * 1000L), // 12 hours ago
+    startTimeInMillis = System.currentTimeMillis() - (12 * 60 * 60 * 1000L),
   )
 
 @OptIn(ExperimentalGlancePreviewApi::class)
-@Preview(widthDp = 57, heightDp = 57) // Small square (1x1)
-@Preview(widthDp = 130, heightDp = 57) // Horizontal rectangle (Nx1)
-@Preview(widthDp = 130, heightDp = 130) // Big square (2x2+)
+@Preview(widthDp = 57, heightDp = 57)
+@Preview(widthDp = 200, heightDp = 57)
+@Preview(widthDp = 130, heightDp = 130)
+@Preview(widthDp = 300, heightDp = 130)
 @Composable
 private fun OneWidgetContentPreview() {
   OneWidgetContent(fastingData = widgetMockFastingData, context = LocalContext.current)
