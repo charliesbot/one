@@ -43,7 +43,6 @@ dependencies {
   implementation(libs.koin.core.coroutines)
   implementation(libs.koin.androidx.workmanager)
   implementation(libs.koin.androidx.compose)
-  implementation(libs.koin.annotations)
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.play.services.wearable)
   implementation(libs.androidx.core.ktx)

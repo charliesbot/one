@@ -1,58 +1,51 @@
 [versions]
 agp = "8.13.1"
-datastorePreferences = "1.2.0"
-firebaseBom = "34.10.0"
+datastorePreferences = "1.2.1"
+firebaseBom = "34.11.0"
 glanceAppwidget = "1.2.0-rc01"
-koinBom = "4.1.1"
-kotlin = "2.3.10"
+koinBom = "4.2.0"
+kotlin = "2.3.20"
 ksp = "2.3.0"
-coreKtx = "1.17.0"
+coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 kotlinxCoroutines = "1.10.2"
 mockk = "1.14.9"
 lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.4"
-composeBom = "2026.02.01"
-koin-annotations = "2.3.1"
+activityCompose = "1.13.0"
+composeBom = "2026.03.01"
 playServicesWearable = "19.0.0"
 startupRuntime = "1.2.0"
 coreSplashscreen = "1.2.0"
-tiles = "1.5.0"
-tilesMaterial = "1.5.0"
-tilesTooling = "1.5.0"
-tilesToolingPreview = "1.5.0"
+tiles = "1.6.0"
 horologistComposeTools = "0.7.15"
 horologistTiles = "0.7.15"
 watchfaceComplicationsDataSourceKtx = "1.3.0"
 appcompat = "1.7.1"
 composeMaterial = "1.13.0"
-runtimeAndroid = "1.10.4"
-uiTooling = "1.10.4"
+runtimeAndroid = "1.10.6"
+uiTooling = "1.10.6"
 wearPhoneInteractions = "1.1.0"
-workRuntimeKtx = "2.11.1"
+workRuntimeKtx = "2.11.2"
 firebaseCrashlytics = "20.0.4"
 googleGmsGoogleServices = "4.4.4"
 googleFirebaseCrashlytics = "3.0.6"
 room = "2.8.4"
 room-plugin = "2.8.4"
-spotless = "8.2.1"
+spotless = "8.4.0"
 ktfmt = "0.54"
 # navigation compose 3
 nav3Core = "1.0.1"
 lifecycleViewmodelNav3 = "2.10.0"
-kotlinSerialization = "2.3.10"
+kotlinSerialization = "2.3.20"
 kotlinxSerializationCore = "1.10.0"
 material3Adaptive = "1.3.0-alpha09"
 # wearos
-wearCompose = "1.5.6"
-wearComposeMaterial = "1.5.6"
-wearComposeNavigation = "1.5.6"
+wearCompose = "1.6.0"
 wearToolingPreview = "1.0.0"
 
 [libraries]
-androidx-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "wearComposeNavigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
@@ -81,7 +74,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 # TODO - charliesbot: Remove material3 version override when it reaches stable
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.5.0-alpha15" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.5.0-alpha16" }
 # End TODO
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
@@ -92,18 +85,17 @@ koin-test = { module = "io.insert-koin:koin-test" }
 kotlinx-coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }           # version comes from the BOM
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services" }
-koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
-koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations" }
 androidx-wear-ongoing = { group = "androidx.wear", name = "wear-ongoing", version = "1.1.0" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
-androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "wearComposeMaterial" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "wearCompose" }
 androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "wearCompose" }
+androidx-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "wearCompose" }
 androidx-wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-tiles = { group = "androidx.wear.tiles", name = "tiles", version.ref = "tiles" }
-androidx-tiles-material = { group = "androidx.wear.tiles", name = "tiles-material", version.ref = "tilesMaterial" }
-androidx-tiles-tooling = { group = "androidx.wear.tiles", name = "tiles-tooling", version.ref = "tilesTooling" }
-androidx-tiles-tooling-preview = { group = "androidx.wear.tiles", name = "tiles-tooling-preview", version.ref = "tilesToolingPreview" }
+androidx-tiles-material = { group = "androidx.wear.tiles", name = "tiles-material", version.ref = "tiles" }
+androidx-tiles-tooling = { group = "androidx.wear.tiles", name = "tiles-tooling", version.ref = "tiles" }
+androidx-tiles-tooling-preview = { group = "androidx.wear.tiles", name = "tiles-tooling-preview", version.ref = "tiles" }
 horologist-compose-tools = { group = "com.google.android.horologist", name = "horologist-compose-tools", version.ref = "horologistComposeTools" }
 horologist-compose-layout = { group = "com.google.android.horologist", name = "horologist-compose-layout", version.ref = "horologistComposeTools" }
 horologist-tiles = { group = "com.google.android.horologist", name = "horologist-tiles", version.ref = "horologistTiles" }
