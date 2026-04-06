@@ -4,27 +4,15 @@ Kotlin Android + Wear OS fasting tracker. Jetpack Compose UI, Koin DI, Room DB, 
 
 ## Before You Start
 
-1. Read `docs/ARCHITECTURE.md` for the full project structure
-2. Create a feature branch from `main`
-3. Ask: **does this change need to sync between phone and watch?**
-
-## Commands
-
-```bash
-./gradlew app:assembleDebug              # Build phone app
-./gradlew wear:assembleDebug             # Build wear app
-./gradlew app:installDebug               # Install phone app on device
-./gradlew wear:installDebug              # Install wear app on device
-./gradlew clean                          # Clean build
-```
+1. Read `@docs/ARCHITECTURE.md` for the full project structure
+2. Ask: **does this change need to sync between phone and watch?**
 
 ## Do Not
 
 - **Break sync** between phone and watch — all fasting state changes MUST propagate via Wearable Data Layer
 - **Forget UI component updates** after data changes — update ALL of: widgets (`WidgetUpdateManager`), complications (`ComplicationUpdateManager`), tiles (`TileService.requestUpdate()`), ongoing activities (`OngoingActivityService`)
 - **Omit timestamps** in sync updates — required for conflict resolution
-- **Create local-only state** that should be synced
-- **Use blocking calls** — use coroutines and Flows everywhere
+- **Create local-only state** that should be synced — use coroutines and Flows everywhere, never blocking calls
 - **Add dependencies** without going through `gradle/libs.versions.toml` first
 - **Skip Koin registration** for new ViewModels or repositories
 - **Filter incorrectly** in listener services — always filter local events to prevent sync loops
@@ -55,10 +43,10 @@ wear ──→ features:dashboard:wear ──→ core
 
 ### Key patterns
 
-- Repository pattern for data access; repositories return `Flow`
-- ViewModels manage UI state with `StateFlow`/`SharedFlow`
-- Koin modules: `AppModule`, `WearAppModule`, `SharedModule`, `DashboardModule`, `WearDashboardModule`, `ProfileModule`, `SettingsModule` — use `koinViewModel()` in Compose
-- Shared models live in `core/src/main/java/.../core/models`; repository interfaces in `core/src/main/java/.../core/data/repositories`
+- Return `Flow` from all repository methods
+- Manage UI state with `StateFlow`/`SharedFlow` in ViewModels
+- Use `koinViewModel()` in Compose — register in the appropriate Koin module: `AppModule`, `WearAppModule`, `SharedModule`, `DashboardModule`, `WearDashboardModule`, `ProfileModule`, `SettingsModule`
+- Place shared models in `core/src/main/java/.../core/models`; repository interfaces in `core/src/main/java/.../core/data/repositories`
 
 ### Data sync
 
@@ -72,27 +60,32 @@ wear ──→ features:dashboard:wear ──→ core
 - Minimum completed fast: 13 hours
 - Spanish localization (`values-es`) in all three source modules
 
+## Commands
+
+```bash
+./gradlew app:assembleDebug              # Build phone app
+./gradlew wear:assembleDebug             # Build wear app
+./gradlew app:installDebug               # Install phone app on device
+./gradlew wear:installDebug              # Install wear app on device
+./gradlew clean                          # Clean build
+```
+
 ## Pull Requests
 
-- PR title: use conventional commits format (`feat`, `fix`, `chore`, etc.) with optional scope, e.g. `feat(sync): add conflict resolution`
-- PR body: brief description of what changed and why
-- Don't add a test plan section
-- Keep the title under 70 characters
-- Use the description for details, not the title
+- Use conventional commits format (`feat`, `fix`, `chore`, etc.) with optional scope, e.g. `feat(sync): add conflict resolution`
+- Keep the title under 70 characters; use the description for details
+- Brief description of what changed and why — no test plan section
 - Do not add "Co-Authored-By" lines
 - End the PR body with hashtags: `#vibe-coded`, the AI tool used (e.g. `#claude-code`, `#gemini-cli`, `#codex`), and a tag for the feature (e.g. `#fasting`, `#sync`, `#widgets`)
 
-## Changelogs
+### Changelogs
 
-- `CHANGELOG.md` — Android phone/tablet app
-- `CHANGELOG_WEAROS.md` — Wear OS app
+- `CHANGELOG.md` — Android phone/tablet app; `CHANGELOG_WEAROS.md` — Wear OS app
 - Add customer-facing changes to the `[Unreleased]` section using categories: Added, Changed, Fixed, Removed
 - **Include**: features, bug fixes, UX changes, performance improvements
 - **Exclude**: refactoring, dependency bumps, architecture changes, code style
 
-## Project Docs
+## Reference Docs
 
-- `docs/ARCHITECTURE.md` — full project structure and layer breakdown
-- `docs/DATA_SYNC.md` — phone <-> Wear OS data sync deep dive
-- `CHANGELOG.md` / `CHANGELOG_WEAROS.md` — release history
-- `gradle/libs.versions.toml` — all dependency versions
+@docs/ARCHITECTURE.md
+@docs/DATA_SYNC.md
