@@ -8,6 +8,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
+import com.charliesbot.onewearos.tiles.TileUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.services.FastingEventCallbacks
@@ -20,6 +21,7 @@ class LocalWatchFastingCallbacks(
   private val context: Context,
   private val complicationUpdateManager: ComplicationUpdateManager,
   private val ongoingActivityManager: OngoingActivityManager,
+  private val tileUpdateManager: TileUpdateManager,
 ) : FastingEventCallbacks {
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
@@ -36,6 +38,7 @@ class LocalWatchFastingCallbacks(
       Log.w(LOG_TAG, "LocalWatch: Cannot start ongoing activity — app is in background", e)
     }
     complicationUpdateManager.requestUpdate()
+    tileUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
   }
 
@@ -44,6 +47,7 @@ class LocalWatchFastingCallbacks(
     val intent = OngoingActivityService.createStopIntent(context)
     context.startService(intent) // Send stop action to the service
     complicationUpdateManager.requestUpdate()
+    tileUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
   }
 
@@ -51,6 +55,7 @@ class LocalWatchFastingCallbacks(
   override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
     complicationUpdateManager.requestUpdate()
+    tileUpdateManager.requestUpdate()
     ongoingActivityManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
   }

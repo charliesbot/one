@@ -112,6 +112,7 @@ dependencies {
   implementation(libs.androidx.startup.runtime)
   implementation(project(":core"))
   implementation(project(":complications"))
+  implementation(project(":tiles"))
   implementation(project(":features:dashboard:wear"))
   ksp(libs.androidx.room.compiler)
   implementation(libs.firebase.crashlytics)
