@@ -20,6 +20,8 @@ kotlin { jvmToolchain(11) }
 dependencies {
   implementation(libs.koin.android)
   implementation(libs.androidx.core.ktx)
+  implementation(platform(libs.androidx.compose.bom))
+  implementation(libs.androidx.ui.graphics)
   implementation(libs.androidx.tiles)
   implementation(libs.androidx.tiles.material)
   implementation(libs.androidx.protolayout)
