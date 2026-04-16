@@ -19,6 +19,7 @@ playServicesWearable = "19.0.0"
 startupRuntime = "1.2.0"
 coreSplashscreen = "1.2.0"
 tiles = "1.6.0"
+protolayout = "1.3.0"
 horologistComposeTools = "0.7.15"
 horologistTiles = "0.7.15"
 watchfaceComplicationsDataSourceKtx = "1.3.0"
@@ -96,6 +97,8 @@ androidx-tiles = { group = "androidx.wear.tiles", name = "tiles", version.ref = 
 androidx-tiles-material = { group = "androidx.wear.tiles", name = "tiles-material", version.ref = "tiles" }
 androidx-tiles-tooling = { group = "androidx.wear.tiles", name = "tiles-tooling", version.ref = "tiles" }
 androidx-tiles-tooling-preview = { group = "androidx.wear.tiles", name = "tiles-tooling-preview", version.ref = "tiles" }
+androidx-protolayout = { group = "androidx.wear.protolayout", name = "protolayout", version.ref = "protolayout" }
+androidx-protolayout-material = { group = "androidx.wear.protolayout", name = "protolayout-material", version.ref = "protolayout" }
 horologist-compose-tools = { group = "com.google.android.horologist", name = "horologist-compose-tools", version.ref = "horologistComposeTools" }
 horologist-compose-layout = { group = "com.google.android.horologist", name = "horologist-compose-layout", version.ref = "horologistComposeTools" }
 horologist-tiles = { group = "com.google.android.horologist", name = "horologist-tiles", version.ref = "horologistTiles" }
