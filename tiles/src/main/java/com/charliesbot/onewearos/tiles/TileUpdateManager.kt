@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
 class TileUpdateManager(
-  private val applicationContext: Context?,
+  private val applicationContext: Context,
   private val timeWindow: Long = 1000L,
   coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default,
   private val updater: (() -> Unit)? = null,
@@ -43,13 +43,7 @@ class TileUpdateManager(
 
   private fun performUpdate() {
     runCatching {
-        val context =
-          applicationContext
-            ?: run {
-              Log.e(AppConstants.LOG_TAG, "TileUpdateManager: applicationContext is null")
-              return
-            }
-        androidx.wear.tiles.TileService.getUpdater(context)
+        androidx.wear.tiles.TileService.getUpdater(applicationContext)
           .requestUpdate(FastingTileService::class.java)
       }
       .onFailure {

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Fasting status tile for at-a-glance progress on the watch face
 - Custom fasting goals from the phone now appear in watch goal selection
 
 ### Changed

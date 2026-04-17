@@ -1,7 +1,9 @@
 package com.charliesbot.onewearos.tiles
 
+import android.content.Context
 import android.util.Log
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -14,12 +16,15 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class TileUpdateManagerTest {
 
+  private lateinit var mockContext: Context
+
   @Before
   fun setUp() {
     mockkStatic(Log::class)
     every { Log.d(any(), any()) } returns 0
     every { Log.e(any(), any()) } returns 0
     every { Log.e(any(), any(), any()) } returns 0
+    mockContext = mockk(relaxed = true)
   }
 
   @Test
@@ -29,7 +34,7 @@ class TileUpdateManagerTest {
     var updateCount = 0
     val manager =
       TileUpdateManager(
-        applicationContext = null,
+        applicationContext = mockContext,
         timeWindow = 1000L,
         coroutineDispatcher = dispatcher,
         updater = { updateCount++ },
@@ -55,7 +60,7 @@ class TileUpdateManagerTest {
     var updateCount = 0
     val manager =
       TileUpdateManager(
-        applicationContext = null,
+        applicationContext = mockContext,
         timeWindow = 1000L,
         coroutineDispatcher = dispatcher,
         updater = { updateCount++ },

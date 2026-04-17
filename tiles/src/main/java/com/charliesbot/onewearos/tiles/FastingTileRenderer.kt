@@ -1,7 +1,7 @@
 package com.charliesbot.onewearos.tiles
 
 import android.content.Context
-import androidx.compose.ui.graphics.toArgb
+import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
@@ -12,6 +12,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.FontStyle
 import androidx.wear.protolayout.LayoutElementBuilders.Spacer
 import androidx.wear.protolayout.LayoutElementBuilders.Text
+import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.material.CircularProgressIndicator
 import com.charliesbot.shared.R as SharedR
 import com.charliesbot.shared.core.constants.FastGoal
@@ -22,6 +23,29 @@ import com.charliesbot.shared.core.utils.formatTimestamp
 object FastingTileRenderer {
 
   private const val MAX_DEGREES = 360f
+
+  private const val COLOR_TRACK = 0xFF303030.toInt()
+  private const val COLOR_TEXT_PRIMARY = 0xFFFFFFFF.toInt()
+  private const val COLOR_TEXT_SECONDARY = 0xFFAAAAAA.toInt()
+
+  private const val LAUNCH_PACKAGE = "com.charliesbot.one"
+  private const val LAUNCH_ACTIVITY = "com.charliesbot.onewearos.presentation.MainActivity"
+
+  private fun createTapClickable(): ModifiersBuilders.Clickable {
+    return ModifiersBuilders.Clickable.Builder()
+      .setId("open_app")
+      .setOnClick(
+        ActionBuilders.LaunchAction.Builder()
+          .setAndroidActivity(
+            ActionBuilders.AndroidActivity.Builder()
+              .setPackageName(LAUNCH_PACKAGE)
+              .setClassName(LAUNCH_ACTIVITY)
+              .build()
+          )
+          .build()
+      )
+      .build()
+  }
 
   fun renderTile(
     context: Context,
@@ -36,6 +60,15 @@ object FastingTileRenderer {
     }
   }
 
+  private fun goalColorToArgb(goal: FastGoal): Int {
+    return android.graphics.Color.argb(
+      goal.color.alpha,
+      goal.color.red,
+      goal.color.green,
+      goal.color.blue,
+    )
+  }
+
   private fun renderFastingActive(
     context: Context,
     progress: FastingProgress,
@@ -43,6 +76,7 @@ object FastingTileRenderer {
   ): LayoutElementBuilders.LayoutElement {
     val progressFraction = (progress.progressPercentage / 100f).coerceIn(0f, 1f)
     val arcLength = progressFraction * MAX_DEGREES
+    val goalArgb = goalColorToArgb(goal)
 
     val progressIndicator =
       CircularProgressIndicator.Builder()
@@ -50,8 +84,8 @@ object FastingTileRenderer {
         .setEndAngle(arcLength - 90f)
         .setCircularProgressIndicatorColors(
           androidx.wear.protolayout.material.ProgressIndicatorColors(
-            /* indicatorColor= */ argb(goal.color.toArgb()),
-            /* trackColor= */ argb(0xFF303030.toInt()),
+            /* indicatorColor= */ argb(goalArgb),
+            /* trackColor= */ argb(COLOR_TRACK),
           )
         )
         .build()
@@ -65,7 +99,7 @@ object FastingTileRenderer {
           )
         )
         .setFontStyle(
-          FontStyle.Builder().setSize(sp(16f)).setColor(argb(0xFFFFFFFF.toInt())).build()
+          FontStyle.Builder().setSize(sp(16f)).setColor(argb(COLOR_TEXT_PRIMARY)).build()
         )
         .build()
 
@@ -75,7 +109,7 @@ object FastingTileRenderer {
         .setFontStyle(
           FontStyle.Builder()
             .setSize(sp(24f))
-            .setColor(argb(goal.color.toArgb()))
+            .setColor(argb(goalArgb))
             .setWeight(LayoutElementBuilders.FONT_WEIGHT_BOLD)
             .build()
         )
@@ -90,7 +124,7 @@ object FastingTileRenderer {
           )
         )
         .setFontStyle(
-          FontStyle.Builder().setSize(sp(14f)).setColor(argb(0xFFAAAAAA.toInt())).build()
+          FontStyle.Builder().setSize(sp(14f)).setColor(argb(COLOR_TEXT_SECONDARY)).build()
         )
         .build()
 
@@ -110,6 +144,9 @@ object FastingTileRenderer {
       .setHeight(expand())
       .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
       .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+      .setModifiers(
+        ModifiersBuilders.Modifiers.Builder().setClickable(createTapClickable()).build()
+      )
       .addContent(progressIndicator)
       .addContent(centerContent)
       .build()
@@ -120,7 +157,7 @@ object FastingTileRenderer {
       Text.Builder()
         .setText(context.getString(SharedR.string.tile_text_not_fasting))
         .setFontStyle(
-          FontStyle.Builder().setSize(sp(18f)).setColor(argb(0xFFFFFFFF.toInt())).build()
+          FontStyle.Builder().setSize(sp(18f)).setColor(argb(COLOR_TEXT_PRIMARY)).build()
         )
         .build()
 
@@ -129,6 +166,9 @@ object FastingTileRenderer {
       .setHeight(expand())
       .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
       .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+      .setModifiers(
+        ModifiersBuilders.Modifiers.Builder().setClickable(createTapClickable()).build()
+      )
       .addContent(notFastingText)
       .build()
   }

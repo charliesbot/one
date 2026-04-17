@@ -1,8 +1,5 @@
 package com.charliesbot.onewearos.tiles
 
-import android.app.PendingIntent
-import android.content.ComponentName
-import android.content.Intent
 import android.util.Log
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ResourceBuilders
@@ -15,6 +12,8 @@ import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.utils.FastingProgressUtil
 import com.google.common.util.concurrent.ListenableFuture
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
@@ -27,36 +26,36 @@ class FastingTileService : TileService(), KoinComponent {
   override fun onTileRequest(
     request: RequestBuilders.TileRequest
   ): ListenableFuture<TileBuilders.Tile> {
-    Log.d(LOG_TAG, "FastingTileService: onTileRequest")
+    Log.d(LOG_TAG, "FastingTileService: tileRequest")
 
-    val fastingData = runBlocking { repository.fastingDataItem.first() }
+    val tile = runBlocking {
+      val fastingData = repository.fastingDataItem.first()
 
-    val fastingProgress =
-      if (fastingData.isFasting) {
-        FastingProgressUtil.calculateFastingProgress(
-          fastingData,
-          currentTimeMillis = System.currentTimeMillis(),
+      val fastingProgress =
+        if (fastingData.isFasting) {
+          FastingProgressUtil.calculateFastingProgress(
+            fastingData,
+            currentTimeMillis = System.currentTimeMillis(),
+          )
+        } else {
+          null
+        }
+
+      val fastingGoal =
+        if (fastingData.isFasting) {
+          PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
+        } else {
+          null
+        }
+
+      val layout =
+        FastingTileRenderer.renderTile(
+          context = this@FastingTileService,
+          fastingDataItem = fastingData,
+          fastingProgress = fastingProgress,
+          fastingGoal = fastingGoal,
         )
-      } else {
-        null
-      }
 
-    val fastingGoal =
-      if (fastingData.isFasting) {
-        PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
-      } else {
-        null
-      }
-
-    val layout =
-      FastingTileRenderer.renderTile(
-        context = this@FastingTileService,
-        fastingDataItem = fastingData,
-        fastingProgress = fastingProgress,
-        fastingGoal = fastingGoal,
-      )
-
-    val tile =
       TileBuilders.Tile.Builder()
         .setResourcesVersion("1")
         .setTileTimeline(
@@ -69,6 +68,7 @@ class FastingTileService : TileService(), KoinComponent {
             .build()
         )
         .build()
+    }
 
     return ImmediateFuture(tile)
   }
@@ -76,42 +76,20 @@ class FastingTileService : TileService(), KoinComponent {
   override fun onTileResourcesRequest(
     request: RequestBuilders.ResourcesRequest
   ): ListenableFuture<ResourceBuilders.Resources> {
-    val resources = ResourceBuilders.Resources.Builder().setVersion("1").build()
-    return ImmediateFuture(resources)
+    return ImmediateFuture(ResourceBuilders.Resources.Builder().setVersion("1").build())
   }
+}
 
-  private fun createTapIntent(): PendingIntent {
-    val intent =
-      Intent().apply {
-        component =
-          ComponentName(
-            "com.charliesbot.one",
-            "com.charliesbot.onewearos.presentation.MainActivity",
-          )
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      }
+private class ImmediateFuture<V>(private val value: V) : ListenableFuture<V> {
+  override fun addListener(listener: Runnable, executor: Executor) = executor.execute(listener)
 
-    return PendingIntent.getActivity(
-      this,
-      0,
-      intent,
-      PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-    )
-  }
+  override fun cancel(mayInterruptIfRunning: Boolean) = false
 
-  private class ImmediateFuture<T>(private val value: T) : ListenableFuture<T> {
-    override fun cancel(mayInterruptIfRunning: Boolean) = false
+  override fun isCancelled() = false
 
-    override fun isCancelled() = false
+  override fun isDone() = true
 
-    override fun isDone() = true
+  override fun get(): V = value
 
-    override fun get(): T = value
-
-    override fun get(timeout: Long, unit: java.util.concurrent.TimeUnit): T = value
-
-    override fun addListener(listener: Runnable, executor: java.util.concurrent.Executor) {
-      executor.execute(listener)
-    }
-  }
+  override fun get(timeout: Long, unit: TimeUnit): V = value
 }
