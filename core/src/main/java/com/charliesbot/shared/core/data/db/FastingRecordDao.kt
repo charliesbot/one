@@ -8,15 +8,16 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FastingRecordDao {
-  @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insert(fastingRecord: FastingRecord)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  suspend fun insert(fastingRecord: FastingRecordEntity)
 
   @Query("SELECT * FROM fasting_history ORDER BY endTimeEpochMillis DESC")
-  fun getAllFastings(): Flow<List<FastingRecord>>
+  fun getAllFastings(): Flow<List<FastingRecordEntity>>
 
   @Query(
     "SELECT * FROM fasting_history WHERE endTimeEpochMillis >= :sinceTimestamp ORDER BY endTimeEpochMillis DESC"
   )
-  fun getFastingsSince(sinceTimestamp: Long): Flow<List<FastingRecord>>
+  fun getFastingsSince(sinceTimestamp: Long): Flow<List<FastingRecordEntity>>
 
   /**
    * Gets all fastings completed within a specific time range. Note: startTimestamp is inclusive,
@@ -30,7 +31,7 @@ interface FastingRecordDao {
   fun getFastingsForPeriod(
     startTimestamp: Long,
     endExclusiveTimestamp: Long,
-  ): Flow<List<FastingRecord>>
+  ): Flow<List<FastingRecordEntity>>
 
   @Query("DELETE FROM fasting_history WHERE startTimeEpochMillis = :startTimeEpochMillis")
   suspend fun deleteByStartTime(startTimeEpochMillis: Long)

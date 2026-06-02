@@ -1,7 +1,7 @@
 package com.charliesbot.shared.core.domain.repository
 
-import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
+import com.charliesbot.shared.core.models.FastingRecord
 import java.time.YearMonth
 import kotlinx.coroutines.flow.Flow
 

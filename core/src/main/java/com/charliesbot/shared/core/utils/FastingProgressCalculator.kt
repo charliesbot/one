@@ -1,7 +1,7 @@
 package com.charliesbot.shared.core.utils
 
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.data.db.FastingRecord
+import com.charliesbot.shared.core.models.FastingRecord
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.models.TimePeriodType
 import java.util.Calendar

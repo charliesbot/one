@@ -9,8 +9,7 @@ package com.charliesbot.shared.core.models
  * Its properties are also the data that is synced between devices (e.g., phone and watch) via the
  * Wearable Data Layer to ensure state consistency.
  *
- * This is distinct from [com.charliesbot.shared.core.data.db.FastingRecord], which represents a
- * *completed, historical* fast.
+ * This is distinct from [FastingRecord], which represents a *completed, historical* fast.
  *
  * @property isFasting True if the user is currently fasting, false otherwise.
  * @property startTimeInMillis The timestamp (in UTC milliseconds) when the *current* fast began.

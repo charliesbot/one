@@ -4,12 +4,12 @@ import com.charliesbot.shared.core.abstraction.AppVersionProvider
 import com.charliesbot.shared.core.abstraction.ClipboardHelper
 import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.abstraction.StringProvider
-import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
 import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
+import com.charliesbot.shared.core.models.FastingRecord
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
 import com.charliesbot.shared.core.services.SmartReminderCallback

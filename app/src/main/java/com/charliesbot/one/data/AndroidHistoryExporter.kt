@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import android.util.Log
 import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.data.db.FastingRecord
+import com.charliesbot.shared.core.models.FastingRecord
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
