@@ -1,13 +1,16 @@
 package com.charliesbot.one.data
 
-import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.data.db.FastingRecordDao
+import com.charliesbot.shared.core.data.db.toEntity
+import com.charliesbot.shared.core.data.db.toModel
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingHistoryTimePeriod
+import com.charliesbot.shared.core.models.FastingRecord
 import java.time.YearMonth
 import java.time.ZoneId
 import java.util.Calendar
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class FastingHistoryRepositoryImpl(private val fastingRecordDao: FastingRecordDao) :
   FastingHistoryRepository {
@@ -46,10 +49,13 @@ class FastingHistoryRepositoryImpl(private val fastingRecordDao: FastingRecordDa
     calendar.set(Calendar.SECOND, 0)
     calendar.set(Calendar.MILLISECOND, 0)
     val startOfWeek = calendar.timeInMillis
-    return fastingRecordDao.getFastingsSince(startOfWeek)
+    return fastingRecordDao.getFastingsSince(startOfWeek).map { records ->
+      records.map { it.toModel() }
+    }
   }
 
-  override fun getAllHistory(): Flow<List<FastingRecord>> = fastingRecordDao.getAllFastings()
+  override fun getAllHistory(): Flow<List<FastingRecord>> =
+    fastingRecordDao.getAllFastings().map { records -> records.map { it.toModel() } }
 
   override fun getHistoryByTimePeriod(period: FastingHistoryTimePeriod): Flow<List<FastingRecord>> {
     val calendar = Calendar.getInstance()
@@ -60,7 +66,9 @@ class FastingHistoryRepositoryImpl(private val fastingRecordDao: FastingRecordDa
     }
 
     val sinceTimestamp = calendar.timeInMillis
-    return fastingRecordDao.getFastingsSince(sinceTimestamp)
+    return fastingRecordDao.getFastingsSince(sinceTimestamp).map { records ->
+      records.map { it.toModel() }
+    }
   }
 
   override fun getFastingsForMonth(yearMonth: YearMonth): Flow<List<FastingRecord>> {
@@ -79,14 +87,16 @@ class FastingHistoryRepositoryImpl(private val fastingRecordDao: FastingRecordDa
         .toInstant()
         .toEpochMilli()
 
-    return fastingRecordDao.getFastingsForPeriod(
-      startTimestamp = startTimestamp,
-      endExclusiveTimestamp = endExclusiveTimestamp,
-    )
+    return fastingRecordDao
+      .getFastingsForPeriod(
+        startTimestamp = startTimestamp,
+        endExclusiveTimestamp = endExclusiveTimestamp,
+      )
+      .map { records -> records.map { it.toModel() } }
   }
 
   override suspend fun saveFastingRecord(record: FastingRecord) {
-    fastingRecordDao.insert(record)
+    fastingRecordDao.insert(record.toEntity())
   }
 
   override suspend fun deleteFastingRecord(startTimeEpochMillis: Long) {
@@ -102,10 +112,11 @@ class FastingHistoryRepositoryImpl(private val fastingRecordDao: FastingRecordDa
     fastingRecordDao.deleteByStartTime(originalStartTime)
     fastingRecordDao.insert(
       FastingRecord(
-        startTimeEpochMillis = newStartTime,
-        endTimeEpochMillis = newEndTime,
-        fastingGoalId = goalId,
-      )
+          startTimeEpochMillis = newStartTime,
+          endTimeEpochMillis = newEndTime,
+          fastingGoalId = goalId,
+        )
+        .toEntity()
     )
   }
 }

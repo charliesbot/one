@@ -3,9 +3,9 @@ package com.charliesbot.one.services
 import android.util.Log
 import com.charliesbot.one.widget.WidgetUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.models.FastingRecord
 import com.charliesbot.shared.core.services.BaseFastingListenerService
 import org.koin.core.component.inject
 

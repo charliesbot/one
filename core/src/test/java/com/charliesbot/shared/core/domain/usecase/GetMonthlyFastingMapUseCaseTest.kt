@@ -1,7 +1,7 @@
 package com.charliesbot.shared.core.domain.usecase
 
-import com.charliesbot.shared.core.data.db.FastingRecord
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
+import com.charliesbot.shared.core.models.FastingRecord
 import io.mockk.every
 import io.mockk.mockk
 import java.time.LocalDate
