@@ -113,6 +113,7 @@ dependencies {
   implementation(libs.androidx.wear.ongoing)
   implementation(libs.androidx.startup.runtime)
   implementation(project(":core"))
+  implementation(project(":core:data"))
   implementation(project(":complications"))
   implementation(project(":tiles"))
   implementation(project(":features:dashboard:wear"))
