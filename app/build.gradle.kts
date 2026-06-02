@@ -129,6 +129,7 @@ dependencies {
 
   ksp(libs.androidx.room.compiler)
   implementation(project(":core"))
+  implementation(project(":core:data"))
   implementation(project(":widget"))
   implementation(project(":features:dashboard:app"))
   implementation(project(":features:profile:app"))
