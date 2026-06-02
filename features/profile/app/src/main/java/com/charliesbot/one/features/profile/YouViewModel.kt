@@ -2,9 +2,9 @@ package com.charliesbot.one.features.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.shared.core.components.FastingDayData
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
+import com.charliesbot.shared.core.models.FastingDayData
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth

@@ -1,8 +1,8 @@
 package com.charliesbot.one.features.profile
 
-import com.charliesbot.shared.core.components.FastingDayData
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
+import com.charliesbot.shared.core.models.FastingDayData
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
