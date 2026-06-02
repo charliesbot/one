@@ -1,11 +1,10 @@
 plugins {
   alias(libs.plugins.android.library)
-  alias(libs.plugins.kotlin.android)
 }
 
 android {
   namespace = "com.charliesbot.onewearos.tiles"
-  compileSdk = 36
+  compileSdk = 37
 
   defaultConfig { minSdk = 33 }
 
@@ -18,6 +17,7 @@ android {
 kotlin { jvmToolchain(11) }
 
 dependencies {
+  implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.tiles)
@@ -26,6 +26,7 @@ dependencies {
   implementation(libs.androidx.protolayout.material)
   implementation(libs.play.services.wearable)
   implementation(project(":core"))
+  compileOnly(platform(libs.androidx.compose.bom))
   compileOnly(libs.androidx.ui.graphics)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)

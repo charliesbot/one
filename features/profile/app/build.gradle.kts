@@ -2,13 +2,12 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.library)
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.compose.compiler)
 }
 
 android {
   namespace = "com.charliesbot.one.features.profile"
-  compileSdk = 36
+  compileSdk = 37
 
   defaultConfig { minSdk = 31 }
 

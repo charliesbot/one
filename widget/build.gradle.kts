@@ -1,12 +1,11 @@
 plugins {
   alias(libs.plugins.android.library)
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.compose.compiler)
 }
 
 android {
   namespace = "com.charliesbot.one.widget"
-  compileSdk = 36
+  compileSdk = 37
 
   defaultConfig { minSdk = 31 }
 
@@ -20,6 +19,7 @@ android {
 kotlin { jvmToolchain(11) }
 
 dependencies {
+  implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
   implementation(libs.androidx.glance)
   implementation(libs.androidx.glance.appwidget)

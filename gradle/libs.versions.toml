@@ -1,49 +1,49 @@
 [versions]
-agp = "9.1.0"
+agp = "9.2.1"
 datastorePreferences = "1.2.1"
-firebaseBom = "34.11.0"
+firebaseBom = "34.14.0"
 glanceAppwidget = "1.2.0-rc01"
-koinBom = "4.2.0"
-kotlin = "2.3.20"
-ksp = "2.3.2"
+koinBom = "4.2.1"
+kotlin = "2.3.21"
+ksp = "2.3.8"
 coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-kotlinxCoroutines = "1.10.2"
-mockk = "1.14.9"
+kotlinxCoroutines = "1.11.0"
+mockk = "1.14.11"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
-composeBom = "2026.03.01"
-playServicesWearable = "19.0.0"
+composeBom = "2026.05.01"
+playServicesWearable = "20.0.1"
 startupRuntime = "1.2.0"
 coreSplashscreen = "1.2.0"
 tiles = "1.6.0"
-protolayout = "1.3.0"
+protolayout = "1.4.0"
 horologistComposeTools = "0.7.15"
 horologistTiles = "0.7.15"
 watchfaceComplicationsDataSourceKtx = "1.3.0"
 appcompat = "1.7.1"
-composeMaterial = "1.13.0"
-runtimeAndroid = "1.10.6"
-uiTooling = "1.10.6"
+composeMaterial = "1.14.0"
+runtimeAndroid = "1.11.2"
+uiTooling = "1.11.2"
 wearPhoneInteractions = "1.1.0"
 workRuntimeKtx = "2.11.2"
-firebaseCrashlytics = "20.0.4"
+firebaseCrashlytics = "20.0.6"
 googleGmsGoogleServices = "4.4.4"
-googleFirebaseCrashlytics = "3.0.6"
+googleFirebaseCrashlytics = "3.0.7"
 room = "2.8.4"
 room-plugin = "2.8.4"
-spotless = "8.4.0"
+spotless = "8.6.0"
 ktfmt = "0.54"
 # navigation compose 3
-nav3Core = "1.0.1"
+nav3Core = "1.1.2"
 lifecycleViewmodelNav3 = "2.10.0"
-kotlinSerialization = "2.3.20"
-kotlinxSerializationCore = "1.10.0"
-material3Adaptive = "1.3.0-alpha09"
+kotlinSerialization = "2.3.21"
+kotlinxSerializationCore = "1.11.0"
+material3Adaptive = "1.3.0-beta02"
 # wearos
-wearCompose = "1.6.0"
+wearCompose = "1.6.2"
 wearToolingPreview = "1.0.0"
 
 [libraries]
@@ -75,7 +75,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 # TODO - charliesbot: Remove material3 version override when it reaches stable
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.5.0-alpha16" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.5.0-alpha20" }
 # End TODO
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
@@ -121,7 +121,6 @@ androidx-material3-adaptive = { module = "androidx.compose.material3.adaptive:ad
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -130,5 +129,4 @@ google-gms-google-services = { id = "com.google.gms.google-services", version.re
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 androidx-room = { id = "androidx.room", version.ref = "room-plugin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-
 

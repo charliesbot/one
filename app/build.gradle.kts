@@ -2,11 +2,11 @@ import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.application)
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.ksp)
   alias(libs.plugins.google.gms.google.services)
@@ -31,7 +31,7 @@ val versionNameProperty: String =
 
 android {
   namespace = "com.charliesbot.one"
-  compileSdk = 36
+  compileSdk = 37
 
   defaultConfig {
     applicationId = "com.charliesbot.one"
@@ -75,6 +75,7 @@ android {
       resValue("string", "app_name", "One")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       ndk { debugSymbolLevel = "SYMBOL_TABLE" }
+      configure<CrashlyticsExtension> { nativeSymbolUploadEnabled = true }
     }
   }
   compileOptions {
@@ -84,8 +85,8 @@ android {
   buildFeatures {
     compose = true
     buildConfig = true
+    resValues = true
   }
-  firebaseCrashlytics { nativeSymbolUploadEnabled = true }
 }
 
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
