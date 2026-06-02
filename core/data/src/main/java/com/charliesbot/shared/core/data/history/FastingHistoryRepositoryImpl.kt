@@ -1,4 +1,4 @@
-package com.charliesbot.one.data
+package com.charliesbot.shared.core.data.history
 
 import com.charliesbot.shared.core.data.db.FastingRecordDao
 import com.charliesbot.shared.core.data.db.toEntity

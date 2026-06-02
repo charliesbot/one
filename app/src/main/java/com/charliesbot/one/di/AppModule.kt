@@ -2,13 +2,10 @@ package com.charliesbot.one.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.room.Room
-import com.charliesbot.one.BuildConfig
 import com.charliesbot.one.data.AndroidAppVersionProvider
 import com.charliesbot.one.data.AndroidClipboardHelper
 import com.charliesbot.one.data.AndroidHistoryExporter
 import com.charliesbot.one.data.AndroidStringProvider
-import com.charliesbot.one.data.FastingHistoryRepositoryImpl
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
@@ -17,8 +14,6 @@ import com.charliesbot.shared.core.abstraction.AppVersionProvider
 import com.charliesbot.shared.core.abstraction.ClipboardHelper
 import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.abstraction.StringProvider
-import com.charliesbot.shared.core.data.db.AppDatabase
-import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventCallbacks
@@ -27,18 +22,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val appModule = module {
-  single {
-    Room.databaseBuilder(androidContext(), AppDatabase::class.java, "fasting_history.db")
-      .apply {
-        if (BuildConfig.DEBUG) {
-          fallbackToDestructiveMigration(true)
-        }
-      }
-      .build()
-  }
-
-  single { get<AppDatabase>().fastingRecordDao() }
-
   single<SharedPreferences> {
     androidContext().getSharedPreferences("one_fasting_prefs", Context.MODE_PRIVATE)
   }
@@ -52,8 +35,6 @@ val appModule = module {
       settingsRepository = get(),
     )
   }
-
-  single<FastingHistoryRepository> { FastingHistoryRepositoryImpl(fastingRecordDao = get()) }
 
   single<StringProvider> { AndroidStringProvider(androidContext()) }
 

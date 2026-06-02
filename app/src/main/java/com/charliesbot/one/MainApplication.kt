@@ -6,6 +6,7 @@ import com.charliesbot.one.features.dashboard.di.dashboardModule
 import com.charliesbot.one.features.profile.di.profileModule
 import com.charliesbot.one.features.settings.di.settingsModule
 import com.charliesbot.one.notifications.SmartReminderWorker
+import com.charliesbot.shared.core.di.historyDatabaseModule
 import com.charliesbot.shared.core.di.sharedModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -21,7 +22,14 @@ class MainApplication : Application() {
       // Reference Android context
       androidContext(this@MainApplication)
       // Load modules
-      modules(sharedModule, appModule, dashboardModule, profileModule, settingsModule)
+      modules(
+        sharedModule,
+        historyDatabaseModule,
+        appModule,
+        dashboardModule,
+        profileModule,
+        settingsModule,
+      )
     }
 
     // Schedule the daily smart reminder worker

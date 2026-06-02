@@ -1,14 +1,13 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
-import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
-  alias(libs.plugins.ksp)
   alias(libs.plugins.google.gms.google.services)
   alias(libs.plugins.google.firebase.crashlytics)
 }
@@ -117,7 +116,6 @@ dependencies {
   implementation(project(":complications"))
   implementation(project(":tiles"))
   implementation(project(":features:dashboard:wear"))
-  ksp(libs.androidx.room.compiler)
   implementation(libs.firebase.crashlytics)
   androidTestImplementation(platform(libs.androidx.compose.bom))
   androidTestImplementation(libs.androidx.ui.test.junit4)
