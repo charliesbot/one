@@ -30,6 +30,8 @@ include(":wear")
 
 include(":core")
 
+include(":core:model")
+
 include(":widget")
 
 include(":complications")
