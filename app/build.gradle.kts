@@ -1,14 +1,13 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
-import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
-  alias(libs.plugins.ksp)
   alias(libs.plugins.google.gms.google.services)
   alias(libs.plugins.google.firebase.crashlytics)
   alias(libs.plugins.jetbrains.kotlin.serialization)
@@ -113,9 +112,6 @@ dependencies {
   implementation(libs.androidx.material3)
   implementation(libs.play.services.wearable)
   implementation(libs.androidx.ui.tooling.preview)
-  implementation(libs.androidx.room.runtime)
-  implementation(libs.androidx.room.ktx)
-
   implementation(libs.nav3.runtime)
   implementation(libs.nav3.ui)
   implementation(libs.androidx.lifecycle.viewmodel.nav3)
@@ -127,7 +123,6 @@ dependencies {
 
   implementation(libs.androidx.material3.adaptive)
 
-  ksp(libs.androidx.room.compiler)
   implementation(project(":core"))
   implementation(project(":core:data"))
   implementation(project(":widget"))

@@ -3,8 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
   alias(libs.plugins.android.library)
   alias(libs.plugins.compose.compiler)
-  alias(libs.plugins.ksp)
-  alias(libs.plugins.androidx.room)
   alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
@@ -34,8 +32,6 @@ android {
 
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
-room { schemaDirectory("$projectDir/schemas") }
-
 dependencies {
   api(project(":core:domain"))
   api(project(":core:model"))
@@ -59,9 +55,6 @@ dependencies {
   implementation(libs.androidx.compose.material)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.kotlinx.serialization.json)
-  implementation(libs.androidx.room.runtime)
-  implementation(libs.androidx.room.ktx)
-  ksp(libs.androidx.room.compiler)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.mockk)
