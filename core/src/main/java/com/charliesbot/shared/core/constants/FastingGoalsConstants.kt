@@ -3,6 +3,7 @@ package com.charliesbot.shared.core.constants
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.models.FastingRules
 
 data class FastGoal(
   val id: String,
@@ -22,7 +23,7 @@ data class FastGoal(
 object PredefinedFastingGoals {
 
   // Minimum hours to consider a completed fast
-  const val MIN_FASTING_HOURS = 13f
+  const val MIN_FASTING_HOURS = FastingRules.MINIMUM_COMPLETED_FAST_HOURS
 
   // Helper to calculate milliseconds from hours
   private fun hoursToMillis(hours: Int): Long = hours * 60L * 60L * 1000L

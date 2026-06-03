@@ -1,8 +1,8 @@
 package com.charliesbot.shared.core.domain.usecase
 
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingDayData
+import com.charliesbot.shared.core.models.FastingRules
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
@@ -27,7 +27,7 @@ class GetMonthlyFastingMapUseCase(private val repository: FastingHistoryReposito
         FastingDayData(
           date = date,
           durationHours = durationHours,
-          isGoalMet = durationHours >= PredefinedFastingGoals.MIN_FASTING_HOURS,
+          isGoalMet = durationHours >= FastingRules.MINIMUM_COMPLETED_FAST_HOURS,
           startTimeEpochMillis = longestFast.startTimeEpochMillis,
           endTimeEpochMillis = longestFast.endTimeEpochMillis,
           goalId = longestFast.fastingGoalId,
