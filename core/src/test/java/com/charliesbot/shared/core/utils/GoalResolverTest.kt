@@ -54,7 +54,7 @@ class GoalResolverTest {
         color = Color.Red,
         durationMillis = 14 * 60 * 60 * 1000L,
       )
-    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal))
+    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal.toData()))
 
     val resolver = GoalResolver(customGoalRepository)
     val goals = resolver.allGoals.first()
@@ -74,7 +74,7 @@ class GoalResolverTest {
         color = Color.Blue,
         durationMillis = 15 * 60 * 60 * 1000L,
       )
-    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal))
+    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal.toData()))
 
     val resolver = GoalResolver(customGoalRepository)
     resolver.allGoals.first() // trigger collection which calls registerCustomGoals
