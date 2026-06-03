@@ -3,7 +3,7 @@ package com.charliesbot.shared.core.domain.usecase
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.services.FastingEventCallbacks
-import com.charliesbot.shared.core.services.FastingEventManager
+import com.charliesbot.shared.core.services.FastingEventProcessor
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -15,13 +15,13 @@ import org.junit.Test
 class UpdateFastingConfigUseCaseTest {
 
   private val repository: FastingDataRepository = mockk()
-  private val eventManager: FastingEventManager = mockk(relaxed = true)
+  private val eventProcessor: FastingEventProcessor = mockk(relaxed = true)
   private val callbacks: FastingEventCallbacks = mockk(relaxed = true)
   private lateinit var useCase: UpdateFastingConfigUseCase
 
   @Before
   fun setup() {
-    useCase = UpdateFastingConfigUseCase(repository, eventManager, callbacks)
+    useCase = UpdateFastingConfigUseCase(repository, eventProcessor, callbacks)
   }
 
   @Test
@@ -43,6 +43,6 @@ class UpdateFastingConfigUseCaseTest {
 
     assertTrue(result.isSuccess)
     coVerify { repository.updateFastingConfig(2000L, "16:8") }
-    coVerify { eventManager.processStateChange(previous, current, callbacks) }
+    coVerify { eventProcessor.processStateChange(previous, current, callbacks) }
   }
 }

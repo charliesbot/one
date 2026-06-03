@@ -26,8 +26,8 @@ import org.koin.core.component.KoinComponent
  * 2. The event is verified to be from a remote node via `isFromRemoteDevice`.
  * 3. The local repository is updated with the new data.
  * 4. `onPlatformFastingStateSynced()` is called for UI refreshes (like complications).
- * 5. The core business logic is delegated to the central [FastingEventManager], which in turn calls
- *    the `onPlatformFastingStarted/Completed` hooks for state transition actions.
+ * 5. The core business logic is delegated to the central [FastingEventProcessor], which in turn
+ *    calls the `onPlatformFastingStarted/Completed` hooks for state transition actions.
  *
  * **ARCHITECTURAL NOTE**: This service is intentionally designed to **ONLY** process remote events.
  * All fasting state changes initiated by the user on the local device should be handled by the
@@ -35,14 +35,14 @@ import org.koin.core.component.KoinComponent
  * ensure consistent logic and immediate UI feedback. This clear separation of concerns is critical
  * to the app's architecture.
  *
- * @see FastingEventManager
+ * @see FastingEventProcessor
  * @see com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
  * @see FastingEventCallbacks
  */
 abstract class BaseFastingListenerService :
   WearableListenerService(), KoinComponent, FastingEventCallbacks {
   private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-  protected val eventManager: FastingEventManager by inject()
+  protected val eventProcessor: FastingEventProcessor by inject()
   protected val fastingRepository: FastingDataRepository by inject()
   private val nodeClient: NodeClient by inject()
   private var currentLastTimestamp = 0L
@@ -187,7 +187,7 @@ abstract class BaseFastingListenerService :
               lastUpdateTimestamp = newestRemoteItem.updateTimestamp,
             )
             onPlatformFastingStateSynced()
-            eventManager.processStateChange(
+            eventProcessor.processStateChange(
               previousItem = previousItem,
               currentItem = newestRemoteItem,
               callbacks = this@BaseFastingListenerService,

@@ -1,30 +1,25 @@
 package com.charliesbot.shared.core.services
 
+import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.notifications.NotificationScheduler
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class FastingEventManagerTest {
+class FastingEventProcessorTest {
 
-  private lateinit var notificationScheduler: NotificationScheduler
+  private lateinit var notificationScheduler: FastingNotificationScheduler
   private lateinit var callbacks: FastingEventCallbacks
-  private lateinit var eventManager: FastingEventManager
+  private lateinit var eventProcessor: FastingEventProcessor
 
   @Before
   fun setup() {
-    mockkStatic(android.util.Log::class)
-    every { android.util.Log.d(any(), any()) } returns 0
-
     notificationScheduler = mockk(relaxed = true)
     callbacks = mockk(relaxed = true)
 
-    eventManager = FastingEventManager(notificationScheduler)
+    eventProcessor = FastingEventProcessor(notificationScheduler)
   }
 
   @Test
@@ -33,7 +28,7 @@ class FastingEventManagerTest {
     val current =
       FastingDataItem(isFasting = true, startTimeInMillis = 1000L, fastingGoalId = "16:8")
 
-    eventManager.processStateChange(previous, current, callbacks)
+    eventProcessor.processStateChange(previous, current, callbacks)
 
     coVerify { notificationScheduler.scheduleNotifications(1000L, "16:8") }
     coVerify { callbacks.onFastingStarted(current) }
@@ -45,7 +40,7 @@ class FastingEventManagerTest {
     val previous = FastingDataItem(isFasting = true)
     val current = FastingDataItem(isFasting = false)
 
-    eventManager.processStateChange(previous, current, callbacks)
+    eventProcessor.processStateChange(previous, current, callbacks)
 
     coVerify { notificationScheduler.cancelAllNotifications() }
     coVerify { callbacks.onFastingCompleted(current) }
@@ -58,7 +53,7 @@ class FastingEventManagerTest {
     val current =
       FastingDataItem(isFasting = true, startTimeInMillis = 2000L, fastingGoalId = "18:6")
 
-    eventManager.processStateChange(previous, current, callbacks)
+    eventProcessor.processStateChange(previous, current, callbacks)
 
     coVerify { notificationScheduler.cancelAllNotifications() }
     coVerify { notificationScheduler.scheduleNotifications(2000L, "18:6") }
@@ -70,7 +65,7 @@ class FastingEventManagerTest {
     val previous = FastingDataItem(isFasting = false)
     val current = FastingDataItem(isFasting = false)
 
-    eventManager.processStateChange(previous, current, callbacks)
+    eventProcessor.processStateChange(previous, current, callbacks)
 
     coVerify { callbacks.onFastingUpdated(current) }
     coVerify(exactly = 0) { notificationScheduler.scheduleNotifications(any(), any()) }
@@ -82,7 +77,7 @@ class FastingEventManagerTest {
     val current =
       FastingDataItem(isFasting = true, startTimeInMillis = 3000L, fastingGoalId = "circadian")
 
-    eventManager.processStateChange(null, current, callbacks)
+    eventProcessor.processStateChange(null, current, callbacks)
 
     coVerify { notificationScheduler.scheduleNotifications(3000L, "circadian") }
     coVerify { callbacks.onFastingStarted(current) }
@@ -92,7 +87,7 @@ class FastingEventManagerTest {
   fun `null previousItem treated as not fasting triggers inactive update`() = runTest {
     val current = FastingDataItem(isFasting = false)
 
-    eventManager.processStateChange(null, current, callbacks)
+    eventProcessor.processStateChange(null, current, callbacks)
 
     coVerify { callbacks.onFastingUpdated(current) }
     coVerify(exactly = 0) { notificationScheduler.scheduleNotifications(any(), any()) }
@@ -106,7 +101,7 @@ class FastingEventManagerTest {
     val current =
       FastingDataItem(isFasting = true, startTimeInMillis = 5000L, fastingGoalId = "20:4")
 
-    eventManager.processStateChange(previous, current, callbacks)
+    eventProcessor.processStateChange(previous, current, callbacks)
 
     coVerify { notificationScheduler.scheduleNotifications(5000L, "20:4") }
     coVerify(exactly = 0) { notificationScheduler.scheduleNotifications(999L, any()) }

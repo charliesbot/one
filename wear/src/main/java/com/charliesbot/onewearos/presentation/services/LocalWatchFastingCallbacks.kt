@@ -15,7 +15,7 @@ import com.charliesbot.shared.core.services.FastingEventCallbacks
 
 /**
  * Handles fasting events that originate locally ONLY on the watch (user actions). Notifications are
- * handled by [com.charliesbot.shared.core.services.FastingEventManager].
+ * handled by [com.charliesbot.shared.core.services.FastingEventProcessor].
  */
 class LocalWatchFastingCallbacks(
   private val context: Context,

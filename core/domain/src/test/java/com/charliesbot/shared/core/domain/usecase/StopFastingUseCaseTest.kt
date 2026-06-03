@@ -3,7 +3,7 @@ package com.charliesbot.shared.core.domain.usecase
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.services.FastingEventCallbacks
-import com.charliesbot.shared.core.services.FastingEventManager
+import com.charliesbot.shared.core.services.FastingEventProcessor
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -15,13 +15,13 @@ import org.junit.Test
 class StopFastingUseCaseTest {
 
   private val repository: FastingDataRepository = mockk()
-  private val eventManager: FastingEventManager = mockk(relaxed = true)
+  private val eventProcessor: FastingEventProcessor = mockk(relaxed = true)
   private val callbacks: FastingEventCallbacks = mockk(relaxed = true)
   private lateinit var useCase: StopFastingUseCase
 
   @Before
   fun setup() {
-    useCase = StopFastingUseCase(repository, eventManager, callbacks)
+    useCase = StopFastingUseCase(repository, eventProcessor, callbacks)
   }
 
   @Test
@@ -35,7 +35,7 @@ class StopFastingUseCaseTest {
   }
 
   @Test
-  fun `returns success and calls eventManager when fasting`() = runTest {
+  fun `returns success and calls eventProcessor when fasting`() = runTest {
     val existing = FastingDataItem(isFasting = true, fastingGoalId = "18:6")
     val previous = FastingDataItem(isFasting = true)
     val current = FastingDataItem(isFasting = false)
@@ -48,7 +48,7 @@ class StopFastingUseCaseTest {
     assertTrue(result.isSuccess)
     coVerify(ordering = io.mockk.Ordering.ORDERED) {
       repository.stopFasting("18:6")
-      eventManager.processStateChange(previous, current, callbacks)
+      eventProcessor.processStateChange(previous, current, callbacks)
     }
   }
 }

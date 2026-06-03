@@ -11,6 +11,7 @@ import com.charliesbot.shared.core.constants.AppConstants
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.models.NotificationType
 import java.util.concurrent.TimeUnit
@@ -21,7 +22,7 @@ class NotificationScheduler(
   private val workerClass: Class<out ListenableWorker>,
   private val settingsRepository: SettingsRepository,
   private val workManager: WorkManager = WorkManager.getInstance(context),
-) {
+) : FastingNotificationScheduler {
   companion object {
     private const val SMART_REMINDER_TAG = "smart_reminder_notification"
     private const val FASTING_NOTIFICATION_TAG = "fasting_notification"
@@ -54,7 +55,7 @@ class NotificationScheduler(
     )
   }
 
-  suspend fun scheduleNotifications(startMillis: Long, fastingGoalId: String) {
+  override suspend fun scheduleNotifications(startMillis: Long, fastingGoalId: String) {
     cancelFastingNotifications()
 
     // Check if notifications are enabled
@@ -174,7 +175,7 @@ class NotificationScheduler(
     workManager.cancelAllWorkByTag(SMART_REMINDER_TAG)
   }
 
-  fun cancelAllNotifications() {
+  override fun cancelAllNotifications() {
     workManager.cancelAllWork()
   }
 }

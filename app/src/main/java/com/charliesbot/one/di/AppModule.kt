@@ -14,6 +14,7 @@ import com.charliesbot.shared.core.abstraction.AppVersionProvider
 import com.charliesbot.shared.core.abstraction.ClipboardHelper
 import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.abstraction.StringProvider
+import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventCallbacks
@@ -35,6 +36,7 @@ val appModule = module {
       settingsRepository = get(),
     )
   }
+  single<FastingNotificationScheduler> { get<NotificationScheduler>() }
 
   single<StringProvider> { AndroidStringProvider(androidContext()) }
 
