@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.services
+package com.charliesbot.shared.core.domain.events
 
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.models.FastingDataItem
