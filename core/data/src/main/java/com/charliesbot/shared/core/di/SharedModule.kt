@@ -25,7 +25,7 @@ val sharedModule = module {
   single<DataStore<Preferences>> { androidContext().fastingDataStore }
   single<FastingDataRepository> { FastingDataRepositoryImpl(androidContext(), dataStore = get()) }
   single<SettingsRepository> { SettingsRepositoryImpl(androidContext(), dataStore = get()) }
-  single<FastingEventManager> { FastingEventManager() }
+  single<FastingEventManager> { FastingEventManager(get()) }
   factory { GetSuggestedFastingStartTimeUseCase(get(), get()) }
 
   factory { ObserveFastingStateUseCase(get()) }

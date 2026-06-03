@@ -3,16 +3,10 @@ package com.charliesbot.shared.core.services
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 
 class FastingEventManagerTest {
 
@@ -22,22 +16,10 @@ class FastingEventManagerTest {
 
   @Before
   fun setup() {
-    mockkStatic(android.util.Log::class)
-    every { android.util.Log.d(any(), any()) } returns 0
-    every { android.util.Log.e(any(), any()) } returns 0
-    every { android.util.Log.w(any(), any<String>()) } returns 0
-
     notificationScheduler = mockk(relaxed = true)
     callbacks = mockk(relaxed = true)
 
-    startKoin { modules(module { single { notificationScheduler } }) }
-
-    eventManager = FastingEventManager()
-  }
-
-  @After
-  fun tearDown() {
-    stopKoin()
+    eventManager = FastingEventManager(notificationScheduler)
   }
 
   @Test
