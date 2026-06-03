@@ -13,4 +13,7 @@ dependencies {
   api(project(":core:model"))
   api(platform(libs.kotlinx.coroutines.bom))
   api(libs.kotlinx.coroutines.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockk)
 }
