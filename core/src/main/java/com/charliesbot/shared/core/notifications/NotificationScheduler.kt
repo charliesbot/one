@@ -21,7 +21,7 @@ class NotificationScheduler(
   private val workerClass: Class<out ListenableWorker>,
   private val settingsRepository: SettingsRepository,
   private val workManager: WorkManager = WorkManager.getInstance(context),
-) {
+) : FastingNotificationScheduler {
   companion object {
     private const val SMART_REMINDER_TAG = "smart_reminder_notification"
     private const val FASTING_NOTIFICATION_TAG = "fasting_notification"
@@ -54,7 +54,7 @@ class NotificationScheduler(
     )
   }
 
-  suspend fun scheduleNotifications(startMillis: Long, fastingGoalId: String) {
+  override suspend fun scheduleNotifications(startMillis: Long, fastingGoalId: String) {
     cancelFastingNotifications()
 
     // Check if notifications are enabled
@@ -174,7 +174,7 @@ class NotificationScheduler(
     workManager.cancelAllWorkByTag(SMART_REMINDER_TAG)
   }
 
-  fun cancelAllNotifications() {
+  override fun cancelAllNotifications() {
     workManager.cancelAllWork()
   }
 }

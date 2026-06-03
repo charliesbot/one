@@ -1,7 +1,7 @@
 package com.charliesbot.shared.core.services
 
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.notifications.NotificationScheduler
+import com.charliesbot.shared.core.notifications.FastingNotificationScheduler
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -12,7 +12,7 @@ import org.junit.Test
 
 class FastingEventManagerTest {
 
-  private lateinit var notificationScheduler: NotificationScheduler
+  private lateinit var notificationScheduler: FastingNotificationScheduler
   private lateinit var callbacks: FastingEventCallbacks
   private lateinit var eventManager: FastingEventManager
 

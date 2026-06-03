@@ -3,9 +3,9 @@ package com.charliesbot.shared.core.services
 import android.util.Log
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.notifications.NotificationScheduler
+import com.charliesbot.shared.core.notifications.FastingNotificationScheduler
 
-class FastingEventManager(private val notificationScheduler: NotificationScheduler) {
+class FastingEventManager(private val notificationScheduler: FastingNotificationScheduler) {
   /**
    * Intelligently processes any fasting state change by comparing the state before and after the
    * event. This centralizes all business rule decisions.

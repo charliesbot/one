@@ -15,6 +15,7 @@ import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
 import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
+import com.charliesbot.shared.core.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.services.FastingEventManager
 import com.charliesbot.shared.core.utils.GoalResolver
 import com.google.android.gms.wearable.Wearable
@@ -25,7 +26,7 @@ val sharedModule = module {
   single<DataStore<Preferences>> { androidContext().fastingDataStore }
   single<FastingDataRepository> { FastingDataRepositoryImpl(androidContext(), dataStore = get()) }
   single<SettingsRepository> { SettingsRepositoryImpl(androidContext(), dataStore = get()) }
-  single<FastingEventManager> { FastingEventManager(get()) }
+  single<FastingEventManager> { FastingEventManager(get<FastingNotificationScheduler>()) }
   factory { GetSuggestedFastingStartTimeUseCase(get(), get()) }
 
   factory { ObserveFastingStateUseCase(get()) }
