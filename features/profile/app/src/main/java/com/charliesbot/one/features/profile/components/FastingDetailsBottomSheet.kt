@@ -34,8 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
-import com.charliesbot.shared.core.components.FastingDayData
 import com.charliesbot.shared.core.components.TimePickerDialog
+import com.charliesbot.shared.core.models.FastingDayData
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.features.profile.components.FastingDetailsBottomSheet
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingMonthCalendar
+import com.charliesbot.shared.core.models.FastingDayData
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -45,7 +46,7 @@ fun YouScreen(viewModel: YouViewModel = koinViewModel()) {
 @Composable
 fun YouScreenContent(
   uiState: CalendarUiState,
-  onDaySelected: (com.charliesbot.shared.core.components.FastingDayData?) -> Unit,
+  onDaySelected: (FastingDayData?) -> Unit,
   onNextMonth: () -> Unit,
   onPreviousMonth: () -> Unit,
   onDeleteFastingEntry: (Long) -> Unit,

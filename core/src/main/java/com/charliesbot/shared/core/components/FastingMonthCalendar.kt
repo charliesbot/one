@@ -34,21 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.models.FastingDayData
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-
-data class FastingDayData(
-  val date: LocalDate,
-  val durationHours: Int? = null, // null means no fasting that day
-  val isGoalMet: Boolean = false,
-  val startTimeEpochMillis: Long? = null,
-  val endTimeEpochMillis: Long? = null,
-  val goalId: String? = null,
-)
 
 @Composable
 fun FastingMonthCalendar(
