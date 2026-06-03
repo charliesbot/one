@@ -6,6 +6,7 @@ import com.charliesbot.shared.core.data.repository.CustomGoalRepositoryImpl
 import com.charliesbot.shared.core.data.repository.FastingDataRepositoryImpl
 import com.charliesbot.shared.core.data.repository.SettingsRepositoryImpl
 import com.charliesbot.shared.core.datastore.fastingDataStore
+import com.charliesbot.shared.core.domain.events.FastingEventProcessor
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
@@ -16,7 +17,6 @@ import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
 import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
-import com.charliesbot.shared.core.services.FastingEventProcessor
 import com.charliesbot.shared.core.utils.GoalResolver
 import com.google.android.gms.wearable.Wearable
 import org.koin.android.ext.koin.androidContext

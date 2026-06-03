@@ -1,8 +1,8 @@
 package com.charliesbot.shared.core.domain.usecase
 
+import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
+import com.charliesbot.shared.core.domain.events.FastingEventProcessor
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
-import com.charliesbot.shared.core.services.FastingEventCallbacks
-import com.charliesbot.shared.core.services.FastingEventProcessor
 
 class UpdateFastingConfigUseCase(
   private val fastingRepository: FastingDataRepository,

@@ -7,9 +7,9 @@ import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManag
 import com.charliesbot.onewearos.presentation.services.LocalWatchFastingCallbacks
 import com.charliesbot.onewearos.tiles.TileUpdateManager
 import com.charliesbot.shared.core.abstraction.StringProvider
+import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.notifications.NotificationScheduler
-import com.charliesbot.shared.core.services.FastingEventCallbacks
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

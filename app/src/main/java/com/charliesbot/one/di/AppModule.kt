@@ -14,10 +14,10 @@ import com.charliesbot.shared.core.abstraction.AppVersionProvider
 import com.charliesbot.shared.core.abstraction.ClipboardHelper
 import com.charliesbot.shared.core.abstraction.HistoryExporter
 import com.charliesbot.shared.core.abstraction.StringProvider
+import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
 import com.charliesbot.shared.core.notifications.NotificationScheduler
-import com.charliesbot.shared.core.services.FastingEventCallbacks
 import com.charliesbot.shared.core.services.SmartReminderCallback
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module

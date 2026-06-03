@@ -1,9 +1,9 @@
 package com.charliesbot.shared.core.domain.usecase
 
+import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
+import com.charliesbot.shared.core.domain.events.FastingEventProcessor
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.services.FastingEventCallbacks
-import com.charliesbot.shared.core.services.FastingEventProcessor
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

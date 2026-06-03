@@ -10,12 +10,12 @@ import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.onewearos.tiles.TileUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.services.FastingEventCallbacks
 
 /**
  * Handles fasting events that originate locally ONLY on the watch (user actions). Notifications are
- * handled by [com.charliesbot.shared.core.services.FastingEventProcessor].
+ * handled by [com.charliesbot.shared.core.domain.events.FastingEventProcessor].
  */
 class LocalWatchFastingCallbacks(
   private val context: Context,
