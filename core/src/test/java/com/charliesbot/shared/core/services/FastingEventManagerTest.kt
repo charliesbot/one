@@ -3,7 +3,9 @@ package com.charliesbot.shared.core.services
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -16,6 +18,9 @@ class FastingEventManagerTest {
 
   @Before
   fun setup() {
+    mockkStatic(android.util.Log::class)
+    every { android.util.Log.d(any(), any()) } returns 0
+
     notificationScheduler = mockk(relaxed = true)
     callbacks = mockk(relaxed = true)
 

@@ -1,5 +1,7 @@
 package com.charliesbot.shared.core.services
 
+import android.util.Log
+import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.notifications.NotificationScheduler
 
@@ -20,9 +22,15 @@ class FastingEventManager(private val notificationScheduler: NotificationSchedul
     val wasFasting = previousItem?.isFasting == true
     val isNowFasting = currentItem.isFasting
 
+    Log.d(
+      LOG_TAG,
+      "EventManager: Processing state change. Was Fasting: $wasFasting, Is Now Fasting: $isNowFasting",
+    )
+
     when {
       // Case 1: A new fast is starting (false -> true)
       !wasFasting && isNowFasting -> {
+        Log.d(LOG_TAG, "EventManager: Firing onFastingStarted.")
         notificationScheduler.scheduleNotifications(
           currentItem.startTimeInMillis,
           currentItem.fastingGoalId,
@@ -32,12 +40,14 @@ class FastingEventManager(private val notificationScheduler: NotificationSchedul
 
       // Case 2: An existing fast has stopped (true -> false)
       wasFasting && !isNowFasting -> {
+        Log.d(LOG_TAG, "EventManager: Firing onFastingCompleted.")
         notificationScheduler.cancelAllNotifications()
         callbacks.onFastingCompleted(currentItem)
       }
 
       // Case 3: An *active* fast was updated (true -> true)
       wasFasting && isNowFasting -> {
+        Log.d(LOG_TAG, "EventManager: Firing onFastingUpdated for an active fast.")
         // Reschedule notifications with the new config
         notificationScheduler.cancelAllNotifications()
         notificationScheduler.scheduleNotifications(
@@ -49,6 +59,7 @@ class FastingEventManager(private val notificationScheduler: NotificationSchedul
 
       // Case 4: An *inactive* fast's config was updated (false -> false)
       else -> {
+        Log.d(LOG_TAG, "EventManager: Firing onFastingUpdated for an inactive fast.")
         // No notifications needed, but we still trigger the UI update callback.
         callbacks.onFastingUpdated(currentItem)
       }
