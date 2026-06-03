@@ -2,11 +2,11 @@ package com.charliesbot.shared.core.domain.usecase
 
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.services.FastingEventCallbacks
-import com.charliesbot.shared.core.services.FastingEventManager
+import com.charliesbot.shared.core.services.FastingEventProcessor
 
 class StartFastingUseCase(
   private val fastingRepository: FastingDataRepository,
-  private val eventManager: FastingEventManager,
+  private val eventProcessor: FastingEventProcessor,
   private val localCallbacks: FastingEventCallbacks,
 ) {
   suspend operator fun invoke(goalId: String): Result<Unit> = runCatching {
@@ -18,6 +18,6 @@ class StartFastingUseCase(
     val startTime = System.currentTimeMillis()
     val (previousItem, currentItem) = fastingRepository.startFasting(startTime, goalId)
 
-    eventManager.processStateChange(previousItem, currentItem, localCallbacks)
+    eventProcessor.processStateChange(previousItem, currentItem, localCallbacks)
   }
 }
