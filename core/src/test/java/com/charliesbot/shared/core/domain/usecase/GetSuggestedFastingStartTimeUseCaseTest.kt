@@ -7,7 +7,6 @@ import com.charliesbot.shared.core.models.FastingRecord
 import com.charliesbot.shared.core.models.SuggestionSource
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
@@ -26,12 +25,6 @@ class GetSuggestedFastingStartTimeUseCaseTest {
 
   @Before
   fun setup() {
-    // Mock Android Log to prevent failures in unit tests
-    mockkStatic(android.util.Log::class)
-    every { android.util.Log.d(any(), any()) } returns 0
-    every { android.util.Log.e(any(), any()) } returns 0
-    every { android.util.Log.e(any(), any(), any()) } returns 0
-
     historyRepository = mockk()
     settingsRepository = mockk()
     useCase = GetSuggestedFastingStartTimeUseCase(historyRepository, settingsRepository)

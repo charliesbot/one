@@ -1,7 +1,5 @@
 package com.charliesbot.shared.core.domain.usecase
 
-import android.util.Log
-import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
@@ -41,11 +39,6 @@ class GetSuggestedFastingStartTimeUseCase(
     val allHistory = historyRepository.getAllHistory().first()
     val recentFasts = allHistory.filter { it.startTimeEpochMillis > cutoffTime }
     val hasEnoughHistory = recentFasts.size >= MIN_RECORDS_FOR_AVERAGE
-
-    Log.d(
-      LOG_TAG,
-      "GetSuggestedFastingStartTimeUseCase: Mode=$mode, Found ${recentFasts.size} fasts in last $HISTORY_DAYS days",
-    )
 
     return when (mode) {
       SmartReminderMode.BEDTIME_ONLY -> {
@@ -100,15 +93,6 @@ class GetSuggestedFastingStartTimeUseCase(
     // Convert to today's timestamp
     val suggestedTimeMillis = minutesToTodayTimestamp(avgMinutes)
 
-    val hours = avgMinutes / 60
-    val mins = avgMinutes % 60
-    val formattedTime = String.format("%02d:%02d", hours, mins)
-
-    Log.d(
-      LOG_TAG,
-      "GetSuggestedFastingStartTimeUseCase: Moving average calculated as $formattedTime",
-    )
-
     return SuggestedFastingTime(
       suggestedTimeMillis = suggestedTimeMillis,
       suggestedTimeMinutes = avgMinutes,
@@ -136,11 +120,6 @@ class GetSuggestedFastingStartTimeUseCase(
     val bedtimeMins = bedtimeMinutes % 60
     val formattedBedtime = String.format("%02d:%02d", bedtimeHours % 24, bedtimeMins)
 
-    Log.d(
-      LOG_TAG,
-      "GetSuggestedFastingStartTimeUseCase: Bedtime-based calculation (bedtime: $formattedBedtime)",
-    )
-
     return SuggestedFastingTime(
       suggestedTimeMillis = suggestedTimeMillis,
       suggestedTimeMinutes = suggestedMinutes,
@@ -153,12 +132,6 @@ class GetSuggestedFastingStartTimeUseCase(
   private suspend fun calculateFromFixedTime(): SuggestedFastingTime {
     val fixedMinutes = settingsRepository.fixedFastingStartMinutes.first()
     val suggestedTimeMillis = minutesToTodayTimestamp(fixedMinutes)
-
-    val hours = fixedMinutes / 60
-    val mins = fixedMinutes % 60
-    val formattedTime = String.format("%02d:%02d", hours % 24, mins)
-
-    Log.d(LOG_TAG, "GetSuggestedFastingStartTimeUseCase: Fixed time ($formattedTime)")
 
     return SuggestedFastingTime(
       suggestedTimeMillis = suggestedTimeMillis,
