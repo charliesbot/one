@@ -6,6 +6,7 @@ import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -21,6 +22,9 @@ class GoalResolverTest {
 
   @Before
   fun setup() {
+    mockkStatic(android.util.Log::class)
+    every { android.util.Log.e(any(), any<String>()) } returns 0
+
     customGoalRepository = mockk()
   }
 
