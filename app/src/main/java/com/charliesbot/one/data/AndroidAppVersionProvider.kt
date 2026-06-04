@@ -2,8 +2,8 @@ package com.charliesbot.one.data
 
 import android.content.Context
 import android.util.Log
-import com.charliesbot.shared.core.abstraction.AppVersionProvider
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.platform.AppVersionProvider
 
 class AndroidAppVersionProvider(private val context: Context) : AppVersionProvider {
   override val versionName: String =

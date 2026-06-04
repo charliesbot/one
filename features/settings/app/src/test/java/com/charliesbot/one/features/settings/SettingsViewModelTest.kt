@@ -1,9 +1,10 @@
 package com.charliesbot.one.features.settings
 
-import com.charliesbot.shared.core.abstraction.AppVersionProvider
-import com.charliesbot.shared.core.abstraction.ClipboardHelper
-import com.charliesbot.shared.core.abstraction.HistoryExporter
-import com.charliesbot.shared.core.abstraction.StringProvider
+import com.charliesbot.shared.core.domain.platform.AppVersionProvider
+import com.charliesbot.shared.core.domain.platform.ClipboardHelper
+import com.charliesbot.shared.core.domain.platform.HistoryExporter
+import com.charliesbot.shared.core.domain.platform.SmartReminderCallback
+import com.charliesbot.shared.core.domain.platform.StringProvider
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
@@ -12,7 +13,6 @@ import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
 import com.charliesbot.shared.core.models.FastingRecord
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
-import com.charliesbot.shared.core.services.SmartReminderCallback
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

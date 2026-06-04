@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.abstraction
+package com.charliesbot.shared.core.domain.platform
 
 import com.charliesbot.shared.core.models.FastingRecord
 

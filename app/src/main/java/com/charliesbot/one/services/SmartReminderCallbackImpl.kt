@@ -2,7 +2,7 @@ package com.charliesbot.one.services
 
 import android.content.Context
 import com.charliesbot.one.notifications.SmartReminderWorker
-import com.charliesbot.shared.core.services.SmartReminderCallback
+import com.charliesbot.shared.core.domain.platform.SmartReminderCallback
 
 class SmartReminderCallbackImpl(private val context: Context) : SmartReminderCallback {
 

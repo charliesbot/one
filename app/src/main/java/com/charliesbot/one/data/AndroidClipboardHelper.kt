@@ -3,7 +3,7 @@ package com.charliesbot.one.data
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import com.charliesbot.shared.core.abstraction.ClipboardHelper
+import com.charliesbot.shared.core.domain.platform.ClipboardHelper
 
 class AndroidClipboardHelper(private val context: Context) : ClipboardHelper {
   override fun copy(label: String, text: String) {
