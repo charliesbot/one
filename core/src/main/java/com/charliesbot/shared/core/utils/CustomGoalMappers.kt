@@ -1,18 +1,10 @@
-package com.charliesbot.shared.core.domain.model
+package com.charliesbot.shared.core.utils
 
 import androidx.compose.ui.graphics.Color
 import com.charliesbot.shared.core.constants.FastGoal
-import kotlinx.serialization.Serializable
+import com.charliesbot.shared.core.models.CustomGoalData
 
-@Serializable
-data class CustomGoalData(
-  val id: String,
-  val name: String,
-  val durationMillis: Long,
-  val colorHex: Long,
-)
-
-internal fun CustomGoalData.toFastGoal(): FastGoal =
+fun CustomGoalData.toFastGoal(): FastGoal =
   FastGoal(
     id = id,
     titleText = name,
@@ -21,7 +13,7 @@ internal fun CustomGoalData.toFastGoal(): FastGoal =
     durationMillis = durationMillis,
   )
 
-internal fun FastGoal.toData(): CustomGoalData =
+fun FastGoal.toData(): CustomGoalData =
   CustomGoalData(
     id = id,
     name = titleText ?: id,
@@ -29,7 +21,7 @@ internal fun FastGoal.toData(): CustomGoalData =
     colorHex = color.value.toLong(),
   )
 
-internal fun formatDurationDisplay(millis: Long): String {
+private fun formatDurationDisplay(millis: Long): String {
   val totalHours = millis / (60L * 60L * 1000L)
   return totalHours.toString()
 }

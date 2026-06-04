@@ -1,6 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-plugins { alias(libs.plugins.kotlin.jvm) }
+plugins {
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.jetbrains.kotlin.serialization)
+}
 
 java {
   sourceCompatibility = JavaVersion.VERSION_11
@@ -8,3 +11,5 @@ java {
 }
 
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
+
+dependencies { implementation(libs.kotlinx.serialization.core) }

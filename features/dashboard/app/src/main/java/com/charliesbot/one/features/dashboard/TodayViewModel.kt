@@ -19,6 +19,7 @@ import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.utils.FastingProgressCalculator
 import com.charliesbot.shared.core.utils.GoalResolver
+import com.charliesbot.shared.core.utils.toData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -158,7 +159,7 @@ class TodayViewModel(
 
   fun saveCustomGoal(goal: FastGoal) {
     viewModelScope.launch {
-      customGoalRepository.saveCustomGoal(goal)
+      customGoalRepository.saveCustomGoal(goal.toData())
       updateFastingConfigUseCase(goalId = goal.id)
     }
   }
