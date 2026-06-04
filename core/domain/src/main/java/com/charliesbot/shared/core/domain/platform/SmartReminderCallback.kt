@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.services
+package com.charliesbot.shared.core.domain.platform
 
 /**
  * Callback interface for triggering smart reminder recalculation. This allows the features module
