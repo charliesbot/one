@@ -1,12 +1,12 @@
-package com.charliesbot.shared.core.services
+package com.charliesbot.shared.core.data.services
 
 import android.util.Log
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.data.sync.getLatestFastingState
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.events.FastingEventProcessor
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.utils.getLatestFastingState
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.WearableListenerService

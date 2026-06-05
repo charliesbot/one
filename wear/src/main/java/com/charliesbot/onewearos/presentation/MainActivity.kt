@@ -21,7 +21,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.charliesbot.onewearos.core.components.NotificationPermissionDialog
 import com.charliesbot.onewearos.presentation.navigation.WearNavigation
 import com.charliesbot.onewearos.presentation.theme.OneTheme
-import com.charliesbot.shared.core.notifications.NotificationUtil
+import com.charliesbot.shared.core.data.notifications.NotificationUtil
 
 class MainActivity : ComponentActivity() {
   private val requestNotificationPermission =

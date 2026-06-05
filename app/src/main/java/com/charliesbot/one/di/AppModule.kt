@@ -10,6 +10,7 @@ import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
 import com.charliesbot.one.widget.WidgetUpdateManager
+import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.platform.AppVersionProvider
@@ -18,7 +19,6 @@ import com.charliesbot.shared.core.domain.platform.HistoryExporter
 import com.charliesbot.shared.core.domain.platform.SmartReminderCallback
 import com.charliesbot.shared.core.domain.platform.StringProvider
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
-import com.charliesbot.shared.core.notifications.NotificationScheduler
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

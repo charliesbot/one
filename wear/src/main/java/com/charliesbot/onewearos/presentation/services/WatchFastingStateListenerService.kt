@@ -9,13 +9,13 @@ import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.tiles.TileUpdateManager
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.DataLayerConstants
+import com.charliesbot.shared.core.data.notifications.NotificationScheduler
+import com.charliesbot.shared.core.data.notifications.NotificationUtil
+import com.charliesbot.shared.core.data.services.BaseFastingListenerService
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.notifications.NotificationScheduler
-import com.charliesbot.shared.core.notifications.NotificationUtil
-import com.charliesbot.shared.core.services.BaseFastingListenerService
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem

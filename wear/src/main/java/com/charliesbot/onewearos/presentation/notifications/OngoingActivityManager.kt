@@ -18,8 +18,8 @@ import com.charliesbot.shared.R as SharedR
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.NotificationConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
-import com.charliesbot.shared.core.notifications.NotificationUtil
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 

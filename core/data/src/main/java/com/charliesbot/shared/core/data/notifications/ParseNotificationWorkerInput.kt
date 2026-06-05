@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.data.notifications
 
 import androidx.work.Data
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY

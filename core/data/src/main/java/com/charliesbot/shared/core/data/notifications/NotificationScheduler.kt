@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.notifications
+package com.charliesbot.shared.core.data.notifications
 
 import android.content.Context
 import android.util.Log
