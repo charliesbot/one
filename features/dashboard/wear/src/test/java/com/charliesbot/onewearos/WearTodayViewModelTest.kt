@@ -6,6 +6,8 @@ import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.models.FastingGoal
+import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.charliesbot.shared.core.utils.GoalResolver
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -52,12 +54,16 @@ class WearTodayViewModelTest {
 
   @After
   fun tearDown() {
+    PredefinedFastingGoals.registerCustomGoals(emptyList())
     Dispatchers.resetMain()
   }
 
-  private fun createViewModel(fastingItem: FastingDataItem? = null): WearTodayViewModel {
+  private fun createViewModel(
+    fastingItem: FastingDataItem? = null,
+    goals: List<FastingGoal> = FastingGoalCatalog.allGoals,
+  ): WearTodayViewModel {
     every { observeFastingStateUseCase() } returns flowOf(fastingItem)
-    every { goalResolver.allGoals } returns flowOf(PredefinedFastingGoals.allGoals)
+    every { goalResolver.allGoals } returns flowOf(goals)
 
     return WearTodayViewModel(
       observeFastingStateUseCase = observeFastingStateUseCase,
@@ -140,5 +146,26 @@ class WearTodayViewModelTest {
     val result = viewModel.temporalStartTime.value
     assertEquals(LocalDate.of(2026, 3, 15), result?.toLocalDate())
     assertEquals(LocalTime.of(18, 0), result?.toLocalTime())
+  }
+
+  @Test
+  fun `allGoals exposes FastGoal values and registers custom goals for lookup`() = runTest {
+    val customGoal =
+      FastingGoal(
+        id = "custom_wear",
+        name = "Wear Goal",
+        durationMillis = 15 * 60 * 60 * 1000L,
+        colorHex = 0xFF0000FF,
+      )
+    val viewModel = createViewModel(goals = FastingGoalCatalog.allGoals + customGoal)
+
+    backgroundScope.launch { viewModel.allGoals.collect {} }
+    advanceUntilIdle()
+
+    val fastGoals = viewModel.allGoals.value
+    assertEquals(6, fastGoals.size)
+    assertEquals("Wear Goal", fastGoals.last().titleText)
+    assertEquals("15", fastGoals.last().durationDisplay)
+    assertEquals(fastGoals.last(), PredefinedFastingGoals.getGoalById("custom_wear"))
   }
 }

@@ -12,6 +12,7 @@ import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.GoalResolver
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
+import com.charliesbot.shared.core.utils.toFastGoal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -33,11 +34,17 @@ class WearTodayViewModel(
 ) : ViewModel() {
 
   val allGoals: StateFlow<List<FastGoal>> =
-    goalResolver.allGoals.stateIn(
-      viewModelScope,
-      SharingStarted.WhileSubscribed(5000L),
-      PredefinedFastingGoals.allGoals,
-    )
+    goalResolver.allGoals
+      .map { goals ->
+        val fastGoals = goals.map { it.toFastGoal() }
+        PredefinedFastingGoals.registerCustomGoals(fastGoals.filter { it.isCustom })
+        fastGoals
+      }
+      .stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        PredefinedFastingGoals.allGoals,
+      )
 
   private val currentFasting: StateFlow<FastingDataItem?> =
     observeFastingStateUseCase()

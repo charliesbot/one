@@ -1,6 +1,11 @@
 package com.charliesbot.shared.core.models
 
-data class FastingGoal(val id: String, val name: String? = null, val durationMillis: Long) {
+data class FastingGoal(
+  val id: String,
+  val name: String? = null,
+  val durationMillis: Long,
+  val colorHex: Long? = null,
+) {
   val durationDisplay: String
     get() = (durationMillis / MILLIS_PER_HOUR).toString()
 

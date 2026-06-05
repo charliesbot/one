@@ -10,6 +10,8 @@ import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.models.FastingGoal
+import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
 import com.charliesbot.shared.core.utils.GoalResolver
@@ -60,15 +62,18 @@ class TodayViewModelTest {
 
   @After
   fun tearDown() {
+    PredefinedFastingGoals.registerCustomGoals(emptyList())
     Dispatchers.resetMain()
   }
 
-  private fun createViewModel(): TodayViewModel {
+  private fun createViewModel(
+    goals: List<FastingGoal> = FastingGoalCatalog.allGoals
+  ): TodayViewModel {
     every { observeFastingStateUseCase() } returns flowOf(null)
     every { fastingHistoryRepository.getCurrentWeekHistory() } returns flowOf(emptyList())
     every { settingsRepository.smartRemindersEnabled } returns flowOf(false)
     every { settingsRepository.bedtimeMinutes } returns flowOf(1320)
-    every { goalResolver.allGoals } returns flowOf(PredefinedFastingGoals.allGoals)
+    every { goalResolver.allGoals } returns flowOf(goals)
     coEvery { getSuggestedFastingStartTimeUseCase() } returns
       SuggestedFastingTime(
         suggestedTimeMillis = 0L,
@@ -106,7 +111,7 @@ class TodayViewModelTest {
     every { fastingHistoryRepository.getCurrentWeekHistory() } returns flowOf(emptyList())
     every { settingsRepository.smartRemindersEnabled } returns flowOf(false)
     every { settingsRepository.bedtimeMinutes } returns flowOf(1320)
-    every { goalResolver.allGoals } returns flowOf(PredefinedFastingGoals.allGoals)
+    every { goalResolver.allGoals } returns flowOf(FastingGoalCatalog.allGoals)
     coEvery { getSuggestedFastingStartTimeUseCase() } returns
       SuggestedFastingTime(
         suggestedTimeMillis = 0L,
@@ -185,5 +190,25 @@ class TodayViewModelTest {
     assertTrue(viewModel.isGoalBottomSheetOpen.value)
     viewModel.closeGoalBottomSheet()
     assertFalse(viewModel.isGoalBottomSheetOpen.value)
+  }
+
+  @Test
+  fun `allGoals exposes FastGoal values and registers custom goals for lookup`() = runTest {
+    val customGoal =
+      FastingGoal(
+        id = "custom_test",
+        name = "My Goal",
+        durationMillis = 14 * 60 * 60 * 1000L,
+        colorHex = 0xFFFF0000,
+      )
+    val viewModel = createViewModel(goals = FastingGoalCatalog.allGoals + customGoal)
+    backgroundScope.launch { viewModel.allGoals.collect {} }
+    advanceUntilIdle()
+
+    val fastGoals = viewModel.allGoals.value
+    assertEquals(6, fastGoals.size)
+    assertEquals("My Goal", fastGoals.last().titleText)
+    assertEquals("14", fastGoals.last().durationDisplay)
+    assertEquals(fastGoals.last(), PredefinedFastingGoals.getGoalById("custom_test"))
   }
 }
