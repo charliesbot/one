@@ -12,4 +12,8 @@ java {
 
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
-dependencies { implementation(libs.kotlinx.serialization.core) }
+dependencies {
+  implementation(libs.kotlinx.serialization.core)
+
+  testImplementation(libs.junit)
+}

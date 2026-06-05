@@ -3,7 +3,9 @@ package com.charliesbot.shared.core.constants
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.charliesbot.shared.R
-import com.charliesbot.shared.core.models.FastingRules
+import com.charliesbot.shared.core.models.CUSTOM_GOAL_ID_PREFIX
+import com.charliesbot.shared.core.models.FastingGoal
+import com.charliesbot.shared.core.models.FastingGoalCatalog
 
 data class FastGoal(
   val id: String,
@@ -14,7 +16,7 @@ data class FastGoal(
   val durationMillis: Long, // The actual duration in milliseconds for calculations
 ) {
   val isCustom: Boolean
-    get() = id.startsWith("custom_")
+    get() = id.startsWith(CUSTOM_GOAL_ID_PREFIX)
 
   fun getTitle(context: android.content.Context): String =
     titleText ?: context.getString(titleResId)
@@ -22,55 +24,36 @@ data class FastGoal(
 
 object PredefinedFastingGoals {
 
-  // Minimum hours to consider a completed fast
-  const val MIN_FASTING_HOURS = FastingRules.MINIMUM_COMPLETED_FAST_HOURS
-
-  // Helper to calculate milliseconds from hours
-  private fun hoursToMillis(hours: Int): Long = hours * 60L * 60L * 1000L
+  const val MIN_FASTING_HOURS = FastingGoalCatalog.MIN_FASTING_HOURS
 
   val CIRCADIAN =
-    FastGoal(
-      id = "circadian",
+    FastingGoalCatalog.CIRCADIAN.toFastGoal(
       titleResId = R.string.fasting_goal_circadian,
-      durationDisplay = "13",
       color = Color(0xFF6096BA), // Dusty Blue / Muted Teal
-      durationMillis = hoursToMillis(13),
     )
 
   val SIXTEEN_EIGHT =
-    FastGoal(
-      id = "16:8",
+    FastingGoalCatalog.SIXTEEN_EIGHT.toFastGoal(
       titleResId = R.string.fasting_goal_16_8,
-      durationDisplay = "16",
       color = Color(0xFF82B387), // Muted Sage Green
-      durationMillis = hoursToMillis(16),
     )
 
   val EIGHTEEN_SIX =
-    FastGoal(
-      id = "18:6",
+    FastingGoalCatalog.EIGHTEEN_SIX.toFastGoal(
       titleResId = R.string.fasting_goal_18_6,
-      durationDisplay = "18",
       color = Color(0xFFE5A98C), // Muted Peach / Terracotta
-      durationMillis = hoursToMillis(18),
     )
 
   val TWENTY_FOUR =
-    FastGoal(
-      id = "20:4",
+    FastingGoalCatalog.TWENTY_FOUR.toFastGoal(
       titleResId = R.string.fasting_goal_20_4,
-      durationDisplay = "20",
       color = Color(0xFFC9AB6A), // Muted Gold / Ochre
-      durationMillis = hoursToMillis(20),
     )
 
   val THIRTY_SIX_HOUR =
-    FastGoal(
-      id = "36hour",
+    FastingGoalCatalog.THIRTY_SIX_HOUR.toFastGoal(
       titleResId = R.string.fasting_goal_36_hour,
-      durationDisplay = "36",
       color = Color(0xFF9787BE), // Dusty Lavender / Muted Plum
-      durationMillis = hoursToMillis(36),
     )
 
   val allGoals: List<FastGoal> =
@@ -104,8 +87,17 @@ object PredefinedFastingGoals {
 
       else -> {
         Log.e(AppConstants.LOG_TAG, "Invalid goal id: $id")
-        goalsById["16:8"]!!
+        goalsById[FastingGoalCatalog.DEFAULT_GOAL_ID]!!
       }
     }
   }
+
+  private fun FastingGoal.toFastGoal(titleResId: Int, color: Color): FastGoal =
+    FastGoal(
+      id = id,
+      titleResId = titleResId,
+      durationDisplay = durationDisplay,
+      color = color,
+      durationMillis = durationMillis,
+    )
 }
