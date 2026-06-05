@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.data.sync
 
 import com.charliesbot.shared.core.constants.DataLayerConstants
 import com.charliesbot.shared.core.models.FastingDataItem

@@ -36,7 +36,11 @@ dependencies {
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
+  implementation(libs.androidx.work.runtime.ktx)
   implementation(libs.play.services.wearable)
   implementation(libs.kotlinx.serialization.json)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockk)
   ksp(libs.androidx.room.compiler)
 }

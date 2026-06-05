@@ -14,12 +14,12 @@ import androidx.work.WorkerParameters
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.MainActivity
 import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_ID
+import com.charliesbot.shared.core.data.notifications.NotificationUtil
+import com.charliesbot.shared.core.data.notifications.parseWorkerInput
 import com.charliesbot.shared.core.domain.notifications.generateDismissalId
 import com.charliesbot.shared.core.domain.notifications.getNotificationText
 import com.charliesbot.shared.core.domain.platform.StringProvider
 import com.charliesbot.shared.core.models.NotificationWorkerInput
-import com.charliesbot.shared.core.notifications.NotificationUtil
-import com.charliesbot.shared.core.utils.parseWorkerInput
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
