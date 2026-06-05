@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.one.features.profile.components.FastingDetailsBottomSheet
 import com.charliesbot.shared.R
-import com.charliesbot.shared.core.components.FastingMonthCalendar
+import com.charliesbot.shared.core.designsystem.app.components.FastingMonthCalendar
 import com.charliesbot.shared.core.models.FastingDayData
 import org.koin.androidx.compose.koinViewModel
 

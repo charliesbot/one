@@ -35,7 +35,6 @@ kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 dependencies {
   api(project(":core:domain"))
   api(project(":core:model"))
-  implementation(project(":core:designsystem:common"))
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
   implementation(libs.koin.core.coroutines)

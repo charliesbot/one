@@ -49,11 +49,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
-import com.charliesbot.shared.core.components.CustomGoalCard
-import com.charliesbot.shared.core.components.GoalSelectionCard
-import com.charliesbot.shared.core.components.WheelPicker
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.app.components.CustomGoalCard
+import com.charliesbot.shared.core.designsystem.app.components.GoalSelectionCard
+import com.charliesbot.shared.core.designsystem.app.components.WheelPicker
 import java.util.UUID
 
 private sealed interface SheetView {

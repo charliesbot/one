@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.components
+package com.charliesbot.shared.core.designsystem.app.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
