@@ -20,6 +20,7 @@ import com.charliesbot.one.features.dashboard.TodayScreen
 import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
 import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -33,7 +34,7 @@ fun MainNavigation() {
         NavigationBarItem(
           icon = {
             Icon(
-              painter = painterResource(SharedR.drawable.today_24px),
+              painter = painterResource(DesignSystemR.drawable.today_24px),
               contentDescription = stringResource(SharedR.string.nav_today),
             )
           },
@@ -49,7 +50,7 @@ fun MainNavigation() {
         NavigationBarItem(
           icon = {
             Icon(
-              painterResource(SharedR.drawable.person_24px),
+              painterResource(DesignSystemR.drawable.person_24px),
               contentDescription = stringResource(SharedR.string.nav_you),
             )
           },
@@ -65,7 +66,7 @@ fun MainNavigation() {
         NavigationBarItem(
           icon = {
             Icon(
-              painterResource(SharedR.drawable.settings_24px),
+              painterResource(DesignSystemR.drawable.settings_24px),
               contentDescription = stringResource(SharedR.string.settings_title),
             )
           },

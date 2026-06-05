@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.charliesbot.shared.R
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.models.FastingDayData
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -108,7 +108,10 @@ private fun MonthHeader(
               ),
             interactionSource = interactionSources[0],
           ) {
-            Icon(painter = painterResource(R.drawable.chevron_left_24px), contentDescription = null)
+            Icon(
+              painter = painterResource(DesignSystemR.drawable.chevron_left_24px),
+              contentDescription = null,
+            )
           }
         },
         menuContent = {},
@@ -125,7 +128,7 @@ private fun MonthHeader(
               ),
           ) {
             Icon(
-              painter = painterResource(R.drawable.chevron_right_24px),
+              painter = painterResource(DesignSystemR.drawable.chevron_right_24px),
               contentDescription = null,
             )
           }

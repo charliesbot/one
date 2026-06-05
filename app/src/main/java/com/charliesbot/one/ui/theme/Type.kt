@@ -4,9 +4,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.charliesbot.shared.core.theme.GoogleSans
-import com.charliesbot.shared.core.theme.GoogleSansTitleLargeSpecific
-import com.charliesbot.shared.core.theme.GoogleSansWide
+import com.charliesbot.shared.core.designsystem.common.theme.GoogleSans
+import com.charliesbot.shared.core.designsystem.common.theme.GoogleSansTitleLargeSpecific
+import com.charliesbot.shared.core.designsystem.common.theme.GoogleSansWide
 
 // Material 3 Typography Scale
 val Typography =

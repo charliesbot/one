@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.components
+package com.charliesbot.shared.core.designsystem.common.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio

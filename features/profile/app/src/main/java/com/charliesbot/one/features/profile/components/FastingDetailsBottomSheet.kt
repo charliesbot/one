@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.TimePickerDialog
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.models.FastingDayData
 import java.time.Instant
 import java.time.LocalDate
@@ -153,7 +154,7 @@ fun FastingDetailsBottomSheet(
       TimeRow(
         icon = {
           Icon(
-            painter = painterResource(R.drawable.play_arrow_24px),
+            painter = painterResource(DesignSystemR.drawable.play_arrow_24px),
             contentDescription = "Start",
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp),
@@ -170,7 +171,7 @@ fun FastingDetailsBottomSheet(
       TimeRow(
         icon = {
           Icon(
-            painter = painterResource(R.drawable.stop_24px),
+            painter = painterResource(DesignSystemR.drawable.stop_24px),
             contentDescription = "End",
             tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.size(24.dp),
@@ -187,7 +188,7 @@ fun FastingDetailsBottomSheet(
 
       TextButton(onClick = { showDeleteConfirmation = true }) {
         Icon(
-          painter = painterResource(R.drawable.delete_24px),
+          painter = painterResource(DesignSystemR.drawable.delete_24px),
           contentDescription = null,
           tint = MaterialTheme.colorScheme.error,
           modifier = Modifier.size(20.dp),
@@ -229,7 +230,7 @@ private fun TimeRow(
     }
 
     Icon(
-      painter = painterResource(R.drawable.chevron_right_24px),
+      painter = painterResource(DesignSystemR.drawable.chevron_right_24px),
       contentDescription = null,
       tint = MaterialTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.size(20.dp),

@@ -10,9 +10,9 @@ import androidx.wear.compose.material3.AlertDialogDefaults
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
-import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @Composable
 fun NotificationPermissionDialog(
@@ -25,7 +25,7 @@ fun NotificationPermissionDialog(
     onDismissRequest = onDismiss,
     icon = {
       Icon(
-        painter = painterResource(com.charliesbot.shared.R.drawable.notifications_24px),
+        painter = painterResource(DesignSystemR.drawable.notifications_24px),
         contentDescription = "Notification Permission",
       )
     },

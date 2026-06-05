@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @Composable
 fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
@@ -18,7 +19,7 @@ fun NotificationPermissionDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     title = { Text(stringResource(SharedR.string.notification_permission_title)) },
     icon = {
       Icon(
-        painter = painterResource(SharedR.drawable.notifications_24px),
+        painter = painterResource(DesignSystemR.drawable.notifications_24px),
         contentDescription = stringResource(SharedR.string.notification_permission_icon_desc),
       )
     },
