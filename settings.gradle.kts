@@ -36,6 +36,8 @@ include(":core:domain")
 
 include(":core:model")
 
+include(":core:designsystem:common")
+
 include(":widget")
 
 include(":complications")

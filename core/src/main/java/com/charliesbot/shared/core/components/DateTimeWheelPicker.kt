@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.charliesbot.shared.R
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -282,7 +283,7 @@ fun DateTimeWheelPickerDialog(
         Box(modifier = Modifier.fillMaxWidth()) {
           IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd)) {
             Icon(
-              painter = painterResource(id = R.drawable.close_24px),
+              painter = painterResource(id = DesignSystemR.drawable.close_24px),
               contentDescription = stringResource(R.string.time_picker_cancel),
             )
           }

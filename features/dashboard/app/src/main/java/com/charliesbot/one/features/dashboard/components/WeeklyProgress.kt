@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.charliesbot.shared.R
-import com.charliesbot.shared.core.components.FastingProgressBar
+import com.charliesbot.shared.core.designsystem.common.components.FastingProgressBar
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.testing.MockDataUtils
 

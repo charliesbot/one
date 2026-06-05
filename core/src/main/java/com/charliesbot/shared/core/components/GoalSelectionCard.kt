@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.constants.FastGoal
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -63,7 +64,7 @@ private fun SelectionCard(
         if (onEdit != null) {
           OutlinedIconButton(onClick = onEdit, modifier = Modifier.size(24.dp)) {
             Icon(
-              painter = painterResource(R.drawable.edit_24px),
+              painter = painterResource(DesignSystemR.drawable.edit_24px),
               contentDescription = "",
               modifier = Modifier.size(14.dp),
             )

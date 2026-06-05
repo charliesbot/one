@@ -57,6 +57,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.TimePickerDialog
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
@@ -308,7 +309,10 @@ private fun SmartRemindersCard(
             onCheckedChange = onEnabledChange,
             thumbContent = {
               Icon(
-                painterResource(if (enabled) R.drawable.check_24px else R.drawable.close_24px),
+                painterResource(
+                  if (enabled) DesignSystemR.drawable.check_24px
+                  else DesignSystemR.drawable.close_24px
+                ),
                 contentDescription = null,
                 modifier = Modifier.size(SwitchDefaults.IconSize),
               )
@@ -367,9 +371,9 @@ private fun SmartRemindersCard(
               painter =
                 painterResource(
                   if (isCustomizeExpanded) {
-                    R.drawable.keyboard_arrow_up_24px
+                    DesignSystemR.drawable.keyboard_arrow_up_24px
                   } else {
-                    R.drawable.keyboard_arrow_down_24px
+                    DesignSystemR.drawable.keyboard_arrow_down_24px
                   }
                 ),
               contentDescription = null,
@@ -533,7 +537,9 @@ private fun SwitchSettingItem(
         onCheckedChange = onCheckedChange,
         thumbContent = {
           Icon(
-            painterResource(if (checked) R.drawable.check_24px else R.drawable.close_24px),
+            painterResource(
+              if (checked) DesignSystemR.drawable.check_24px else DesignSystemR.drawable.close_24px
+            ),
             contentDescription = null,
             modifier = Modifier.size(SwitchDefaults.IconSize),
           )
