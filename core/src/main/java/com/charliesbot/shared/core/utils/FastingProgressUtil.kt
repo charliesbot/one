@@ -1,6 +1,7 @@
 package com.charliesbot.shared.core.utils
 
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.progress.calculateProgressPercentage
 import com.charliesbot.shared.core.models.FastingDataItem
 
 data class FastingProgress(

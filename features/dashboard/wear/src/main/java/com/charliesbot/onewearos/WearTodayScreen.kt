@@ -40,7 +40,7 @@ import com.charliesbot.onewearos.components.TimeButtonActions
 import com.charliesbot.shared.R
 import com.charliesbot.shared.core.components.FastingProgressBar
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.utils.calculateProgressFraction
+import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
 import kotlinx.coroutines.delay

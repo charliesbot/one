@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.domain.notifications
 
 import com.charliesbot.shared.core.models.NotificationType
 
