@@ -1,21 +1,18 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.domain.progress
 
-import com.charliesbot.shared.core.constants.AppConstants
+private const val INVALID_GOAL_DURATION_MESSAGE =
+  "totalDurationGoalMillis cannot be null or less than or equal to 0"
 
 fun calculateProgressFraction(progressMillis: Long, totalDurationGoalMillis: Long?): Float {
   if (totalDurationGoalMillis == null || totalDurationGoalMillis <= 0) {
-    throw Error(
-      AppConstants.LOG_TAG + "totalDurationGoalMillis cannot be null or less than or equal to 0"
-    )
+    throw Error(INVALID_GOAL_DURATION_MESSAGE)
   }
   return (progressMillis.toFloat() / totalDurationGoalMillis).coerceIn(0f, 1f)
 }
 
 fun calculateProgressPercentage(progressMillis: Long, totalDurationGoalMillis: Long?): Int {
   if (totalDurationGoalMillis == null || totalDurationGoalMillis <= 0) {
-    throw Error(
-      AppConstants.LOG_TAG + "totalDurationGoalMillis cannot be null or less than or equal to 0"
-    )
+    throw Error(INVALID_GOAL_DURATION_MESSAGE)
   }
   val progressFraction = calculateProgressFraction(progressMillis, totalDurationGoalMillis)
   return progressFraction.times(100).toInt()
