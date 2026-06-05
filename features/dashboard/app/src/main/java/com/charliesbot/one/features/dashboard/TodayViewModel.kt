@@ -20,6 +20,7 @@ import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.utils.GoalResolver
 import com.charliesbot.shared.core.utils.toData
+import com.charliesbot.shared.core.utils.toFastGoal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -69,11 +70,17 @@ class TodayViewModel(
       .stateIn(scope = viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
   val allGoals: StateFlow<List<FastGoal>> =
-    goalResolver.allGoals.stateIn(
-      viewModelScope,
-      SharingStarted.WhileSubscribed(5000L),
-      PredefinedFastingGoals.allGoals,
-    )
+    goalResolver.allGoals
+      .map { goals ->
+        val fastGoals = goals.map { it.toFastGoal() }
+        PredefinedFastingGoals.registerCustomGoals(fastGoals.filter { it.isCustom })
+        fastGoals
+      }
+      .stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        PredefinedFastingGoals.allGoals,
+      )
 
   // Smart Reminders
   val smartRemindersEnabled: StateFlow<Boolean> =

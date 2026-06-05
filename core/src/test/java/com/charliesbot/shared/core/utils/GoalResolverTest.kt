@@ -1,16 +1,13 @@
 package com.charliesbot.shared.core.utils
 
-import androidx.compose.ui.graphics.Color
-import com.charliesbot.shared.core.constants.FastGoal
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
+import com.charliesbot.shared.core.models.CustomGoalData
+import com.charliesbot.shared.core.models.FastingGoalCatalog
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -22,15 +19,7 @@ class GoalResolverTest {
 
   @Before
   fun setup() {
-    mockkStatic(android.util.Log::class)
-    every { android.util.Log.e(any(), any<String>()) } returns 0
-
     customGoalRepository = mockk()
-  }
-
-  @After
-  fun tearDown() {
-    PredefinedFastingGoals.registerCustomGoals(emptyList())
   }
 
   @Test
@@ -41,69 +30,45 @@ class GoalResolverTest {
     val goals = resolver.allGoals.first()
 
     assertEquals(5, goals.size)
-    assertEquals(PredefinedFastingGoals.allGoals, goals)
+    assertEquals(FastingGoalCatalog.allGoals, goals)
   }
 
   @Test
   fun `emits predefined plus custom goals combined`() = runTest {
     val customGoal =
-      FastGoal(
+      CustomGoalData(
         id = "custom_1",
-        titleText = "My Goal",
-        durationDisplay = "14",
-        color = Color.Red,
+        name = "My Goal",
         durationMillis = 14 * 60 * 60 * 1000L,
+        colorHex = 0xFFFF0000,
       )
-    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal.toData()))
+    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal))
 
     val resolver = GoalResolver(customGoalRepository)
     val goals = resolver.allGoals.first()
 
     assertEquals(6, goals.size)
-    assertTrue(goals.containsAll(PredefinedFastingGoals.allGoals))
-    assertTrue(goals.contains(customGoal))
+    assertTrue(goals.containsAll(FastingGoalCatalog.allGoals))
+    assertEquals(customGoal.toFastingGoal(), goals.last())
   }
 
   @Test
-  fun `collecting the flow registers custom goals so getGoalById resolves them`() = runTest {
+  fun `custom goal keeps display metadata as pure scalar values`() = runTest {
     val customGoal =
-      FastGoal(
+      CustomGoalData(
         id = "custom_2",
-        titleText = "Custom Goal",
-        durationDisplay = "15",
-        color = Color.Blue,
+        name = "Custom Goal",
         durationMillis = 15 * 60 * 60 * 1000L,
+        colorHex = 0xFF0000FF,
       )
-    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal.toData()))
-
+    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal))
     val resolver = GoalResolver(customGoalRepository)
-    resolver.allGoals.first() // trigger collection which calls registerCustomGoals
 
-    val resolved = PredefinedFastingGoals.getGoalById("custom_2")
-    assertEquals(customGoal, resolved)
-  }
+    val resolved = resolver.allGoals.first().last()
 
-  @Test
-  fun `collecting with empty list clears previously registered custom goals`() = runTest {
-    // First register a custom goal
-    val customGoal =
-      FastGoal(
-        id = "custom_3",
-        titleText = "Temp Goal",
-        durationDisplay = "22",
-        color = Color.Green,
-        durationMillis = 22 * 60 * 60 * 1000L,
-      )
-    PredefinedFastingGoals.registerCustomGoals(listOf(customGoal))
-    assertEquals(customGoal, PredefinedFastingGoals.getGoalById("custom_3"))
-
-    // Now collect with empty list
-    every { customGoalRepository.customGoals } returns flowOf(emptyList())
-    val resolver = GoalResolver(customGoalRepository)
-    resolver.allGoals.first()
-
-    // custom_3 should no longer resolve — falls back to 16:8
-    val resolved = PredefinedFastingGoals.getGoalById("custom_3")
-    assertEquals("16:8", resolved.id)
+    assertEquals("custom_2", resolved.id)
+    assertEquals("Custom Goal", resolved.name)
+    assertEquals("15", resolved.durationDisplay)
+    assertEquals(0xFF0000FF, resolved.colorHex)
   }
 }
