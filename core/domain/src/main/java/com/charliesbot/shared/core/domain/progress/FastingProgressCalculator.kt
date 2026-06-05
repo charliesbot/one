@@ -1,7 +1,7 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.domain.progress
 
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.FastingRecord
+import com.charliesbot.shared.core.models.FastingRules
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.models.TimePeriodType
 import java.util.Calendar
@@ -33,8 +33,7 @@ object FastingProgressCalculator {
             durationMillis / (1000 * 60f * 60f) // Convert to hours
           } ?: 0f
 
-        // We consider a fasting of over 13 hours as completed
-        val completedFasting = longestFastHours >= PredefinedFastingGoals.MIN_FASTING_HOURS
+        val completedFasting = longestFastHours >= FastingRules.MINIMUM_COMPLETED_FAST_HOURS
         val progress = if (completedFasting) 1.0f else 0.0f
 
         TimePeriodProgress(
