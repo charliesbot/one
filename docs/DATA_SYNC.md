@@ -4,7 +4,9 @@
 
 ONE uses the **Wearable Data Layer API** (Google Play Services) for bidirectional sync between the phone and Wear OS apps. When a user starts or stops a fast on either device, the change propagates to the other device within seconds.
 
-The sync layer lives entirely in `:core` — both `:app` and `:wear` extend shared base classes with platform-specific hooks.
+The sync layer lives in `:core:data` and is exposed through domain contracts in
+`:core:domain`. Both `:app` and `:wear` extend shared data-layer base classes
+with platform-specific hooks.
 
 ## Package Name Requirement
 
@@ -50,6 +52,13 @@ This is a Google Play Services requirement. The Wearable Data Layer only connect
 | `smart_reminder_mode`      | String  | `AUTO`, `BEDTIME_ONLY`, `MOVING_AVERAGE_ONLY`, or `FIXED_TIME` |
 | `timestamp`                | Long    | When settings were last updated    |
 
+### `/custom_goals` — One-way (phone -> watch)
+
+| Key                      | Type   | Description                           |
+| ------------------------ | ------ | ------------------------------------- |
+| `custom_goals_json`      | String | Serialized list of custom goal data   |
+| `custom_goals_timestamp` | Long   | When custom goals were last updated   |
+
 ## Sync Flow
 
 ### User starts a fast (on either device)
@@ -57,10 +66,11 @@ This is a Google Play Services requirement. The Wearable Data Layer only connect
 ```mermaid
 sequenceDiagram
     participant User
-    participant RepoA as FastingDataRepository<br/>(Device A)
+    participant RepoA as FastingDataRepositoryImpl<br/>(Device A)
     participant DataLayer as Wearable Data Layer
     participant ListenerB as BaseFastingListenerService<br/>(Device B)
-    participant ManagerB as FastingEventManager<br/>(Device B)
+    participant RepoB as FastingDataRepositoryImpl<br/>(Device B)
+    participant ProcessorB as FastingEventProcessor<br/>(Device B)
     participant UIB as UI Surfaces<br/>(Device B)
 
     User->>RepoA: startFasting()
@@ -69,16 +79,18 @@ sequenceDiagram
     DataLayer->>ListenerB: onDataChanged()
     ListenerB->>ListenerB: isFromRemoteDevice() ✓
     ListenerB->>ListenerB: timestamp > local? ✓
-    ListenerB->>ManagerB: processStateChange()
-    ManagerB->>ManagerB: updateLocalStore()
-    ManagerB->>ListenerB: onPlatformFastingStarted()
-    ManagerB->>ListenerB: onPlatformFastingStateSynced()
+    ListenerB->>RepoB: updateFastingStatusFromRemote()
+    ListenerB->>ListenerB: onPlatformFastingStateSynced()
+    ListenerB->>ProcessorB: processStateChange(previous, current)
+    ProcessorB->>ListenerB: onPlatformFastingStarted()
     ListenerB->>UIB: Update widgets / complications / ongoing activity
 ```
 
 ### User stops a fast (on either device)
 
-Same flow, but `FastingEventManager.processStateChange()` detects the `wasFasting && !isNowFasting` transition and calls `onPlatformFastingCompleted()` instead.
+Same flow, but `FastingEventProcessor.processStateChange()` detects the
+`wasFasting && !isNowFasting` transition and calls
+`onPlatformFastingCompleted()` instead.
 
 ## Conflict Resolution
 
@@ -114,6 +126,7 @@ If the local node ID can't be determined (e.g. Play Services unavailable), event
 | `/fasting_state`  | Phone <-> Watch    | Users can start/stop fasts on either device               |
 | `/settings`       | Phone -> Watch     | Settings UI only exists on phone; watch applies silently  |
 | `/smart_reminder` | Phone -> Watch     | Reminders are computed on phone; watch schedules locally   |
+| `/custom_goals`   | Phone -> Watch     | Custom-goal editing exists on phone; watch reflects goals  |
 
 For one-way paths, the watch listener applies updates with `syncToRemote = false` to prevent echoing data back to the phone.
 
@@ -140,19 +153,20 @@ Both `WidgetUpdateManager` and `ComplicationUpdateManager` debounce requests (1s
 
 | Component                      | File                                                                                   |
 | ------------------------------ | -------------------------------------------------------------------------------------- |
-| Data Layer constants           | `core/.../core/constants/DataLayerConstants.kt`                                        |
-| DataStore constants            | `core/.../core/constants/DataStoreConstants.kt`                                        |
-| Fasting data repository        | `core/.../core/data/repositories/fastingDataRepository/FastingDataRepositoryImpl.kt`   |
-| Settings repository            | `core/.../core/data/repositories/settingsRepository/SettingsRepositoryImpl.kt`         |
-| Base listener service          | `core/.../core/services/BaseFastingListenerService.kt`                                 |
-| Fasting event manager          | `core/.../core/services/FastingEventManager.kt`                                        |
-| FastingDataItem model          | `core/.../core/models/FastingDataItem.kt`                                              |
-| Latest state utility           | `core/.../core/utils/GetLatestDataUpdate.kt`                                           |
-| DataMap converter              | `core/.../core/utils/GetFastingItemFromDataLayer.kt`                                   |
+| Data Layer constants           | `core/src/main/java/.../core/constants/DataLayerConstants.kt`                          |
+| DataStore constants            | `core/src/main/java/.../core/constants/DataStoreConstants.kt`                          |
+| Fasting data repository        | `core/data/src/main/java/.../core/data/repository/FastingDataRepositoryImpl.kt`        |
+| Settings repository            | `core/data/src/main/java/.../core/data/repository/SettingsRepositoryImpl.kt`           |
+| Custom goal repository         | `core/data/src/main/java/.../core/data/repository/CustomGoalRepositoryImpl.kt`         |
+| Base listener service          | `core/data/src/main/java/.../core/data/services/BaseFastingListenerService.kt`         |
+| Fasting event processor        | `core/domain/src/main/java/.../core/domain/events/FastingEventProcessor.kt`            |
+| FastingDataItem model          | `core/model/src/main/java/.../core/models/FastingDataItem.kt`                          |
+| Latest state utility           | `core/data/src/main/java/.../core/data/sync/GetLatestDataUpdate.kt`                    |
+| DataMap converter              | `core/data/src/main/java/.../core/data/sync/GetFastingItemFromDataLayer.kt`            |
 | Phone listener service         | `app/.../one/services/FastingStateListenerService.kt`                                  |
-| Widget update manager          | `app/.../one/widgets/WidgetUpdateManager.kt`                                           |
+| Widget update manager          | `widget/src/main/java/.../one/widget/WidgetUpdateManager.kt`                           |
 | Watch listener service         | `wear/.../onewearos/presentation/services/WatchFastingStateListenerService.kt`         |
-| Complication update manager    | `wear/.../onewearos/complication/ComplicationUpdateManager.kt`                         |
+| Complication update manager    | `complications/src/main/java/.../onewearos/complications/ComplicationUpdateManager.kt` |
 | Ongoing activity service       | `wear/.../onewearos/presentation/services/OngoingActivityService.kt`                   |
 
 > Paths abbreviated with `...` for readability. Full base: `src/main/java/com/charliesbot/`.
