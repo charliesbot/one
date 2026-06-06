@@ -30,7 +30,7 @@ import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
 import com.charliesbot.shared.core.models.FastingDataItem

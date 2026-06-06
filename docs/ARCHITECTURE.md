@@ -30,13 +30,15 @@ The architecture is split by responsibility:
 | `:core:model` | Pure Kotlin models and value types |
 | `:core:domain` | Pure Kotlin repository interfaces, use cases, and domain logic |
 | `:core:data` | Android data layer: Room, DataStore, repositories, sync, notifications, DI |
+| `:core:strings` | Shared user-facing strings and translations |
 | `:core:designsystem:common` | Shared non-string resources and common Compose UI |
 | `:core:designsystem:app` | Phone-only shared Compose components |
-| `:core` | Legacy Android compatibility module for remaining shared Android code and resources |
+| `:core` | Legacy Android compatibility module for remaining shared Android code and notification resources |
 
 `:core` is intentionally smaller than before. New pure logic should go to
 `:core:model` or `:core:domain`; new data/platform infrastructure should go to
-`:core:data`; new shared UI should go to the appropriate design-system module.
+`:core:data`; new strings should go to `:core:strings`; new shared UI should go
+to the appropriate design-system module.
 
 ## Dependency Flow
 
@@ -49,19 +51,22 @@ The architecture is split by responsibility:
 
 :core                       → :core:domain, :core:model
 :core:data                  → :core, :core:domain, :core:model
+:core:strings
 :core:designsystem:common
-:core:designsystem:app     → :core, :core:designsystem:common
+:core:designsystem:app     → :core, :core:strings, :core:designsystem:common
 
-:features:*:app            → :core, :core:designsystem:app, :core:designsystem:common
-:features:dashboard:wear   → :core, :core:designsystem:common
+:features:*:app            → :core, :core:strings, :core:designsystem:app,
+                              :core:designsystem:common
+:features:dashboard:wear   → :core, :core:strings, :core:designsystem:common
 
-:app                       → :core, :core:data, :core:designsystem:common,
-                              :features:*:app, :widget
-:wear                      → :core, :core:data, :core:designsystem:common, :features:dashboard:wear,
+:app                       → :core, :core:data, :core:strings,
+                              :core:designsystem:common, :features:*:app, :widget
+:wear                      → :core, :core:data, :core:strings,
+                              :core:designsystem:common, :features:dashboard:wear,
                               :complications, :tiles
-:widget                    → :core
-:complications             → :core
-:tiles                     → :core
+:widget                    → :core, :core:strings
+:complications             → :core, :core:strings
+:tiles                     → :core, :core:strings
 ```
 
 Feature modules should not depend on each other. Phone feature modules may use
@@ -110,6 +115,19 @@ Examples:
 - notification scheduling
 - `SharedModule`
 - `HistoryDatabaseModule`
+
+### `:core:strings`
+
+Shared user-facing strings used by phone, Wear, widgets, tiles, and
+complications. Translations live next to the default strings in locale-specific
+resource directories.
+
+Examples:
+
+- navigation labels
+- feature copy and action labels
+- widget, tile, and complication text
+- notification text
 
 ### `:core:designsystem:common`
 
@@ -193,6 +211,7 @@ See `docs/DATA_SYNC.md` for paths, keys, conflict resolution, and key files.
 - Put repository interfaces and use cases in `:core:domain`.
 - Put repository implementations, Room, DataStore, WorkManager, sync, and Koin
   data bindings in `:core:data`.
+- Put shared user-facing strings in `:core:strings`.
 - Put non-string shared resources in `:core:designsystem:common`.
 - Put phone-only shared Compose components in `:core:designsystem:app`.
 - Keep Wear UI on Wear Compose and do not depend on `:core:designsystem:app`.
@@ -210,6 +229,7 @@ Use this placement guide:
 | Pure model/value object | `:core:model` |
 | Repository interface or use case | `:core:domain` |
 | Room/DataStore/WorkManager/Play Services implementation | `:core:data` |
+| Shared user-facing string | `:core:strings` |
 | Shared vector/font/non-string resource | `:core:designsystem:common` |
 | Phone-only reusable Compose component | `:core:designsystem:app` |
 | Wear-only reusable Compose component | Wear feature or future Wear design-system module |

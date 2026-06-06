@@ -14,7 +14,7 @@ import androidx.wear.ongoing.OngoingActivity
 import androidx.wear.ongoing.Status
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.MainActivity
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.NotificationConstants
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals

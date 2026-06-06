@@ -11,7 +11,7 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.onewearos.presentation.theme.OneTheme
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @Composable
