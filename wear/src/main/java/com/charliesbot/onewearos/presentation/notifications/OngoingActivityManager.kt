@@ -17,7 +17,7 @@ import com.charliesbot.onewearos.presentation.MainActivity
 import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.constants.NotificationConstants
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import kotlinx.coroutines.flow.first

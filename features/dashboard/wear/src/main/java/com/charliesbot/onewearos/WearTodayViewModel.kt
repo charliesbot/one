@@ -3,8 +3,8 @@ package com.charliesbot.onewearos
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.shared.core.constants.FastGoal
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.FastGoal
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.goals.GoalResolver
 import com.charliesbot.shared.core.domain.usecase.ObserveFastingStateUseCase
 import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase

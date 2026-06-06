@@ -1,8 +1,8 @@
 package com.charliesbot.shared.core.utils
 
 import androidx.compose.ui.graphics.Color
-import com.charliesbot.shared.core.constants.FastGoal
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.FastGoal
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.models.CustomGoalData
 import com.charliesbot.shared.core.models.FastingGoal
 

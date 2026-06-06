@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.core.strings.R
-import com.charliesbot.shared.core.constants.FastGoal
+import com.charliesbot.shared.core.designsystem.common.goals.FastGoal
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
