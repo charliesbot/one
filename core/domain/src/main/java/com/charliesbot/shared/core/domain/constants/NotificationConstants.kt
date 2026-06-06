@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.constants
+package com.charliesbot.shared.core.domain.constants
 
 object NotificationConstants {
   const val NOTIFICATION_ID = 1001

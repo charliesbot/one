@@ -3,7 +3,7 @@ package com.charliesbot.one.features.settings
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.platform.AppVersionProvider
 import com.charliesbot.shared.core.domain.platform.ClipboardHelper
 import com.charliesbot.shared.core.domain.platform.HistoryExporter

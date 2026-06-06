@@ -7,8 +7,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.constants.DataLayerConstants
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants
 import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase

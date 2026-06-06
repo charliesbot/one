@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.provider.MediaStore
 import android.util.Log
-import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.platform.HistoryExporter
 import com.charliesbot.shared.core.models.FastingRecord
 import java.text.SimpleDateFormat

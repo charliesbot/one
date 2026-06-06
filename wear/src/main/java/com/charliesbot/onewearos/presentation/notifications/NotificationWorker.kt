@@ -13,7 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.MainActivity
-import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_ID
+import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_ID
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.data.notifications.parseWorkerInput
 import com.charliesbot.shared.core.domain.notifications.generateDismissalId

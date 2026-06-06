@@ -1,6 +1,6 @@
 package com.charliesbot.shared.core.data.sync
 
-import com.charliesbot.shared.core.constants.DataLayerConstants
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.google.android.gms.wearable.DataMap
 

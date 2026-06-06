@@ -2,7 +2,7 @@ package com.charliesbot.onewearos.tiles
 
 import android.content.Context
 import android.util.Log
-import com.charliesbot.shared.core.constants.AppConstants
+import com.charliesbot.shared.core.domain.constants.AppConstants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

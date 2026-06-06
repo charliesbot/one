@@ -6,8 +6,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.constants.DataLayerConstants
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.models.CustomGoalData
 import com.google.android.gms.wearable.PutDataMapRequest
