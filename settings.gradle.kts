@@ -38,6 +38,8 @@ include(":core:model")
 
 include(":core:designsystem:common")
 
+include(":core:designsystem:app")
+
 include(":widget")
 
 include(":complications")

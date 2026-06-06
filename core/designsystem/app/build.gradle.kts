@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-  namespace = "com.charliesbot.one.features.settings"
+  namespace = "com.charliesbot.shared.core.designsystem.app"
   compileSdk = 37
 
   defaultConfig { minSdk = 31 }
@@ -22,14 +22,7 @@ kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
 dependencies {
   implementation(project(":core"))
-  implementation(project(":core:designsystem:app"))
   implementation(project(":core:designsystem:common"))
-
-  implementation(platform(libs.kotlinx.coroutines.bom))
-  implementation(libs.kotlinx.coroutines.core)
-
-  implementation(platform(libs.koin.bom))
-  implementation(libs.koin.androidx.compose)
 
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.androidx.ui)
@@ -37,11 +30,5 @@ dependencies {
   implementation(libs.androidx.material3)
   implementation(libs.androidx.ui.tooling.preview)
 
-  implementation(libs.androidx.lifecycle.runtime.ktx)
-  implementation(libs.androidx.lifecycle.runtime.compose)
-  implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-  testImplementation(libs.junit)
-  testImplementation(libs.mockk)
-  testImplementation(libs.kotlinx.coroutines.test)
+  debugImplementation(libs.ui.tooling)
 }
