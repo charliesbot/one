@@ -10,9 +10,10 @@ import androidx.work.WorkManager
 import com.charliesbot.shared.core.domain.constants.AppConstants
 import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
 import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
+import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
+import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.charliesbot.shared.core.models.NotificationType
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.first
@@ -21,6 +22,7 @@ class NotificationScheduler(
   private val context: Context,
   private val workerClass: Class<out ListenableWorker>,
   private val settingsRepository: SettingsRepository,
+  private val customGoalRepository: CustomGoalRepository,
   private val workManager: WorkManager = WorkManager.getInstance(context),
 ) : FastingNotificationScheduler {
   companion object {
@@ -68,7 +70,7 @@ class NotificationScheduler(
       return
     }
 
-    val endMillis = PredefinedFastingGoals.getGoalById(fastingGoalId).durationMillis
+    val endMillis = resolveGoalDurationMillis(fastingGoalId)
     val completeFastNotificationDelay = startMillis + endMillis - System.currentTimeMillis()
     // We show a notification 1 hour before the goal
     val almostCompleteFastNotificationDelay =
@@ -177,5 +179,11 @@ class NotificationScheduler(
 
   override fun cancelAllNotifications() {
     workManager.cancelAllWork()
+  }
+
+  private suspend fun resolveGoalDurationMillis(fastingGoalId: String): Long {
+    val customGoal =
+      customGoalRepository.customGoals.first().firstOrNull { goal -> goal.id == fastingGoalId }
+    return customGoal?.durationMillis ?: FastingGoalCatalog.getGoalById(fastingGoalId).durationMillis
   }
 }

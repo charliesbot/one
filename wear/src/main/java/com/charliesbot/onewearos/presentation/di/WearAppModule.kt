@@ -19,6 +19,7 @@ val wearAppModule = module {
       context = androidContext(),
       workerClass = NotificationWorker::class.java,
       settingsRepository = get(),
+      customGoalRepository = get(),
     )
   }
   single<FastingNotificationScheduler> { get<NotificationScheduler>() }

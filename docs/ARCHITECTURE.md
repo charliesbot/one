@@ -118,6 +118,10 @@ Examples:
 - `SharedModule`
 - `HistoryDatabaseModule`
 
+Data-layer code should use pure goal models such as `FastingGoalCatalog` for
+durations and default goal IDs. UI-specific goal presentation belongs outside
+`:core:data`.
+
 ### `:core:strings`
 
 Shared user-facing strings used by phone, Wear, widgets, tiles, and
