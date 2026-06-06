@@ -1,6 +1,7 @@
 package com.charliesbot.onewearos
 
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.goals.GoalResolver
 import com.charliesbot.shared.core.domain.usecase.ObserveFastingStateUseCase
 import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
@@ -8,7 +9,6 @@ import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingGoal
 import com.charliesbot.shared.core.models.FastingGoalCatalog
-import com.charliesbot.shared.core.utils.GoalResolver
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

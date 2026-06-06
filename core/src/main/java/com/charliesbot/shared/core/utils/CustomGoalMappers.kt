@@ -15,9 +15,6 @@ fun CustomGoalData.toFastGoal(): FastGoal =
     durationMillis = durationMillis,
   )
 
-fun CustomGoalData.toFastingGoal(): FastingGoal =
-  FastingGoal(id = id, name = name, durationMillis = durationMillis, colorHex = colorHex)
-
 fun FastingGoal.toFastGoal(): FastGoal =
   if (isCustom) {
     FastGoal(

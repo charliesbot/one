@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.domain.goals
 
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.models.CustomGoalData
