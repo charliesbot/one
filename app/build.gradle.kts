@@ -125,6 +125,7 @@ dependencies {
 
   implementation(project(":core"))
   implementation(project(":core:data"))
+  implementation(project(":core:strings"))
   implementation(project(":core:designsystem:common"))
   implementation(project(":widget"))
   implementation(project(":features:dashboard:app"))

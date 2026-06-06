@@ -50,7 +50,7 @@ import com.charliesbot.one.features.dashboard.components.CurrentFastingProgress
 import com.charliesbot.one.features.dashboard.components.GoalBottomSheet
 import com.charliesbot.one.features.dashboard.components.TimeDisplay
 import com.charliesbot.one.features.dashboard.components.WeeklyProgress
-import com.charliesbot.shared.R
+import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.designsystem.app.components.TimePickerDialog

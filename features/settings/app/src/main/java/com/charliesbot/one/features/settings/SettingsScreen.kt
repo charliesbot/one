@@ -55,7 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.charliesbot.shared.R
+import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.designsystem.app.components.TimePickerDialog
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode

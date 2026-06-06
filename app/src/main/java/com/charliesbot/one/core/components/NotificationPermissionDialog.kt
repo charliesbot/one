@@ -9,7 +9,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.charliesbot.one.ui.theme.OneTheme
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @Composable

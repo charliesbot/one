@@ -2,7 +2,7 @@ package com.charliesbot.shared.core.constants
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.charliesbot.shared.R
+import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.models.CUSTOM_GOAL_ID_PREFIX
 import com.charliesbot.shared.core.models.FastingGoal
 import com.charliesbot.shared.core.models.FastingGoalCatalog

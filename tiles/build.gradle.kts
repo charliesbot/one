@@ -24,6 +24,7 @@ dependencies {
   implementation(libs.androidx.protolayout.material)
   implementation(libs.play.services.wearable)
   implementation(project(":core"))
+  implementation(project(":core:strings"))
   compileOnly(platform(libs.androidx.compose.bom))
   compileOnly(libs.androidx.ui.graphics)
   testImplementation(libs.junit)

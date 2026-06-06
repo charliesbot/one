@@ -14,7 +14,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.Spacer
 import androidx.wear.protolayout.LayoutElementBuilders.Text
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.material.CircularProgressIndicator
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.FastingProgress

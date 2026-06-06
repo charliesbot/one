@@ -16,7 +16,8 @@ import androidx.wear.watchface.complications.data.RangedValueComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.R as LegacyR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
@@ -37,7 +38,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService(), KoinC
   override fun getPreviewData(type: ComplicationType): ComplicationData? {
     val icon =
       MonochromaticImage.Builder(
-          Icon.createWithResource(this, SharedR.drawable.ic_notification_status)
+          Icon.createWithResource(this, LegacyR.drawable.ic_notification_status)
         )
         .build()
     val contentDescription =
@@ -114,7 +115,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService(), KoinC
       PlainComplicationText.Builder(getString(SharedR.string.complication_text_not_fasting)).build()
     val icon =
       MonochromaticImage.Builder(
-          Icon.createWithResource(this, SharedR.drawable.ic_notification_status)
+          Icon.createWithResource(this, LegacyR.drawable.ic_notification_status)
         )
         .build()
 
@@ -187,7 +188,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService(), KoinC
     val contentDescription = createContentDescription(fastingProgress, fastingGoal)
     val icon =
       MonochromaticImage.Builder(
-          Icon.createWithResource(this, SharedR.drawable.ic_notification_status)
+          Icon.createWithResource(this, LegacyR.drawable.ic_notification_status)
         )
         .build()
     val elapsedHours = fastingProgress.elapsedHours.toInt()

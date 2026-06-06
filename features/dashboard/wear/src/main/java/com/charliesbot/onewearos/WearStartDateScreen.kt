@@ -23,7 +23,7 @@ import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.tooling.preview.devices.WearDevices
-import com.charliesbot.shared.R
+import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.utils.TimeFormat
 import com.charliesbot.shared.core.utils.convertLocalDateTimeToMillis
 import com.charliesbot.shared.core.utils.formatDate

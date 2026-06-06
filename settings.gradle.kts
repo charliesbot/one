@@ -36,6 +36,8 @@ include(":core:domain")
 
 include(":core:model")
 
+include(":core:strings")
+
 include(":core:designsystem:common")
 
 include(":core:designsystem:app")

@@ -19,7 +19,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.charliesbot.one.features.dashboard.TodayScreen
 import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
-import com.charliesbot.shared.R as SharedR
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 
 @ExperimentalMaterial3ExpressiveApi
