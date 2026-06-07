@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.constants
+package com.charliesbot.shared.core.data.constants
 
 object DataStoreConstants {
   const val FASTING_PATH_KEY = "/fasting_state"

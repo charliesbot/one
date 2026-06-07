@@ -100,6 +100,7 @@ Examples:
 - fasting use cases
 - `FastingEventProcessor`
 - notification scheduler abstraction
+- shared sync, notification, and logging constants
 
 ### `:core:data`
 
@@ -113,6 +114,7 @@ Examples:
 - `BaseFastingListenerService`
 - Wearable Data Layer helpers
 - notification scheduling
+- DataStore preference keys
 - `SharedModule`
 - `HistoryDatabaseModule`
 
@@ -227,8 +229,9 @@ Use this placement guide:
 | New code | Module |
 | --- | --- |
 | Pure model/value object | `:core:model` |
-| Repository interface or use case | `:core:domain` |
+| Repository interface, use case, or shared cross-layer constant | `:core:domain` |
 | Room/DataStore/WorkManager/Play Services implementation | `:core:data` |
+| DataStore key or implementation-only data constant | `:core:data` |
 | Shared user-facing string | `:core:strings` |
 | Shared vector/font/non-string resource | `:core:designsystem:common` |
 | Phone-only reusable Compose component | `:core:designsystem:app` |

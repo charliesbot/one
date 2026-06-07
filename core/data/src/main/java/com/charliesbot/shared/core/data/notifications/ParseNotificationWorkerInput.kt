@@ -1,8 +1,8 @@
 package com.charliesbot.shared.core.data.notifications
 
 import androidx.work.Data
-import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
-import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
+import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
+import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
 import com.charliesbot.shared.core.models.NotificationType
 import com.charliesbot.shared.core.models.NotificationWorkerInput
 

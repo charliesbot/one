@@ -7,9 +7,9 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.charliesbot.shared.core.constants.AppConstants
-import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
-import com.charliesbot.shared.core.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
+import com.charliesbot.shared.core.domain.constants.AppConstants
+import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_FASTING_START_MILLIS_KEY
+import com.charliesbot.shared.core.domain.constants.NotificationConstants.NOTIFICATION_TYPE_KEY
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.repository.SettingsRepository

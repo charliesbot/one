@@ -2,10 +2,11 @@ package com.charliesbot.shared.core.constants
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.charliesbot.shared.core.strings.R
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.models.CUSTOM_GOAL_ID_PREFIX
 import com.charliesbot.shared.core.models.FastingGoal
 import com.charliesbot.shared.core.models.FastingGoalCatalog
+import com.charliesbot.shared.core.strings.R
 
 data class FastGoal(
   val id: String,
@@ -86,7 +87,7 @@ object PredefinedFastingGoals {
       custom != null -> custom
 
       else -> {
-        Log.e(AppConstants.LOG_TAG, "Invalid goal id: $id")
+        Log.e(LOG_TAG, "Invalid goal id: $id")
         goalsById[FastingGoalCatalog.DEFAULT_GOAL_ID]!!
       }
     }

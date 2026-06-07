@@ -13,8 +13,8 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.charliesbot.onewearos.R
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
-import com.charliesbot.shared.core.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.constants.NotificationConstants
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.NotificationConstants
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import org.koin.core.component.KoinComponent
