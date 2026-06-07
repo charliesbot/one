@@ -21,11 +21,13 @@ android {
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
 dependencies {
+  implementation(project(":core:domain"))
   api(project(":core:model"))
   implementation(project(":core:strings"))
   api(platform(libs.androidx.compose.bom))
   implementation(libs.androidx.ui)
   api(libs.androidx.ui.graphics)
+  implementation(libs.androidx.material3.adaptive)
   implementation(libs.androidx.material3)
   implementation(libs.androidx.ui.tooling.preview)
 

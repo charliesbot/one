@@ -22,8 +22,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.charliesbot.shared.core.utils.TimeFormat
-import com.charliesbot.shared.core.utils.formatDate
+import com.charliesbot.shared.core.designsystem.common.utils.TimeFormat
+import com.charliesbot.shared.core.designsystem.common.utils.formatDate
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

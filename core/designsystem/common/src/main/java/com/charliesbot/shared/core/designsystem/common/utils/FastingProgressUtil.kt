@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.designsystem.common.utils
 
 import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.progress.calculateProgressPercentage

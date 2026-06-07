@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.testing
+package com.charliesbot.one.features.dashboard
 
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.models.TimePeriodType

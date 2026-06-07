@@ -16,15 +16,15 @@ import androidx.wear.watchface.complications.data.RangedValueComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import com.charliesbot.shared.R as LegacyR
 import com.charliesbot.shared.core.strings.R as SharedR
+import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.designsystem.common.goals.FastGoal
 import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.utils.FastingProgress
-import com.charliesbot.shared.core.utils.FastingProgressUtil
+import com.charliesbot.shared.core.designsystem.common.utils.FastingProgress
+import com.charliesbot.shared.core.designsystem.common.utils.FastingProgressUtil
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -38,7 +38,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService(), KoinC
   override fun getPreviewData(type: ComplicationType): ComplicationData? {
     val icon =
       MonochromaticImage.Builder(
-          Icon.createWithResource(this, LegacyR.drawable.ic_notification_status)
+          Icon.createWithResource(this, DesignSystemR.drawable.ic_notification_status)
         )
         .build()
     val contentDescription =
@@ -115,7 +115,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService(), KoinC
       PlainComplicationText.Builder(getString(SharedR.string.complication_text_not_fasting)).build()
     val icon =
       MonochromaticImage.Builder(
-          Icon.createWithResource(this, LegacyR.drawable.ic_notification_status)
+          Icon.createWithResource(this, DesignSystemR.drawable.ic_notification_status)
         )
         .build()
 
@@ -188,7 +188,7 @@ class MainComplicationService : SuspendingComplicationDataSourceService(), KoinC
     val contentDescription = createContentDescription(fastingProgress, fastingGoal)
     val icon =
       MonochromaticImage.Builder(
-          Icon.createWithResource(this, LegacyR.drawable.ic_notification_status)
+          Icon.createWithResource(this, DesignSystemR.drawable.ic_notification_status)
         )
         .build()
     val elapsedHours = fastingProgress.elapsedHours.toInt()

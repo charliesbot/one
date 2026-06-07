@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.designsystem.common.utils
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -6,8 +6,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DateUtilsTest {
-
-  // ============= Existing DateUtils Function Tests =============
 
   @Test
   fun `getHours returns correct hours from milliseconds`() {
@@ -28,7 +26,6 @@ class DateUtilsTest {
 
   @Test
   fun `formatTimestamp formats duration correctly`() {
-    // 1 hour, 30 minutes, 45 seconds
     val millis = (1 * 60 * 60 + 30 * 60 + 45) * 1000L
     val result = formatTimestamp(millis)
     assertEquals("01:30:45", result)
@@ -42,7 +39,6 @@ class DateUtilsTest {
 
   @Test
   fun `formatTimestamp handles large values`() {
-    // 100 hours, 30 minutes, 15 seconds
     val millis = (100 * 60 * 60 + 30 * 60 + 15) * 1000L
     val result = formatTimestamp(millis)
     assertEquals("100:30:15", result)
@@ -61,7 +57,6 @@ class DateUtilsTest {
     val localDateTime = convertMillisToLocalDateTime(original)
     val converted = convertLocalDateTimeToMillis(localDateTime)
 
-    // Should be within 1 second (millisecond precision may differ)
     assertTrue(
       "Expected times to be close but diff was ${kotlin.math.abs(original - converted)}",
       kotlin.math.abs(original - converted) < 1000,

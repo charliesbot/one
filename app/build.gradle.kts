@@ -123,7 +123,6 @@ dependencies {
 
   implementation(libs.androidx.material3.adaptive)
 
-  implementation(project(":core"))
   implementation(project(":core:data"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))

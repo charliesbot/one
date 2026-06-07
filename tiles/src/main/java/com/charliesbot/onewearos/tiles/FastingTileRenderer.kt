@@ -17,8 +17,8 @@ import androidx.wear.protolayout.material.CircularProgressIndicator
 import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.designsystem.common.goals.FastGoal
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.utils.FastingProgress
-import com.charliesbot.shared.core.utils.formatTimestamp
+import com.charliesbot.shared.core.designsystem.common.utils.FastingProgress
+import com.charliesbot.shared.core.designsystem.common.utils.formatTimestamp
 
 object FastingTileRenderer {
 

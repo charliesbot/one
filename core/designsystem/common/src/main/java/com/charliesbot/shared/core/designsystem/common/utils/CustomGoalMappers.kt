@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.designsystem.common.utils
 
 import androidx.compose.ui.graphics.Color
 import com.charliesbot.shared.core.designsystem.common.goals.FastGoal
