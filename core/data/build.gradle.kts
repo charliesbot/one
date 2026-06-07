@@ -25,7 +25,6 @@ kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 room { schemaDirectory("$projectDir/schemas") }
 
 dependencies {
-  implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:model"))
   implementation(platform(libs.koin.bom))
