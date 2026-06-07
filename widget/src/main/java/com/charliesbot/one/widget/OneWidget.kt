@@ -12,7 +12,7 @@ import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import org.koin.core.component.KoinComponent

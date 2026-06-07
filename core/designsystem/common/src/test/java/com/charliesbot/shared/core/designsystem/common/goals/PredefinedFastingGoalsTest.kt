@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.constants
+package com.charliesbot.shared.core.designsystem.common.goals
 
 import androidx.compose.ui.graphics.Color
 import io.mockk.every

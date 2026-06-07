@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.charliesbot.shared.core.strings.R
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.designsystem.common.components.FastingProgressBar
 import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
 import com.charliesbot.shared.core.domain.progress.calculateProgressPercentage

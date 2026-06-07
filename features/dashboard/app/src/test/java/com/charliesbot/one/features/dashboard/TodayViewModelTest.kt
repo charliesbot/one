@@ -1,6 +1,6 @@
 package com.charliesbot.one.features.dashboard
 
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.goals.GoalResolver
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository

@@ -1,6 +1,6 @@
 package com.charliesbot.onewearos
 
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.goals.GoalResolver
 import com.charliesbot.shared.core.domain.usecase.ObserveFastingStateUseCase
 import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
