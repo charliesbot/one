@@ -9,11 +9,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.constants.DataStoreConstants
-import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.PutDataRequest
@@ -68,7 +68,7 @@ class FastingDataRepositoryImpl(context: Context, private val dataStore: DataSto
           LOG_TAG,
           "FastingGoalId Flow: read from DataStore key ${PrefKeys.FASTING_GOAL_ID}: $currentGoalId",
         )
-        currentGoalId ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
+        currentGoalId ?: FastingGoalCatalog.DEFAULT_GOAL_ID
       }
   override val lastUpdateTimestamp: Flow<Long> =
     dataStore.data
@@ -103,7 +103,7 @@ class FastingDataRepositoryImpl(context: Context, private val dataStore: DataSto
       val isFasting = prefs[PrefKeys.IS_FASTING] == true
       val startTime = prefs[PrefKeys.START_TIME] ?: -1
       val timestamp = prefs[PrefKeys.LAST_UPDATED_TIMESTAMP] ?: -1
-      val fastingGoalId = prefs[PrefKeys.FASTING_GOAL_ID] ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id
+      val fastingGoalId = prefs[PrefKeys.FASTING_GOAL_ID] ?: FastingGoalCatalog.DEFAULT_GOAL_ID
       val item = FastingDataItem(isFasting, startTime, timestamp, fastingGoalId)
       Log.d(
         LOG_TAG,
