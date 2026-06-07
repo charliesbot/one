@@ -1,6 +1,7 @@
 package com.charliesbot.one.features.dashboard
 
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.goals.GoalResolver
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
@@ -14,7 +15,6 @@ import com.charliesbot.shared.core.models.FastingGoal
 import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
-import com.charliesbot.shared.core.utils.GoalResolver
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

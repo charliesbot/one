@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.goals.GoalResolver
 import com.charliesbot.shared.core.domain.progress.FastingProgressCalculator
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
@@ -18,7 +19,6 @@ import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.TimePeriodProgress
-import com.charliesbot.shared.core.utils.GoalResolver
 import com.charliesbot.shared.core.utils.toData
 import com.charliesbot.shared.core.utils.toFastGoal
 import kotlinx.coroutines.flow.MutableStateFlow
