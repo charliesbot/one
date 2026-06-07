@@ -27,7 +27,6 @@ dependencies {
   implementation(libs.androidx.glance.preview)
   implementation(libs.androidx.glance.appwidget.preview)
   implementation(libs.androidx.core.ktx)
-  implementation(project(":core"))
   implementation(project(":core:designsystem:common"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))

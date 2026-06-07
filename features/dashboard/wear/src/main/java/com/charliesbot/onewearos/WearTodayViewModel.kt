@@ -11,8 +11,8 @@ import com.charliesbot.shared.core.domain.usecase.StartFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.StopFastingUseCase
 import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
-import com.charliesbot.shared.core.utils.toFastGoal
+import com.charliesbot.shared.core.designsystem.common.utils.convertMillisToLocalDateTime
+import com.charliesbot.shared.core.designsystem.common.utils.toFastGoal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

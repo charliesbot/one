@@ -20,7 +20,6 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.play.services.wearable)
   implementation(libs.androidx.watchface.complications.data.source.ktx)
-  implementation(project(":core"))
   implementation(project(":core:designsystem:common"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))

@@ -111,7 +111,6 @@ dependencies {
   implementation(libs.androidx.wear.phone.interactions)
   implementation(libs.androidx.wear.ongoing)
   implementation(libs.androidx.startup.runtime)
-  implementation(project(":core"))
   implementation(project(":core:data"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))

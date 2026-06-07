@@ -21,7 +21,6 @@ android {
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
 dependencies {
-  implementation(project(":core"))
   implementation(project(":core:strings"))
   implementation(project(":core:designsystem:common"))
 

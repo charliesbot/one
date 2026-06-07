@@ -107,7 +107,7 @@ class OngoingActivityService : Service(), KoinComponent {
     NotificationUtil.createNotificationChannel(this)
 
     return NotificationCompat.Builder(this, NotificationUtil.CHANNEL_ID)
-      .setSmallIcon(com.charliesbot.shared.R.drawable.ic_notification_status)
+      .setSmallIcon(com.charliesbot.shared.core.data.R.drawable.ic_notification_status)
       .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
       .setPriority(NotificationCompat.PRIORITY_LOW)
       .build()

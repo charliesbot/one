@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.designsystem.common.utils
 
 import android.text.format.DateUtils
 import java.text.DateFormat
@@ -48,21 +48,12 @@ fun convertMillisToLocalDateTime(millis: Long): LocalDateTime =
 fun getFormattedRelativeTime(startTimeMillis: Long): String {
   val nowMillis = System.currentTimeMillis()
   val minResolution = DateUtils.MINUTE_IN_MILLIS
-
-  // Use DateUtils.FORMAT_ABBREV_RELATIVE for shorter text like "5 min. ago" or "Yesterday".
-  val flags = DateUtils.FORMAT_ABBREV_RELATIVE // Or pass 0 for non-abbreviated
+  val flags = DateUtils.FORMAT_ABBREV_RELATIVE
 
   return DateUtils.getRelativeTimeSpanString(startTimeMillis, nowMillis, minResolution, flags)
     .toString()
 }
 
-/**
- * Formats minutes from midnight as a locale-aware time string. Uses 12-hour or 24-hour format based
- * on user's system settings.
- *
- * @param minutes Minutes from midnight (0-1439)
- * @return Formatted time string (e.g., "8:00 PM" or "20:00" depending on locale)
- */
 fun formatMinutesAsTime(minutes: Int): String {
   val calendar =
     Calendar.getInstance().apply {

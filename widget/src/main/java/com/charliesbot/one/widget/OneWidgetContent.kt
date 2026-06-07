@@ -34,7 +34,7 @@ import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.utils.getHours
+import com.charliesbot.shared.core.designsystem.common.utils.getHours
 
 @Composable
 fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {

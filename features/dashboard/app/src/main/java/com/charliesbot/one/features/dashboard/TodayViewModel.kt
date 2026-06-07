@@ -19,8 +19,8 @@ import com.charliesbot.shared.core.domain.usecase.UpdateFastingConfigUseCase
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.TimePeriodProgress
-import com.charliesbot.shared.core.utils.toData
-import com.charliesbot.shared.core.utils.toFastGoal
+import com.charliesbot.shared.core.designsystem.common.utils.toData
+import com.charliesbot.shared.core.designsystem.common.utils.toFastGoal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

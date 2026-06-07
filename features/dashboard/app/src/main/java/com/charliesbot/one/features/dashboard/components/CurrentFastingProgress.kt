@@ -23,7 +23,7 @@ import com.charliesbot.shared.core.designsystem.common.goals.PredefinedFastingGo
 import com.charliesbot.shared.core.designsystem.common.components.FastingProgressBar
 import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
 import com.charliesbot.shared.core.domain.progress.calculateProgressPercentage
-import com.charliesbot.shared.core.utils.formatTimestamp
+import com.charliesbot.shared.core.designsystem.common.utils.formatTimestamp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

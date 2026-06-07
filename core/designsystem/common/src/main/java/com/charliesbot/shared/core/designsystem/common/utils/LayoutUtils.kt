@@ -1,4 +1,4 @@
-package com.charliesbot.shared.core.utils
+package com.charliesbot.shared.core.designsystem.common.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -13,7 +13,6 @@ fun calculateWindowSizeClass(): WindowSizeClass {
   return WindowSizeClass.BREAKPOINTS_V2.computeWindowSizeClass(currentWindowMetrics)
 }
 
-// window is at least 840dp wide
 @Composable
 fun isWidthAtLeastMedium(): Boolean {
   val sizeClass = calculateWindowSizeClass()

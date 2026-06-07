@@ -61,7 +61,7 @@ import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
-import com.charliesbot.shared.core.utils.formatMinutesAsTime
+import com.charliesbot.shared.core.designsystem.common.utils.formatMinutesAsTime
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
