@@ -117,7 +117,6 @@ dependencies {
   implementation(project(":core:strings"))
   implementation(project(":core:designsystem:common"))
   implementation(project(":complications"))
-  implementation(project(":tiles"))
   implementation(project(":features:dashboard:wear"))
   implementation(libs.firebase.crashlytics)
   androidTestImplementation(platform(libs.androidx.compose.bom))

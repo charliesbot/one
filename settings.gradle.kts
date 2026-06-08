@@ -46,8 +46,6 @@ include(":widget")
 
 include(":complications")
 
-include(":tiles")
-
 file("features")
   .listFiles()
   ?.filter { it.isDirectory }
