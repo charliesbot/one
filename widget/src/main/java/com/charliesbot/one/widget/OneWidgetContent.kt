@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
@@ -81,8 +82,7 @@ fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
       verticalAlignment = Alignment.CenterVertically,
     ) {
       when (layoutSize) {
-        OneWidgetLayoutSize.Minimal ->
-          MinimalWidgetLayout(contentState = contentState, size = size)
+        OneWidgetLayoutSize.Minimal -> MinimalWidgetLayout(contentState = contentState, size = size)
 
         OneWidgetLayoutSize.Compact ->
           CompactWidgetLayout(context = context, contentState = contentState, size = size)
@@ -102,136 +102,108 @@ private fun MinimalWidgetLayout(contentState: WidgetContentState, size: DpSize) 
   val ringDp = minOf(size.width.value * 0.58f, size.height.value * 0.72f, 72f).dp
 
   WidgetProgressBar(
-    isFasting = contentState.fastingData.isFasting,
-    elapsedTime = contentState.elapsedMillis,
-    fastingGoalMillis = contentState.fastingGoalMillis,
-    isGoalMet = contentState.isGoalMet,
+    contentState = contentState,
     ringDp = ringDp,
     strokeDp = (ringDp.value * 0.16f).dp,
   )
 }
 
 @Composable
-private fun CompactWidgetLayout(
-  context: Context,
-  contentState: WidgetContentState,
-  size: DpSize,
-) {
+private fun CompactWidgetLayout(context: Context, contentState: WidgetContentState, size: DpSize) {
   val squareSide = minOf(size.width, size.height)
   val showText = squareSide >= OneWidgetSize.TEXT_THRESHOLD
   val ringDp = (squareSide.value * if (showText) 0.35f else 0.65f).dp
 
   WidgetProgressBar(
-    isFasting = contentState.fastingData.isFasting,
-    elapsedTime = contentState.elapsedMillis,
-    fastingGoalMillis = contentState.fastingGoalMillis,
-    isGoalMet = contentState.isGoalMet,
+    contentState = contentState,
     ringDp = ringDp,
     strokeDp = (squareSide.value * 0.07f).dp,
   )
   if (showText) {
     Spacer(modifier = GlanceModifier.height((squareSide.value * 0.04f).dp))
-    WidgetFooter(
-      context = context,
-      isFasting = contentState.fastingData.isFasting,
-      hours = contentState.hours,
-      referenceSize = squareSide,
-    )
+    WidgetFooter(context = context, contentState = contentState, referenceSize = squareSide)
   }
 }
 
 @Composable
-private fun WideWidgetLayout(
-  context: Context,
-  contentState: WidgetContentState,
-  size: DpSize,
-) {
+private fun WideWidgetLayout(context: Context, contentState: WidgetContentState, size: DpSize) {
   val ringDp = minOf(size.height.value * 0.62f, 76f).dp
 
+  HorizontalWidgetLayout(
+    context = context,
+    contentState = contentState,
+    ringDp = ringDp,
+    strokeDp = (ringDp.value * 0.14f).dp,
+    horizontalPadding = 16.dp,
+    verticalPadding = 10.dp,
+    spacerWidth = 14.dp,
+    referenceSize = size.height,
+  )
+}
+
+@Composable
+private fun ExpandedWidgetLayout(context: Context, contentState: WidgetContentState, size: DpSize) {
+  val ringDp = minOf(size.height.value * 0.52f, 104f).dp
+
+  HorizontalWidgetLayout(
+    context = context,
+    contentState = contentState,
+    ringDp = ringDp,
+    strokeDp = (ringDp.value * 0.12f).dp,
+    horizontalPadding = 22.dp,
+    verticalPadding = 18.dp,
+    spacerWidth = 18.dp,
+    referenceSize = size.height,
+  )
+}
+
+@Composable
+private fun HorizontalWidgetLayout(
+  context: Context,
+  contentState: WidgetContentState,
+  ringDp: Dp,
+  strokeDp: Dp,
+  horizontalPadding: Dp,
+  verticalPadding: Dp,
+  spacerWidth: Dp,
+  referenceSize: Dp,
+) {
   Row(
-    modifier = GlanceModifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 10.dp),
+    modifier =
+      GlanceModifier.fillMaxSize()
+        .padding(horizontal = horizontalPadding, vertical = verticalPadding),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    WidgetProgressBar(
-      isFasting = contentState.fastingData.isFasting,
-      elapsedTime = contentState.elapsedMillis,
-      fastingGoalMillis = contentState.fastingGoalMillis,
-      isGoalMet = contentState.isGoalMet,
-      ringDp = ringDp,
-      strokeDp = (ringDp.value * 0.14f).dp,
-    )
-    Spacer(modifier = GlanceModifier.width(14.dp))
+    WidgetProgressBar(contentState = contentState, ringDp = ringDp, strokeDp = strokeDp)
+    Spacer(modifier = GlanceModifier.width(spacerWidth))
     WidgetFooter(
       context = context,
-      isFasting = contentState.fastingData.isFasting,
-      hours = contentState.hours,
-      referenceSize = size.height,
+      contentState = contentState,
+      referenceSize = referenceSize,
       alignment = Alignment.Start,
     )
   }
 }
 
 @Composable
-private fun ExpandedWidgetLayout(
-  context: Context,
-  contentState: WidgetContentState,
-  size: DpSize,
-) {
-  val ringDp = minOf(size.height.value * 0.52f, 104f).dp
-
-  Row(
-    modifier = GlanceModifier.fillMaxSize().padding(horizontal = 22.dp, vertical = 18.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    WidgetProgressBar(
-      isFasting = contentState.fastingData.isFasting,
-      elapsedTime = contentState.elapsedMillis,
-      fastingGoalMillis = contentState.fastingGoalMillis,
-      isGoalMet = contentState.isGoalMet,
-      ringDp = ringDp,
-      strokeDp = (ringDp.value * 0.12f).dp,
-    )
-    Spacer(modifier = GlanceModifier.width(18.dp))
-    Column(horizontalAlignment = Alignment.Start, verticalAlignment = Alignment.CenterVertically) {
-      WidgetFooter(
-        context = context,
-        isFasting = contentState.fastingData.isFasting,
-        hours = contentState.hours,
-        referenceSize = size.height,
-        alignment = Alignment.Start,
-      )
-    }
-  }
-}
-
-@Composable
-private fun WidgetProgressBar(
-  isFasting: Boolean,
-  elapsedTime: Long,
-  fastingGoalMillis: Long,
-  isGoalMet: Boolean,
-  ringDp: Dp,
-  strokeDp: Dp,
-) {
+private fun WidgetProgressBar(contentState: WidgetContentState, ringDp: Dp, strokeDp: Dp) {
   val context = LocalContext.current
-  val progress = calculateProgressFraction(elapsedTime, fastingGoalMillis)
+  val progress =
+    calculateProgressFraction(contentState.elapsedMillis, contentState.fastingGoalMillis)
 
   val trackComposeColor = GlanceTheme.colors.outline.getColor(context).copy(alpha = 0.35f)
   val indicatorComposeColor =
-    if (isGoalMet) {
-      GlanceTheme.colors.tertiary.getColor(context)
-    } else if (isFasting) {
-      GlanceTheme.colors.primary.getColor(context)
-    } else {
-      trackComposeColor
+    when {
+      contentState.isGoalMet -> GlanceTheme.colors.tertiary.getColor(context)
+      contentState.fastingData.isFasting -> GlanceTheme.colors.primary.getColor(context)
+      else -> trackComposeColor
     }
 
   val density = context.resources.displayMetrics.density
 
   val ringBitmap =
-    remember(progress, indicatorComposeColor, trackComposeColor, density) {
+    remember(progress, indicatorComposeColor, trackComposeColor, density, ringDp, strokeDp) {
       val sizePx = (ringDp.value * density).toInt()
       val strokePx = (strokeDp.value * density)
 
@@ -244,9 +216,12 @@ private fun WidgetProgressBar(
       )
     }
 
-  val remainingHours = (getHours(fastingGoalMillis) - getHours(elapsedTime)).coerceAtLeast(0)
+  val remainingHours =
+    (getHours(contentState.fastingGoalMillis) - getHours(contentState.elapsedMillis)).coerceAtLeast(
+      0
+    )
   val contentDescription =
-    if (isFasting) {
+    if (contentState.fastingData.isFasting) {
       context.getString(
         SharedR.string.accessibility_fasting_status,
         (progress * 100).toInt(),
@@ -266,94 +241,127 @@ private fun WidgetProgressBar(
 @Composable
 private fun WidgetFooter(
   context: Context,
-  isFasting: Boolean,
-  hours: Long,
+  contentState: WidgetContentState,
   referenceSize: Dp,
   alignment: Alignment.Horizontal = Alignment.CenterHorizontally,
 ) {
-  val actualHours = hours.coerceAtLeast(0)
+  val actualHours = contentState.hours.coerceAtLeast(0)
 
   // Convert dp-based sizes to sp to cancel out font scaling.
   // dp_value / fontScale gives sp that renders at the intended dp size.
   val fontScale = context.resources.configuration.fontScale
-  val largeTextSize = ((referenceSize.value * 0.22f).coerceIn(20f, 60f) / fontScale).sp
-  val smallTextSize = ((referenceSize.value * 0.09f).coerceIn(8f, 24f) / fontScale).sp
-  val goalMetTextSize = ((referenceSize.value * 0.12f).coerceIn(10f, 30f) / fontScale).sp
+  val largeTextSize =
+    scaledTextSize(referenceSize, multiplier = 0.22f, min = 20f, max = 60f, fontScale)
+  val smallTextSize =
+    scaledTextSize(referenceSize, multiplier = 0.09f, min = 8f, max = 24f, fontScale)
+  val goalMetTextSize =
+    scaledTextSize(referenceSize, multiplier = 0.12f, min = 10f, max = 30f, fontScale)
 
-  if (isFasting && actualHours <= 0) {
-    return Column(horizontalAlignment = alignment) {
-      Text(
-        text = context.getString(SharedR.string.widget_goal_met_part_1),
-        style =
-          TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = goalMetTextSize),
-        maxLines = 1,
+  when {
+    contentState.fastingData.isFasting && actualHours <= 0 ->
+      GoalMetFooter(context = context, textSize = goalMetTextSize, alignment = alignment)
+
+    contentState.fastingData.isFasting ->
+      FastingFooter(
+        context = context,
+        actualHours = actualHours,
+        largeTextSize = largeTextSize,
+        smallTextSize = smallTextSize,
+        alignment = alignment,
       )
-      Text(
-        text = context.getString(SharedR.string.widget_goal_met_part_2),
-        style =
-          TextStyle(
-            color = GlanceTheme.colors.onTertiaryContainer,
-            fontSize = goalMetTextSize,
-            fontWeight = FontWeight.Bold,
-          ),
-        maxLines = 1,
-      )
-    }
+
+    else -> NotFastingFooter(context = context, textSize = goalMetTextSize)
   }
+}
 
-  if (isFasting) {
-    return Column(horizontalAlignment = alignment) {
-      Text(
-        text = actualHours.toString(),
-        style =
-          TextStyle(
-            color = GlanceTheme.colors.primary,
-            fontSize = largeTextSize,
-            fontWeight = FontWeight.Bold,
-          ),
-        maxLines = 1,
-      )
-      Text(
-        text =
-          context.resources.getQuantityString(
-            SharedR.plurals.widget_hours_left_plural,
-            actualHours.toInt(),
-          ),
-        style =
-          TextStyle(
-            color = GlanceTheme.colors.secondary,
-            fontSize = smallTextSize,
-            fontWeight = FontWeight.Bold,
-          ),
-        maxLines = 1,
-      )
-    }
+private fun scaledTextSize(
+  referenceSize: Dp,
+  multiplier: Float,
+  min: Float,
+  max: Float,
+  fontScale: Float,
+) = ((referenceSize.value * multiplier).coerceIn(min, max) / fontScale).sp
+
+@Composable
+private fun GoalMetFooter(context: Context, textSize: TextUnit, alignment: Alignment.Horizontal) {
+  Column(horizontalAlignment = alignment) {
+    Text(
+      text = context.getString(SharedR.string.widget_goal_met_part_1),
+      style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = textSize),
+      maxLines = 1,
+    )
+    Text(
+      text = context.getString(SharedR.string.widget_goal_met_part_2),
+      style =
+        TextStyle(
+          color = GlanceTheme.colors.onTertiaryContainer,
+          fontSize = textSize,
+          fontWeight = FontWeight.Bold,
+        ),
+      maxLines = 1,
+    )
   }
+}
 
-  return Text(
+@Composable
+private fun FastingFooter(
+  context: Context,
+  actualHours: Long,
+  largeTextSize: TextUnit,
+  smallTextSize: TextUnit,
+  alignment: Alignment.Horizontal,
+) {
+  Column(horizontalAlignment = alignment) {
+    Text(
+      text = actualHours.toString(),
+      style =
+        TextStyle(
+          color = GlanceTheme.colors.primary,
+          fontSize = largeTextSize,
+          fontWeight = FontWeight.Bold,
+        ),
+      maxLines = 1,
+    )
+    Text(
+      text =
+        context.resources.getQuantityString(
+          SharedR.plurals.widget_hours_left_plural,
+          actualHours.toInt(),
+        ),
+      style =
+        TextStyle(
+          color = GlanceTheme.colors.secondary,
+          fontSize = smallTextSize,
+          fontWeight = FontWeight.Bold,
+        ),
+      maxLines = 1,
+    )
+  }
+}
+
+@Composable
+private fun NotFastingFooter(context: Context, textSize: TextUnit) {
+  Text(
     text = context.getString(SharedR.string.widget_not_fasting),
     style =
       TextStyle(
         color = GlanceTheme.colors.onSurface,
-        fontSize = goalMetTextSize,
+        fontSize = textSize,
         fontWeight = FontWeight.Bold,
       ),
     maxLines = 1,
   )
 }
 
-val widgetMockFastingData =
+private val widgetMockFastingData =
   FastingDataItem(
     fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
     isFasting = true,
     startTimeInMillis = System.currentTimeMillis() - (12 * 60 * 60 * 1000L),
   )
 
-val widgetMockNotFastingData =
-  FastingDataItem(
-    fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id,
-    isFasting = false,
-  )
+private val widgetMockNotFastingData =
+  FastingDataItem(fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id, isFasting = false)
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview(widthDp = 57, heightDp = 57)
