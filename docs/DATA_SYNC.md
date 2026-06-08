@@ -164,7 +164,7 @@ Both `WidgetUpdateManager` and `ComplicationUpdateManager` debounce requests (1s
 | Latest state utility           | `core/data/src/main/java/.../core/data/sync/GetLatestDataUpdate.kt`                    |
 | DataMap converter              | `core/data/src/main/java/.../core/data/sync/GetFastingItemFromDataLayer.kt`            |
 | Phone listener service         | `app/.../one/services/FastingStateListenerService.kt`                                  |
-| Widget update manager          | `widget/src/main/java/.../one/widget/WidgetUpdateManager.kt`                           |
+| Widget update manager          | `widget/app/src/main/java/.../one/widget/WidgetUpdateManager.kt`                       |
 | Watch listener service         | `wear/.../onewearos/presentation/services/WatchFastingStateListenerService.kt`         |
 | Complication update manager    | `complications/src/main/java/.../onewearos/complications/ComplicationUpdateManager.kt` |
 | Ongoing activity service       | `wear/.../onewearos/presentation/services/OngoingActivityService.kt`                   |

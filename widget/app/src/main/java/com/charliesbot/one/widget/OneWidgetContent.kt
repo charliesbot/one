@@ -34,35 +34,17 @@ import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.charliesbot.one.widget.common.FastingWidgetState
+import com.charliesbot.one.widget.common.toFastingWidgetState
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.strings.R as SharedR
-import com.charliesbot.shared.core.utils.getHours
-
-private data class WidgetContentState(
-  val fastingData: FastingDataItem,
-  val elapsedMillis: Long,
-  val fastingGoalMillis: Long,
-  val hours: Long,
-  val isGoalMet: Boolean,
-)
 
 @Composable
 fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
   val currentTime = System.currentTimeMillis()
-  val startTimeInMillis = fastingData.startTimeInMillis
-  val elapsedMillis = (currentTime - startTimeInMillis).coerceAtLeast(0)
   val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
-  val hours = getHours(selectedGoal.durationMillis) - getHours(elapsedMillis)
-  val contentState =
-    WidgetContentState(
-      fastingData = fastingData,
-      elapsedMillis = elapsedMillis,
-      fastingGoalMillis = selectedGoal.durationMillis,
-      hours = hours,
-      isGoalMet = fastingData.isFasting && hours <= 0,
-    )
+  val contentState = fastingData.toFastingWidgetState(currentTime, selectedGoal.durationMillis)
 
   val size = LocalSize.current
   val layoutSize = OneWidgetSize.layoutFor(size)
@@ -98,7 +80,7 @@ fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
 }
 
 @Composable
-private fun MinimalWidgetLayout(contentState: WidgetContentState, size: DpSize) {
+private fun MinimalWidgetLayout(contentState: FastingWidgetState, size: DpSize) {
   val ringDp = minOf(size.width.value * 0.58f, size.height.value * 0.72f, 72f).dp
 
   WidgetProgressBar(
@@ -109,7 +91,7 @@ private fun MinimalWidgetLayout(contentState: WidgetContentState, size: DpSize) 
 }
 
 @Composable
-private fun CompactWidgetLayout(context: Context, contentState: WidgetContentState, size: DpSize) {
+private fun CompactWidgetLayout(context: Context, contentState: FastingWidgetState, size: DpSize) {
   val squareSide = minOf(size.width, size.height)
   val showText = squareSide >= OneWidgetSize.TEXT_THRESHOLD
   val ringDp = (squareSide.value * if (showText) 0.35f else 0.65f).dp
@@ -126,7 +108,7 @@ private fun CompactWidgetLayout(context: Context, contentState: WidgetContentSta
 }
 
 @Composable
-private fun WideWidgetLayout(context: Context, contentState: WidgetContentState, size: DpSize) {
+private fun WideWidgetLayout(context: Context, contentState: FastingWidgetState, size: DpSize) {
   val ringDp = minOf(size.height.value * 0.62f, 76f).dp
 
   HorizontalWidgetLayout(
@@ -142,7 +124,7 @@ private fun WideWidgetLayout(context: Context, contentState: WidgetContentState,
 }
 
 @Composable
-private fun ExpandedWidgetLayout(context: Context, contentState: WidgetContentState, size: DpSize) {
+private fun ExpandedWidgetLayout(context: Context, contentState: FastingWidgetState, size: DpSize) {
   val ringDp = minOf(size.height.value * 0.52f, 104f).dp
 
   HorizontalWidgetLayout(
@@ -160,7 +142,7 @@ private fun ExpandedWidgetLayout(context: Context, contentState: WidgetContentSt
 @Composable
 private fun HorizontalWidgetLayout(
   context: Context,
-  contentState: WidgetContentState,
+  contentState: FastingWidgetState,
   ringDp: Dp,
   strokeDp: Dp,
   horizontalPadding: Dp,
@@ -187,16 +169,15 @@ private fun HorizontalWidgetLayout(
 }
 
 @Composable
-private fun WidgetProgressBar(contentState: WidgetContentState, ringDp: Dp, strokeDp: Dp) {
+private fun WidgetProgressBar(contentState: FastingWidgetState, ringDp: Dp, strokeDp: Dp) {
   val context = LocalContext.current
-  val progress =
-    calculateProgressFraction(contentState.elapsedMillis, contentState.fastingGoalMillis)
+  val progress = contentState.progressFraction
 
   val trackComposeColor = GlanceTheme.colors.outline.getColor(context).copy(alpha = 0.35f)
   val indicatorComposeColor =
     when {
       contentState.isGoalMet -> GlanceTheme.colors.tertiary.getColor(context)
-      contentState.fastingData.isFasting -> GlanceTheme.colors.primary.getColor(context)
+      contentState.isFasting -> GlanceTheme.colors.primary.getColor(context)
       else -> trackComposeColor
     }
 
@@ -216,12 +197,9 @@ private fun WidgetProgressBar(contentState: WidgetContentState, ringDp: Dp, stro
       )
     }
 
-  val remainingHours =
-    (getHours(contentState.fastingGoalMillis) - getHours(contentState.elapsedMillis)).coerceAtLeast(
-      0
-    )
+  val remainingHours = contentState.hoursRemaining.coerceAtLeast(0)
   val contentDescription =
-    if (contentState.fastingData.isFasting) {
+    if (contentState.isFasting) {
       context.getString(
         SharedR.string.accessibility_fasting_status,
         (progress * 100).toInt(),
@@ -241,11 +219,11 @@ private fun WidgetProgressBar(contentState: WidgetContentState, ringDp: Dp, stro
 @Composable
 private fun WidgetFooter(
   context: Context,
-  contentState: WidgetContentState,
+  contentState: FastingWidgetState,
   referenceSize: Dp,
   alignment: Alignment.Horizontal = Alignment.CenterHorizontally,
 ) {
-  val actualHours = contentState.hours.coerceAtLeast(0)
+  val actualHours = contentState.hoursRemaining.coerceAtLeast(0)
 
   // Convert dp-based sizes to sp to cancel out font scaling.
   // dp_value / fontScale gives sp that renders at the intended dp size.
@@ -258,10 +236,10 @@ private fun WidgetFooter(
     scaledTextSize(referenceSize, multiplier = 0.12f, min = 10f, max = 30f, fontScale)
 
   when {
-    contentState.fastingData.isFasting && actualHours <= 0 ->
+    contentState.isFasting && actualHours <= 0 ->
       GoalMetFooter(context = context, textSize = goalMetTextSize, alignment = alignment)
 
-    contentState.fastingData.isFasting ->
+    contentState.isFasting ->
       FastingFooter(
         context = context,
         actualHours = actualHours,

@@ -42,7 +42,9 @@ include(":core:designsystem:common")
 
 include(":core:designsystem:app")
 
-include(":widget")
+include(":widget:common")
+
+include(":widget:app")
 
 include(":complications")
 
