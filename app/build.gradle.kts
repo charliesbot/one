@@ -128,7 +128,7 @@ dependencies {
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))
   implementation(project(":core:designsystem:common"))
-  implementation(project(":widget"))
+  implementation(project(":widget:app"))
   implementation(project(":features:dashboard:app"))
   implementation(project(":features:profile:app"))
   implementation(project(":features:settings:app"))
