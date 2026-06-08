@@ -30,4 +30,6 @@ dependencies {
   implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))
+
+  testImplementation(libs.junit)
 }
