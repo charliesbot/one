@@ -34,7 +34,7 @@ android {
   defaultConfig {
     applicationId = "com.charliesbot.one"
     minSdk = 33
-    targetSdk = 35
+    targetSdk = 37
     versionCode = versionCodeProperty.toInt() + 1 // Wear OS gets +1 to avoid Play Store conflict
     versionName = "$versionNameProperty-wear" // Append "-wear" to distinguish from phone app
   }
@@ -117,6 +117,7 @@ dependencies {
   implementation(project(":core:strings"))
   implementation(project(":core:designsystem:common"))
   implementation(project(":complications"))
+  implementation(project(":widget:wear"))
   implementation(project(":features:dashboard:wear"))
   implementation(libs.firebase.crashlytics)
   androidTestImplementation(platform(libs.androidx.compose.bom))
