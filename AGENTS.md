@@ -10,7 +10,7 @@ Kotlin Android + Wear OS fasting tracker. Jetpack Compose UI, Koin DI, Room DB, 
 ## Do Not
 
 - **Break sync** between phone and watch — all fasting state changes MUST propagate via Wearable Data Layer
-- **Forget UI component updates** after data changes — update ALL of: widgets (`WidgetUpdateManager`), complications (`ComplicationUpdateManager`), tiles (`TileService.requestUpdate()`), ongoing activities (`OngoingActivityService`)
+- **Forget UI component updates** after data changes — update ALL of: widgets (`WidgetUpdateManager`), complications (`ComplicationUpdateManager`), ongoing activities (`OngoingActivityService`)
 - **Omit timestamps** in sync updates — required for conflict resolution
 - **Create local-only state** that should be synced — use coroutines and Flows everywhere, never blocking calls
 - **Add dependencies** without going through `gradle/libs.versions.toml` first
@@ -34,7 +34,7 @@ wear ──→ features:dashboard:wear ──→ core
 | Module                     | Purpose                                                                  |
 | -------------------------- | ------------------------------------------------------------------------ |
 | `:app`                     | Phone/tablet app — Compose UI, Glance widgets, WorkManager notifications |
-| `:wear`                    | Wear OS app — Wear Compose, complications, tiles, ongoing activities     |
+| `:wear`                    | Wear OS app — Wear Compose, complications, ongoing activities            |
 | `:features:dashboard:app`  | Phone dashboard / today screen feature                                   |
 | `:features:dashboard:wear` | Wear OS dashboard / today screen feature                                 |
 | `:features:profile`        | User profile and fasting history feature                                 |

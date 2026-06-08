@@ -16,7 +16,6 @@ A beautifully designed intermittent fasting tracker for Android and Wear OS that
 ### Wear OS Companion
 - **Full Standalone App**: Start, stop, and track fasts directly from your watch
 - **Watch Face Complications**: See fasting status at a glance
-- **Tiles**: Quick access from the watch tiles menu
 - **Ongoing Activities**: Persistent notification during active fasts
 - **Perfect Sync**: Seamless synchronization between phone and watch
 
@@ -102,7 +101,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - See [CLAUDE.md](CLAUDE.md) for detailed development guidelines
 - See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design details
 - Ensure phone-watch sync works before submitting PRs
-- Test all UI components (widgets, complications, tiles)
+- Test all UI components (widgets, complications)
 - Follow existing code style and patterns
 
 ## License

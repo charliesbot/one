@@ -22,7 +22,6 @@ The architecture is split by responsibility:
 | `:wear` | Wear OS shell, Wear navigation, Koin startup, watch sync service and ongoing activity hooks |
 | `:widget` | Glance widgets |
 | `:complications` | Wear complication data sources |
-| `:tiles` | Wear tiles |
 | `:features:dashboard:app` | Phone dashboard and today screen |
 | `:features:dashboard:wear` | Wear dashboard |
 | `:features:profile:app` | Phone fasting history/profile UI |
@@ -63,10 +62,9 @@ to the appropriate design-system module.
                               :core:designsystem:common, :features:*:app, :widget
 :wear                      → :core, :core:data, :core:strings,
                               :core:designsystem:common, :features:dashboard:wear,
-                              :complications, :tiles
+                              :complications
 :widget                    → :core, :core:strings
 :complications             → :core, :core:strings
-:tiles                     → :core, :core:strings
 ```
 
 Feature modules should not depend on each other. Phone feature modules may use
@@ -120,7 +118,7 @@ Examples:
 
 ### `:core:strings`
 
-Shared user-facing strings used by phone, Wear, widgets, tiles, and
+Shared user-facing strings used by phone, Wear, widgets, and
 complications. Translations live next to the default strings in locale-specific
 resource directories.
 
@@ -128,7 +126,7 @@ Examples:
 
 - navigation labels
 - feature copy and action labels
-- widget, tile, and complication text
+- widget and complication text
 - notification text
 
 ### `:core:designsystem:common`

@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fasting status tile for at-a-glance progress on the watch face
 - Custom fasting goals from the phone now appear in watch goal selection
 
 ### Changed
@@ -45,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[Unreleased]** section is for work in progress
 - When releasing a version, move items from Unreleased to a new version section
 - Use these categories:
-  - **Added** for new features (complications, tiles, ongoing activities)
+  - **Added** for new features (complications, ongoing activities)
   - **Changed** for changes in existing functionality  
   - **Deprecated** for soon-to-be removed features
   - **Removed** for now removed features
@@ -53,4 +52,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Security** for vulnerability fixes
 - Include both English and Spanish descriptions where applicable
 - Keep entries concise but descriptive
-- Focus on Wear OS specific features: complications, tiles, ongoing activities, sync behavior
+- Focus on Wear OS specific features: complications, ongoing activities, sync behavior
