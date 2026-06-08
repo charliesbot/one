@@ -35,7 +35,7 @@ android {
   defaultConfig {
     applicationId = "com.charliesbot.one"
     minSdk = 31
-    targetSdk = 36
+    targetSdk = 37
     versionCode = versionCodeProperty.toInt()
     versionName = "$versionNameProperty-mobile" // Append "-mobile" to distinguish from Wear OS app
 

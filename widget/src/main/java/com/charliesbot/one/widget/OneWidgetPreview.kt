@@ -7,8 +7,6 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
@@ -31,7 +29,7 @@ fun updateWidgetPreview(context: Context) {
         appwidgetManager.setWidgetPreview(
           ComponentName(context, OneWidgetReceiver::class.java),
           AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN,
-          OneWidgetPreview().compose(context, size = DpSize(200.dp, 200.dp)),
+          OneWidgetPreview().compose(context, size = OneWidgetSize.Compact),
         )
       } catch (e: Exception) {
         Log.e(TAG, e.message, e)
@@ -42,7 +40,7 @@ fun updateWidgetPreview(context: Context) {
 
 class OneWidgetPreview : GlanceAppWidget() {
   override val sizeMode: SizeMode
-    get() = SizeMode.Exact
+    get() = SizeMode.Responsive(OneWidgetSize.SupportedSizes)
 
   override suspend fun provideGlance(context: Context, id: GlanceId) {
     provideContent {
@@ -54,7 +52,7 @@ class OneWidgetPreview : GlanceAppWidget() {
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
-@Preview(widthDp = 200, heightDp = 200) // Max size
+@Preview(widthDp = 130, heightDp = 130)
 @Composable
 private fun OneWidgetPreviewPreview() {
   OneWidgetContent(fastingData = widgetMockFastingData, context = LocalContext.current)
