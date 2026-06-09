@@ -46,6 +46,8 @@ include(":widget:common")
 
 include(":widget:app")
 
+include(":widget:wear")
+
 include(":complications")
 
 file("features")

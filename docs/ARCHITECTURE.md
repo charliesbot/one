@@ -22,6 +22,7 @@ The architecture is split by responsibility:
 | `:wear` | Wear OS shell, Wear navigation, Koin startup, watch sync service and ongoing activity hooks |
 | `:widget:common` | Shared widget state projection |
 | `:widget:app` | Phone/tablet Glance widgets |
+| `:widget:wear` | Wear OS Glance widgets |
 | `:complications` | Wear complication data sources |
 | `:features:dashboard:app` | Phone dashboard and today screen |
 | `:features:dashboard:wear` | Wear dashboard |
@@ -64,9 +65,10 @@ to the appropriate design-system module.
                               :widget:app
 :wear                      → :core, :core:data, :core:strings,
                               :core:designsystem:common, :features:dashboard:wear,
-                              :complications
+                              :complications, :widget:wear
 :widget:common             → :core:model, :core:domain
 :widget:app                → :core, :core:strings, :widget:common
+:widget:wear               → :core:strings, :widget:common
 :complications             → :core, :core:strings
 ```
 

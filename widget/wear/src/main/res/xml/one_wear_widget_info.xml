@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wearwidget-provider
+    description="@string/wear_widget_description"
+    icon="@drawable/wear_widget_preview"
+    label="@string/wear_widget_label"
+    preferredType="SMALL">
+    <container
+        type="SMALL"
+        previewImage="@drawable/wear_widget_preview" />
+    <container
+        type="LARGE"
+        previewImage="@drawable/wear_widget_preview" />
+</wearwidget-provider>
