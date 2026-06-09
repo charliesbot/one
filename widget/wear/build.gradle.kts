@@ -28,8 +28,13 @@ dependencies {
   implementation(libs.androidx.tiles.tooling.preview)
   implementation(libs.androidx.wear.compose.ui.tooling)
   implementation(libs.androidx.wear.remote.material3)
+  implementation(platform(libs.koin.bom))
+  implementation(libs.koin.android)
   implementation(project(":widget:common"))
+  implementation(project(":core:domain"))
   implementation(project(":core:strings"))
 
   debugImplementation(libs.androidx.tiles.renderer)
+
+  testImplementation(libs.junit)
 }
