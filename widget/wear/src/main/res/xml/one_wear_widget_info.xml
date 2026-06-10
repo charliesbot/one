@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wearwidget-provider
     description="@string/wear_widget_description"
-    icon="@drawable/wear_widget_preview"
+    icon="@drawable/wear_widget"
     label="@string/wear_widget_label"
     preferredType="SMALL">
     <container
         type="SMALL"
-        previewImage="@drawable/wear_widget_preview" />
+        previewImage="@drawable/wear_widget" />
     <container
         type="LARGE"
-        previewImage="@drawable/wear_widget_preview" />
+        previewImage="@drawable/wear_widget" />
 </wearwidget-provider>

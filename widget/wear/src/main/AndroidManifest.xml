@@ -14,6 +14,9 @@
             <meta-data
                 android:name="androidx.glance.wear.widget.provider"
                 android:resource="@xml/one_wear_widget_info" />
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/wear_widget" />
         </service>
     </application>
 </manifest>
