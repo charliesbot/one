@@ -1,5 +1,6 @@
 package com.charliesbot.onewearos.presentation.di
 
+import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.data.WearStringProvider
 import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
@@ -23,9 +24,10 @@ val wearAppModule = module {
   single<FastingNotificationScheduler> { get<NotificationScheduler>() }
   single<StringProvider> { WearStringProvider(androidContext()) }
   single<ComplicationUpdateManager> { ComplicationUpdateManager(androidContext()) }
+  single<WearWidgetUpdateManager> { WearWidgetUpdateManager(androidContext()) }
   single<OngoingActivityManager> {
     OngoingActivityManager(context = androidContext(), fastingDataRepository = get())
   }
-  single { LocalWatchFastingCallbacks(get(), get(), get()) }
+  single { LocalWatchFastingCallbacks(get(), get(), get(), get()) }
   single<FastingEventCallbacks> { get<LocalWatchFastingCallbacks>() }
 }

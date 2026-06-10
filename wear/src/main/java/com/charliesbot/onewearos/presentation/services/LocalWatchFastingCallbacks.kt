@@ -6,6 +6,7 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
@@ -20,6 +21,7 @@ class LocalWatchFastingCallbacks(
   private val context: Context,
   private val complicationUpdateManager: ComplicationUpdateManager,
   private val ongoingActivityManager: OngoingActivityManager,
+  private val wearWidgetUpdateManager: WearWidgetUpdateManager,
 ) : FastingEventCallbacks {
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
@@ -36,6 +38,7 @@ class LocalWatchFastingCallbacks(
       Log.w(LOG_TAG, "LocalWatch: Cannot start ongoing activity — app is in background", e)
     }
     complicationUpdateManager.requestUpdate()
+    wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
   }
 
@@ -44,6 +47,7 @@ class LocalWatchFastingCallbacks(
     val intent = OngoingActivityService.createStopIntent(context)
     context.startService(intent) // Send stop action to the service
     complicationUpdateManager.requestUpdate()
+    wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
   }
 
@@ -51,6 +55,7 @@ class LocalWatchFastingCallbacks(
   override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
     complicationUpdateManager.requestUpdate()
+    wearWidgetUpdateManager.requestUpdate()
     ongoingActivityManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
   }
