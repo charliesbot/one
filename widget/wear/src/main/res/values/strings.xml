@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="wear_widget_label">ONE</string>
+    <string name="wear_widget_label">Fasting</string>
     <string name="wear_widget_description">Fasting status</string>
 </resources>

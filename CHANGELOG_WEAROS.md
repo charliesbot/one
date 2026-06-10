@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Improved the Wear widget layout so fasting status is centered and easier to scan
+
 ### Fixed
 
 - Watch now correctly resolves custom fasting goals instead of falling back to 16:8
