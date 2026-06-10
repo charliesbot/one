@@ -5,6 +5,7 @@ import android.app.ForegroundServiceStartNotAllowedException
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
@@ -26,6 +27,7 @@ import org.koin.core.component.inject
 
 class WatchFastingStateListenerService : BaseFastingListenerService() {
   private val complicationUpdateManager: ComplicationUpdateManager by inject()
+  private val wearWidgetUpdateManager: WearWidgetUpdateManager by inject()
   private val settingsRepository: SettingsRepository by inject()
   private val customGoalRepository: CustomGoalRepository by inject()
   private val notificationScheduler: NotificationScheduler by inject()
@@ -37,6 +39,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
     super.onPlatformFastingStateSynced()
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Handling a remote data sync")
     complicationUpdateManager.requestUpdate()
+    wearWidgetUpdateManager.requestUpdate()
   }
 
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)

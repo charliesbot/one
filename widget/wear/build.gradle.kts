@@ -31,10 +31,13 @@ dependencies {
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
   implementation(project(":widget:common"))
+  implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))
 
   debugImplementation(libs.androidx.tiles.renderer)
 
   testImplementation(libs.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockk)
 }
