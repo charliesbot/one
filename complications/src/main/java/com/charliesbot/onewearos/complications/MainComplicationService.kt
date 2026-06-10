@@ -17,12 +17,12 @@ import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.charliesbot.shared.R as LegacyR
-import com.charliesbot.shared.core.strings.R as SharedR
-import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.strings.R as SharedR
 import com.charliesbot.shared.core.utils.FastingProgress
 import com.charliesbot.shared.core.utils.FastingProgressUtil
 import kotlinx.coroutines.flow.first

@@ -37,10 +37,10 @@ import androidx.wear.compose.material3.TextToggleButtonDefaults
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.charliesbot.one.features.dashboard.wear.R as WearR
 import com.charliesbot.onewearos.components.TimeButtonActions
-import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.designsystem.common.components.FastingProgressBar
 import com.charliesbot.shared.core.domain.progress.calculateProgressFraction
+import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import com.charliesbot.shared.core.utils.formatTimestamp
 import kotlinx.coroutines.delay

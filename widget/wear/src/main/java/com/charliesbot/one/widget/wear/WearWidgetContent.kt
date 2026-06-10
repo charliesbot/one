@@ -36,7 +36,4 @@ internal fun FastingWidgetState.toWearWidgetContent(
   }
 }
 
-internal data class WearWidgetContent(
-  val primaryText: String,
-  val secondaryText: String,
-)
+internal data class WearWidgetContent(val primaryText: String, val secondaryText: String)
