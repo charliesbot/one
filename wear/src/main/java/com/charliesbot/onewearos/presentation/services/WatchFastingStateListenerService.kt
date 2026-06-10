@@ -6,11 +6,11 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
-import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.domain.constants.DataLayerConstants
 import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.data.services.BaseFastingListenerService
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode

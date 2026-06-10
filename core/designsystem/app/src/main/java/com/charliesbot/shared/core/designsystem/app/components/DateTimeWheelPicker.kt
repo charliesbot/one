@@ -35,8 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
+import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime

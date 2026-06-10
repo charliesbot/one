@@ -1,8 +1,8 @@
 package com.charliesbot.shared.core.data.services
 
 import android.util.Log
-import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.sync.getLatestFastingState
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.events.FastingEventProcessor
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository

@@ -2,8 +2,8 @@ package com.charliesbot.one.services
 
 import android.util.Log
 import com.charliesbot.one.widget.WidgetUpdateManager
-import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.data.services.BaseFastingListenerService
+import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingRecord
