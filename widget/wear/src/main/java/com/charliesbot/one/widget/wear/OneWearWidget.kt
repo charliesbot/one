@@ -3,13 +3,18 @@
 package com.charliesbot.one.widget.wear
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import androidx.compose.remote.creation.compose.action.pendingIntentAction
 import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteBox
 import androidx.compose.remote.creation.compose.layout.RemoteColumn
 import androidx.compose.remote.creation.compose.layout.RemoteComposable
 import androidx.compose.remote.creation.compose.layout.RemoteSpacer
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
+import androidx.compose.remote.creation.compose.modifier.clickable
 import androidx.compose.remote.creation.compose.modifier.fillMaxSize
 import androidx.compose.remote.creation.compose.modifier.height
 import androidx.compose.remote.creation.compose.modifier.padding
@@ -47,45 +52,89 @@ class OneWearWidget : GlanceWearWidget(), KoinComponent {
     val state = fastingData.toFastingWidgetState(System.currentTimeMillis(), goal.durationMillis)
 
     return WearWidgetDocument(background = WearWidgetBrush) {
-      OneWearWidgetContent(content = state.toWearWidgetContent(context))
+      OneWearWidgetContent(
+        content = state.toWearWidgetContent(context),
+        openAppPendingIntent = createOpenAppPendingIntent(context),
+      )
     }
   }
 }
 
 @RemoteComposable
 @Composable
-private fun OneWearWidgetContent(content: WearWidgetContent) {
+private fun OneWearWidgetContent(content: WearWidgetContent, openAppPendingIntent: PendingIntent) {
   RemoteMaterialTheme {
     RemoteBox(
-      modifier = RemoteModifier.fillMaxSize().padding(horizontal = 24.rdp, vertical = 18.rdp),
+      modifier =
+        RemoteModifier.fillMaxSize()
+          .clickable(pendingIntentAction(openAppPendingIntent))
+          .padding(horizontal = 24.rdp, vertical = 18.rdp),
       contentAlignment = RemoteAlignment.Center,
     ) {
-      RemoteColumn(horizontalAlignment = RemoteAlignment.CenterHorizontally) {
-        RemoteText(
-          text = RemoteString(content.primaryText),
-          fontSize = 42.rsp,
-          color = RemoteMaterialTheme.colorScheme.primary,
-          fontWeight = FontWeight.SemiBold,
-          textAlign = TextAlign.Center,
-          maxLines = 1,
-        )
-        if (content.secondaryText.isNotBlank()) {
-          RemoteSpacer(modifier = RemoteModifier.height(2.rdp))
-          RemoteText(
-            text = RemoteString(content.secondaryText),
-            fontSize = 18.rsp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-          )
-        }
+      when (content) {
+        is WearWidgetContent.Fasting -> FastingContent(content)
+        is WearWidgetContent.NotFasting -> NotFastingContent(content)
       }
     }
   }
 }
 
+@RemoteComposable
+@Composable
+private fun FastingContent(content: WearWidgetContent.Fasting) {
+  RemoteColumn(horizontalAlignment = RemoteAlignment.CenterHorizontally) {
+    RemoteText(
+      text = RemoteString(content.primaryText),
+      fontSize = 42.rsp,
+      color = RemoteMaterialTheme.colorScheme.primary,
+      fontWeight = FontWeight.SemiBold,
+      textAlign = TextAlign.Center,
+      maxLines = 1,
+    )
+    if (content.secondaryText.isNotBlank()) {
+      RemoteSpacer(modifier = RemoteModifier.height(2.rdp))
+      RemoteText(
+        text = RemoteString(content.secondaryText),
+        fontSize = 18.rsp,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+      )
+    }
+  }
+}
+
+@RemoteComposable
+@Composable
+private fun NotFastingContent(content: WearWidgetContent.NotFasting) {
+  RemoteBox(modifier = RemoteModifier.fillMaxSize(), contentAlignment = RemoteAlignment.Center) {
+    RemoteText(
+      text = RemoteString(content.text),
+      fontSize = 24.rsp,
+      color = RemoteMaterialTheme.colorScheme.primary,
+      fontWeight = FontWeight.SemiBold,
+      textAlign = TextAlign.Center,
+      maxLines = 3,
+    )
+  }
+}
+
 private fun defaultFastingData() =
   FastingDataItem(fastingGoalId = FastingGoalCatalog.DEFAULT_GOAL_ID)
+
+private fun createOpenAppPendingIntent(context: Context): PendingIntent {
+  val intent =
+    Intent().apply {
+      component = ComponentName(context.packageName, WEAR_MAIN_ACTIVITY_CLASS_NAME)
+      flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+    }
+  return PendingIntent.getActivity(
+    context,
+    OPEN_APP_REQUEST_CODE,
+    intent,
+    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+  )
+}
 
 private class PreviewOneWearWidget : GlanceWearWidget() {
   override suspend fun provideWidgetData(
@@ -94,7 +143,8 @@ private class PreviewOneWearWidget : GlanceWearWidget() {
   ): WearWidgetData =
     WearWidgetDocument(background = WearWidgetBrush) {
       OneWearWidgetContent(
-        content = WearWidgetContent(primaryText = "7", secondaryText = "hours left")
+        content = WearWidgetContent.Fasting(primaryText = "7", secondaryText = "hours left"),
+        openAppPendingIntent = createOpenAppPendingIntent(context),
       )
     }
 }
@@ -104,3 +154,7 @@ private class PreviewOneWearWidget : GlanceWearWidget() {
 private fun OneWearWidgetPreview(
   @PreviewParameter(WearWidgetParamsProviderSnapshot::class) params: WearWidgetParams
 ) = WearWidgetPreviewSnapshot(PreviewOneWearWidget(), params)
+
+private const val OPEN_APP_REQUEST_CODE = 0
+private const val WEAR_MAIN_ACTIVITY_CLASS_NAME =
+  "com.charliesbot.onewearos.presentation.MainActivity"

@@ -24,16 +24,20 @@ internal fun FastingWidgetState.toWearWidgetContent(
 
   return when {
     isFasting && isGoalMet ->
-      WearWidgetContent(primaryText = goalMetPartOne, secondaryText = goalMetPartTwo)
+      WearWidgetContent.Fasting(primaryText = goalMetPartOne, secondaryText = goalMetPartTwo)
 
     isFasting ->
-      WearWidgetContent(
+      WearWidgetContent.Fasting(
         primaryText = hoursRemaining.toString(),
         secondaryText = hoursLeftText(hoursRemaining),
       )
 
-    else -> WearWidgetContent(primaryText = notFastingText, secondaryText = "")
+    else -> WearWidgetContent.NotFasting(text = notFastingText)
   }
 }
 
-internal data class WearWidgetContent(val primaryText: String, val secondaryText: String)
+internal sealed interface WearWidgetContent {
+  data class NotFasting(val text: String) : WearWidgetContent
+
+  data class Fasting(val primaryText: String, val secondaryText: String) : WearWidgetContent
+}

@@ -9,21 +9,24 @@ class WearWidgetContentTest {
   fun `returns not fasting content when no fast is active`() {
     val content = notFastingState().toWearWidgetContent()
 
-    assertEquals(WearWidgetContent(primaryText = "Not fasting", secondaryText = ""), content)
+    assertEquals(WearWidgetContent.NotFasting(text = "Not fasting"), content)
   }
 
   @Test
   fun `returns remaining hours content while fasting`() {
     val content = fastingState(hoursRemaining = 4).toWearWidgetContent()
 
-    assertEquals(WearWidgetContent(primaryText = "4", secondaryText = "hours left: 4"), content)
+    assertEquals(
+      WearWidgetContent.Fasting(primaryText = "4", secondaryText = "hours left: 4"),
+      content,
+    )
   }
 
   @Test
   fun `returns goal met content after the goal is reached`() {
     val content = fastingState(hoursRemaining = -1, isGoalMet = true).toWearWidgetContent()
 
-    assertEquals(WearWidgetContent(primaryText = "Goal", secondaryText = "Met!"), content)
+    assertEquals(WearWidgetContent.Fasting(primaryText = "Goal", secondaryText = "Met!"), content)
   }
 
   private fun FastingWidgetState.toWearWidgetContent(): WearWidgetContent =
