@@ -119,7 +119,7 @@ jobs:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: production
+          tracks: production
           status: completed
           whatsNewDirectory: .github/whatsnew
           changesNotSentForReview: ${{ github.event.inputs.skip_review == 'true' }}
@@ -130,7 +130,7 @@ jobs:
           serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: com.charliesbot.one
           releaseFiles: wear/build/outputs/bundle/release/wear-release.aab
-          track: wear:production
+          tracks: wear:production
           status: completed
           whatsNewDirectory: .github/whatsnew
           changesNotSentForReview: ${{ github.event.inputs.skip_review == 'true' }}
