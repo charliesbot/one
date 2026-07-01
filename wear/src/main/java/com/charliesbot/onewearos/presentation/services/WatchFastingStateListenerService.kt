@@ -1,12 +1,11 @@
 package com.charliesbot.onewearos.presentation.services
 
 import android.Manifest
-import android.app.ForegroundServiceStartNotAllowedException
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.core.content.ContextCompat
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
+import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.data.services.BaseFastingListenerService
@@ -27,6 +26,7 @@ import org.koin.core.component.inject
 
 class WatchFastingStateListenerService : BaseFastingListenerService() {
   private val complicationUpdateManager: ComplicationUpdateManager by inject()
+  private val ongoingActivityManager: OngoingActivityManager by inject()
   private val wearWidgetUpdateManager: WearWidgetUpdateManager by inject()
   private val settingsRepository: SettingsRepository by inject()
   private val customGoalRepository: CustomGoalRepository by inject()
@@ -57,21 +57,10 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingStarted(fastingDataItem)
-    val intent =
-      OngoingActivityService.createStartIntent(
-        this,
-        fastingDataItem.startTimeInMillis,
-        fastingDataItem.fastingGoalId,
-      )
-    try {
-      ContextCompat.startForegroundService(this, intent)
-    } catch (e: ForegroundServiceStartNotAllowedException) {
-      Log.w(
-        LOG_TAG,
-        "${this::class.java.simpleName} - Cannot start ongoing activity — app is in background",
-        e,
-      )
-    }
+    ongoingActivityManager.startOngoingActivity(
+      fastingDataItem.startTimeInMillis,
+      fastingDataItem.fastingGoalId,
+    )
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast started from REMOTE")
   }
 
@@ -79,8 +68,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
   override suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingCompleted(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast completed from REMOTE")
-    val intent = OngoingActivityService.createStopIntent(this)
-    startService(intent) // Send stop action to the service
+    ongoingActivityManager.stopOngoingActivity()
   }
 
   override fun onDataChanged(dataEvents: DataEventBuffer) {

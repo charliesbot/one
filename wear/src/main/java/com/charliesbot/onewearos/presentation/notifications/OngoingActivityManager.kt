@@ -47,6 +47,9 @@ class OngoingActivityManager(
       "OngoingActivityManager: Starting ongoing activity. startTime=$startTimeMillis, goalId=$fastingGoalId",
     )
 
+    // Ensure the notification channel exists before posting (no foreground service does this now).
+    NotificationUtil.createNotificationChannel(context)
+
     val fastingGoal = PredefinedFastingGoals.getGoalById(fastingGoalId)
     val pendingIntent = createTouchIntent()
 

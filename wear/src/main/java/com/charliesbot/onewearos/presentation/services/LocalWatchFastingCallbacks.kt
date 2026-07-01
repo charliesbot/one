@@ -1,11 +1,8 @@
 package com.charliesbot.onewearos.presentation.services
 
 import android.Manifest
-import android.app.ForegroundServiceStartNotAllowedException
-import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.core.content.ContextCompat
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
@@ -18,7 +15,6 @@ import com.charliesbot.shared.core.models.FastingDataItem
  * handled by [com.charliesbot.shared.core.domain.events.FastingEventProcessor].
  */
 class LocalWatchFastingCallbacks(
-  private val context: Context,
   private val complicationUpdateManager: ComplicationUpdateManager,
   private val ongoingActivityManager: OngoingActivityManager,
   private val wearWidgetUpdateManager: WearWidgetUpdateManager,
@@ -26,17 +22,10 @@ class LocalWatchFastingCallbacks(
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting start")
-    val intent =
-      OngoingActivityService.createStartIntent(
-        context,
-        fastingDataItem.startTimeInMillis,
-        fastingDataItem.fastingGoalId,
-      )
-    try {
-      ContextCompat.startForegroundService(context, intent)
-    } catch (e: ForegroundServiceStartNotAllowedException) {
-      Log.w(LOG_TAG, "LocalWatch: Cannot start ongoing activity — app is in background", e)
-    }
+    ongoingActivityManager.startOngoingActivity(
+      fastingDataItem.startTimeInMillis,
+      fastingDataItem.fastingGoalId,
+    )
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
@@ -44,8 +33,7 @@ class LocalWatchFastingCallbacks(
 
   override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
-    val intent = OngoingActivityService.createStopIntent(context)
-    context.startService(intent) // Send stop action to the service
+    ongoingActivityManager.stopOngoingActivity()
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
