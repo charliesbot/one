@@ -5,7 +5,7 @@ package com.charliesbot.one.widget.wear
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.remote.tooling.preview.RemoteDocPreview
+import androidx.compose.remote.tooling.preview.RemoteDocumentPreview
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,7 +29,7 @@ internal fun WearWidgetPreviewSnapshot(
       }
     }
 
-  RemoteDocPreview(
+  RemoteDocumentPreview(
     document,
     modifier = modifier.width(params.widthDp.dp).height(params.heightDp.dp),
   )

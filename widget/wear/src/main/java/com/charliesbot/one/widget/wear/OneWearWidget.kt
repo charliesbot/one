@@ -54,7 +54,7 @@ class OneWearWidget : GlanceWearWidget(), KoinComponent {
     return WearWidgetDocument(background = WearWidgetBrush) {
       OneWearWidgetContent(
         content = state.toWearWidgetContent(context),
-        openAppPendingIntent = createOpenAppPendingIntent(context),
+        openAppPendingIntent = ::createOpenAppPendingIntent,
       )
     }
   }
@@ -62,7 +62,10 @@ class OneWearWidget : GlanceWearWidget(), KoinComponent {
 
 @RemoteComposable
 @Composable
-private fun OneWearWidgetContent(content: WearWidgetContent, openAppPendingIntent: PendingIntent) {
+private fun OneWearWidgetContent(
+  content: WearWidgetContent,
+  openAppPendingIntent: (Context) -> PendingIntent,
+) {
   RemoteMaterialTheme {
     RemoteBox(
       modifier =
@@ -144,7 +147,7 @@ private class PreviewOneWearWidget : GlanceWearWidget() {
     WearWidgetDocument(background = WearWidgetBrush) {
       OneWearWidgetContent(
         content = WearWidgetContent.Fasting(primaryText = "7", secondaryText = "hours left"),
-        openAppPendingIntent = createOpenAppPendingIntent(context),
+        openAppPendingIntent = ::createOpenAppPendingIntent,
       )
     }
 }
