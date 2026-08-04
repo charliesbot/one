@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- History export and notification messages no longer crash in release builds
+
 ### Deprecated
 
 ### Removed

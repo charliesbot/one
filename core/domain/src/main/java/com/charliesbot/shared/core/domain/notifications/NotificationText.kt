@@ -1,5 +1,6 @@
 package com.charliesbot.shared.core.domain.notifications
 
+import com.charliesbot.shared.core.domain.platform.StringKey
 import com.charliesbot.shared.core.domain.platform.StringProvider
 import com.charliesbot.shared.core.models.NotificationContent
 import com.charliesbot.shared.core.models.NotificationType
@@ -11,25 +12,25 @@ fun getNotificationText(
   when (notificationType) {
     NotificationType.ONE_HOUR_BEFORE ->
       NotificationContent(
-        title = stringProvider.getString("notification_one_hour_title"),
-        message = stringProvider.getString("notification_one_hour_message"),
+        title = stringProvider.getString(StringKey.NOTIFICATION_ONE_HOUR_TITLE),
+        message = stringProvider.getString(StringKey.NOTIFICATION_ONE_HOUR_MESSAGE),
       )
 
     NotificationType.COMPLETION ->
       NotificationContent(
-        title = stringProvider.getString("notification_completion_title"),
-        message = stringProvider.getString("notification_completion_message"),
+        title = stringProvider.getString(StringKey.NOTIFICATION_COMPLETION_TITLE),
+        message = stringProvider.getString(StringKey.NOTIFICATION_COMPLETION_MESSAGE),
       )
 
     NotificationType.SMART_REMINDER_1H_BEFORE ->
       NotificationContent(
-        title = stringProvider.getString("notification_smart_reminder_1h_title"),
-        message = stringProvider.getString("notification_smart_reminder_1h_message"),
+        title = stringProvider.getString(StringKey.NOTIFICATION_SMART_REMINDER_1H_TITLE),
+        message = stringProvider.getString(StringKey.NOTIFICATION_SMART_REMINDER_1H_MESSAGE),
       )
 
     NotificationType.SMART_REMINDER_START ->
       NotificationContent(
-        title = stringProvider.getString("notification_smart_reminder_start_title"),
-        message = stringProvider.getString("notification_smart_reminder_start_message"),
+        title = stringProvider.getString(StringKey.NOTIFICATION_SMART_REMINDER_START_TITLE),
+        message = stringProvider.getString(StringKey.NOTIFICATION_SMART_REMINDER_START_MESSAGE),
       )
   }

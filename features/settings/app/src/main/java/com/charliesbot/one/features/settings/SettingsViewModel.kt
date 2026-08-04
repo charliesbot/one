@@ -8,6 +8,7 @@ import com.charliesbot.shared.core.domain.platform.AppVersionProvider
 import com.charliesbot.shared.core.domain.platform.ClipboardHelper
 import com.charliesbot.shared.core.domain.platform.HistoryExporter
 import com.charliesbot.shared.core.domain.platform.SmartReminderCallback
+import com.charliesbot.shared.core.domain.platform.StringKey
 import com.charliesbot.shared.core.domain.platform.StringProvider
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
@@ -164,7 +165,9 @@ class SettingsViewModel(
         if (records.isEmpty()) {
           Log.d(LOG_TAG, "SettingsViewModel: No records to export")
           _sideEffects.send(
-            SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR))
+            SettingsSideEffect.ShowSnackbar(
+              stringProvider.getString(StringKey.SETTINGS_EXPORT_ERROR)
+            )
           )
           return@launch
         }
@@ -174,21 +177,21 @@ class SettingsViewModel(
           .onSuccess {
             _sideEffects.send(
               SettingsSideEffect.ShowSnackbar(
-                stringProvider.getString(SettingsStrings.EXPORT_SUCCESS)
+                stringProvider.getString(StringKey.SETTINGS_EXPORT_SUCCESS)
               )
             )
           }
           .onFailure {
             _sideEffects.send(
               SettingsSideEffect.ShowSnackbar(
-                stringProvider.getString(SettingsStrings.EXPORT_ERROR)
+                stringProvider.getString(StringKey.SETTINGS_EXPORT_ERROR)
               )
             )
           }
       } catch (e: Exception) {
         Log.e(LOG_TAG, "SettingsViewModel: Export failed", e)
         _sideEffects.send(
-          SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.EXPORT_ERROR))
+          SettingsSideEffect.ShowSnackbar(stringProvider.getString(StringKey.SETTINGS_EXPORT_ERROR))
         )
       } finally {
         _isExporting.value = false
@@ -202,14 +205,16 @@ class SettingsViewModel(
       syncFastingStateUseCase()
         .onSuccess {
           _sideEffects.send(
-            SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_SUCCESS))
+            SettingsSideEffect.ShowSnackbar(
+              stringProvider.getString(StringKey.SETTINGS_SYNC_SUCCESS)
+            )
           )
           Log.d(LOG_TAG, "SettingsViewModel: Force sync successful")
         }
         .onFailure { e ->
           Log.e(LOG_TAG, "SettingsViewModel: Force sync failed", e)
           _sideEffects.send(
-            SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.SYNC_ERROR))
+            SettingsSideEffect.ShowSnackbar(stringProvider.getString(StringKey.SETTINGS_SYNC_ERROR))
           )
         }
       _isSyncing.value = false
@@ -221,7 +226,9 @@ class SettingsViewModel(
       try {
         clipboardHelper.copy("App Version", appVersionProvider.versionName)
         _sideEffects.send(
-          SettingsSideEffect.ShowSnackbar(stringProvider.getString(SettingsStrings.VERSION_COPIED))
+          SettingsSideEffect.ShowSnackbar(
+            stringProvider.getString(StringKey.SETTINGS_VERSION_COPIED)
+          )
         )
         Log.d(LOG_TAG, "SettingsViewModel: Version copied to clipboard")
       } catch (e: Exception) {
