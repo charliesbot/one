@@ -12,7 +12,6 @@ import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteBox
 import androidx.compose.remote.creation.compose.layout.RemoteColumn
 import androidx.compose.remote.creation.compose.layout.RemoteComposable
-import androidx.compose.remote.creation.compose.layout.RemoteSpacer
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
 import androidx.compose.remote.creation.compose.modifier.clickable
 import androidx.compose.remote.creation.compose.modifier.fillMaxSize
@@ -95,7 +94,7 @@ private fun FastingContent(content: WearWidgetContent.Fasting) {
       maxLines = 1,
     )
     if (content.secondaryText.isNotBlank()) {
-      RemoteSpacer(modifier = RemoteModifier.height(2.rdp))
+      RemoteBox(modifier = RemoteModifier.height(2.rdp))
       RemoteText(
         text = RemoteString(content.secondaryText),
         fontSize = 18.rsp,
