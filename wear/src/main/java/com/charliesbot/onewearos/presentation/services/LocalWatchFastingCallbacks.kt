@@ -3,12 +3,14 @@ package com.charliesbot.onewearos.presentation.services
 import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import com.charliesbot.one.widget.wear.WearWidgetRefreshScheduler
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.utils.GoalResolver
 
 /**
  * Handles fasting events that originate locally ONLY on the watch (user actions). Notifications are
@@ -18,6 +20,8 @@ class LocalWatchFastingCallbacks(
   private val complicationUpdateManager: ComplicationUpdateManager,
   private val ongoingActivityManager: OngoingActivityManager,
   private val wearWidgetUpdateManager: WearWidgetUpdateManager,
+  private val wearWidgetRefreshScheduler: WearWidgetRefreshScheduler,
+  private val goalResolver: GoalResolver,
 ) : FastingEventCallbacks {
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
@@ -28,12 +32,18 @@ class LocalWatchFastingCallbacks(
     )
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
+    val goalDuration = goalResolver.resolveGoalDurationMillis(fastingDataItem.fastingGoalId)
+    wearWidgetRefreshScheduler.scheduleNext(
+      startTimeMillis = fastingDataItem.startTimeInMillis,
+      goalDurationMillis = goalDuration,
+    )
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
   }
 
   override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
     ongoingActivityManager.stopOngoingActivity()
+    wearWidgetRefreshScheduler.cancel()
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
@@ -44,6 +54,11 @@ class LocalWatchFastingCallbacks(
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
+    val goalDuration = goalResolver.resolveGoalDurationMillis(fastingDataItem.fastingGoalId)
+    wearWidgetRefreshScheduler.scheduleNext(
+      startTimeMillis = fastingDataItem.startTimeInMillis,
+      goalDurationMillis = goalDuration,
+    )
     ongoingActivityManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
   }

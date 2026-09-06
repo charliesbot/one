@@ -27,10 +27,13 @@ dependencies {
   implementation(libs.androidx.glance.preview)
   implementation(libs.androidx.glance.appwidget.preview)
   implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.work.runtime.ktx)
   implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))
   implementation(project(":widget:common"))
 
   testImplementation(libs.junit)
+  testImplementation(libs.mockk)
+  testImplementation(libs.kotlinx.coroutines.test)
 }

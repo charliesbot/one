@@ -9,6 +9,7 @@ import com.charliesbot.one.data.AndroidStringProvider
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
+import com.charliesbot.one.widget.PhoneWidgetRefreshScheduler
 import com.charliesbot.one.widget.WidgetUpdateManager
 import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
@@ -28,6 +29,7 @@ val appModule = module {
   }
 
   single<WidgetUpdateManager> { WidgetUpdateManager(androidContext()) }
+  single { PhoneWidgetRefreshScheduler(androidContext()) }
 
   single<NotificationScheduler> {
     NotificationScheduler(
@@ -48,7 +50,7 @@ val appModule = module {
 
   factory { GetMonthlyFastingMapUseCase(get()) }
 
-  single { LocalFastingCallback(get(), get()) }
+  single { LocalFastingCallback(get(), get(), get(), get()) }
   single<FastingEventCallbacks> { get<LocalFastingCallback>() }
 
   single<SmartReminderCallback> { SmartReminderCallbackImpl(androidContext()) }

@@ -27,7 +27,7 @@ class WearWidgetUpdateManager(
   fun cancel() = requester.cancel()
 }
 
-private suspend fun updateOneWearWidgets(context: Context) {
+internal suspend fun updateOneWearWidgets(context: Context) {
   val widget = OneWearWidget()
   GlanceWearWidgetManager(context).fetchActiveWidgets(OneWearWidget::class).forEach {
     widget.triggerUpdate(context, it.instanceId)

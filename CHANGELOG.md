@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Home screen widget now refreshes hourly and progress updates properly during active fasts without opening the app
 - History export and notification messages no longer crash in release builds
 
 ### Deprecated

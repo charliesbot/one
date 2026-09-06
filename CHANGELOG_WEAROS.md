@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Wear widget now periodically refreshes fasting hours remaining and progress during active fasts
 - Watch now correctly resolves custom fasting goals instead of falling back to 16:8
 
 ### Deprecated
