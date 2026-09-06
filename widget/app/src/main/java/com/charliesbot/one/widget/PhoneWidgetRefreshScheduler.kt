@@ -43,11 +43,13 @@ class PhoneWidgetRefreshScheduler(
         return@withLock
       }
       val goalDuration = goalResolver.durationMillis(fastingData.fastingGoalId)
-      schedule(
-        startTimeMillis = fastingData.startTimeInMillis,
-        goalDurationMillis = goalDuration,
-        policy = ExistingWorkPolicy.REPLACE,
-      )
+      val delayMillis =
+        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+          currentTimeMillis = System.currentTimeMillis(),
+          startTimeMillis = fastingData.startTimeInMillis,
+          goalDurationMillis = goalDuration,
+        )
+      schedule(delayMillis = delayMillis, policy = ExistingWorkPolicy.REPLACE)
     }
 
   suspend fun onFastingCompleted() = mutex.withLock { cancel() }
@@ -65,18 +67,7 @@ class PhoneWidgetRefreshScheduler(
         return@withLock
       }
 
-      val workInfos =
-        try {
-          workManager.getWorkInfosForUniqueWork(WORK_NAME).await()
-        } catch (e: CancellationException) {
-          throw e
-        } catch (e: Exception) {
-          emptyList<WorkInfo>()
-        }
-
-      val hasActiveWork =
-        workInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
-      if (hasActiveWork) {
+      if (hasActiveWork()) {
         // Preserve existing active work - do not cancel or postpone due refresh
         return@withLock
       }
@@ -96,12 +87,7 @@ class PhoneWidgetRefreshScheduler(
         return@withLock
       }
 
-      schedule(
-        startTimeMillis = current.startTimeInMillis,
-        goalDurationMillis = goalDuration,
-        currentTimeMillis = currentTimeMillis,
-        policy = ExistingWorkPolicy.KEEP,
-      )
+      schedule(delayMillis = delayMillis, policy = ExistingWorkPolicy.KEEP)
     }
 
   suspend fun onWorkerTickCompleted(
@@ -129,19 +115,14 @@ class PhoneWidgetRefreshScheduler(
         return@withLock
       }
 
-      val elapsed = (currentTimeMillis - current.startTimeInMillis).coerceAtLeast(0L)
-      if (elapsed >= goalDurationMillis) {
-        // Goal reached, end refresh chain
-        cancel()
-        return@withLock
-      }
+      val delayMillis =
+        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+          currentTimeMillis = currentTimeMillis,
+          startTimeMillis = current.startTimeInMillis,
+          goalDurationMillis = goalDurationMillis,
+        )
 
-      schedule(
-        startTimeMillis = current.startTimeInMillis,
-        goalDurationMillis = goalDurationMillis,
-        currentTimeMillis = currentTimeMillis,
-        policy = ExistingWorkPolicy.REPLACE,
-      )
+      schedule(delayMillis = delayMillis, policy = ExistingWorkPolicy.REPLACE)
     }
 
   fun enqueueImmediateRecovery(policy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP) {
@@ -156,19 +137,17 @@ class PhoneWidgetRefreshScheduler(
     workManager.enqueueUniqueWork(WORK_NAME, policy, workRequest)
   }
 
-  private fun schedule(
-    startTimeMillis: Long,
-    goalDurationMillis: Long,
-    currentTimeMillis: Long = System.currentTimeMillis(),
-    policy: ExistingWorkPolicy,
-  ) {
-    val delayMillis =
-      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-        currentTimeMillis = currentTimeMillis,
-        startTimeMillis = startTimeMillis,
-        goalDurationMillis = goalDurationMillis,
-      )
+  private suspend fun hasActiveWork(): Boolean =
+    try {
+      val workInfos = workManager.getWorkInfosForUniqueWork(WORK_NAME).await()
+      workInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      false
+    }
 
+  private fun schedule(delayMillis: Long?, policy: ExistingWorkPolicy) {
     if (delayMillis == null || delayMillis <= 0L) {
       cancel()
       return

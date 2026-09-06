@@ -23,37 +23,41 @@ constructor(
   private val goalResolver: GoalResolver by inject()
   private val scheduler: PhoneWidgetRefreshScheduler by inject()
 
-  override suspend fun doWork(): Result {
-    return try {
+  override suspend fun doWork(): Result =
+    try {
       val snapshot = fastingDataRepository.getCurrentFasting()
       if (snapshot == null || !snapshot.isFasting) {
         scheduler.onFastingCompleted()
         widgetUpdater(applicationContext)
-        return Result.success()
+        Result.success()
+      } else {
+        val goalDuration = goalResolver.durationMillis(snapshot.fastingGoalId)
+
+        // Directly await Glance widget recomposition
+        widgetUpdater(applicationContext)
+
+        // Delegate next boundary scheduling with snapshot verification against stale work
+        scheduler.onWorkerTickCompleted(
+          snapshotStartTime = snapshot.startTimeInMillis,
+          snapshotGoalId = snapshot.fastingGoalId,
+          goalDurationMillis = goalDuration,
+        )
+
+        Result.success()
       }
-
-      val goalDuration = goalResolver.durationMillis(snapshot.fastingGoalId)
-
-      // Directly await Glance widget recomposition
-      widgetUpdater(applicationContext)
-
-      // Delegate next boundary scheduling with snapshot verification against stale work
-      scheduler.onWorkerTickCompleted(
-        snapshotStartTime = snapshot.startTimeInMillis,
-        snapshotGoalId = snapshot.fastingGoalId,
-        goalDurationMillis = goalDuration,
-      )
-
-      Result.success()
     } catch (e: CancellationException) {
       throw e
     } catch (e: Exception) {
-      Log.e("PhoneWidgetWorker", "Phone widget refresh worker failed (attempt $runAttemptCount)", e)
-      if (runAttemptCount < 3) {
+      Log.e(TAG, "Phone widget refresh worker failed (attempt $runAttemptCount)", e)
+      if (runAttemptCount < MAX_RETRIES) {
         Result.retry()
       } else {
         Result.failure()
       }
     }
+
+  companion object {
+    private const val TAG = "PhoneWidgetWorker"
+    private const val MAX_RETRIES = 3
   }
 }
