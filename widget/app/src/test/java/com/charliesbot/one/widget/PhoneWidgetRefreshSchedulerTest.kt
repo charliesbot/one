@@ -15,6 +15,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Before
 import org.junit.Test
 
@@ -258,7 +259,7 @@ class PhoneWidgetRefreshSchedulerTest {
         FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
       coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns goalDuration
 
-      scheduler.reconcile(currentTimeMillis = currentTime)
+      withTimeout(5000L) { scheduler.reconcile(currentTimeMillis = currentTime) }
 
       org.junit.Assert.assertTrue(widgetUpdated)
       verify { workManager.cancelUniqueWork(PhoneWidgetRefreshScheduler.WORK_NAME) }

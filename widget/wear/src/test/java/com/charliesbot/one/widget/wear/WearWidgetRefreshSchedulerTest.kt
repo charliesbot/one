@@ -15,6 +15,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Before
 import org.junit.Test
 
@@ -230,9 +231,10 @@ class WearWidgetRefreshSchedulerTest {
   }
 
   @Test
-  fun `reconcile triggers immediate widget update and cancels when goal has already passed`() =
+  fun `reconcile triggers immediate widget update and cancels when goal has already passed with re-entrant provider`() =
     runTest {
-      var widgetUpdated = false
+      val widget = OneWearWidget(fastingDataRepository = repository, goalResolver = goalResolver)
+      var renderCount = 0
       val scheduler =
         WearWidgetRefreshScheduler(
           context = context,
@@ -240,7 +242,10 @@ class WearWidgetRefreshSchedulerTest {
           goalResolver = goalResolver,
           workManager = workManager,
           activeWidgetChecker = { true },
-          widgetUpdater = { widgetUpdated = true },
+          widgetUpdater = { ctx ->
+            renderCount++
+            widget.provideWidgetData(ctx, mockk(relaxed = true))
+          },
         )
       val emptyFuture =
         mockk<ListenableFuture<List<WorkInfo>>> {
@@ -256,9 +261,9 @@ class WearWidgetRefreshSchedulerTest {
         FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
       coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns goalDuration
 
-      scheduler.reconcile(currentTimeMillis = currentTime)
+      withTimeout(5000L) { scheduler.reconcile(currentTimeMillis = currentTime) }
 
-      org.junit.Assert.assertTrue(widgetUpdated)
+      org.junit.Assert.assertEquals(1, renderCount)
       verify { workManager.cancelUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) }
       verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>()) }
     }
