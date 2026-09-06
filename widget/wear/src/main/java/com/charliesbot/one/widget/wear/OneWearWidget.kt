@@ -39,9 +39,7 @@ import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.core.component.KoinComponent
 
-class OneWearWidget
-@JvmOverloads
-constructor(
+class OneWearWidget(
   fastingDataRepository: FastingDataRepository? = null,
   goalResolver: GoalResolver? = null,
 ) : GlanceWearWidget(), KoinComponent {
