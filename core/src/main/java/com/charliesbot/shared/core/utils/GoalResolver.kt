@@ -13,7 +13,7 @@ class GoalResolver(customGoalRepository: CustomGoalRepository) {
       FastingGoalCatalog.allGoals + customGoalData.map { it.toFastingGoal() }
     }
 
-  suspend fun resolveGoalDurationMillis(goalId: String): Long {
+  suspend fun durationMillis(goalId: String): Long {
     val customMatch = allGoals.first().find { it.id == goalId }
     return customMatch?.durationMillis ?: FastingGoalCatalog.getGoalById(goalId).durationMillis
   }

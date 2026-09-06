@@ -47,7 +47,7 @@ class WearWidgetRefreshSchedulerTest {
         )
       val startTime = System.currentTimeMillis() - (2 * oneHourMillis)
       val goalId = "16:8"
-      coEvery { goalResolver.resolveGoalDurationMillis(goalId) } returns 16 * oneHourMillis
+      coEvery { goalResolver.durationMillis(goalId) } returns 16 * oneHourMillis
 
       scheduler.onFastingStartedOrUpdated(
         FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = goalId)
@@ -132,7 +132,7 @@ class WearWidgetRefreshSchedulerTest {
         startTimeInMillis = System.currentTimeMillis() - (2 * oneHourMillis),
         fastingGoalId = "16:8",
       )
-    coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns 16 * oneHourMillis
+    coEvery { goalResolver.durationMillis("16:8") } returns 16 * oneHourMillis
 
     scheduler.reconcile()
 
@@ -259,7 +259,7 @@ class WearWidgetRefreshSchedulerTest {
       val currentTime = startTime + (17 * oneHourMillis) // 17 hours elapsed > 16 hours goal
       coEvery { repository.getCurrentFasting() } returns
         FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
-      coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns goalDuration
+      coEvery { goalResolver.durationMillis("16:8") } returns goalDuration
 
       withTimeout(5000L) { scheduler.reconcile(currentTimeMillis = currentTime) }
 
@@ -305,8 +305,8 @@ class WearWidgetRefreshSchedulerTest {
       val startTime = 1000L
       val oldGoalId = "16:8"
       val newGoalId = "18:6"
-      coEvery { goalResolver.resolveGoalDurationMillis(oldGoalId) } returns 16 * oneHourMillis
-      coEvery { goalResolver.resolveGoalDurationMillis(newGoalId) } returns 18 * oneHourMillis
+      coEvery { goalResolver.durationMillis(oldGoalId) } returns 16 * oneHourMillis
+      coEvery { goalResolver.durationMillis(newGoalId) } returns 18 * oneHourMillis
 
       val callOrder = mutableListOf<String>()
       every {

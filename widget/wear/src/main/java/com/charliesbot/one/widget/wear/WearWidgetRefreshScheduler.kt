@@ -38,7 +38,7 @@ class WearWidgetRefreshScheduler(
         cancel()
         return@withLock
       }
-      val goalDuration = goalResolver.resolveGoalDurationMillis(fastingData.fastingGoalId)
+      val goalDuration = goalResolver.durationMillis(fastingData.fastingGoalId)
       schedule(
         startTimeMillis = fastingData.startTimeInMillis,
         goalDurationMillis = goalDuration,
@@ -77,7 +77,7 @@ class WearWidgetRefreshScheduler(
         return@withLock
       }
 
-      val goalDuration = goalResolver.resolveGoalDurationMillis(current.fastingGoalId)
+      val goalDuration = goalResolver.durationMillis(current.fastingGoalId)
       val delayMillis =
         WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
           currentTimeMillis = currentTimeMillis,

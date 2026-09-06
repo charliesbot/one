@@ -76,7 +76,7 @@ class WearWidgetRefreshWorkerTest {
 
     coEvery { repository.getCurrentFasting() } returns
       FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
-    coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns goalDuration
+    coEvery { goalResolver.durationMillis("16:8") } returns goalDuration
 
     val worker = WearWidgetRefreshWorker(context, workerParams, testWidgetUpdater)
     val result = worker.doWork()

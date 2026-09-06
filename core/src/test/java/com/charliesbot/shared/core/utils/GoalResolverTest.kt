@@ -73,7 +73,7 @@ class GoalResolverTest {
   }
 
   @Test
-  fun `resolveGoalDurationMillis returns custom duration when found`() = runTest {
+  fun `durationMillis returns custom duration when found`() = runTest {
     val customGoal =
       CustomGoalData(
         id = "custom_14",
@@ -84,18 +84,18 @@ class GoalResolverTest {
     every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal))
     val resolver = GoalResolver(customGoalRepository)
 
-    val duration = resolver.resolveGoalDurationMillis("custom_14")
+    val duration = resolver.durationMillis("custom_14")
 
     assertEquals(14 * 60 * 60 * 1000L, duration)
   }
 
   @Test
-  fun `resolveGoalDurationMillis falls back to predefined catalog for standard id`() = runTest {
+  fun `durationMillis falls back to predefined catalog for standard id`() = runTest {
     every { customGoalRepository.customGoals } returns flowOf(emptyList())
     val resolver = GoalResolver(customGoalRepository)
 
     val duration =
-      resolver.resolveGoalDurationMillis(
+      resolver.durationMillis(
         com.charliesbot.shared.core.constants.PredefinedFastingGoals.SIXTEEN_EIGHT.id
       )
 

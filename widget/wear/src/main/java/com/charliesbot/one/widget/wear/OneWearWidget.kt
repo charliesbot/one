@@ -53,7 +53,7 @@ constructor(
     params: WearWidgetParams,
   ): WearWidgetData {
     val fastingData = repo.getCurrentFasting() ?: defaultFastingData()
-    val goalDuration = goals.resolveGoalDurationMillis(fastingData.fastingGoalId)
+    val goalDuration = goals.durationMillis(fastingData.fastingGoalId)
     val state = fastingData.toFastingWidgetState(System.currentTimeMillis(), goalDuration)
 
     return WearWidgetDocument(background = WearWidgetBrush) {

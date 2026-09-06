@@ -32,7 +32,7 @@ constructor(
         return Result.success()
       }
 
-      val goalDuration = goalResolver.resolveGoalDurationMillis(snapshot.fastingGoalId)
+      val goalDuration = goalResolver.durationMillis(snapshot.fastingGoalId)
 
       // Directly await Glance widget recomposition
       widgetUpdater(applicationContext)
