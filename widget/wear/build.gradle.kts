@@ -32,6 +32,7 @@ dependencies {
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
   implementation(libs.androidx.work.runtime.ktx)
+  implementation(libs.androidx.concurrent.futures.ktx)
   implementation(project(":widget:common"))
   implementation(project(":core"))
   implementation(project(":core:domain"))

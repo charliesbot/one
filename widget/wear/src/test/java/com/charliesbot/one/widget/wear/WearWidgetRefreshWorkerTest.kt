@@ -10,7 +10,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -35,9 +34,7 @@ class WearWidgetRefreshWorkerTest {
   @Before
   fun setup() {
     context = mockk(relaxed = true)
-    workerParams = mockk(relaxed = true) {
-      every { runAttemptCount } returns 0
-    }
+    workerParams = mockk(relaxed = true) { every { runAttemptCount } returns 0 }
     repository = mockk()
     goalResolver = mockk()
     scheduler = mockk(relaxed = true)
@@ -68,7 +65,7 @@ class WearWidgetRefreshWorkerTest {
 
     assertEquals(Result.success(), result)
     assertEquals(1, widgetUpdateCount)
-    verify { scheduler.onFastingCompleted() }
+    coVerify { scheduler.onFastingCompleted() }
     coVerify(exactly = 0) { scheduler.onWorkerTickCompleted(any(), any(), any()) }
   }
 
@@ -77,11 +74,8 @@ class WearWidgetRefreshWorkerTest {
     val startTime = System.currentTimeMillis() - (5 * oneHourMillis)
     val goalDuration = 16 * oneHourMillis
 
-    coEvery { repository.getCurrentFasting() } returns FastingDataItem(
-      isFasting = true,
-      startTimeInMillis = startTime,
-      fastingGoalId = "16:8",
-    )
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
     coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns goalDuration
 
     val worker = WearWidgetRefreshWorker(context, workerParams, testWidgetUpdater)

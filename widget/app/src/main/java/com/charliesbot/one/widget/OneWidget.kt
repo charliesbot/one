@@ -75,10 +75,7 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
         fastingDataRepository.fastingDataItem.collectAsState(
           initial = FastingDataItem(fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id)
         )
-      val allGoals by
-        goalResolver.allGoals.collectAsState(
-          initial = FastingGoalCatalog.allGoals
-        )
+      val allGoals by goalResolver.allGoals.collectAsState(initial = FastingGoalCatalog.allGoals)
       val durationMillis =
         allGoals.find { it.id == fastingData.fastingGoalId }?.durationMillis
           ?: PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId).durationMillis

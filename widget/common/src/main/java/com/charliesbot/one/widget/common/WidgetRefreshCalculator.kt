@@ -4,8 +4,8 @@ object WidgetRefreshCalculator {
   private const val MILLIS_PER_HOUR = 60L * 60L * 1000L
 
   /**
-   * Calculates the delay in milliseconds until the next displayed-hour boundary
-   * or the exact goal boundary.
+   * Calculates the delay in milliseconds until the next displayed-hour boundary or the exact goal
+   * boundary.
    *
    * Returns null if the fast has already reached or exceeded the goal duration.
    */

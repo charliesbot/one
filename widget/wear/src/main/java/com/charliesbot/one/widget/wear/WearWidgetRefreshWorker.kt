@@ -10,7 +10,9 @@ import kotlinx.coroutines.CancellationException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class WearWidgetRefreshWorker @JvmOverloads constructor(
+class WearWidgetRefreshWorker
+@JvmOverloads
+constructor(
   context: Context,
   workerParameters: WorkerParameters,
   private val widgetUpdater: suspend (Context) -> Unit = { updateOneWearWidgets(it) },

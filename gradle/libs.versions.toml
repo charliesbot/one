@@ -29,6 +29,7 @@ runtimeAndroid = "1.12.0"
 uiTooling = "1.12.0"
 wearPhoneInteractions = "1.1.1"
 workRuntimeKtx = "2.11.2"
+concurrentFuturesKtx = "1.3.0"
 firebaseCrashlytics = "20.1.0"
 googleGmsGoogleServices = "4.5.0"
 googleFirebaseCrashlytics = "3.0.8"
@@ -62,6 +63,7 @@ androidx-glance-wear = { module = "androidx.glance.wear:wear", version.ref = "gl
 androidx-glance-wear-core = { module = "androidx.glance.wear:wear-core", version.ref = "glanceWear" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+androidx-concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrentFuturesKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

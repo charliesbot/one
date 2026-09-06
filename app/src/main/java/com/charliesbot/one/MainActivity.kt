@@ -42,9 +42,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onStart() {
     super.onStart()
-    lifecycleScope.launch {
-      phoneWidgetRefreshScheduler.reconcile()
-    }
+    lifecycleScope.launch { phoneWidgetRefreshScheduler.reconcile() }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {

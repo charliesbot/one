@@ -16,11 +16,12 @@ class WidgetRefreshCalculatorTest {
 
     // Next boundary should be at 12 hours elapsed (45 minutes from now)
     val expectedDelay = 45 * 60 * 1000L
-    val actualDelay = WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-      currentTimeMillis = currentTime,
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-    )
+    val actualDelay =
+      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+        currentTimeMillis = currentTime,
+        startTimeMillis = startTime,
+        goalDurationMillis = goalDuration,
+      )
 
     assertEquals(expectedDelay, actualDelay)
   }
@@ -32,27 +33,31 @@ class WidgetRefreshCalculatorTest {
 
     // At 11 hours elapsed: 5 hours remaining
     val timeAtFiveHoursLeft = 11 * oneHourMillis
-    val delayAtFiveHours = WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-      currentTimeMillis = timeAtFiveHoursLeft,
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-    )
+    val delayAtFiveHours =
+      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+        currentTimeMillis = timeAtFiveHoursLeft,
+        startTimeMillis = startTime,
+        goalDurationMillis = goalDuration,
+      )
     // When exactly on the hour, next tick is 1 full hour later
     assertEquals(oneHourMillis, delayAtFiveHours)
 
     // Time advances 3 hours to 14 hours elapsed (2 hours remaining) without DB update
     val timeAtTwoHoursLeft = 14 * oneHourMillis + (20 * 60 * 1000L)
-    val state = com.charliesbot.shared.core.models.FastingDataItem(isFasting = true, startTimeInMillis = startTime)
-      .toFastingWidgetState(timeAtTwoHoursLeft, goalDuration)
+    val state =
+      com.charliesbot.shared.core.models
+        .FastingDataItem(isFasting = true, startTimeInMillis = startTime)
+        .toFastingWidgetState(timeAtTwoHoursLeft, goalDuration)
 
     assertEquals(2L, state.hoursRemaining)
     assertEquals(0.8958f, state.progressFraction, 0.001f)
 
-    val delayAtTwoHours = WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-      currentTimeMillis = timeAtTwoHoursLeft,
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-    )
+    val delayAtTwoHours =
+      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+        currentTimeMillis = timeAtTwoHoursLeft,
+        startTimeMillis = startTime,
+        goalDurationMillis = goalDuration,
+      )
     // 40 minutes remaining until 15th hour
     assertEquals(40 * 60 * 1000L, delayAtTwoHours)
   }
@@ -64,11 +69,12 @@ class WidgetRefreshCalculatorTest {
     // 15 hours and 40 minutes elapsed -> 20 minutes remaining until goal
     val currentTime = 15 * oneHourMillis + (40 * 60 * 1000L)
 
-    val actualDelay = WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-      currentTimeMillis = currentTime,
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-    )
+    val actualDelay =
+      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+        currentTimeMillis = currentTime,
+        startTimeMillis = startTime,
+        goalDurationMillis = goalDuration,
+      )
 
     // Delay must cap at 20 minutes (goal reached), not 60 minutes
     assertEquals(20 * 60 * 1000L, actualDelay)
@@ -80,11 +86,12 @@ class WidgetRefreshCalculatorTest {
     val goalDuration = 16 * oneHourMillis
     val currentTime = 16 * oneHourMillis
 
-    val actualDelay = WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-      currentTimeMillis = currentTime,
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-    )
+    val actualDelay =
+      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+        currentTimeMillis = currentTime,
+        startTimeMillis = startTime,
+        goalDurationMillis = goalDuration,
+      )
 
     assertNull(actualDelay)
   }
@@ -95,11 +102,12 @@ class WidgetRefreshCalculatorTest {
     val currentTime = 1000L
     val goalDuration = 16 * oneHourMillis
 
-    val actualDelay = WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-      currentTimeMillis = currentTime,
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-    )
+    val actualDelay =
+      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+        currentTimeMillis = currentTime,
+        startTimeMillis = startTime,
+        goalDurationMillis = goalDuration,
+      )
 
     assertEquals(4000L, actualDelay)
   }

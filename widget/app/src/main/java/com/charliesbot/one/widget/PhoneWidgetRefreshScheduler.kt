@@ -3,6 +3,8 @@ package com.charliesbot.one.widget
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import androidx.concurrent.futures.await
+import androidx.glance.appwidget.updateAll
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -12,6 +14,9 @@ import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.GoalResolver
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class PhoneWidgetRefreshScheduler(
   private val context: Context,
@@ -23,91 +28,132 @@ class PhoneWidgetRefreshScheduler(
       .getAppWidgetIds(ComponentName(context, OneWidgetReceiver::class.java))
       .isNotEmpty()
   },
+  private val widgetUpdater: suspend (Context) -> Unit = { OneWidget().updateAll(it) },
 ) {
   companion object {
     const val WORK_NAME = "fasting_phone_widget_hourly_refresh"
   }
 
-  suspend fun onFastingStartedOrUpdated(fastingData: FastingDataItem) {
-    if (!activeWidgetChecker() || !fastingData.isFasting) {
-      cancel()
-      return
-    }
-    val goalDuration = goalResolver.resolveGoalDurationMillis(fastingData.fastingGoalId)
-    schedule(
-      startTimeMillis = fastingData.startTimeInMillis,
-      goalDurationMillis = goalDuration,
-      policy = ExistingWorkPolicy.REPLACE,
-    )
-  }
+  internal val mutex = Mutex()
 
-  fun onFastingCompleted() {
-    cancel()
-  }
-
-  suspend fun reconcile() {
-    if (!activeWidgetChecker()) {
-      cancel()
-      return
+  suspend fun onFastingStartedOrUpdated(fastingData: FastingDataItem) =
+    mutex.withLock {
+      if (!activeWidgetChecker() || !fastingData.isFasting) {
+        cancel()
+        return@withLock
+      }
+      val goalDuration = goalResolver.resolveGoalDurationMillis(fastingData.fastingGoalId)
+      schedule(
+        startTimeMillis = fastingData.startTimeInMillis,
+        goalDurationMillis = goalDuration,
+        policy = ExistingWorkPolicy.REPLACE,
+      )
     }
 
-    val current = fastingDataRepository.getCurrentFasting()
-    if (current == null || !current.isFasting) {
-      cancel()
-      return
-    }
+  suspend fun onFastingCompleted() = mutex.withLock { cancel() }
 
-    val workInfos = try {
-      workManager.getWorkInfosForUniqueWork(WORK_NAME).get()
-    } catch (e: Exception) {
-      emptyList<WorkInfo>()
-    }
+  suspend fun reconcile(currentTimeMillis: Long = System.currentTimeMillis()) =
+    mutex.withLock {
+      if (!activeWidgetChecker()) {
+        cancel()
+        return@withLock
+      }
 
-    val hasActiveWork =
-      workInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
-    if (hasActiveWork) {
-      // Preserve existing active work - do not cancel or postpone due refresh
-      return
-    }
+      val current = fastingDataRepository.getCurrentFasting()
+      if (current == null || !current.isFasting) {
+        cancel()
+        return@withLock
+      }
 
-    val goalDuration = goalResolver.resolveGoalDurationMillis(current.fastingGoalId)
-    schedule(
-      startTimeMillis = current.startTimeInMillis,
-      goalDurationMillis = goalDuration,
-      policy = ExistingWorkPolicy.KEEP,
-    )
-  }
+      val workInfos =
+        try {
+          workManager.getWorkInfosForUniqueWork(WORK_NAME).await()
+        } catch (e: CancellationException) {
+          throw e
+        } catch (e: Exception) {
+          emptyList<WorkInfo>()
+        }
+
+      val hasActiveWork =
+        workInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
+      if (hasActiveWork) {
+        // Preserve existing active work - do not cancel or postpone due refresh
+        return@withLock
+      }
+
+      val goalDuration = goalResolver.resolveGoalDurationMillis(current.fastingGoalId)
+      val delayMillis =
+        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+          currentTimeMillis = currentTimeMillis,
+          startTimeMillis = current.startTimeInMillis,
+          goalDurationMillis = goalDuration,
+        )
+
+      if (delayMillis == null || delayMillis <= 0L) {
+        // Fast has reached/passed goal while work was missing; update widget immediately
+        widgetUpdater(context)
+        cancel()
+        return@withLock
+      }
+
+      schedule(
+        startTimeMillis = current.startTimeInMillis,
+        goalDurationMillis = goalDuration,
+        currentTimeMillis = currentTimeMillis,
+        policy = ExistingWorkPolicy.KEEP,
+      )
+    }
 
   suspend fun onWorkerTickCompleted(
     snapshotStartTime: Long,
     snapshotGoalId: String,
     goalDurationMillis: Long,
     currentTimeMillis: Long = System.currentTimeMillis(),
-  ) {
-    val current = fastingDataRepository.getCurrentFasting()
-    if (current == null || !current.isFasting) {
+  ) =
+    mutex.withLock {
+      if (!activeWidgetChecker()) {
+        cancel()
+        return@withLock
+      }
+
+      val current = fastingDataRepository.getCurrentFasting()
+      if (current == null || !current.isFasting) {
+        cancel()
+        return@withLock
+      }
+
+      // Protect against stale work: do not overwrite newer schedule if start time or goal changed
+      if (
+        current.startTimeInMillis != snapshotStartTime || current.fastingGoalId != snapshotGoalId
+      ) {
+        return@withLock
+      }
+
+      val elapsed = (currentTimeMillis - current.startTimeInMillis).coerceAtLeast(0L)
+      if (elapsed >= goalDurationMillis) {
+        // Goal reached, end refresh chain
+        cancel()
+        return@withLock
+      }
+
+      schedule(
+        startTimeMillis = current.startTimeInMillis,
+        goalDurationMillis = goalDurationMillis,
+        currentTimeMillis = currentTimeMillis,
+        policy = ExistingWorkPolicy.REPLACE,
+      )
+    }
+
+  fun enqueueImmediateRecovery(policy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP) {
+    if (!activeWidgetChecker()) {
       cancel()
       return
     }
 
-    // Protect against stale work: do not overwrite newer schedule if start time or goal changed
-    if (current.startTimeInMillis != snapshotStartTime || current.fastingGoalId != snapshotGoalId) {
-      return
-    }
+    val workRequest =
+      OneTimeWorkRequestBuilder<PhoneWidgetRefreshWorker>().addTag(WORK_NAME).build()
 
-    val elapsed = (currentTimeMillis - current.startTimeInMillis).coerceAtLeast(0L)
-    if (elapsed >= goalDurationMillis) {
-      // Goal reached, end refresh chain
-      cancel()
-      return
-    }
-
-    schedule(
-      startTimeMillis = current.startTimeInMillis,
-      goalDurationMillis = goalDurationMillis,
-      currentTimeMillis = currentTimeMillis,
-      policy = ExistingWorkPolicy.REPLACE,
-    )
+    workManager.enqueueUniqueWork(WORK_NAME, policy, workRequest)
   }
 
   private fun schedule(
@@ -134,11 +180,7 @@ class PhoneWidgetRefreshScheduler(
         .addTag(WORK_NAME)
         .build()
 
-    workManager.enqueueUniqueWork(
-      WORK_NAME,
-      policy,
-      workRequest,
-    )
+    workManager.enqueueUniqueWork(WORK_NAME, policy, workRequest)
   }
 
   fun cancel() {

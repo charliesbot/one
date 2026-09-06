@@ -36,8 +36,8 @@ import com.charliesbot.one.widget.common.toFastingWidgetState
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingGoalCatalog
-import org.koin.core.component.KoinComponent
 import com.charliesbot.shared.core.utils.GoalResolver
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class OneWearWidget : GlanceWearWidget(), KoinComponent {

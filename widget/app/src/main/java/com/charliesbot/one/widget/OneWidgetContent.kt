@@ -44,7 +44,8 @@ import com.charliesbot.shared.core.strings.R as SharedR
 fun OneWidgetContent(
   fastingData: FastingDataItem,
   context: Context,
-  goalDurationMillis: Long = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId).durationMillis,
+  goalDurationMillis: Long =
+    PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId).durationMillis,
 ) {
   val currentTime = System.currentTimeMillis()
   val contentState = fastingData.toFastingWidgetState(currentTime, goalDurationMillis)

@@ -29,6 +29,7 @@ dependencies {
   implementation(libs.androidx.glance.appwidget.preview)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.work.runtime.ktx)
+  implementation(libs.androidx.concurrent.futures.ktx)
   implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))

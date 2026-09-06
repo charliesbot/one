@@ -94,7 +94,10 @@ class GoalResolverTest {
     every { customGoalRepository.customGoals } returns flowOf(emptyList())
     val resolver = GoalResolver(customGoalRepository)
 
-    val duration = resolver.resolveGoalDurationMillis(com.charliesbot.shared.core.constants.PredefinedFastingGoals.SIXTEEN_EIGHT.id)
+    val duration =
+      resolver.resolveGoalDurationMillis(
+        com.charliesbot.shared.core.constants.PredefinedFastingGoals.SIXTEEN_EIGHT.id
+      )
 
     assertEquals(16 * 60 * 60 * 1000L, duration)
   }

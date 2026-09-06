@@ -11,7 +11,9 @@ import kotlinx.coroutines.CancellationException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class PhoneWidgetRefreshWorker @JvmOverloads constructor(
+class PhoneWidgetRefreshWorker
+@JvmOverloads
+constructor(
   context: Context,
   workerParameters: WorkerParameters,
   private val widgetUpdater: suspend (Context) -> Unit = { OneWidget().updateAll(it) },

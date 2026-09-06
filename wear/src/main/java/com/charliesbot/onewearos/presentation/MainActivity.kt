@@ -39,9 +39,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onStart() {
     super.onStart()
-    lifecycleScope.launch {
-      wearWidgetRefreshScheduler.reconcile()
-    }
+    lifecycleScope.launch { wearWidgetRefreshScheduler.reconcile() }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
