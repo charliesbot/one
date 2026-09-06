@@ -14,6 +14,7 @@ android {
     targetCompatibility = JavaVersion.VERSION_11
   }
   buildFeatures { compose = true }
+  testOptions { unitTests.isReturnDefaultValues = true }
 }
 
 kotlin { jvmToolchain(11) }

@@ -19,20 +19,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.charliesbot.one.core.components.NotificationPermissionDialog
 import com.charliesbot.one.navigation.MainNavigation
 import com.charliesbot.one.ui.theme.OneTheme
+import com.charliesbot.one.widget.PhoneWidgetRefreshScheduler
 import com.charliesbot.one.widget.updateWidgetPreview
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MainActivity : ComponentActivity() {
+  private val phoneWidgetRefreshScheduler: PhoneWidgetRefreshScheduler by inject()
+
   private val requestNotificationPermission =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
       if (isGranted) {
         NotificationUtil.createNotificationChannel(this)
       }
     }
+
+  override fun onStart() {
+    super.onStart()
+    lifecycleScope.launch {
+      phoneWidgetRefreshScheduler.reconcile()
+    }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

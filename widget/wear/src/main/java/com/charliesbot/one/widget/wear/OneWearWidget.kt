@@ -37,18 +37,22 @@ import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingGoalCatalog
 import org.koin.core.component.KoinComponent
+import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.core.component.inject
 
 class OneWearWidget : GlanceWearWidget(), KoinComponent {
   private val fastingDataRepository: FastingDataRepository by inject()
+  private val goalResolver: GoalResolver by inject()
+  private val wearWidgetRefreshScheduler: WearWidgetRefreshScheduler by inject()
 
   override suspend fun provideWidgetData(
     context: Context,
     params: WearWidgetParams,
   ): WearWidgetData {
+    wearWidgetRefreshScheduler.reconcile()
     val fastingData = fastingDataRepository.getCurrentFasting() ?: defaultFastingData()
-    val goal = FastingGoalCatalog.getGoalById(fastingData.fastingGoalId)
-    val state = fastingData.toFastingWidgetState(System.currentTimeMillis(), goal.durationMillis)
+    val goalDuration = goalResolver.resolveGoalDurationMillis(fastingData.fastingGoalId)
+    val state = fastingData.toFastingWidgetState(System.currentTimeMillis(), goalDuration)
 
     return WearWidgetDocument(background = WearWidgetBrush) {
       OneWearWidgetContent(

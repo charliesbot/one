@@ -8,37 +8,27 @@ import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingRecord
-import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.core.component.inject
 
 class FastingStateListenerService : BaseFastingListenerService() {
   private val widgetUpdateManager: WidgetUpdateManager by inject()
   private val fastingHistoryRepository: FastingHistoryRepository by inject()
   private val phoneWidgetRefreshScheduler: PhoneWidgetRefreshScheduler by inject()
-  private val goalResolver: GoalResolver by inject()
 
   override suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingStarted(fastingDataItem)
-    val duration = goalResolver.resolveGoalDurationMillis(fastingDataItem.fastingGoalId)
-    phoneWidgetRefreshScheduler.scheduleNext(
-      startTimeMillis = fastingDataItem.startTimeInMillis,
-      goalDurationMillis = duration,
-    )
+    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
   }
 
   override suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingUpdated(fastingDataItem)
-    val duration = goalResolver.resolveGoalDurationMillis(fastingDataItem.fastingGoalId)
-    phoneWidgetRefreshScheduler.scheduleNext(
-      startTimeMillis = fastingDataItem.startTimeInMillis,
-      goalDurationMillis = duration,
-    )
+    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
   }
 
   // Called when the WATCH stops a fast
   override suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingCompleted(fastingDataItem)
-    phoneWidgetRefreshScheduler.cancel()
+    phoneWidgetRefreshScheduler.onFastingCompleted()
     fastingHistoryRepository.saveFastingRecord(
       FastingRecord(
         startTimeEpochMillis = fastingDataItem.startTimeInMillis,
@@ -57,8 +47,4 @@ class FastingStateListenerService : BaseFastingListenerService() {
     )
     widgetUpdateManager.requestUpdate()
   }
-
-  // Note: Settings sync is ONE-WAY (phone → watch only)
-  // The phone does NOT listen to settings from the watch
-  // Only fasting state is bidirectional
 }

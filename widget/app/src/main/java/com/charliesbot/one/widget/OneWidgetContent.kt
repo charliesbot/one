@@ -41,10 +41,13 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.strings.R as SharedR
 
 @Composable
-fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
+fun OneWidgetContent(
+  fastingData: FastingDataItem,
+  context: Context,
+  goalDurationMillis: Long = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId).durationMillis,
+) {
   val currentTime = System.currentTimeMillis()
-  val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
-  val contentState = fastingData.toFastingWidgetState(currentTime, selectedGoal.durationMillis)
+  val contentState = fastingData.toFastingWidgetState(currentTime, goalDurationMillis)
 
   val size = LocalSize.current
   val layoutSize = OneWidgetSize.layoutFor(size)

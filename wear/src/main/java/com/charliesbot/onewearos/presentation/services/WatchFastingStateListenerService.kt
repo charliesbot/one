@@ -16,7 +16,6 @@ import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.FastingDataItem
-import com.charliesbot.shared.core.utils.GoalResolver
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
@@ -31,7 +30,6 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
   private val ongoingActivityManager: OngoingActivityManager by inject()
   private val wearWidgetUpdateManager: WearWidgetUpdateManager by inject()
   private val wearWidgetRefreshScheduler: WearWidgetRefreshScheduler by inject()
-  private val goalResolver: GoalResolver by inject()
   private val settingsRepository: SettingsRepository by inject()
   private val customGoalRepository: CustomGoalRepository by inject()
   private val notificationScheduler: NotificationScheduler by inject()
@@ -65,22 +63,14 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
       fastingDataItem.startTimeInMillis,
       fastingDataItem.fastingGoalId,
     )
-    val goalDuration = goalResolver.resolveGoalDurationMillis(fastingDataItem.fastingGoalId)
-    wearWidgetRefreshScheduler.scheduleNext(
-      startTimeMillis = fastingDataItem.startTimeInMillis,
-      goalDurationMillis = goalDuration,
-    )
+    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast started from REMOTE")
   }
 
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingUpdated(fastingDataItem)
-    val goalDuration = goalResolver.resolveGoalDurationMillis(fastingDataItem.fastingGoalId)
-    wearWidgetRefreshScheduler.scheduleNext(
-      startTimeMillis = fastingDataItem.startTimeInMillis,
-      goalDurationMillis = goalDuration,
-    )
+    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast updated from REMOTE")
   }
 
@@ -89,7 +79,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
     super.onPlatformFastingCompleted(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast completed from REMOTE")
     ongoingActivityManager.stopOngoingActivity()
-    wearWidgetRefreshScheduler.cancel()
+    wearWidgetRefreshScheduler.onFastingCompleted()
   }
 
   override fun onDataChanged(dataEvents: DataEventBuffer) {

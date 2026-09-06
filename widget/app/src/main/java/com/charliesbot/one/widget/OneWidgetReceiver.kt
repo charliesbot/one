@@ -6,8 +6,6 @@ import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
-import com.charliesbot.shared.core.domain.repository.FastingDataRepository
-import com.charliesbot.shared.core.utils.GoalResolver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,21 +16,17 @@ class OneWidgetReceiver : GlanceAppWidgetReceiver(), KoinComponent {
   override val glanceAppWidget: GlanceAppWidget
     get() = OneWidget()
 
-  private val fastingDataRepository: FastingDataRepository by inject()
-  private val goalResolver: GoalResolver by inject()
   private val scheduler: PhoneWidgetRefreshScheduler by inject()
 
   override fun onEnabled(context: Context) {
     super.onEnabled(context)
     Log.d(LOG_TAG, "OneWidgetReceiver: onEnabled - first widget placed")
+    val pendingResult = goAsync()
     CoroutineScope(Dispatchers.IO).launch {
-      val fastingData = fastingDataRepository.getCurrentFasting()
-      if (fastingData?.isFasting == true) {
-        val duration = goalResolver.resolveGoalDurationMillis(fastingData.fastingGoalId)
-        scheduler.scheduleNext(
-          startTimeMillis = fastingData.startTimeInMillis,
-          goalDurationMillis = duration,
-        )
+      try {
+        scheduler.reconcile()
+      } finally {
+        pendingResult.finish()
       }
     }
   }

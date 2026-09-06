@@ -26,10 +26,10 @@ val wearAppModule = module {
   single<StringProvider> { WearStringProvider(androidContext()) }
   single<ComplicationUpdateManager> { ComplicationUpdateManager(androidContext()) }
   single<WearWidgetUpdateManager> { WearWidgetUpdateManager(androidContext()) }
-  single { WearWidgetRefreshScheduler(androidContext()) }
+  single { WearWidgetRefreshScheduler(androidContext(), get(), get()) }
   single<OngoingActivityManager> {
     OngoingActivityManager(context = androidContext(), fastingDataRepository = get())
   }
-  single { LocalWatchFastingCallbacks(get(), get(), get(), get(), get()) }
+  single { LocalWatchFastingCallbacks(get(), get(), get(), get()) }
   single<FastingEventCallbacks> { get<LocalWatchFastingCallbacks>() }
 }

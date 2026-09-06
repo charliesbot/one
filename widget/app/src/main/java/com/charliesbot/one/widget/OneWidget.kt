@@ -23,6 +23,8 @@ import androidx.glance.appwidget.provideContent
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.models.FastingGoalCatalog
+import com.charliesbot.shared.core.utils.GoalResolver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,6 +65,7 @@ object ProgressBitmap {
 
 class OneWidget : GlanceAppWidget(), KoinComponent {
   private val fastingDataRepository: FastingDataRepository by inject()
+  private val goalResolver: GoalResolver by inject()
 
   override val sizeMode: SizeMode = SizeMode.Responsive(OneWidgetSize.SupportedSizes)
 
@@ -72,8 +75,19 @@ class OneWidget : GlanceAppWidget(), KoinComponent {
         fastingDataRepository.fastingDataItem.collectAsState(
           initial = FastingDataItem(fastingGoalId = PredefinedFastingGoals.SIXTEEN_EIGHT.id)
         )
+      val allGoals by
+        goalResolver.allGoals.collectAsState(
+          initial = FastingGoalCatalog.allGoals
+        )
+      val durationMillis =
+        allGoals.find { it.id == fastingData.fastingGoalId }?.durationMillis
+          ?: PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId).durationMillis
 
-      OneWidgetContent(fastingData = fastingData, context = context)
+      OneWidgetContent(
+        fastingData = fastingData,
+        context = context,
+        goalDurationMillis = durationMillis,
+      )
     }
   }
 }

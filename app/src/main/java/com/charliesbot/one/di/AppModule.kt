@@ -29,7 +29,7 @@ val appModule = module {
   }
 
   single<WidgetUpdateManager> { WidgetUpdateManager(androidContext()) }
-  single { PhoneWidgetRefreshScheduler(androidContext()) }
+  single { PhoneWidgetRefreshScheduler(androidContext(), get(), get()) }
 
   single<NotificationScheduler> {
     NotificationScheduler(
@@ -50,7 +50,7 @@ val appModule = module {
 
   factory { GetMonthlyFastingMapUseCase(get()) }
 
-  single { LocalFastingCallback(get(), get(), get(), get()) }
+  single { LocalFastingCallback(get(), get(), get()) }
   single<FastingEventCallbacks> { get<LocalFastingCallback>() }
 
   single<SmartReminderCallback> { SmartReminderCallbackImpl(androidContext()) }

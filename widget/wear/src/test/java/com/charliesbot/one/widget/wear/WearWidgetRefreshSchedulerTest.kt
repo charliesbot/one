@@ -3,7 +3,14 @@ package com.charliesbot.one.widget.wear
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.charliesbot.shared.core.domain.repository.FastingDataRepository
+import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.utils.GoalResolver
+import com.google.common.util.concurrent.ListenableFuture
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
@@ -13,46 +20,33 @@ import org.junit.Test
 class WearWidgetRefreshSchedulerTest {
   private lateinit var context: Context
   private lateinit var workManager: WorkManager
+  private lateinit var repository: FastingDataRepository
+  private lateinit var goalResolver: GoalResolver
   private val oneHourMillis = 60L * 60L * 1000L
 
   @Before
   fun setup() {
     context = mockk(relaxed = true)
     workManager = mockk(relaxed = true)
+    repository = mockk()
+    goalResolver = mockk()
   }
 
   @Test
-  fun `does not schedule and cancels work when no active widgets exist`() = runTest {
+  fun `onFastingStartedOrUpdated schedules with REPLACE when widgets active and fasting`() = runTest {
     val scheduler = WearWidgetRefreshScheduler(
       context = context,
-      workManager = workManager,
-      activeWidgetChecker = { false },
-    )
-
-    scheduler.scheduleNext(startTimeMillis = 0L, goalDurationMillis = 16 * oneHourMillis)
-
-    verify { workManager.cancelUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) }
-    verify(exactly = 0) {
-      workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
-    }
-  }
-
-  @Test
-  fun `schedules unique work with delay when widget is active and fast is ongoing`() = runTest {
-    val scheduler = WearWidgetRefreshScheduler(
-      context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
       workManager = workManager,
       activeWidgetChecker = { true },
     )
+    val startTime = System.currentTimeMillis() - (2 * oneHourMillis)
+    val goalId = "16:8"
+    coEvery { goalResolver.resolveGoalDurationMillis(goalId) } returns 16 * oneHourMillis
 
-    val startTime = 1000L
-    val currentTime = startTime + (11 * oneHourMillis) + (15 * 60 * 1000L)
-    val goalDuration = 16 * oneHourMillis
-
-    scheduler.scheduleNext(
-      startTimeMillis = startTime,
-      goalDurationMillis = goalDuration,
-      currentTimeMillis = currentTime,
+    scheduler.onFastingStartedOrUpdated(
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = goalId)
     )
 
     verify(exactly = 1) {
@@ -65,19 +59,130 @@ class WearWidgetRefreshSchedulerTest {
   }
 
   @Test
-  fun `cancels work when fast is already completed`() = runTest {
+  fun `onFastingStartedOrUpdated cancels when no active widgets exist`() = runTest {
     val scheduler = WearWidgetRefreshScheduler(
       context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
+      workManager = workManager,
+      activeWidgetChecker = { false },
+    )
+
+    scheduler.onFastingStartedOrUpdated(
+      FastingDataItem(isFasting = true, startTimeInMillis = 1000L, fastingGoalId = "16:8")
+    )
+
+    verify { workManager.cancelUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) }
+    verify(exactly = 0) {
+      workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+    }
+  }
+
+  @Test
+  fun `reconcile preserves existing ENQUEUED work without modifying it`() = runTest {
+    val scheduler = WearWidgetRefreshScheduler(
+      context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
       workManager = workManager,
       activeWidgetChecker = { true },
     )
+    val activeWorkInfo = mockk<WorkInfo> {
+      every { state } returns WorkInfo.State.ENQUEUED
+    }
+    val future = mockk<ListenableFuture<List<WorkInfo>>> {
+      every { get() } returns listOf(activeWorkInfo)
+    }
+    every { workManager.getWorkInfosForUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) } returns future
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(isFasting = true, startTimeInMillis = 1000L, fastingGoalId = "16:8")
 
+    scheduler.reconcile()
+
+    // Must NOT enqueue or cancel anything
+    verify(exactly = 0) {
+      workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+    }
+    verify(exactly = 0) {
+      workManager.cancelUniqueWork(any())
+    }
+  }
+
+  @Test
+  fun `reconcile establishes missing work with KEEP when fast is active`() = runTest {
+    val scheduler = WearWidgetRefreshScheduler(
+      context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
+      workManager = workManager,
+      activeWidgetChecker = { true },
+    )
+    val emptyFuture = mockk<ListenableFuture<List<WorkInfo>>> {
+      every { get() } returns emptyList()
+    }
+    every { workManager.getWorkInfosForUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) } returns emptyFuture
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(
+        isFasting = true,
+        startTimeInMillis = System.currentTimeMillis() - (2 * oneHourMillis),
+        fastingGoalId = "16:8",
+      )
+    coEvery { goalResolver.resolveGoalDurationMillis("16:8") } returns 16 * oneHourMillis
+
+    scheduler.reconcile()
+
+    verify(exactly = 1) {
+      workManager.enqueueUniqueWork(
+        WearWidgetRefreshScheduler.WORK_NAME,
+        ExistingWorkPolicy.KEEP,
+        any<OneTimeWorkRequest>(),
+      )
+    }
+  }
+
+  @Test
+  fun `onWorkerTickCompleted protects against stale work when fasting state changed during execution`() = runTest {
+    val scheduler = WearWidgetRefreshScheduler(
+      context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
+      workManager = workManager,
+      activeWidgetChecker = { true },
+    )
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(isFasting = true, startTimeInMillis = 5000L, fastingGoalId = "16:8")
+
+    scheduler.onWorkerTickCompleted(
+      snapshotStartTime = 1000L,
+      snapshotGoalId = "16:8",
+      goalDurationMillis = 16 * oneHourMillis,
+      currentTimeMillis = 2000L,
+    )
+
+    verify(exactly = 0) {
+      workManager.enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+    }
+  }
+
+  @Test
+  fun `onWorkerTickCompleted cancels when goal is reached`() = runTest {
+    val scheduler = WearWidgetRefreshScheduler(
+      context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
+      workManager = workManager,
+      activeWidgetChecker = { true },
+    )
     val startTime = 1000L
-    val currentTime = startTime + (16 * oneHourMillis)
     val goalDuration = 16 * oneHourMillis
+    val currentTime = startTime + goalDuration
 
-    scheduler.scheduleNext(
-      startTimeMillis = startTime,
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
+
+    scheduler.onWorkerTickCompleted(
+      snapshotStartTime = startTime,
+      snapshotGoalId = "16:8",
       goalDurationMillis = goalDuration,
       currentTimeMillis = currentTime,
     )
@@ -89,15 +194,34 @@ class WearWidgetRefreshSchedulerTest {
   }
 
   @Test
-  fun `cancel delegates to workManager cancelUniqueWork`() {
+  fun `onWorkerTickCompleted schedules next boundary when fast is still ongoing`() = runTest {
     val scheduler = WearWidgetRefreshScheduler(
       context = context,
+      fastingDataRepository = repository,
+      goalResolver = goalResolver,
       workManager = workManager,
       activeWidgetChecker = { true },
     )
+    val startTime = 1000L
+    val goalDuration = 16 * oneHourMillis
+    val currentTime = startTime + (5 * oneHourMillis) + (15 * 60 * 1000L)
 
-    scheduler.cancel()
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "16:8")
 
-    verify { workManager.cancelUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) }
+    scheduler.onWorkerTickCompleted(
+      snapshotStartTime = startTime,
+      snapshotGoalId = "16:8",
+      goalDurationMillis = goalDuration,
+      currentTimeMillis = currentTime,
+    )
+
+    verify(exactly = 1) {
+      workManager.enqueueUniqueWork(
+        WearWidgetRefreshScheduler.WORK_NAME,
+        ExistingWorkPolicy.REPLACE,
+        any<OneTimeWorkRequest>(),
+      )
+    }
   }
 }
