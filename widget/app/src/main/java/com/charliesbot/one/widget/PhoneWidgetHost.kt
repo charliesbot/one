@@ -22,5 +22,5 @@ class PhoneWidgetHost(
     widgetUpdater(context)
   }
 
-  override fun canEnqueueImmediateRecovery(): Boolean = activeWidgetChecker()
+  override fun canRequestRefreshImmediately(): Boolean = activeWidgetChecker()
 }

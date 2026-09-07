@@ -19,7 +19,7 @@ class OneWidgetReceiver : GlanceAppWidgetReceiver(), KoinComponent {
   override fun onEnabled(context: Context) {
     super.onEnabled(context)
     Log.d(LOG_TAG, "OneWidgetReceiver: onEnabled - first widget placed")
-    scheduler.enqueueImmediateRecovery()
+    scheduler.ensureRefreshEnqueued()
   }
 
   override fun onDisabled(context: Context) {

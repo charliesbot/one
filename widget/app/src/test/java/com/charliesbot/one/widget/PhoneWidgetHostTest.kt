@@ -17,17 +17,17 @@ class PhoneWidgetHostTest {
   }
 
   @Test
-  fun `hasActiveWidgets and canEnqueueImmediateRecovery delegate to activeWidgetChecker`() =
+  fun `hasActiveWidgets and canRequestRefreshImmediately delegate to activeWidgetChecker`() =
     runTest {
       var active = true
       val adapter = PhoneWidgetHost(context = context, activeWidgetChecker = { active })
 
       assertTrue(adapter.hasActiveWidgets())
-      assertTrue(adapter.canEnqueueImmediateRecovery())
+      assertTrue(adapter.canRequestRefreshImmediately())
 
       active = false
       assertFalse(adapter.hasActiveWidgets())
-      assertFalse(adapter.canEnqueueImmediateRecovery())
+      assertFalse(adapter.canRequestRefreshImmediately())
     }
 
   @Test

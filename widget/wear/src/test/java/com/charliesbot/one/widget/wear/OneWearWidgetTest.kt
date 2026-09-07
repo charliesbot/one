@@ -51,6 +51,6 @@ class OneWearWidgetTest {
 
     widget.onAdded(context, handle)
 
-    verify(exactly = 1) { scheduler.enqueueImmediateRecovery() }
+    verify(exactly = 1) { scheduler.ensureRefreshEnqueued() }
   }
 }

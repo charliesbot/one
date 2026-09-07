@@ -34,7 +34,7 @@ class OneWidgetReceiverTest {
 
     receiver.onEnabled(context)
 
-    verify(exactly = 1) { scheduler.enqueueImmediateRecovery() }
+    verify(exactly = 1) { scheduler.ensureRefreshEnqueued() }
   }
 
   @Test

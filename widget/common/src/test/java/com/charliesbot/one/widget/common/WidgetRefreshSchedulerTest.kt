@@ -29,7 +29,7 @@ class WidgetRefreshSchedulerTest {
 
     coEvery { platformAdapter.hasActiveWidgets() } returns true
     coEvery { platformAdapter.hasActiveWork() } returns false
-    coEvery { platformAdapter.canEnqueueImmediateRecovery() } returns true
+    coEvery { platformAdapter.canRequestRefreshImmediately() } returns true
   }
 
   // --- 1. Delayed Execution ---
@@ -293,22 +293,22 @@ class WidgetRefreshSchedulerTest {
   // --- 5. Recovery ---
 
   @Test
-  fun `enqueueImmediateRecovery enqueues immediate work when canEnqueueImmediateRecovery is true`() {
+  fun `ensureRefreshEnqueued enqueues immediate work when canRequestRefreshImmediately is true`() {
     val scheduler = WidgetRefreshScheduler(repository, goalDurationResolver, platformAdapter)
-    coEvery { platformAdapter.canEnqueueImmediateRecovery() } returns true
+    coEvery { platformAdapter.canRequestRefreshImmediately() } returns true
 
-    scheduler.enqueueImmediateRecovery()
+    scheduler.ensureRefreshEnqueued()
 
     verify(exactly = 1) { platformAdapter.enqueueImmediateWork() }
     verify(exactly = 0) { platformAdapter.cancelScheduledWork() }
   }
 
   @Test
-  fun `enqueueImmediateRecovery cancels work when canEnqueueImmediateRecovery is false`() {
+  fun `ensureRefreshEnqueued cancels work when canRequestRefreshImmediately is false`() {
     val scheduler = WidgetRefreshScheduler(repository, goalDurationResolver, platformAdapter)
-    coEvery { platformAdapter.canEnqueueImmediateRecovery() } returns false
+    coEvery { platformAdapter.canRequestRefreshImmediately() } returns false
 
-    scheduler.enqueueImmediateRecovery()
+    scheduler.ensureRefreshEnqueued()
 
     verify(exactly = 1) { platformAdapter.cancelScheduledWork() }
     verify(exactly = 0) { platformAdapter.enqueueImmediateWork() }

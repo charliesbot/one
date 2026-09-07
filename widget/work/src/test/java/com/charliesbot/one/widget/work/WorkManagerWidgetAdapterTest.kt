@@ -109,10 +109,10 @@ class WorkManagerWidgetAdapterTest {
   @Test
   fun `widget operations delegate to the platform host`() = runTest {
     coEvery { host.hasActiveWidgets() } returns true
-    every { host.canEnqueueImmediateRecovery() } returns false
+    every { host.canRequestRefreshImmediately() } returns false
 
     assertTrue(adapter.hasActiveWidgets())
-    assertFalse(adapter.canEnqueueImmediateRecovery())
+    assertFalse(adapter.canRequestRefreshImmediately())
     adapter.requestWidgetUpdate()
 
     coVerify(exactly = 1) { host.requestWidgetUpdate() }

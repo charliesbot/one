@@ -13,5 +13,5 @@ interface WidgetPlatformAdapter {
 
   suspend fun requestWidgetUpdate()
 
-  fun canEnqueueImmediateRecovery(): Boolean = true
+  fun canRequestRefreshImmediately(): Boolean = true
 }

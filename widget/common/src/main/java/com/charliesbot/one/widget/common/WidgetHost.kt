@@ -7,5 +7,5 @@ interface WidgetHost {
   suspend fun requestWidgetUpdate()
 
   /** Synchronous recovery gate; hosts needing suspend discovery defer that check to the worker. */
-  fun canEnqueueImmediateRecovery(): Boolean = true
+  fun canRequestRefreshImmediately(): Boolean = true
 }

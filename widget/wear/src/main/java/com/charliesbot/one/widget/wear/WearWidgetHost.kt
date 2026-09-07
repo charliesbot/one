@@ -18,5 +18,5 @@ class WearWidgetHost(
     widgetUpdater(context)
   }
 
-  override fun canEnqueueImmediateRecovery(): Boolean = true
+  override fun canRequestRefreshImmediately(): Boolean = true
 }

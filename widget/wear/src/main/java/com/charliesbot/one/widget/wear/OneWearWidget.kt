@@ -49,7 +49,7 @@ class OneWearWidget : GlanceWearWidget(), KoinComponent {
 
   override suspend fun onAdded(context: Context, widgetHandle: ActiveWearWidgetHandle) {
     super.onAdded(context, widgetHandle)
-    scheduler.enqueueImmediateRecovery()
+    scheduler.ensureRefreshEnqueued()
   }
 
   override suspend fun provideWidgetData(

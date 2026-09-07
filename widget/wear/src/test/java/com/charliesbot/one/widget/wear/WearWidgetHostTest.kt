@@ -17,17 +17,17 @@ class WearWidgetHostTest {
   }
 
   @Test
-  fun `hasActiveWidgets delegates to activeWidgetChecker and canEnqueueImmediateRecovery is true`() =
+  fun `hasActiveWidgets delegates to activeWidgetChecker and canRequestRefreshImmediately is true`() =
     runTest {
       var active = true
       val adapter = WearWidgetHost(context = context, activeWidgetChecker = { active })
 
       assertTrue(adapter.hasActiveWidgets())
-      assertTrue(adapter.canEnqueueImmediateRecovery())
+      assertTrue(adapter.canRequestRefreshImmediately())
 
       active = false
       assertFalse(adapter.hasActiveWidgets())
-      assertTrue(adapter.canEnqueueImmediateRecovery()) // Always true on Wear
+      assertTrue(adapter.canRequestRefreshImmediately()) // Always true on Wear
     }
 
   @Test

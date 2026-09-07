@@ -52,5 +52,5 @@ class WorkManagerWidgetAdapter(
 
   override suspend fun requestWidgetUpdate() = host.requestWidgetUpdate()
 
-  override fun canEnqueueImmediateRecovery(): Boolean = host.canEnqueueImmediateRecovery()
+  override fun canRequestRefreshImmediately(): Boolean = host.canRequestRefreshImmediately()
 }

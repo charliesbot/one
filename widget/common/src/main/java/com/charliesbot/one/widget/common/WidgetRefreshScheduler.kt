@@ -172,16 +172,16 @@ class WidgetRefreshScheduler(
   /**
    * Ensures refresh work is queued when a widget is added or enabled, keeping existing work intact.
    *
-   * "Recovery" means restoring a potentially missing refresh schedule, not recovering fasting data.
-   * Requests work without an initial delay; Android may still defer execution. Uses the platform's
-   * synchronous recovery gate: phone checks widget presence now, while Wear allows the request and
-   * defers presence checking to worker execution. Cancels work if the gate rejects the request.
+   * Restores a potentially missing refresh schedule without changing fasting data. Requests work
+   * without an initial delay; Android may still defer execution. Uses the platform's synchronous
+   * request gate: phone checks widget presence now, while Wear allows the request and defers
+   * presence checking to worker execution. Cancels work if the gate rejects the request.
    *
    * Does not acquire the scheduling mutex or wait for the worker to run, so non-suspending
    * lifecycle callbacks can invoke it directly.
    */
-  fun enqueueImmediateRecovery() {
-    if (!platformAdapter.canEnqueueImmediateRecovery()) {
+  fun ensureRefreshEnqueued() {
+    if (!platformAdapter.canRequestRefreshImmediately()) {
       cancel()
       return
     }
