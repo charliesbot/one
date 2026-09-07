@@ -30,14 +30,14 @@ class LocalWatchFastingCallbacks(
     )
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
-    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    wearWidgetRefreshScheduler.reconcile()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
   }
 
   override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
     ongoingActivityManager.stopOngoingActivity()
-    wearWidgetRefreshScheduler.onFastingCompleted()
+    wearWidgetRefreshScheduler.reconcile()
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
@@ -48,7 +48,7 @@ class LocalWatchFastingCallbacks(
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
-    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    wearWidgetRefreshScheduler.reconcile()
     ongoingActivityManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
   }

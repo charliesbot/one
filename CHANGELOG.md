@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Home screen widget now refreshes hourly and progress updates properly during active fasts without opening the app
+- Home screen widget now refreshes fasting progress approximately hourly without opening the app; Android battery restrictions may delay updates
 - History export and notification messages no longer crash in release builds
 
 ### Deprecated

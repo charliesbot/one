@@ -17,18 +17,18 @@ class LocalFastingCallback(
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalFastingCallback: Processing LOCAL fasting start")
     widgetUpdateManager.requestUpdate()
-    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    phoneWidgetRefreshScheduler.reconcile()
   }
 
   override suspend fun onFastingUpdated(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalFastingCallback: Processing LOCAL fasting update")
     widgetUpdateManager.requestUpdate()
-    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    phoneWidgetRefreshScheduler.reconcile()
   }
 
   override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalFastingCallback: Processing LOCAL fasting completion")
-    phoneWidgetRefreshScheduler.onFastingCompleted()
+    phoneWidgetRefreshScheduler.reconcile()
     widgetUpdateManager.requestUpdate()
     fastingHistoryRepository.saveFastingRecord(
       FastingRecord(
