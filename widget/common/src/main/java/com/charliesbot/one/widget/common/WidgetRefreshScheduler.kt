@@ -12,6 +12,25 @@ class WidgetRefreshScheduler(
 ) {
   private val mutex = Mutex()
 
+  /** Refreshes widget content, then reconciles continuation against the latest fasting state. */
+  suspend fun refresh() {
+    val snapshot = fastingDataRepository.getCurrentFasting()
+    if (snapshot == null || !snapshot.isFasting) {
+      onFastingCompleted()
+      platformAdapter.requestWidgetUpdate()
+      return
+    }
+
+    val goalDuration = goalDurationResolver.durationMillis(snapshot.fastingGoalId)
+    // Updating may suspend while fasting state changes; do not hold the scheduling mutex here.
+    platformAdapter.requestWidgetUpdate()
+    onWorkerTickCompleted(
+      snapshotStartTime = snapshot.startTimeInMillis,
+      snapshotGoalId = snapshot.fastingGoalId,
+      goalDurationMillis = goalDuration,
+    )
+  }
+
   suspend fun onFastingStartedOrUpdated(
     fastingData: FastingDataItem,
     currentTimeMillis: Long = System.currentTimeMillis(),
