@@ -18,18 +18,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.onewearos.core.components.NotificationPermissionDialog
 import com.charliesbot.onewearos.presentation.navigation.WearNavigation
 import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
+  private val wearWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
+
   private val requestNotificationPermission =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
       if (isGranted) {
         NotificationUtil.createNotificationChannel(this)
       }
     }
+
+  override fun onStart() {
+    super.onStart()
+    lifecycleScope.launch { wearWidgetRefreshScheduler.reconcile() }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     installSplashScreen()

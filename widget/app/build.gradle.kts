@@ -14,6 +14,7 @@ android {
     targetCompatibility = JavaVersion.VERSION_11
   }
   buildFeatures { compose = true }
+  testOptions { unitTests.isReturnDefaultValues = true }
 }
 
 kotlin { jvmToolchain(11) }
@@ -27,10 +28,14 @@ dependencies {
   implementation(libs.androidx.glance.preview)
   implementation(libs.androidx.glance.appwidget.preview)
   implementation(libs.androidx.core.ktx)
+  implementation(platform(libs.kotlinx.coroutines.bom))
+  implementation(libs.kotlinx.coroutines.core)
   implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))
-  implementation(project(":widget:common"))
+  api(project(":widget:common"))
 
   testImplementation(libs.junit)
+  testImplementation(libs.mockk)
+  testImplementation(libs.kotlinx.coroutines.test)
 }

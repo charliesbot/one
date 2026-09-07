@@ -2,6 +2,7 @@ package com.charliesbot.one.services
 
 import android.util.Log
 import com.charliesbot.one.widget.WidgetUpdateManager
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.data.services.BaseFastingListenerService
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.repository.FastingHistoryRepository
@@ -12,10 +13,23 @@ import org.koin.core.component.inject
 class FastingStateListenerService : BaseFastingListenerService() {
   private val widgetUpdateManager: WidgetUpdateManager by inject()
   private val fastingHistoryRepository: FastingHistoryRepository by inject()
+  private val phoneWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
 
   // Called when the WATCH starts a fast
+  override suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
+    super.onPlatformFastingStarted(fastingDataItem)
+    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+  }
+
+  override suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
+    super.onPlatformFastingUpdated(fastingDataItem)
+    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+  }
+
+  // Called when the WATCH stops a fast
   override suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingCompleted(fastingDataItem)
+    phoneWidgetRefreshScheduler.onFastingCompleted()
     fastingHistoryRepository.saveFastingRecord(
       FastingRecord(
         startTimeEpochMillis = fastingDataItem.startTimeInMillis,

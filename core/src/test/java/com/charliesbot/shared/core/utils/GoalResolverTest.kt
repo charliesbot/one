@@ -71,4 +71,34 @@ class GoalResolverTest {
     assertEquals("15", resolved.durationDisplay)
     assertEquals(0xFF0000FF, resolved.colorHex)
   }
+
+  @Test
+  fun `durationMillis returns custom duration when found`() = runTest {
+    val customGoal =
+      CustomGoalData(
+        id = "custom_14",
+        name = "14h Goal",
+        durationMillis = 14 * 60 * 60 * 1000L,
+        colorHex = 0xFFFF0000,
+      )
+    every { customGoalRepository.customGoals } returns flowOf(listOf(customGoal))
+    val resolver = GoalResolver(customGoalRepository)
+
+    val duration = resolver.durationMillis("custom_14")
+
+    assertEquals(14 * 60 * 60 * 1000L, duration)
+  }
+
+  @Test
+  fun `durationMillis falls back to predefined catalog for standard id`() = runTest {
+    every { customGoalRepository.customGoals } returns flowOf(emptyList())
+    val resolver = GoalResolver(customGoalRepository)
+
+    val duration =
+      resolver.durationMillis(
+        com.charliesbot.shared.core.constants.PredefinedFastingGoals.SIXTEEN_EIGHT.id
+      )
+
+    assertEquals(16 * 60 * 60 * 1000L, duration)
+  }
 }

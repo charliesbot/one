@@ -14,6 +14,7 @@ android {
     targetCompatibility = JavaVersion.VERSION_11
   }
   buildFeatures { compose = true }
+  testOptions { unitTests.isReturnDefaultValues = true }
 }
 
 kotlin { jvmToolchain(11) }
@@ -30,7 +31,7 @@ dependencies {
   implementation(libs.androidx.wear.remote.material3)
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
-  implementation(project(":widget:common"))
+  api(project(":widget:common"))
   implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))

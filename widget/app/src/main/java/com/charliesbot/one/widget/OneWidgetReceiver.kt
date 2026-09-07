@@ -5,11 +5,28 @@ import android.content.Context
 import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class OneWidgetReceiver : GlanceAppWidgetReceiver() {
+class OneWidgetReceiver : GlanceAppWidgetReceiver(), KoinComponent {
   override val glanceAppWidget: GlanceAppWidget
     get() = OneWidget()
+
+  private val scheduler: WidgetRefreshScheduler by inject()
+
+  override fun onEnabled(context: Context) {
+    super.onEnabled(context)
+    Log.d(LOG_TAG, "OneWidgetReceiver: onEnabled - first widget placed")
+    scheduler.ensureRefreshEnqueued()
+  }
+
+  override fun onDisabled(context: Context) {
+    super.onDisabled(context)
+    Log.d(LOG_TAG, "OneWidgetReceiver: onDisabled - last widget removed")
+    scheduler.cancel()
+  }
 
   override fun onUpdate(
     context: Context,

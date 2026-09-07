@@ -53,6 +53,48 @@ class FastingWidgetStateTest {
     assertFalse(state.isGoalMet)
     assertEquals(0f, state.progressFraction, 0.0001f)
   }
+
+  @Test
+  fun customGoalDurationMapsAccuratelyAndRecalculatesOnTimeAdvance() {
+    val startTime = 0L
+    val customGoal14h = 14.hoursMillis
+
+    // At 9 hours elapsed -> 5 hours left
+    val state9h =
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "custom_14")
+        .toFastingWidgetState(currentTimeMillis = 9.hoursMillis, fastingGoalMillis = customGoal14h)
+    assertEquals(5, state9h.hoursRemaining)
+    assertEquals(9f / 14f, state9h.progressFraction, 0.0001f)
+
+    // Time advances to 12 hours elapsed (delayed execution) -> 2 hours left
+    val state12h =
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = "custom_14")
+        .toFastingWidgetState(currentTimeMillis = 12.hoursMillis, fastingGoalMillis = customGoal14h)
+    assertEquals(2, state12h.hoursRemaining)
+    assertEquals(12f / 14f, state12h.progressFraction, 0.0001f)
+  }
+
+  @Test
+  fun customGoalDurationDirectlyDrivesBothRemainingHoursAndProgress() {
+    val startTime = 0L
+    val currentTime = 10.hoursMillis // 10 hours elapsed
+    val fastingData =
+      FastingDataItem(
+        isFasting = true,
+        startTimeInMillis = startTime,
+        fastingGoalId = "custom_goal",
+      )
+
+    // With 14-hour custom goal
+    val state14h = fastingData.toFastingWidgetState(currentTime, 14.hoursMillis)
+    assertEquals(4, state14h.hoursRemaining)
+    assertEquals(10f / 14f, state14h.progressFraction, 0.0001f)
+
+    // With 20-hour custom goal for the identical elapsed time
+    val state20h = fastingData.toFastingWidgetState(currentTime, 20.hoursMillis)
+    assertEquals(10, state20h.hoursRemaining)
+    assertEquals(10f / 20f, state20h.progressFraction, 0.0001f)
+  }
 }
 
 private val Int.hoursMillis: Long

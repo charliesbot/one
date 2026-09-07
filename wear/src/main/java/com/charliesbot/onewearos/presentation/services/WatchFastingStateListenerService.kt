@@ -3,6 +3,7 @@ package com.charliesbot.onewearos.presentation.services
 import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
@@ -28,6 +29,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
   private val complicationUpdateManager: ComplicationUpdateManager by inject()
   private val ongoingActivityManager: OngoingActivityManager by inject()
   private val wearWidgetUpdateManager: WearWidgetUpdateManager by inject()
+  private val wearWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
   private val settingsRepository: SettingsRepository by inject()
   private val customGoalRepository: CustomGoalRepository by inject()
   private val notificationScheduler: NotificationScheduler by inject()
@@ -61,7 +63,15 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
       fastingDataItem.startTimeInMillis,
       fastingDataItem.fastingGoalId,
     )
+    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast started from REMOTE")
+  }
+
+  @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+  override suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
+    super.onPlatformFastingUpdated(fastingDataItem)
+    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast updated from REMOTE")
   }
 
   // Called when the PHONE stops a fast
@@ -69,6 +79,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
     super.onPlatformFastingCompleted(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast completed from REMOTE")
     ongoingActivityManager.stopOngoingActivity()
+    wearWidgetRefreshScheduler.onFastingCompleted()
   }
 
   override fun onDataChanged(dataEvents: DataEventBuffer) {

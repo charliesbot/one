@@ -29,26 +29,36 @@ import androidx.glance.wear.GlanceWearWidget
 import androidx.glance.wear.WearWidgetBrush
 import androidx.glance.wear.WearWidgetData
 import androidx.glance.wear.WearWidgetDocument
+import androidx.glance.wear.core.ActiveWearWidgetHandle
 import androidx.glance.wear.core.WearWidgetParams
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteText
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.common.toFastingWidgetState
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingGoalCatalog
+import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class OneWearWidget : GlanceWearWidget(), KoinComponent {
-  private val fastingDataRepository: FastingDataRepository by inject()
+  private val repo: FastingDataRepository by inject()
+  private val goals: GoalResolver by inject()
+  private val scheduler: WidgetRefreshScheduler by inject()
+
+  override suspend fun onAdded(context: Context, widgetHandle: ActiveWearWidgetHandle) {
+    super.onAdded(context, widgetHandle)
+    scheduler.ensureRefreshEnqueued()
+  }
 
   override suspend fun provideWidgetData(
     context: Context,
     params: WearWidgetParams,
   ): WearWidgetData {
-    val fastingData = fastingDataRepository.getCurrentFasting() ?: defaultFastingData()
-    val goal = FastingGoalCatalog.getGoalById(fastingData.fastingGoalId)
-    val state = fastingData.toFastingWidgetState(System.currentTimeMillis(), goal.durationMillis)
+    val fastingData = repo.getCurrentFasting() ?: defaultFastingData()
+    val goalDuration = goals.durationMillis(fastingData.fastingGoalId)
+    val state = fastingData.toFastingWidgetState(System.currentTimeMillis(), goalDuration)
 
     return WearWidgetDocument(background = WearWidgetBrush) {
       OneWearWidgetContent(

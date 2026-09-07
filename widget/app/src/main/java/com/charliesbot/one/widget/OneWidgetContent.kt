@@ -41,10 +41,9 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.strings.R as SharedR
 
 @Composable
-fun OneWidgetContent(fastingData: FastingDataItem, context: Context) {
+fun OneWidgetContent(fastingData: FastingDataItem, context: Context, goalDurationMillis: Long) {
   val currentTime = System.currentTimeMillis()
-  val selectedGoal = PredefinedFastingGoals.getGoalById(fastingData.fastingGoalId)
-  val contentState = fastingData.toFastingWidgetState(currentTime, selectedGoal.durationMillis)
+  val contentState = fastingData.toFastingWidgetState(currentTime, goalDurationMillis)
 
   val size = LocalSize.current
   val layoutSize = OneWidgetSize.layoutFor(size)
@@ -353,11 +352,19 @@ private annotation class OneWidgetSizePreviews
 @OneWidgetSizePreviews
 @Composable
 private fun OneWidgetContentPreview() {
-  OneWidgetContent(fastingData = widgetMockFastingData, context = LocalContext.current)
+  OneWidgetContent(
+    fastingData = widgetMockFastingData,
+    context = LocalContext.current,
+    goalDurationMillis = PredefinedFastingGoals.SIXTEEN_EIGHT.durationMillis,
+  )
 }
 
 @OneWidgetSizePreviews
 @Composable
 private fun OneWidgetContentNotFastingPreview() {
-  OneWidgetContent(fastingData = widgetMockNotFastingData, context = LocalContext.current)
+  OneWidgetContent(
+    fastingData = widgetMockNotFastingData,
+    context = LocalContext.current,
+    goalDurationMillis = PredefinedFastingGoals.SIXTEEN_EIGHT.durationMillis,
+  )
 }

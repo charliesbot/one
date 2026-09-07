@@ -20,7 +20,8 @@ The architecture is split by responsibility:
 | --- | --- |
 | `:app` | Phone/tablet shell, Navigation 3, Koin startup, widgets, phone sync service |
 | `:wear` | Wear OS shell, Wear navigation, Koin startup, watch sync service and ongoing activity hooks |
-| `:widget:common` | Shared widget state projection |
+| `:widget:common` | JVM-only widget state, refresh rules, and host contracts |
+| `:widget:work` | Shared Android WorkManager adapter and refresh worker |
 | `:widget:app` | Phone/tablet Glance widgets |
 | `:widget:wear` | Wear OS Glance widgets |
 | `:complications` | Wear complication data sources |
@@ -62,11 +63,12 @@ to the appropriate design-system module.
 
 :app                       → :core, :core:data, :core:strings,
                               :core:designsystem:common, :features:*:app,
-                              :widget:app
+                              :widget:app, :widget:work
 :wear                      → :core, :core:data, :core:strings,
                               :core:designsystem:common, :features:dashboard:wear,
-                              :complications, :widget:wear
+                              :complications, :widget:wear, :widget:work
 :widget:common             → :core:model, :core:domain
+:widget:work               → :widget:common
 :widget:app                → :core, :core:strings, :widget:common
 :widget:wear               → :core:strings, :widget:common
 :complications             → :core, :core:strings
@@ -75,6 +77,15 @@ to the appropriate design-system module.
 Feature modules should not depend on each other. Phone feature modules may use
 `:core:designsystem:app`; Wear feature modules must not depend on phone-only
 design-system code.
+
+## Widget Refresh Ownership
+
+`:widget:common` owns refresh timing, state checks, and reconciliation. It has no
+Android dependencies. `:widget:work` implements WorkManager scheduling and worker
+execution once for both applications; it has no Glance or platform widget dependency.
+Phone and Wear widget modules implement `WidgetHost` for discovery and rendering.
+Each application shell binds its host to the shared adapter in Koin, preserving its
+unique work name. Refreshes remain best-effort: WorkManager can delay execution in Doze.
 
 ## Core Layer Responsibilities
 

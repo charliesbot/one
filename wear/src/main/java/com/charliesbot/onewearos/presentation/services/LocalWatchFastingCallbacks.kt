@@ -3,6 +3,7 @@ package com.charliesbot.onewearos.presentation.services
 import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
@@ -18,6 +19,7 @@ class LocalWatchFastingCallbacks(
   private val complicationUpdateManager: ComplicationUpdateManager,
   private val ongoingActivityManager: OngoingActivityManager,
   private val wearWidgetUpdateManager: WearWidgetUpdateManager,
+  private val wearWidgetRefreshScheduler: WidgetRefreshScheduler,
 ) : FastingEventCallbacks {
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {
@@ -28,12 +30,14 @@ class LocalWatchFastingCallbacks(
     )
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
+    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting start")
   }
 
   override suspend fun onFastingCompleted(fastingDataItem: FastingDataItem) {
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting completion")
     ongoingActivityManager.stopOngoingActivity()
+    wearWidgetRefreshScheduler.onFastingCompleted()
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting completion")
@@ -44,6 +48,7 @@ class LocalWatchFastingCallbacks(
     Log.d(LOG_TAG, "LocalWatch: Processing LOCAL fasting update")
     complicationUpdateManager.requestUpdate()
     wearWidgetUpdateManager.requestUpdate()
+    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
     ongoingActivityManager.requestUpdate()
     Log.d(LOG_TAG, "LocalWatch: Successfully handled local fasting update")
   }
