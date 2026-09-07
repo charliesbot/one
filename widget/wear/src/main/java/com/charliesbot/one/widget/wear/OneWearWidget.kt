@@ -38,13 +38,11 @@ import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.models.FastingGoalCatalog
 import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class OneWearWidget(
-  fastingDataRepository: FastingDataRepository? = null,
-  goalResolver: GoalResolver? = null,
-) : GlanceWearWidget(), KoinComponent {
-  private val repo: FastingDataRepository by lazy { fastingDataRepository ?: getKoin().get() }
-  private val goals: GoalResolver by lazy { goalResolver ?: getKoin().get() }
+class OneWearWidget : GlanceWearWidget(), KoinComponent {
+  private val repo: FastingDataRepository by inject()
+  private val goals: GoalResolver by inject()
 
   override suspend fun provideWidgetData(
     context: Context,

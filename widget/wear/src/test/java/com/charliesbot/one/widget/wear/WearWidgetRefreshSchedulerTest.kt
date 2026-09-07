@@ -13,11 +13,15 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
 
 class WearWidgetRefreshSchedulerTest {
   private lateinit var context: Context
@@ -32,6 +36,20 @@ class WearWidgetRefreshSchedulerTest {
     workManager = mockk(relaxed = true)
     repository = mockk()
     goalResolver = mockk()
+
+    startKoin {
+      modules(
+        module {
+          single { repository }
+          single { goalResolver }
+        }
+      )
+    }
+  }
+
+  @After
+  fun teardown() {
+    stopKoin()
   }
 
   @Test
@@ -233,7 +251,7 @@ class WearWidgetRefreshSchedulerTest {
   @Test
   fun `reconcile triggers immediate widget update and cancels when goal has already passed with re-entrant provider`() =
     runTest {
-      val widget = OneWearWidget(fastingDataRepository = repository, goalResolver = goalResolver)
+      val widget = OneWearWidget()
       var renderCount = 0
       val scheduler =
         WearWidgetRefreshScheduler(
@@ -292,64 +310,116 @@ class WearWidgetRefreshSchedulerTest {
     }
 
   @Test
-  fun `concurrent goal edit interleaving with worker tick completion is safely serialized so edit wins`() =
-    runTest {
-      val scheduler =
-        WearWidgetRefreshScheduler(
-          context = context,
-          fastingDataRepository = repository,
-          goalResolver = goalResolver,
-          workManager = workManager,
-          activeWidgetChecker = { true },
-        )
-      val startTime = 1000L
-      val oldGoalId = "16:8"
-      val newGoalId = "18:6"
-      coEvery { goalResolver.durationMillis(oldGoalId) } returns 16 * oneHourMillis
-      coEvery { goalResolver.durationMillis(newGoalId) } returns 18 * oneHourMillis
+  fun `in-flight worker tick with stale goal does not overwrite newer goal schedule`() = runTest {
+    val scheduler =
+      WearWidgetRefreshScheduler(
+        context = context,
+        fastingDataRepository = repository,
+        goalResolver = goalResolver,
+        workManager = workManager,
+        activeWidgetChecker = { true },
+      )
+    val startTime = 1000L
+    val oldGoalId = "16:8"
+    val newGoalId = "18:6"
+    val oldGoalDuration = 16 * oneHourMillis
+    val newGoalDuration = 18 * oneHourMillis
+    val currentTime = startTime + (10 * oneHourMillis) + (15 * 60 * 1000L) // 10h 15m elapsed
 
-      val callOrder = mutableListOf<String>()
-      every {
-        workManager.enqueueUniqueWork(
-          WearWidgetRefreshScheduler.WORK_NAME,
-          ExistingWorkPolicy.REPLACE,
-          any<OneTimeWorkRequest>(),
-        )
-      } answers
-        {
-          callOrder.add("enqueued")
-          mockk(relaxed = true)
-        }
+    coEvery { goalResolver.durationMillis(oldGoalId) } returns oldGoalDuration
+    coEvery { goalResolver.durationMillis(newGoalId) } returns newGoalDuration
 
-      coEvery { repository.getCurrentFasting() } returns
-        FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = oldGoalId)
+    val enqueuedRequests = mutableListOf<OneTimeWorkRequest>()
+    every {
+      workManager.enqueueUniqueWork(
+        WearWidgetRefreshScheduler.WORK_NAME,
+        ExistingWorkPolicy.REPLACE,
+        capture(enqueuedRequests),
+      )
+    } returns mockk(relaxed = true)
 
-      val workerJob = launch {
-        scheduler.onWorkerTickCompleted(
-          snapshotStartTime = startTime,
-          snapshotGoalId = oldGoalId,
-          goalDurationMillis = 16 * oneHourMillis,
-          currentTimeMillis = startTime + oneHourMillis,
-        )
-      }
-      val editJob = launch {
-        scheduler.onFastingStartedOrUpdated(
-          FastingDataItem(
-            isFasting = true,
-            startTimeInMillis = startTime,
-            fastingGoalId = newGoalId,
-          )
-        )
-      }
+    // 1. Goal edit to 18:6 occurs and is persisted
+    val newFasting =
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = newGoalId)
+    coEvery { repository.getCurrentFasting() } returns newFasting
 
-      workerJob.join()
-      editJob.join()
+    // Edit schedules refresh: from 10h 15m elapsed to 11h boundary = 45m delay
+    scheduler.onFastingStartedOrUpdated(newFasting, currentTimeMillis = currentTime)
+    assertEquals(1, enqueuedRequests.size)
+    val expectedDelay = 45 * 60 * 1000L
+    assertEquals(expectedDelay, enqueuedRequests.last().workSpec.initialDelay)
 
-      org.junit.Assert.assertTrue(callOrder.isNotEmpty())
-    }
+    // 2. In-flight worker tick from old 16:8 goal finishes afterwards
+    scheduler.onWorkerTickCompleted(
+      snapshotStartTime = startTime,
+      snapshotGoalId = oldGoalId,
+      goalDurationMillis = oldGoalDuration,
+      currentTimeMillis = currentTime,
+    )
+
+    // Worker detects stale goal, drops tick without cancelling work, so edit's request survives
+    verify(exactly = 0) { workManager.cancelUniqueWork(WearWidgetRefreshScheduler.WORK_NAME) }
+    assertEquals(1, enqueuedRequests.size)
+    assertEquals(expectedDelay, enqueuedRequests.last().workSpec.initialDelay)
+  }
 
   @Test
-  fun `enqueueImmediateRecovery enqueues OneTimeWorkRequest with KEEP`() {
+  fun `goal edit after worker tick replaces schedule with newer goal timing`() = runTest {
+    val scheduler =
+      WearWidgetRefreshScheduler(
+        context = context,
+        fastingDataRepository = repository,
+        goalResolver = goalResolver,
+        workManager = workManager,
+        activeWidgetChecker = { true },
+      )
+    val startTime = 1000L
+    val oldGoalId = "16:8"
+    val newGoalId = "18:6"
+    val oldGoalDuration = 16 * oneHourMillis
+    val newGoalDuration = 18 * oneHourMillis
+    val currentTime = startTime + (15 * oneHourMillis) + (30 * 60 * 1000L) // 15h 30m elapsed
+
+    coEvery { goalResolver.durationMillis(oldGoalId) } returns oldGoalDuration
+    coEvery { goalResolver.durationMillis(newGoalId) } returns newGoalDuration
+
+    val enqueuedRequests = mutableListOf<OneTimeWorkRequest>()
+    every {
+      workManager.enqueueUniqueWork(
+        WearWidgetRefreshScheduler.WORK_NAME,
+        ExistingWorkPolicy.REPLACE,
+        capture(enqueuedRequests),
+      )
+    } returns mockk(relaxed = true)
+
+    // 1. Worker tick completes when fast is still on old 16:8 goal (delay to 16h boundary = 30m)
+    coEvery { repository.getCurrentFasting() } returns
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = oldGoalId)
+
+    scheduler.onWorkerTickCompleted(
+      snapshotStartTime = startTime,
+      snapshotGoalId = oldGoalId,
+      goalDurationMillis = oldGoalDuration,
+      currentTimeMillis = currentTime,
+    )
+    assertEquals(1, enqueuedRequests.size)
+    assertEquals(30 * 60 * 1000L, enqueuedRequests[0].workSpec.initialDelay)
+
+    // 2. User edits goal to 18:6 at 16h elapsed (at which point 16:8 would have finished, but 18:6
+    // has 1h delay)
+    val editTime = startTime + oldGoalDuration // 16h elapsed
+    val newFasting =
+      FastingDataItem(isFasting = true, startTimeInMillis = startTime, fastingGoalId = newGoalId)
+    coEvery { repository.getCurrentFasting() } returns newFasting
+
+    scheduler.onFastingStartedOrUpdated(newFasting, currentTimeMillis = editTime)
+    assertEquals(2, enqueuedRequests.size)
+    // The newer goal's schedule replaces the worker's schedule with next hour timing
+    assertEquals(oneHourMillis, enqueuedRequests.last().workSpec.initialDelay)
+  }
+
+  @Test
+  fun `enqueueImmediateRecovery enqueues OneTimeWorkRequest with KEEP`() = runTest {
     val scheduler =
       WearWidgetRefreshScheduler(
         context = context,

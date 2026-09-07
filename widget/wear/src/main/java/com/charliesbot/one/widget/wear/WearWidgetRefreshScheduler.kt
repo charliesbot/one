@@ -30,49 +30,43 @@ class WearWidgetRefreshScheduler(
     const val WORK_NAME = "fasting_wear_widget_hourly_refresh"
   }
 
-  internal val mutex = Mutex()
+  private val mutex = Mutex()
 
-  suspend fun onFastingStartedOrUpdated(fastingData: FastingDataItem) =
+  suspend fun onFastingStartedOrUpdated(
+    fastingData: FastingDataItem,
+    currentTimeMillis: Long = System.currentTimeMillis(),
+  ) =
     mutex.withLock {
       if (!activeWidgetChecker() || !fastingData.isFasting) {
-        cancel()
+        cancelLocked()
         return@withLock
       }
       val goalDuration = goalResolver.durationMillis(fastingData.fastingGoalId)
-      schedule(
-        startTimeMillis = fastingData.startTimeInMillis,
-        goalDurationMillis = goalDuration,
-        policy = ExistingWorkPolicy.REPLACE,
-      )
+      val delayMillis =
+        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+          currentTimeMillis = currentTimeMillis,
+          startTimeMillis = fastingData.startTimeInMillis,
+          goalDurationMillis = goalDuration,
+        )
+      scheduleLocked(delayMillis = delayMillis, policy = ExistingWorkPolicy.REPLACE)
     }
 
-  suspend fun onFastingCompleted() = mutex.withLock { cancel() }
+  suspend fun onFastingCompleted() = cancel()
 
   suspend fun reconcile(currentTimeMillis: Long = System.currentTimeMillis()) =
     mutex.withLock {
       if (!activeWidgetChecker()) {
-        cancel()
+        cancelLocked()
         return@withLock
       }
 
       val current = fastingDataRepository.getCurrentFasting()
       if (current == null || !current.isFasting) {
-        cancel()
+        cancelLocked()
         return@withLock
       }
 
-      val workInfos =
-        try {
-          workManager.getWorkInfosForUniqueWork(WORK_NAME).await()
-        } catch (e: CancellationException) {
-          throw e
-        } catch (e: Exception) {
-          emptyList<WorkInfo>()
-        }
-
-      val hasActiveWork =
-        workInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
-      if (hasActiveWork) {
+      if (hasActiveWork()) {
         // Preserve existing active work - do not cancel or postpone due refresh
         return@withLock
       }
@@ -88,16 +82,11 @@ class WearWidgetRefreshScheduler(
       if (delayMillis == null || delayMillis <= 0L) {
         // Fast has reached/passed goal while work was missing; update widget immediately
         widgetUpdater(context)
-        cancel()
+        cancelLocked()
         return@withLock
       }
 
-      schedule(
-        startTimeMillis = current.startTimeInMillis,
-        goalDurationMillis = goalDuration,
-        currentTimeMillis = currentTimeMillis,
-        policy = ExistingWorkPolicy.KEEP,
-      )
+      scheduleLocked(delayMillis = delayMillis, policy = ExistingWorkPolicy.KEEP)
     }
 
   suspend fun onWorkerTickCompleted(
@@ -108,13 +97,13 @@ class WearWidgetRefreshScheduler(
   ) =
     mutex.withLock {
       if (!activeWidgetChecker()) {
-        cancel()
+        cancelLocked()
         return@withLock
       }
 
       val current = fastingDataRepository.getCurrentFasting()
       if (current == null || !current.isFasting) {
-        cancel()
+        cancelLocked()
         return@withLock
       }
 
@@ -125,42 +114,43 @@ class WearWidgetRefreshScheduler(
         return@withLock
       }
 
-      val elapsed = (currentTimeMillis - current.startTimeInMillis).coerceAtLeast(0L)
-      if (elapsed >= goalDurationMillis) {
-        // Goal reached, end refresh chain
-        cancel()
-        return@withLock
-      }
+      val delayMillis =
+        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
+          currentTimeMillis = currentTimeMillis,
+          startTimeMillis = current.startTimeInMillis,
+          goalDurationMillis = goalDurationMillis,
+        )
 
-      schedule(
-        startTimeMillis = current.startTimeInMillis,
-        goalDurationMillis = goalDurationMillis,
-        currentTimeMillis = currentTimeMillis,
-        policy = ExistingWorkPolicy.REPLACE,
-      )
+      scheduleLocked(delayMillis = delayMillis, policy = ExistingWorkPolicy.REPLACE)
     }
 
-  fun enqueueImmediateRecovery(policy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP) {
-    val workRequest = OneTimeWorkRequestBuilder<WearWidgetRefreshWorker>().addTag(WORK_NAME).build()
+  suspend fun enqueueImmediateRecovery() =
+    mutex.withLock {
+      val workRequest =
+        OneTimeWorkRequestBuilder<WearWidgetRefreshWorker>().addTag(WORK_NAME).build()
 
-    workManager.enqueueUniqueWork(WORK_NAME, policy, workRequest)
+      workManager.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.KEEP, workRequest)
+    }
+
+  suspend fun cancel() = mutex.withLock { cancelLocked() }
+
+  private fun cancelLocked() {
+    workManager.cancelUniqueWork(WORK_NAME)
   }
 
-  private fun schedule(
-    startTimeMillis: Long,
-    goalDurationMillis: Long,
-    currentTimeMillis: Long = System.currentTimeMillis(),
-    policy: ExistingWorkPolicy,
-  ) {
-    val delayMillis =
-      WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-        currentTimeMillis = currentTimeMillis,
-        startTimeMillis = startTimeMillis,
-        goalDurationMillis = goalDurationMillis,
-      )
+  private suspend fun hasActiveWork(): Boolean =
+    try {
+      val workInfos = workManager.getWorkInfosForUniqueWork(WORK_NAME).await()
+      workInfos.any { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      false
+    }
 
+  private fun scheduleLocked(delayMillis: Long?, policy: ExistingWorkPolicy) {
     if (delayMillis == null || delayMillis <= 0L) {
-      cancel()
+      cancelLocked()
       return
     }
 
@@ -171,9 +161,5 @@ class WearWidgetRefreshScheduler(
         .build()
 
     workManager.enqueueUniqueWork(WORK_NAME, policy, workRequest)
-  }
-
-  fun cancel() {
-    workManager.cancelUniqueWork(WORK_NAME)
   }
 }
