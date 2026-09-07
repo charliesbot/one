@@ -73,6 +73,28 @@ class FastingWidgetStateTest {
     assertEquals(2, state12h.hoursRemaining)
     assertEquals(12f / 14f, state12h.progressFraction, 0.0001f)
   }
+
+  @Test
+  fun customGoalDurationDirectlyDrivesBothRemainingHoursAndProgress() {
+    val startTime = 0L
+    val currentTime = 10.hoursMillis // 10 hours elapsed
+    val fastingData =
+      FastingDataItem(
+        isFasting = true,
+        startTimeInMillis = startTime,
+        fastingGoalId = "custom_goal",
+      )
+
+    // With 14-hour custom goal
+    val state14h = fastingData.toFastingWidgetState(currentTime, 14.hoursMillis)
+    assertEquals(4, state14h.hoursRemaining)
+    assertEquals(10f / 14f, state14h.progressFraction, 0.0001f)
+
+    // With 20-hour custom goal for the identical elapsed time
+    val state20h = fastingData.toFastingWidgetState(currentTime, 20.hoursMillis)
+    assertEquals(10, state20h.hoursRemaining)
+    assertEquals(10f / 20f, state20h.progressFraction, 0.0001f)
+  }
 }
 
 private val Int.hoursMillis: Long

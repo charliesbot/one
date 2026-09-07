@@ -114,7 +114,11 @@ class OneWidgetPreview : GlanceAppWidget() {
   override suspend fun provideGlance(context: Context, id: GlanceId) {
     provideContent {
       GlanceTheme {
-        OneWidgetContent(fastingData = widgetPreviewFastingData(), context = LocalContext.current)
+        OneWidgetContent(
+          fastingData = widgetPreviewFastingData(),
+          context = LocalContext.current,
+          goalDurationMillis = PredefinedFastingGoals.SIXTEEN_EIGHT.durationMillis,
+        )
       }
     }
   }
