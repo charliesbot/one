@@ -1,4 +1,4 @@
-package com.charliesbot.one.widget
+package com.charliesbot.one.widget.work
 
 import android.content.Context
 import androidx.work.ListenableWorker.Result
@@ -19,7 +19,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 
-class PhoneWidgetRefreshWorkerTest {
+class WidgetRefreshWorkerTest {
   private lateinit var context: Context
   private lateinit var workerParams: WorkerParameters
   private lateinit var scheduler: WidgetRefreshScheduler
@@ -40,7 +40,7 @@ class PhoneWidgetRefreshWorkerTest {
   @Test
   fun `exposes the constructor used by WorkManager`() {
     assertNotNull(
-      PhoneWidgetRefreshWorker::class
+      WidgetRefreshWorker::class
         .java
         .getConstructor(Context::class.java, WorkerParameters::class.java)
     )
@@ -48,7 +48,7 @@ class PhoneWidgetRefreshWorkerTest {
 
   @Test
   fun `delegates refresh to shared scheduler and returns success`() = runTest {
-    val worker = PhoneWidgetRefreshWorker(context, workerParams)
+    val worker = WidgetRefreshWorker(context, workerParams)
 
     assertEquals(Result.success(), worker.doWork())
     coVerify(exactly = 1) { scheduler.refresh() }
@@ -60,7 +60,7 @@ class PhoneWidgetRefreshWorkerTest {
 
     for (attempt in 0..2) {
       every { workerParams.runAttemptCount } returns attempt
-      val worker = PhoneWidgetRefreshWorker(context, workerParams)
+      val worker = WidgetRefreshWorker(context, workerParams)
       assertEquals(Result.retry(), worker.doWork())
     }
   }
@@ -69,7 +69,7 @@ class PhoneWidgetRefreshWorkerTest {
   fun `fails refresh after retry limit`() = runTest {
     every { workerParams.runAttemptCount } returns 3
     coEvery { scheduler.refresh() } throws IllegalStateException("Update failed")
-    val worker = PhoneWidgetRefreshWorker(context, workerParams)
+    val worker = WidgetRefreshWorker(context, workerParams)
 
     assertEquals(Result.failure(), worker.doWork())
   }
@@ -78,6 +78,6 @@ class PhoneWidgetRefreshWorkerTest {
   fun `propagates cancellation without retrying`() = runTest {
     coEvery { scheduler.refresh() } throws CancellationException("Worker cancelled")
 
-    PhoneWidgetRefreshWorker(context, workerParams).doWork()
+    WidgetRefreshWorker(context, workerParams).doWork()
   }
 }

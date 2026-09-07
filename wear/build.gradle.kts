@@ -118,6 +118,7 @@ dependencies {
   implementation(project(":core:designsystem:common"))
   implementation(project(":complications"))
   implementation(project(":widget:wear"))
+  implementation(project(":widget:work"))
   implementation(project(":features:dashboard:wear"))
   implementation(libs.firebase.crashlytics)
   androidTestImplementation(libs.androidx.ui.test.junit4)

@@ -44,6 +44,8 @@ include(":core:designsystem:app")
 
 include(":widget:common")
 
+include(":widget:work")
+
 include(":widget:app")
 
 include(":widget:wear")

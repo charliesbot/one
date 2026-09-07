@@ -28,8 +28,6 @@ dependencies {
   implementation(libs.androidx.glance.preview)
   implementation(libs.androidx.glance.appwidget.preview)
   implementation(libs.androidx.core.ktx)
-  implementation(libs.androidx.work.runtime.ktx)
-  implementation(libs.androidx.concurrent.futures.ktx)
   implementation(platform(libs.kotlinx.coroutines.bom))
   implementation(libs.kotlinx.coroutines.core)
   implementation(project(":core"))

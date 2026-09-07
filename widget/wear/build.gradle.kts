@@ -31,8 +31,6 @@ dependencies {
   implementation(libs.androidx.wear.remote.material3)
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
-  implementation(libs.androidx.work.runtime.ktx)
-  implementation(libs.androidx.concurrent.futures.ktx)
   api(project(":widget:common"))
   implementation(project(":core"))
   implementation(project(":core:domain"))

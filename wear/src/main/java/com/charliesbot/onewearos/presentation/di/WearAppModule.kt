@@ -3,8 +3,9 @@ package com.charliesbot.onewearos.presentation.di
 import com.charliesbot.one.widget.common.GoalDurationResolver
 import com.charliesbot.one.widget.common.WidgetPlatformAdapter
 import com.charliesbot.one.widget.common.WidgetRefreshScheduler
-import com.charliesbot.one.widget.wear.WearWidgetPlatformAdapter
+import com.charliesbot.one.widget.wear.WearWidgetHost
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
+import com.charliesbot.one.widget.work.WorkManagerWidgetAdapter
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.data.WearStringProvider
 import com.charliesbot.onewearos.presentation.notifications.NotificationWorker
@@ -30,7 +31,13 @@ val wearAppModule = module {
   single<StringProvider> { WearStringProvider(androidContext()) }
   single<ComplicationUpdateManager> { ComplicationUpdateManager(androidContext()) }
   single<WearWidgetUpdateManager> { WearWidgetUpdateManager(androidContext()) }
-  single<WidgetPlatformAdapter> { WearWidgetPlatformAdapter(androidContext()) }
+  single<WidgetPlatformAdapter> {
+    WorkManagerWidgetAdapter(
+      context = androidContext(),
+      workName = "fasting_wear_widget_hourly_refresh",
+      host = WearWidgetHost(androidContext()),
+    )
+  }
   single {
     WidgetRefreshScheduler(
       fastingDataRepository = get(),

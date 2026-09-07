@@ -1,4 +1,4 @@
-package com.charliesbot.one.widget
+package com.charliesbot.one.widget.work
 
 import android.content.Context
 import android.util.Log
@@ -9,7 +9,7 @@ import kotlinx.coroutines.CancellationException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class PhoneWidgetRefreshWorker(context: Context, workerParameters: WorkerParameters) :
+class WidgetRefreshWorker(context: Context, workerParameters: WorkerParameters) :
   CoroutineWorker(context, workerParameters), KoinComponent {
   private val scheduler: WidgetRefreshScheduler by inject()
 
@@ -20,12 +20,12 @@ class PhoneWidgetRefreshWorker(context: Context, workerParameters: WorkerParamet
     } catch (e: CancellationException) {
       throw e
     } catch (e: Exception) {
-      Log.e(TAG, "Phone widget refresh worker failed (attempt $runAttemptCount)", e)
+      Log.e(TAG, "Widget refresh worker failed (attempt $runAttemptCount)", e)
       if (runAttemptCount < MAX_RETRIES) Result.retry() else Result.failure()
     }
 
   companion object {
-    private const val TAG = "PhoneWidgetWorker"
+    private const val TAG = "WidgetRefreshWorker"
     private const val MAX_RETRIES = 3
   }
 }

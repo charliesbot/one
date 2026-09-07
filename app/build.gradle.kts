@@ -130,6 +130,7 @@ dependencies {
   implementation(project(":core:strings"))
   implementation(project(":core:designsystem:common"))
   implementation(project(":widget:app"))
+  implementation(project(":widget:work"))
   implementation(project(":features:dashboard:app"))
   implementation(project(":features:profile:app"))
   implementation(project(":features:settings:app"))
