@@ -2,6 +2,7 @@ package com.charliesbot.one.widget.wear
 
 import android.content.Context
 import androidx.glance.wear.core.ActiveWearWidgetHandle
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.utils.GoalResolver
 import io.mockk.mockk
@@ -18,7 +19,7 @@ class OneWearWidgetTest {
   private lateinit var context: Context
   private lateinit var repository: FastingDataRepository
   private lateinit var goalResolver: GoalResolver
-  private lateinit var scheduler: WearWidgetRefreshScheduler
+  private lateinit var scheduler: WidgetRefreshScheduler
 
   @Before
   fun setup() {

@@ -3,7 +3,7 @@ package com.charliesbot.onewearos.presentation.services
 import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.charliesbot.one.widget.wear.WearWidgetRefreshScheduler
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
@@ -19,7 +19,7 @@ class LocalWatchFastingCallbacks(
   private val complicationUpdateManager: ComplicationUpdateManager,
   private val ongoingActivityManager: OngoingActivityManager,
   private val wearWidgetUpdateManager: WearWidgetUpdateManager,
-  private val wearWidgetRefreshScheduler: WearWidgetRefreshScheduler,
+  private val wearWidgetRefreshScheduler: WidgetRefreshScheduler,
 ) : FastingEventCallbacks {
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onFastingStarted(fastingDataItem: FastingDataItem) {

@@ -35,7 +35,7 @@ dependencies {
   implementation(project(":core"))
   implementation(project(":core:domain"))
   implementation(project(":core:strings"))
-  implementation(project(":widget:common"))
+  api(project(":widget:common"))
 
   testImplementation(libs.junit)
   testImplementation(libs.mockk)

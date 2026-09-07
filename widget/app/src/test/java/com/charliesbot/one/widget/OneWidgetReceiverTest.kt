@@ -1,6 +1,7 @@
 package com.charliesbot.one.widget
 
 import android.content.Context
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.After
@@ -12,7 +13,7 @@ import org.koin.dsl.module
 
 class OneWidgetReceiverTest {
   private lateinit var context: Context
-  private lateinit var scheduler: PhoneWidgetRefreshScheduler
+  private lateinit var scheduler: WidgetRefreshScheduler
 
   @Before
   fun setup() {

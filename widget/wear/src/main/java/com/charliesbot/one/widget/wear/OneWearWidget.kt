@@ -33,6 +33,7 @@ import androidx.glance.wear.core.ActiveWearWidgetHandle
 import androidx.glance.wear.core.WearWidgetParams
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteText
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.common.toFastingWidgetState
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
@@ -44,7 +45,7 @@ import org.koin.core.component.inject
 class OneWearWidget : GlanceWearWidget(), KoinComponent {
   private val repo: FastingDataRepository by inject()
   private val goals: GoalResolver by inject()
-  private val scheduler: WearWidgetRefreshScheduler by inject()
+  private val scheduler: WidgetRefreshScheduler by inject()
 
   override suspend fun onAdded(context: Context, widgetHandle: ActiveWearWidgetHandle) {
     super.onAdded(context, widgetHandle)

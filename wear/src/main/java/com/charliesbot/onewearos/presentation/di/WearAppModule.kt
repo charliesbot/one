@@ -1,6 +1,9 @@
 package com.charliesbot.onewearos.presentation.di
 
-import com.charliesbot.one.widget.wear.WearWidgetRefreshScheduler
+import com.charliesbot.one.widget.common.GoalDurationResolver
+import com.charliesbot.one.widget.common.WidgetPlatformAdapter
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
+import com.charliesbot.one.widget.wear.WearWidgetPlatformAdapter
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.data.WearStringProvider
@@ -11,6 +14,7 @@ import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
 import com.charliesbot.shared.core.domain.platform.StringProvider
+import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -26,7 +30,15 @@ val wearAppModule = module {
   single<StringProvider> { WearStringProvider(androidContext()) }
   single<ComplicationUpdateManager> { ComplicationUpdateManager(androidContext()) }
   single<WearWidgetUpdateManager> { WearWidgetUpdateManager(androidContext()) }
-  single { WearWidgetRefreshScheduler(androidContext(), get(), get()) }
+  single<WidgetPlatformAdapter> { WearWidgetPlatformAdapter(androidContext()) }
+  single {
+    WidgetRefreshScheduler(
+      fastingDataRepository = get(),
+      goalDurationResolver =
+        GoalDurationResolver { goalId -> get<GoalResolver>().durationMillis(goalId) },
+      platformAdapter = get(),
+    )
+  }
   single<OngoingActivityManager> {
     OngoingActivityManager(context = androidContext(), fastingDataRepository = get())
   }

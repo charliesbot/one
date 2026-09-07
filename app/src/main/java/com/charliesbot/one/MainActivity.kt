@@ -23,7 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import com.charliesbot.one.core.components.NotificationPermissionDialog
 import com.charliesbot.one.navigation.MainNavigation
 import com.charliesbot.one.ui.theme.OneTheme
-import com.charliesbot.one.widget.PhoneWidgetRefreshScheduler
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.updateWidgetPreview
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ import org.koin.android.ext.android.inject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MainActivity : ComponentActivity() {
-  private val phoneWidgetRefreshScheduler: PhoneWidgetRefreshScheduler by inject()
+  private val phoneWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
 
   private val requestNotificationPermission =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.utils.GoalResolver
 import kotlinx.coroutines.CancellationException
@@ -20,7 +21,7 @@ constructor(
 
   private val fastingDataRepository: FastingDataRepository by inject()
   private val goalResolver: GoalResolver by inject()
-  private val scheduler: WearWidgetRefreshScheduler by inject()
+  private val scheduler: WidgetRefreshScheduler by inject()
 
   override suspend fun doWork(): Result {
     return try {

@@ -9,8 +9,11 @@ import com.charliesbot.one.data.AndroidStringProvider
 import com.charliesbot.one.notifications.NotificationWorker
 import com.charliesbot.one.services.LocalFastingCallback
 import com.charliesbot.one.services.SmartReminderCallbackImpl
-import com.charliesbot.one.widget.PhoneWidgetRefreshScheduler
+import com.charliesbot.one.widget.PhoneWidgetPlatformAdapter
 import com.charliesbot.one.widget.WidgetUpdateManager
+import com.charliesbot.one.widget.common.GoalDurationResolver
+import com.charliesbot.one.widget.common.WidgetPlatformAdapter
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.data.notifications.NotificationScheduler
 import com.charliesbot.shared.core.domain.events.FastingEventCallbacks
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
@@ -20,6 +23,7 @@ import com.charliesbot.shared.core.domain.platform.HistoryExporter
 import com.charliesbot.shared.core.domain.platform.SmartReminderCallback
 import com.charliesbot.shared.core.domain.platform.StringProvider
 import com.charliesbot.shared.core.domain.usecase.GetMonthlyFastingMapUseCase
+import com.charliesbot.shared.core.utils.GoalResolver
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -29,7 +33,15 @@ val appModule = module {
   }
 
   single<WidgetUpdateManager> { WidgetUpdateManager(androidContext()) }
-  single { PhoneWidgetRefreshScheduler(androidContext(), get(), get()) }
+  single<WidgetPlatformAdapter> { PhoneWidgetPlatformAdapter(androidContext()) }
+  single {
+    WidgetRefreshScheduler(
+      fastingDataRepository = get(),
+      goalDurationResolver =
+        GoalDurationResolver { goalId -> get<GoalResolver>().durationMillis(goalId) },
+      platformAdapter = get(),
+    )
+  }
 
   single<NotificationScheduler> {
     NotificationScheduler(

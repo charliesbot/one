@@ -3,6 +3,7 @@ package com.charliesbot.one.widget
 import android.content.Context
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
 import com.charliesbot.shared.core.models.FastingDataItem
 import com.charliesbot.shared.core.utils.GoalResolver
@@ -25,7 +26,7 @@ class PhoneWidgetRefreshWorkerTest {
   private lateinit var workerParams: WorkerParameters
   private lateinit var repository: FastingDataRepository
   private lateinit var goalResolver: GoalResolver
-  private lateinit var scheduler: PhoneWidgetRefreshScheduler
+  private lateinit var scheduler: WidgetRefreshScheduler
   private var widgetUpdateCount = 0
   private val testWidgetUpdater: suspend (Context) -> Unit = { widgetUpdateCount++ }
 

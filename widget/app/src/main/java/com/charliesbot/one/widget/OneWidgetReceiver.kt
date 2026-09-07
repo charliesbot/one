@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -13,7 +14,7 @@ class OneWidgetReceiver : GlanceAppWidgetReceiver(), KoinComponent {
   override val glanceAppWidget: GlanceAppWidget
     get() = OneWidget()
 
-  private val scheduler: PhoneWidgetRefreshScheduler by inject()
+  private val scheduler: WidgetRefreshScheduler by inject()
 
   override fun onEnabled(context: Context) {
     super.onEnabled(context)

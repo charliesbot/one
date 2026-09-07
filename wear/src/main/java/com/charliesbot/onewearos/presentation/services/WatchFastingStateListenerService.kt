@@ -3,7 +3,7 @@ package com.charliesbot.onewearos.presentation.services
 import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.charliesbot.one.widget.wear.WearWidgetRefreshScheduler
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.wear.WearWidgetUpdateManager
 import com.charliesbot.onewearos.complications.ComplicationUpdateManager
 import com.charliesbot.onewearos.presentation.notifications.OngoingActivityManager
@@ -29,7 +29,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
   private val complicationUpdateManager: ComplicationUpdateManager by inject()
   private val ongoingActivityManager: OngoingActivityManager by inject()
   private val wearWidgetUpdateManager: WearWidgetUpdateManager by inject()
-  private val wearWidgetRefreshScheduler: WearWidgetRefreshScheduler by inject()
+  private val wearWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
   private val settingsRepository: SettingsRepository by inject()
   private val customGoalRepository: CustomGoalRepository by inject()
   private val notificationScheduler: NotificationScheduler by inject()

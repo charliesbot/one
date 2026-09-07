@@ -19,7 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.charliesbot.one.widget.wear.WearWidgetRefreshScheduler
+import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.onewearos.core.components.NotificationPermissionDialog
 import com.charliesbot.onewearos.presentation.navigation.WearNavigation
 import com.charliesbot.onewearos.presentation.theme.OneTheme
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
-  private val wearWidgetRefreshScheduler: WearWidgetRefreshScheduler by inject()
+  private val wearWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
 
   private val requestNotificationPermission =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
