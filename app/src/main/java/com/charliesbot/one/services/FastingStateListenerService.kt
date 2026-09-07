@@ -15,6 +15,7 @@ class FastingStateListenerService : BaseFastingListenerService() {
   private val fastingHistoryRepository: FastingHistoryRepository by inject()
   private val phoneWidgetRefreshScheduler: PhoneWidgetRefreshScheduler by inject()
 
+  // Called when the WATCH starts a fast
   override suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingStarted(fastingDataItem)
     phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
@@ -47,4 +48,8 @@ class FastingStateListenerService : BaseFastingListenerService() {
     )
     widgetUpdateManager.requestUpdate()
   }
+
+  // Note: Settings sync is ONE-WAY (phone → watch only)
+  // The phone does NOT listen to settings from the watch
+  // Only fasting state is bidirectional
 }
