@@ -29,6 +29,7 @@ import androidx.glance.wear.GlanceWearWidget
 import androidx.glance.wear.WearWidgetBrush
 import androidx.glance.wear.WearWidgetData
 import androidx.glance.wear.WearWidgetDocument
+import androidx.glance.wear.core.ActiveWearWidgetHandle
 import androidx.glance.wear.core.WearWidgetParams
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteText
@@ -43,6 +44,12 @@ import org.koin.core.component.inject
 class OneWearWidget : GlanceWearWidget(), KoinComponent {
   private val repo: FastingDataRepository by inject()
   private val goals: GoalResolver by inject()
+  private val scheduler: WearWidgetRefreshScheduler by inject()
+
+  override suspend fun onAdded(context: Context, widgetHandle: ActiveWearWidgetHandle) {
+    super.onAdded(context, widgetHandle)
+    scheduler.enqueueImmediateRecovery()
+  }
 
   override suspend fun provideWidgetData(
     context: Context,

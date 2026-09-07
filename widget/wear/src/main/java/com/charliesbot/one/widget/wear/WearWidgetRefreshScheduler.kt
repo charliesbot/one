@@ -51,7 +51,7 @@ class WearWidgetRefreshScheduler(
       scheduleLocked(delayMillis = delayMillis, policy = ExistingWorkPolicy.REPLACE)
     }
 
-  suspend fun onFastingCompleted() = cancel()
+  suspend fun onFastingCompleted() = mutex.withLock { cancelLocked() }
 
   suspend fun reconcile(currentTimeMillis: Long = System.currentTimeMillis()) =
     mutex.withLock {
@@ -124,18 +124,18 @@ class WearWidgetRefreshScheduler(
       scheduleLocked(delayMillis = delayMillis, policy = ExistingWorkPolicy.REPLACE)
     }
 
-  suspend fun enqueueImmediateRecovery() =
-    mutex.withLock {
-      val workRequest =
-        OneTimeWorkRequestBuilder<WearWidgetRefreshWorker>().addTag(WORK_NAME).build()
+  fun enqueueImmediateRecovery() {
+    val workRequest = OneTimeWorkRequestBuilder<WearWidgetRefreshWorker>().addTag(WORK_NAME).build()
 
-      workManager.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.KEEP, workRequest)
-    }
+    workManager.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.KEEP, workRequest)
+  }
 
-  suspend fun cancel() = mutex.withLock { cancelLocked() }
+  fun cancel() {
+    workManager.cancelUniqueWork(WORK_NAME)
+  }
 
   private fun cancelLocked() {
-    workManager.cancelUniqueWork(WORK_NAME)
+    cancel()
   }
 
   private suspend fun hasActiveWork(): Boolean =

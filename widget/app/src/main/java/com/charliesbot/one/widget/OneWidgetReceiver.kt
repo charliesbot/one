@@ -6,9 +6,6 @@ import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -21,27 +18,13 @@ class OneWidgetReceiver : GlanceAppWidgetReceiver(), KoinComponent {
   override fun onEnabled(context: Context) {
     super.onEnabled(context)
     Log.d(LOG_TAG, "OneWidgetReceiver: onEnabled - first widget placed")
-    val pendingResult = goAsync()
-    CoroutineScope(Dispatchers.Default).launch {
-      try {
-        scheduler.enqueueImmediateRecovery()
-      } finally {
-        pendingResult.finish()
-      }
-    }
+    scheduler.enqueueImmediateRecovery()
   }
 
   override fun onDisabled(context: Context) {
     super.onDisabled(context)
     Log.d(LOG_TAG, "OneWidgetReceiver: onDisabled - last widget removed")
-    val pendingResult = goAsync()
-    CoroutineScope(Dispatchers.Default).launch {
-      try {
-        scheduler.cancel()
-      } finally {
-        pendingResult.finish()
-      }
-    }
+    scheduler.cancel()
   }
 
   override fun onUpdate(
