@@ -55,7 +55,7 @@ class WidgetRefreshScheduler(
   ) =
     mutex.withLock {
       if (!platformAdapter.hasActiveWidgets() || !fastingData.isFasting) {
-        cancelLocked()
+        cancel()
         return@withLock
       }
       val goalDuration = goalDurationResolver.durationMillis(fastingData.fastingGoalId)
@@ -74,7 +74,7 @@ class WidgetRefreshScheduler(
    * Acquires the scheduling mutex to serialize this request with other protected scheduling
    * operations. Does not change fasting data or redraw widgets.
    */
-  suspend fun onFastingCompleted() = mutex.withLock { cancelLocked() }
+  suspend fun onFastingCompleted() = mutex.withLock { cancel() }
 
   /**
    * Restores missing refresh work when the main activity starts, preserving queued or running work.
@@ -88,13 +88,13 @@ class WidgetRefreshScheduler(
   suspend fun reconcile(currentTimeMillis: Long = System.currentTimeMillis()) =
     mutex.withLock {
       if (!platformAdapter.hasActiveWidgets()) {
-        cancelLocked()
+        cancel()
         return@withLock
       }
 
       val current = fastingDataRepository.getCurrentFasting()
       if (current == null || !current.isFasting) {
-        cancelLocked()
+        cancel()
         return@withLock
       }
 
@@ -114,7 +114,7 @@ class WidgetRefreshScheduler(
       if (delayMillis == null || delayMillis <= 0L) {
         // Fast has reached/passed goal while work was missing; update widget immediately
         platformAdapter.requestWidgetUpdate()
-        cancelLocked()
+        cancel()
         return@withLock
       }
 
@@ -142,13 +142,13 @@ class WidgetRefreshScheduler(
   ) =
     mutex.withLock {
       if (!platformAdapter.hasActiveWidgets()) {
-        cancelLocked()
+        cancel()
         return@withLock
       }
 
       val current = fastingDataRepository.getCurrentFasting()
       if (current == null || !current.isFasting) {
-        cancelLocked()
+        cancel()
         return@withLock
       }
 
@@ -200,13 +200,9 @@ class WidgetRefreshScheduler(
     platformAdapter.cancelScheduledWork()
   }
 
-  private fun cancelLocked() {
-    cancel()
-  }
-
   private fun scheduleLocked(delayMillis: Long?, replaceExisting: Boolean) {
     if (delayMillis == null || delayMillis <= 0L) {
-      cancelLocked()
+      cancel()
       return
     }
 
