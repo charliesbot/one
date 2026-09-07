@@ -5,6 +5,12 @@ package com.charliesbot.one.widget.common
  *
  * Computes the duration until the next whole elapsed-hour boundary or the fasting goal completion
  * timestamp, whichever occurs first.
+ *
+ * WorkManager delays are minimum waits, not exact execution times. Each refresh schedules only the
+ * next one, so always align its delay to the fast's start time rather than waiting another full
+ * hour. For example, a fast starting at 10 PM targets 11 PM; if that refresh runs at 11:20 PM, the
+ * next delay is 40 minutes (midnight), not 60 minutes (12:20 AM). This avoids accumulating
+ * scheduling drift, but Android can still delay execution, for example during Doze.
  */
 object WidgetRefreshCalculator {
   private const val MILLIS_PER_HOUR = 60L * 60L * 1000L
