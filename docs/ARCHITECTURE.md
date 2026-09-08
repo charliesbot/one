@@ -20,7 +20,7 @@ The architecture is split by responsibility:
 | --- | --- |
 | `:app` | Phone/tablet shell, Navigation 3, Koin startup, widgets, phone sync service |
 | `:wear` | Wear OS shell, Wear navigation, Koin startup, watch sync service and ongoing activity hooks |
-| `:widget:common` | JVM-only widget state, refresh rules, and host contracts |
+| `:widget:common` | JVM-only widget state, refresh eligibility, and host contracts |
 | `:widget:work` | Shared Android WorkManager adapter and refresh worker |
 | `:widget:app` | Phone/tablet Glance widgets |
 | `:widget:wear` | Wear OS Glance widgets |
@@ -80,12 +80,27 @@ design-system code.
 
 ## Widget Refresh Ownership
 
-`:widget:common` owns refresh timing, state checks, and reconciliation. It has no
-Android dependencies. `:widget:work` implements WorkManager scheduling and worker
-execution once for both applications; it has no Glance or platform widget dependency.
-Phone and Wear widget modules implement `WidgetHost` for discovery and rendering.
-Each application shell binds its host to the shared adapter in Koin, preserving its
-unique work name. Refreshes remain best-effort: WorkManager can delay execution in Doze.
+`:widget:common` owns eligibility checks and reconciliation, without Android
+APIs. `:widget:work` uses one unique hourly `PeriodicWorkRequest` per application
+with `KEEP`: repeated requests do not reset its cadence. WorkManager owns repetition;
+workers redraw current content and cancel recurring work when no widgets remain,
+fasting is inactive, or the goal has been reached. They never enqueue successors.
+
+Fasting callbacks and activity startup reconcile against current persisted state,
+not old event payloads. Suspending scheduling decisions use the shared scheduler's
+mutex; synchronous widget lifecycle provisioning/cancellation remains separate.
+Normal worker redraws happen outside the lock and eligibility is read afterward.
+Phone and Wear modules implement `WidgetHost` for discovery and rendering; their
+application shells bind the host and unique work name in Koin.
+
+Refreshes and the goal-reached display are best-effort (approximately hourly), not
+aligned to fasting-hour boundaries. Doze may delay execution further. Start/stop,
+goal changes, and sync retain their existing immediate widget update requests;
+completion notifications are unchanged. No goal-time widget task is scheduled.
+
+No production migration is needed because the one-time-worker build was not
+distributed. When testing over that earlier development build, clear its app data
+or reinstall first: existing unique one-time work is not converted by periodic KEEP.
 
 ## Core Layer Responsibilities
 

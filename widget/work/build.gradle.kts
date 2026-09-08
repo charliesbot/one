@@ -16,7 +16,6 @@ kotlin { jvmToolchain(11) }
 dependencies {
   implementation(project(":widget:common"))
   implementation(libs.androidx.work.runtime.ktx)
-  implementation(libs.androidx.concurrent.futures.ktx)
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
 

@@ -18,18 +18,18 @@ class FastingStateListenerService : BaseFastingListenerService() {
   // Called when the WATCH starts a fast
   override suspend fun onPlatformFastingStarted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingStarted(fastingDataItem)
-    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    phoneWidgetRefreshScheduler.reconcile()
   }
 
   override suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingUpdated(fastingDataItem)
-    phoneWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    phoneWidgetRefreshScheduler.reconcile()
   }
 
   // Called when the WATCH stops a fast
   override suspend fun onPlatformFastingCompleted(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingCompleted(fastingDataItem)
-    phoneWidgetRefreshScheduler.onFastingCompleted()
+    phoneWidgetRefreshScheduler.reconcile()
     fastingHistoryRepository.saveFastingRecord(
       FastingRecord(
         startTimeEpochMillis = fastingDataItem.startTimeInMillis,

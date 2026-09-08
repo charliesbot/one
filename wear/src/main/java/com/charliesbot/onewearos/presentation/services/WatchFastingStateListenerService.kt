@@ -63,14 +63,14 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
       fastingDataItem.startTimeInMillis,
       fastingDataItem.fastingGoalId,
     )
-    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    wearWidgetRefreshScheduler.reconcile()
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast started from REMOTE")
   }
 
   @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
   override suspend fun onPlatformFastingUpdated(fastingDataItem: FastingDataItem) {
     super.onPlatformFastingUpdated(fastingDataItem)
-    wearWidgetRefreshScheduler.onFastingStartedOrUpdated(fastingDataItem)
+    wearWidgetRefreshScheduler.reconcile()
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast updated from REMOTE")
   }
 
@@ -79,7 +79,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
     super.onPlatformFastingCompleted(fastingDataItem)
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Fast completed from REMOTE")
     ongoingActivityManager.stopOngoingActivity()
-    wearWidgetRefreshScheduler.onFastingCompleted()
+    wearWidgetRefreshScheduler.reconcile()
   }
 
   override fun onDataChanged(dataEvents: DataEventBuffer) {

@@ -1,211 +1,90 @@
 package com.charliesbot.one.widget.common
 
 import com.charliesbot.shared.core.domain.repository.FastingDataRepository
-import com.charliesbot.shared.core.models.FastingDataItem
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+/** Coordinates whether periodic widget work is needed; WorkManager owns repetition. */
 class WidgetRefreshScheduler(
   private val fastingDataRepository: FastingDataRepository,
   private val goalDurationResolver: GoalDurationResolver,
   private val platformAdapter: WidgetPlatformAdapter,
+  private val currentTimeMillis: () -> Long = System::currentTimeMillis,
 ) {
   private val mutex = Mutex()
 
   /**
-   * Requests a widget redraw and decides whether another background refresh is needed.
+   * Requests current content, then cancels periodic work if it is no longer needed.
    *
-   * Called by the refresh worker. Reads a fasting snapshot before requesting the redraw, then uses
-   * [onWorkerTickCompleted] to avoid overwriting a schedule for a changed fast. The redraw is
-   * outside the scheduling mutex so other scheduling operations can proceed while it suspends. If
-   * fasting is inactive or missing, cancels scheduled work and requests a redraw without continuing
-   * the chain.
+   * Called by the worker. Redraws outside the mutex and reads eligibility afterward, so an old
+   * pre-redraw snapshot cannot cancel a new fast. Does not enqueue a successor or reset recurrence.
    */
   suspend fun refresh() {
-    val snapshot = fastingDataRepository.getCurrentFasting()
-    if (snapshot == null || !snapshot.isFasting) {
-      onFastingCompleted()
-      platformAdapter.requestWidgetUpdate()
-      return
-    }
-
-    val goalDuration = goalDurationResolver.durationMillis(snapshot.fastingGoalId)
-    // Updating may suspend while fasting state changes; do not hold the scheduling mutex here.
     platformAdapter.requestWidgetUpdate()
-    onWorkerTickCompleted(
-      snapshotStartTime = snapshot.startTimeInMillis,
-      snapshotGoalId = snapshot.fastingGoalId,
-      goalDurationMillis = goalDuration,
-    )
+    mutex.withLock { if (refreshState() != RefreshState.ACTIVE) cancel() }
   }
 
   /**
-   * Replaces the next refresh schedule after a local or synced fasting start or update.
+   * Ensures or cancels periodic work using current persisted state, not an event's old payload.
    *
-   * Checks widget presence, resolves the goal duration, and calculates the next delay while holding
-   * the scheduling mutex. Cancels work if there are no widgets, fasting is inactive, or the goal
-   * has been reached. Does not redraw widgets; the event caller handles the immediate UI update.
-   *
-   * @param fastingData The fasting state supplied by the event callback.
-   * @param currentTimeMillis Time used to calculate the next refresh delay, in epoch milliseconds.
+   * Called after local/synced fasting changes and when the main activity starts. Keeps existing
+   * periodic work intact while eligible. At a reached goal, requests terminal content before
+   * cancelling. This terminal redraw is under the mutex and must not reenter reconciliation.
    */
-  suspend fun onFastingStartedOrUpdated(
-    fastingData: FastingDataItem,
-    currentTimeMillis: Long = System.currentTimeMillis(),
-  ) =
+  suspend fun reconcile() =
     mutex.withLock {
-      if (!platformAdapter.hasActiveWidgets() || !fastingData.isFasting) {
-        cancel()
-        return@withLock
+      when (refreshState()) {
+        RefreshState.ACTIVE -> platformAdapter.ensurePeriodicWork()
+        RefreshState.GOAL_REACHED -> {
+          platformAdapter.requestWidgetUpdate()
+          cancel()
+        }
+        RefreshState.INACTIVE -> cancel()
       }
-      val goalDuration = goalDurationResolver.durationMillis(fastingData.fastingGoalId)
-      val delayMillis =
-        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-          currentTimeMillis = currentTimeMillis,
-          startTimeMillis = fastingData.startTimeInMillis,
-          goalDurationMillis = goalDuration,
-        )
-      scheduleLocked(delayMillis = delayMillis, replaceExisting = true)
     }
 
   /**
-   * Requests cancellation of scheduled refreshes when a fasting stop/completion event is received.
+   * Provisionally ensures periodic work when a widget is added/enabled, keeping existing work.
    *
-   * Acquires the scheduling mutex to serialize this request with other protected scheduling
-   * operations. Does not change fasting data or redraw widgets.
-   */
-  suspend fun onFastingCompleted() = mutex.withLock { cancel() }
-
-  /**
-   * Restores missing refresh work when the main activity starts, preserving queued or running work.
-   *
-   * Cancels scheduling if widgets or an active fast are absent. Otherwise, if work is missing,
-   * schedules the next refresh; if the goal has already been reached, requests a redraw and cancels
-   * scheduling instead. Holds the scheduling mutex throughout, including that goal-reached redraw.
-   *
-   * @param currentTimeMillis Time used to calculate the next refresh delay, in epoch milliseconds.
-   */
-  suspend fun reconcile(currentTimeMillis: Long = System.currentTimeMillis()) =
-    mutex.withLock {
-      if (!platformAdapter.hasActiveWidgets()) {
-        cancel()
-        return@withLock
-      }
-
-      val current = fastingDataRepository.getCurrentFasting()
-      if (current == null || !current.isFasting) {
-        cancel()
-        return@withLock
-      }
-
-      if (platformAdapter.hasActiveWork()) {
-        // Preserve existing active work - do not cancel or postpone due refresh
-        return@withLock
-      }
-
-      val goalDuration = goalDurationResolver.durationMillis(current.fastingGoalId)
-      val delayMillis =
-        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-          currentTimeMillis = currentTimeMillis,
-          startTimeMillis = current.startTimeInMillis,
-          goalDurationMillis = goalDuration,
-        )
-
-      if (delayMillis == null || delayMillis <= 0L) {
-        // Fast has reached/passed goal while work was missing; update widget immediately
-        platformAdapter.requestWidgetUpdate()
-        cancel()
-        return@withLock
-      }
-
-      scheduleLocked(delayMillis = delayMillis, replaceExisting = false)
-    }
-
-  /**
-   * Schedules the next refresh after a worker has requested a widget redraw.
-   *
-   * Rechecks widget presence and current fasting state under the scheduling mutex. Cancels work if
-   * no widgets or active fast remain. If the start time or goal ID differs from the pre-redraw
-   * snapshot, leaves scheduling untouched so an older refresh cannot replace the newer schedule.
-   * Otherwise, replaces the next refresh request, or cancels it when the goal has been reached.
-   *
-   * @param snapshotStartTime Fast start time read before the redraw, in epoch milliseconds.
-   * @param snapshotGoalId Goal ID read before the redraw.
-   * @param goalDurationMillis Goal duration resolved for that snapshot, in milliseconds.
-   * @param currentTimeMillis Time used to calculate the next refresh delay, in epoch milliseconds.
-   */
-  suspend fun onWorkerTickCompleted(
-    snapshotStartTime: Long,
-    snapshotGoalId: String,
-    goalDurationMillis: Long,
-    currentTimeMillis: Long = System.currentTimeMillis(),
-  ) =
-    mutex.withLock {
-      if (!platformAdapter.hasActiveWidgets()) {
-        cancel()
-        return@withLock
-      }
-
-      val current = fastingDataRepository.getCurrentFasting()
-      if (current == null || !current.isFasting) {
-        cancel()
-        return@withLock
-      }
-
-      // Protect against stale work: do not overwrite newer schedule if start time or goal changed
-      if (
-        current.startTimeInMillis != snapshotStartTime || current.fastingGoalId != snapshotGoalId
-      ) {
-        return@withLock
-      }
-
-      val delayMillis =
-        WidgetRefreshCalculator.calculateNextRefreshDelayMillis(
-          currentTimeMillis = currentTimeMillis,
-          startTimeMillis = current.startTimeInMillis,
-          goalDurationMillis = goalDurationMillis,
-        )
-
-      scheduleLocked(delayMillis = delayMillis, replaceExisting = true)
-    }
-
-  /**
-   * Ensures refresh work is queued when a widget is added or enabled, keeping existing work intact.
-   *
-   * Restores a potentially missing refresh schedule without changing fasting data. Requests work
-   * without an initial delay; Android may still defer execution. Uses the platform's synchronous
-   * request gate: phone checks widget presence now, while Wear allows the request and defers
-   * presence checking to worker execution. Cancels work if the gate rejects the request.
-   *
-   * Does not acquire the scheduling mutex or wait for the worker to run, so non-suspending
-   * lifecycle callbacks can invoke it directly.
+   * No initial delay is requested, but Android may defer execution. The worker checks fasting
+   * eligibility on its first run. The synchronous platform gate can reject requests when widget
+   * presence is already known to be absent. Does not acquire the scheduling mutex.
    */
   fun ensureRefreshEnqueued() {
-    if (!platformAdapter.canRequestRefreshImmediately()) {
+    if (platformAdapter.canRequestRefreshImmediately()) {
+      platformAdapter.ensurePeriodicWork()
+    } else {
       cancel()
-      return
     }
-
-    platformAdapter.enqueueImmediateWork()
   }
 
   /**
-   * Requests cancellation of refresh work without acquiring the scheduling mutex.
+   * Requests cancellation without acquiring the mutex or waiting for background cancellation.
    *
-   * Used by synchronous lifecycle callbacks, such as removal of the last phone widget. Does not
-   * change fasting data or redraw widgets. Unlike [onFastingCompleted], this call is not serialized
-   * with protected scheduling operations and does not wait for background cancellation to finish.
+   * Used by non-suspending lifecycle callbacks, such as removal of the last phone widget. Fasting
+   * callbacks use [reconcile] instead so a late stop event cannot blindly cancel a newer fast.
    */
   fun cancel() {
     platformAdapter.cancelScheduledWork()
   }
 
-  private fun scheduleLocked(delayMillis: Long?, replaceExisting: Boolean) {
-    if (delayMillis == null || delayMillis <= 0L) {
-      cancel()
-      return
+  // Called only under the mutex. Sample time after suspended reads, not before waiting for the
+  // lock.
+  private suspend fun refreshState(): RefreshState {
+    if (!platformAdapter.hasActiveWidgets()) return RefreshState.INACTIVE
+    val fast = fastingDataRepository.getCurrentFasting()
+    if (fast == null || !fast.isFasting) return RefreshState.INACTIVE
+    val duration = goalDurationResolver.durationMillis(fast.fastingGoalId)
+    return if (currentTimeMillis() - fast.startTimeInMillis >= duration) {
+      RefreshState.GOAL_REACHED
+    } else {
+      RefreshState.ACTIVE
     }
+  }
 
-    platformAdapter.enqueueDelayedWork(delayMillis = delayMillis, replaceExisting = replaceExisting)
+  private enum class RefreshState {
+    ACTIVE,
+    GOAL_REACHED,
+    INACTIVE,
   }
 }
