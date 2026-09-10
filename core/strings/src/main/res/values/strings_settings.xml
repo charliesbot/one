@@ -36,4 +36,12 @@
     <string name="settings_sync_success">Sync to watch successful!</string>
     <string name="settings_sync_error">Sync failed. Check watch connection.</string>
     <string name="settings_version_copied">Version copied to clipboard</string>
+
+    <!-- Display -->
+    <string name="settings_display_title">Display</string>
+    <string name="settings_time_format">Time format</string>
+    <string name="settings_time_format_system">System</string>
+    <string name="settings_time_format_12_hour">12-hour</string>
+    <string name="settings_time_format_24_hour">24-hour</string>
+    <string name="settings_time_format_example">Example</string>
 </resources>

@@ -149,6 +149,9 @@ private fun SettingsScreenContent(
   onCopyVersionToClipboard: () -> Unit,
   onRateAppClick: () -> Unit,
 ) {
+  // UI-only selection; persistence and app-wide formatting are a separate change.
+  var timeFormat by rememberSaveable { mutableStateOf(TimeFormatOption.SYSTEM) }
+
   Scaffold(
     topBar = {
       TopAppBar(
@@ -219,6 +222,14 @@ private fun SettingsScreenContent(
                 )
               },
             ),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        SettingsGroup(
+          title = stringResource(R.string.settings_display_title),
+          items =
+            listOf({ TimeFormatSetting(selected = timeFormat, onSelected = { timeFormat = it }) }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Time format selector and example under Settings → Display (UI preview only; does not yet change app times)
 - Custom fasting goals now sync from phone to watch via Wearable Data Layer
 
 ### Changed
