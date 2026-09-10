@@ -501,7 +501,6 @@ private fun SettingTile(
   ListItem(
     modifier = modifier.fillMaxWidth().then(Modifier.clickable(onClick = onClick)),
     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-    headlineContent = { Text(text = title, style = MaterialTheme.typography.titleMedium) },
     supportingContent =
       if (description != null) {
         {
@@ -515,7 +514,9 @@ private fun SettingTile(
         null
       },
     trailingContent = trailingContent,
-  )
+  ) {
+    Text(text = title, style = MaterialTheme.typography.titleMedium)
+  }
 }
 
 @Composable
@@ -569,8 +570,6 @@ private fun ActionSettingItem(
           strokeWidth = 2.dp,
           color = MaterialTheme.colorScheme.primary,
         )
-      } else {
-        null
       }
     },
   )

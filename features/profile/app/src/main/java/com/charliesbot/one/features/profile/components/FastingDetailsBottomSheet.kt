@@ -16,9 +16,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -52,7 +53,7 @@ fun FastingDetailsBottomSheet(
   onUpdateStartTime: (newStartTime: Long) -> Unit,
   onUpdateEndTime: (newEndTime: Long) -> Unit,
   modifier: Modifier = Modifier,
-  sheetState: SheetState = rememberModalBottomSheetState(),
+  sheetState: SheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden),
 ) {
   var showDeleteConfirmation by remember { mutableStateOf(false) }
   var showStartTimePicker by remember { mutableStateOf(false) }
