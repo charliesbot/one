@@ -92,6 +92,15 @@ android {
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
 dependencies {
+  constraints {
+    implementation(libs.androidx.concurrent.futures.ktx) {
+      because("Android Test requires a version compatible with the app runtime classpath")
+    }
+    implementation(libs.errorprone.annotations) {
+      because("Espresso and the app runtime must agree under AGP consistent resolution")
+    }
+  }
+
   implementation(platform(libs.kotlinx.coroutines.bom))
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.kotlinx.coroutines.play.services)
