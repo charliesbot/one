@@ -50,6 +50,8 @@ This is a Google Play Services requirement. The Wearable Data Layer only connect
 | `bedtime_minutes`          | Int     | Bedtime as minutes from midnight   |
 | `fixed_fasting_start_minutes` | Int  | Fixed start time as minutes from midnight |
 | `smart_reminder_mode`      | String  | `AUTO`, `BEDTIME_ONLY`, `MOVING_AVERAGE_ONLY`, or `FIXED_TIME` |
+| `time_format_mode`         | String  | `SYSTEM`, `TWELVE_HOUR`, or `TWENTY_FOUR_HOUR` |
+| `time_format_timestamp`    | Long    | Revision of the clock preference, persisted atomically with its value |
 | `timestamp`                | Long    | When settings were last updated    |
 
 ### `/custom_goals` — One-way (phone -> watch)
@@ -170,3 +172,12 @@ Both `WidgetUpdateManager` and `ComplicationUpdateManager` debounce requests (1s
 | Ongoing activity service       | `wear/.../onewearos/presentation/services/OngoingActivityService.kt`                   |
 
 > Paths abbreviated with `...` for readability. Full base: `src/main/java/com/charliesbot/`.
+
+### Clock format preference
+
+The phone owns the selected mode. The watch applies only a strictly newer
+`time_format_timestamp` and never echoes the update. Missing revisions are ignored
+for compatibility with older phones. Missing or unknown local mode values resolve
+to `SYSTEM`. Only the mode syncs: each device resolves `SYSTEM` using its own
+Android 12/24-hour setting. This is presentation state, not fasting state; durations,
+reminder schedules, timestamps, and CSV exports are unchanged.

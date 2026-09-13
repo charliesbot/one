@@ -18,16 +18,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.onewearos.core.components.NotificationPermissionDialog
 import com.charliesbot.onewearos.presentation.navigation.WearNavigation
 import com.charliesbot.onewearos.presentation.theme.OneTheme
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
+import com.charliesbot.shared.core.data.time.DeviceClockFormat
+import com.charliesbot.shared.core.designsystem.common.time.ClockFormatProvider
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
+  private val deviceClockFormat: DeviceClockFormat by inject()
   private val wearWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
 
   private val requestNotificationPermission =
@@ -62,16 +66,22 @@ class MainActivity : ComponentActivity() {
         }
       }
 
-      OneTheme {
-        WearNavigation()
-        NotificationPermissionDialog(
-          isVisible = showNotificationPermission,
-          onDismiss = { showNotificationPermission = false },
-          onConfirm = {
-            showNotificationPermission = false
-            requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-          },
+      val is24Hour by
+        deviceClockFormat.is24Hour.collectAsStateWithLifecycle(
+          initialValue = android.text.format.DateFormat.is24HourFormat(this@MainActivity)
         )
+      ClockFormatProvider(is24Hour) {
+        OneTheme {
+          WearNavigation()
+          NotificationPermissionDialog(
+            isVisible = showNotificationPermission,
+            onDismiss = { showNotificationPermission = false },
+            onConfirm = {
+              showNotificationPermission = false
+              requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            },
+          )
+        }
       }
     }
   }

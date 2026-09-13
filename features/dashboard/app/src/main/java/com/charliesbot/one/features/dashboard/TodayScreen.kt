@@ -53,11 +53,11 @@ import com.charliesbot.one.features.dashboard.components.WeeklyProgress
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import com.charliesbot.shared.core.designsystem.app.components.TimePickerDialog
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import com.charliesbot.shared.core.models.TimePeriodProgress
 import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.testing.MockDataUtils
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
-import com.charliesbot.shared.core.utils.formatMinutesAsTime
 import com.charliesbot.shared.core.utils.getHours
 import com.charliesbot.shared.core.utils.isWidthAtLeastMedium
 import kotlinx.coroutines.delay
@@ -350,7 +350,7 @@ private fun SmartSuggestionCard(
   source: com.charliesbot.shared.core.models.SuggestionSource?,
   modifier: Modifier = Modifier,
 ) {
-  val formattedTime = formatMinutesAsTime(suggestedTimeMinutes)
+  val formattedTime = LocalClockFormat.current.minutes(suggestedTimeMinutes)
   val sourceText =
     when (source) {
       com.charliesbot.shared.core.models.SuggestionSource.MOVING_AVERAGE ->

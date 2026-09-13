@@ -16,6 +16,7 @@ import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.domain.usecase.GetSuggestedFastingStartTimeUseCase
 import com.charliesbot.shared.core.domain.usecase.SyncFastingStateUseCase
 import com.charliesbot.shared.core.models.SuggestedFastingTime
+import com.charliesbot.shared.core.models.TimeFormatMode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class SettingsUiState(
+  val timeFormatMode: TimeFormatMode = TimeFormatMode.SYSTEM,
   val notificationsEnabled: Boolean = true,
   val notifyOnCompletion: Boolean = true,
   val notifyOneHourBefore: Boolean = true,
@@ -83,6 +85,9 @@ class SettingsViewModel(
       .combine(settingsRepository.fixedFastingStartMinutes) { state, fixedMinutes ->
         state.copy(fixedFastingStartMinutes = fixedMinutes)
       }
+      .combine(settingsRepository.timeFormatMode) { state, mode ->
+        state.copy(timeFormatMode = mode)
+      }
       .combine(_isSyncing) { state, isSyncing -> state.copy(isSyncing = isSyncing) }
       .combine(_isExporting) { state, isExporting -> state.copy(isExporting = isExporting) }
       .stateIn(
@@ -101,6 +106,10 @@ class SettingsViewModel(
       settingsRepository.fixedFastingStartMinutes.collect { refreshSuggestion() }
     }
     viewModelScope.launch { settingsRepository.smartReminderMode.collect { refreshSuggestion() } }
+  }
+
+  fun setTimeFormatMode(mode: TimeFormatMode) {
+    viewModelScope.launch { settingsRepository.setTimeFormatMode(mode) }
   }
 
   fun setNotificationsEnabled(enabled: Boolean) {

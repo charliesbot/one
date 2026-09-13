@@ -57,11 +57,12 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charliesbot.shared.core.designsystem.app.components.TimePickerDialog
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.SuggestedFastingTime
 import com.charliesbot.shared.core.models.SuggestionSource
+import com.charliesbot.shared.core.models.TimeFormatMode
 import com.charliesbot.shared.core.strings.R
-import com.charliesbot.shared.core.utils.formatMinutesAsTime
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,6 +90,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = koinViewModel()) {
     uiState = uiState,
     suggestedFastingTime = suggestedFastingTime,
     snackbarHostState = snackbarHostState,
+    onTimeFormatSelected = viewModel::setTimeFormatMode,
     onNotificationsEnabledChange = viewModel::setNotificationsEnabled,
     onSmartRemindersEnabledChange = viewModel::setSmartRemindersEnabled,
     onSmartReminderModeSelected = viewModel::setSmartReminderMode,
@@ -139,6 +141,7 @@ private fun SettingsScreenContent(
   uiState: SettingsUiState,
   suggestedFastingTime: SuggestedFastingTime?,
   snackbarHostState: SnackbarHostState,
+  onTimeFormatSelected: (TimeFormatMode) -> Unit,
   onNotificationsEnabledChange: (Boolean) -> Unit,
   onSmartRemindersEnabledChange: (Boolean) -> Unit,
   onSmartReminderModeSelected: (SmartReminderMode) -> Unit,
@@ -149,9 +152,6 @@ private fun SettingsScreenContent(
   onCopyVersionToClipboard: () -> Unit,
   onRateAppClick: () -> Unit,
 ) {
-  // UI-only selection; persistence and app-wide formatting are a separate change.
-  var timeFormat by rememberSaveable { mutableStateOf(TimeFormatOption.SYSTEM) }
-
   Scaffold(
     topBar = {
       TopAppBar(
@@ -229,7 +229,12 @@ private fun SettingsScreenContent(
         SettingsGroup(
           title = stringResource(R.string.settings_preferences_title),
           items =
-            listOf({ TimeFormatSetting(selected = timeFormat, onSelected = { timeFormat = it }) }),
+            listOf({
+              TimeFormatSetting(
+                selected = uiState.timeFormatMode,
+                onSelected = onTimeFormatSelected,
+              )
+            }),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -343,7 +348,8 @@ private fun SmartRemindersCard(
             Text(text = "🕐", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.size(12.dp))
             Column {
-              val formattedTime = formatMinutesAsTime(suggestedFastingTime.suggestedTimeMinutes)
+              val formattedTime =
+                LocalClockFormat.current.minutes(suggestedFastingTime.suggestedTimeMinutes)
 
               Text(
                 text = stringResource(R.string.settings_start_fast_at, formattedTime),
@@ -436,7 +442,7 @@ private fun SmartRemindersCard(
               // Time setting based on mode
               when (currentMode) {
                 SmartReminderMode.FIXED_TIME -> {
-                  val formattedFixed = formatMinutesAsTime(fixedStartMinutes)
+                  val formattedFixed = LocalClockFormat.current.minutes(fixedStartMinutes)
 
                   Row(
                     modifier =
@@ -461,7 +467,7 @@ private fun SmartRemindersCard(
 
                 SmartReminderMode.BEDTIME_ONLY,
                 SmartReminderMode.AUTO -> {
-                  val formattedBedtime = formatMinutesAsTime(bedtimeMinutes)
+                  val formattedBedtime = LocalClockFormat.current.minutes(bedtimeMinutes)
 
                   Row(
                     modifier =
@@ -660,6 +666,7 @@ private fun PreviewSettingsScreen() {
         source = SuggestionSource.MOVING_AVERAGE,
       ),
     snackbarHostState = remember { SnackbarHostState() },
+    onTimeFormatSelected = {},
     onNotificationsEnabledChange = {},
     onSmartRemindersEnabledChange = {},
     onSmartReminderModeSelected = {},

@@ -12,17 +12,24 @@ import com.charliesbot.shared.core.data.notifications.NotificationUtil
 import com.charliesbot.shared.core.data.services.BaseFastingListenerService
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
 import com.charliesbot.shared.core.domain.constants.DataLayerConstants
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants.TIME_FORMAT_MODE_KEY
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants.TIME_FORMAT_TIMESTAMP_KEY
 import com.charliesbot.shared.core.domain.repository.CustomGoalRepository
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
 import com.charliesbot.shared.core.models.FastingDataItem
+import com.charliesbot.shared.core.models.TimeFormatMode
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
+import com.google.android.gms.wearable.Wearable
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.koin.core.component.inject
 
 class WatchFastingStateListenerService : BaseFastingListenerService() {
@@ -52,6 +59,7 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
 
   override fun onDestroy() {
     Log.d(LOG_TAG, "${this::class.java.simpleName} - Service being destroyed")
+    watchServiceScope.cancel()
     super.onDestroy()
   }
 
@@ -194,6 +202,9 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
     for (event in dataEvents) {
       if (event.type == DataEvent.TYPE_CHANGED && event.dataItem.uri.path == "/settings") {
         val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+        val sourceNodeId = event.dataItem.uri.host
+        val timeFormatMode = TimeFormatMode.fromStoredValue(dataMap.getString(TIME_FORMAT_MODE_KEY))
+        val timeFormatTimestamp = dataMap.getLong(TIME_FORMAT_TIMESTAMP_KEY, 0L)
         val notificationsEnabled = dataMap.getBoolean("notifications_enabled", true)
         val notifyCompletion = dataMap.getBoolean("notify_completion", true)
         val notifyOneHourBefore = dataMap.getBoolean("notify_one_hour_before", true)
@@ -218,6 +229,16 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
         )
         watchServiceScope.launch {
           try {
+            val localNodeId =
+              Wearable.getNodeClient(this@WatchFastingStateListenerService).localNode.await().id
+            if (sourceNodeId == null || sourceNodeId == localNodeId) return@launch
+            val formatChanged =
+              settingsRepository.applyRemoteTimeFormat(timeFormatMode, timeFormatTimestamp)
+            if (formatChanged) {
+              complicationUpdateManager.requestUpdate()
+              wearWidgetUpdateManager.requestUpdate()
+            }
+            // Ongoing activity uses an elapsed stopwatch, not a clock time.
             // syncToRemote = false: Watch should NEVER sync settings back to phone
             settingsRepository.setNotificationsEnabled(notificationsEnabled, syncToRemote = false)
             settingsRepository.setNotifyOnCompletion(notifyCompletion, syncToRemote = false)
@@ -233,6 +254,8 @@ class WatchFastingStateListenerService : BaseFastingListenerService() {
               LOG_TAG,
               "WatchListener: Settings updated successfully (local only, no sync back)",
             )
+          } catch (e: CancellationException) {
+            throw e
           } catch (e: Exception) {
             Log.e(LOG_TAG, "WatchListener: Failed to update settings", e)
           }

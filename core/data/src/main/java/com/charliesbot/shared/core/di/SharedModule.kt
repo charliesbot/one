@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.charliesbot.shared.core.data.repository.CustomGoalRepositoryImpl
 import com.charliesbot.shared.core.data.repository.FastingDataRepositoryImpl
 import com.charliesbot.shared.core.data.repository.SettingsRepositoryImpl
+import com.charliesbot.shared.core.data.time.DeviceClockFormat
 import com.charliesbot.shared.core.datastore.fastingDataStore
 import com.charliesbot.shared.core.domain.events.FastingEventProcessor
 import com.charliesbot.shared.core.domain.notifications.FastingNotificationScheduler
@@ -25,6 +26,7 @@ import org.koin.dsl.module
 val sharedModule = module {
   single<DataStore<Preferences>> { androidContext().fastingDataStore }
   single<FastingDataRepository> { FastingDataRepositoryImpl(androidContext(), dataStore = get()) }
+  single { DeviceClockFormat(androidContext(), get()) }
   single<SettingsRepository> { SettingsRepositoryImpl(androidContext(), dataStore = get()) }
   single<FastingEventProcessor> { FastingEventProcessor(get<FastingNotificationScheduler>()) }
   factory { GetSuggestedFastingStartTimeUseCase(get(), get()) }

@@ -1,6 +1,9 @@
 package com.charliesbot.shared.core.domain.constants
 
 object DataLayerConstants {
+  const val TIME_FORMAT_MODE_KEY = "time_format_mode"
+  const val TIME_FORMAT_TIMESTAMP_KEY = "time_format_timestamp"
+
   const val FASTING_PATH = "/fasting_state"
   const val IS_FASTING_KEY = "is_fasting"
   const val START_TIME_KEY = "start_time"

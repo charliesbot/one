@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.charliesbot.one.core.components.NotificationPermissionDialog
 import com.charliesbot.one.navigation.MainNavigation
@@ -26,11 +27,14 @@ import com.charliesbot.one.ui.theme.OneTheme
 import com.charliesbot.one.widget.common.WidgetRefreshScheduler
 import com.charliesbot.one.widget.updateWidgetPreview
 import com.charliesbot.shared.core.data.notifications.NotificationUtil
+import com.charliesbot.shared.core.data.time.DeviceClockFormat
+import com.charliesbot.shared.core.designsystem.common.time.ClockFormatProvider
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MainActivity : ComponentActivity() {
+  private val deviceClockFormat: DeviceClockFormat by inject()
   private val phoneWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
 
   private val requestNotificationPermission =
@@ -69,18 +73,24 @@ class MainActivity : ComponentActivity() {
         }
       }
 
-      OneTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-          MainNavigation()
+      val is24Hour by
+        deviceClockFormat.is24Hour.collectAsStateWithLifecycle(
+          initialValue = android.text.format.DateFormat.is24HourFormat(this@MainActivity)
+        )
+      ClockFormatProvider(is24Hour) {
+        OneTheme {
+          Box(modifier = Modifier.fillMaxSize()) {
+            MainNavigation()
 
-          if (showNotificationPermission) {
-            NotificationPermissionDialog(
-              onDismiss = { showNotificationPermission = false },
-              onConfirm = {
-                showNotificationPermission = false
-                requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-              },
-            )
+            if (showNotificationPermission) {
+              NotificationPermissionDialog(
+                onDismiss = { showNotificationPermission = false },
+                onConfirm = {
+                  showNotificationPermission = false
+                  requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                },
+              )
+            }
           }
         }
       }

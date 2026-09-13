@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.core.designsystem.app.components.TimePickerDialog
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import com.charliesbot.shared.core.models.FastingDayData
 import com.charliesbot.shared.core.strings.R
 import java.time.Instant
@@ -246,12 +247,11 @@ private fun formatDate(date: LocalDate): String {
   return date.format(formatter)
 }
 
+@Composable
 private fun formatDateTime(epochMillis: Long): String {
   val instant = Instant.ofEpochMilli(epochMillis)
   val zonedDateTime = instant.atZone(ZoneId.systemDefault())
-  // Format: "Feb 10, 7:15 PM" (month, day, time - no year)
-  val formatter = DateTimeFormatter.ofPattern("MMM d, h:mm a")
-  return zonedDateTime.format(formatter)
+  return LocalClockFormat.current.dateTime(zonedDateTime.toLocalDateTime(), "MMM d")
 }
 
 private fun formatDuration(startMillis: Long, endMillis: Long): String {
