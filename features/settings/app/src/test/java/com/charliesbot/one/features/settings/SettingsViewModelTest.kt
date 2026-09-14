@@ -64,6 +64,8 @@ class SettingsViewModelTest {
   }
 
   private fun createViewModel(): SettingsViewModel {
+    every { settingsRepository.timeFormatMode } returns
+      flowOf(com.charliesbot.shared.core.models.TimeFormatMode.SYSTEM)
     every { settingsRepository.notificationsEnabled } returns flowOf(true)
     every { settingsRepository.notifyOnCompletion } returns flowOf(true)
     every { settingsRepository.notifyOneHourBefore } returns flowOf(true)
@@ -91,6 +93,20 @@ class SettingsViewModelTest {
       historyExporter = historyExporter,
       clipboardHelper = clipboardHelper,
     )
+  }
+
+  @Test
+  fun `time format selection persists without recalculating reminders`() = runTest {
+    val viewModel = createViewModel()
+    io.mockk.clearMocks(settingsRepository, smartReminderCallback, answers = false)
+    viewModel.setTimeFormatMode(com.charliesbot.shared.core.models.TimeFormatMode.TWENTY_FOUR_HOUR)
+    advanceUntilIdle()
+    io.mockk.coVerify(exactly = 1) {
+      settingsRepository.setTimeFormatMode(
+        com.charliesbot.shared.core.models.TimeFormatMode.TWENTY_FOUR_HOUR
+      )
+    }
+    io.mockk.coVerify(exactly = 0) { smartReminderCallback.onSmartReminderSettingsChanged() }
   }
 
   @Test

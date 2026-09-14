@@ -22,8 +22,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.charliesbot.shared.core.utils.TimeFormat
-import com.charliesbot.shared.core.utils.formatDate
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -62,7 +61,7 @@ fun TimeDisplay(
       modifier = Modifier.fillMaxWidth(),
     ) {
       Text(
-        text = formatDate(date, TimeFormat.DATE_TIME),
+        text = LocalClockFormat.current.dateTime(date),
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,

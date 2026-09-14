@@ -9,13 +9,18 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.charliesbot.shared.core.data.time.TimeFormatPreferences
 import com.charliesbot.shared.core.domain.constants.AppConstants.LOG_TAG
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants.TIME_FORMAT_MODE_KEY
+import com.charliesbot.shared.core.domain.constants.DataLayerConstants.TIME_FORMAT_TIMESTAMP_KEY
 import com.charliesbot.shared.core.domain.repository.SettingsRepository
 import com.charliesbot.shared.core.domain.repository.SmartReminderMode
+import com.charliesbot.shared.core.models.TimeFormatMode
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.PutDataRequest
 import com.google.android.gms.wearable.Wearable
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -24,6 +29,17 @@ import kotlinx.coroutines.tasks.await
 
 class SettingsRepositoryImpl(context: Context, private val dataStore: DataStore<Preferences>) :
   SettingsRepository {
+
+  private val timeFormatPreferences = TimeFormatPreferences(dataStore)
+  override val timeFormatMode = timeFormatPreferences.mode
+
+  override suspend fun setTimeFormatMode(mode: TimeFormatMode) {
+    timeFormatPreferences.set(mode, System.currentTimeMillis())
+    syncSettingsToRemote()
+  }
+
+  override suspend fun applyRemoteTimeFormat(mode: TimeFormatMode, timestamp: Long): Boolean =
+    timeFormatPreferences.applyRemote(mode, timestamp)
 
   private val dataClient: DataClient = Wearable.getDataClient(context.applicationContext)
 
@@ -165,6 +181,11 @@ class SettingsRepositoryImpl(context: Context, private val dataStore: DataStore<
             dataMap.putInt(BEDTIME_MINUTES_KEY, bedtimeMinutes)
             dataMap.putString(SMART_REMINDER_MODE_KEY, smartReminderMode)
             dataMap.putInt(FIXED_FASTING_START_MINUTES_KEY, fixedFastingStartMinutes)
+            dataMap.putString(
+              TIME_FORMAT_MODE_KEY,
+              TimeFormatMode.fromStoredValue(prefs[TimeFormatPreferences.MODE]).name,
+            )
+            dataMap.putLong(TIME_FORMAT_TIMESTAMP_KEY, prefs[TimeFormatPreferences.TIMESTAMP] ?: 0L)
             dataMap.putLong(TIMESTAMP_KEY, System.currentTimeMillis())
           }
           .asPutDataRequest()
@@ -175,6 +196,8 @@ class SettingsRepositoryImpl(context: Context, private val dataStore: DataStore<
         LOG_TAG,
         "SettingsRepo: Settings synced to Data Layer - notifications: $notificationsEnabled, completion: $notifyCompletion, oneHour: $notifyOneHourBefore, smartReminders: $smartRemindersEnabled, bedtime: $bedtimeMinutes, mode: $smartReminderMode, fixedStart: $fixedFastingStartMinutes",
       )
+    } catch (e: CancellationException) {
+      throw e
     } catch (e: Exception) {
       Log.e(LOG_TAG, "SettingsRepo: Error syncing settings to Data Layer", e)
     }

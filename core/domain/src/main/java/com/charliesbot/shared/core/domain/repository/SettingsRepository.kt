@@ -1,5 +1,6 @@
 package com.charliesbot.shared.core.domain.repository
 
+import com.charliesbot.shared.core.models.TimeFormatMode
 import kotlinx.coroutines.flow.Flow
 
 /** Mode for calculating smart reminder times. */
@@ -18,6 +19,12 @@ enum class SmartReminderMode {
 }
 
 interface SettingsRepository {
+  val timeFormatMode: Flow<TimeFormatMode>
+
+  suspend fun setTimeFormatMode(mode: TimeFormatMode)
+
+  suspend fun applyRemoteTimeFormat(mode: TimeFormatMode, timestamp: Long): Boolean
+
   val notificationsEnabled: Flow<Boolean>
   val notifyOnCompletion: Flow<Boolean>
   val notifyOneHourBefore: Flow<Boolean>

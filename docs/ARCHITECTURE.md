@@ -267,3 +267,14 @@ Use this placement guide:
 | Wear-only reusable Compose component | Wear feature or future Wear design-system module |
 | Feature screen/ViewModel | Matching `:features:<name>:<platform>` module |
 | App startup/navigation/platform service | `:app` or `:wear` |
+
+## Clock Presentation
+
+`ClockFormat` and `TimeFormatMode` live in `:core:model`; they never format
+durations or serialized timestamps. `SettingsRepository` exposes the stored mode.
+`:core:data` owns its DataStore revision and `DeviceClockFormat`, which observes
+Android’s clock preference while collected. Phone and watch activity shells
+collect the resolved preference with their lifecycle and provide `LocalClockFormat`
+through `:core:designsystem:common`. That module exposes `:core:model` for its
+clock-presentation contract. Feature screens and pickers consume the same value;
+they do not independently read settings or resolve 12/24-hour policy.

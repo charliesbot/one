@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import com.charliesbot.shared.core.strings.R
 import com.charliesbot.shared.core.utils.convertMillisToLocalDateTime
 import java.time.LocalDate
@@ -71,7 +73,19 @@ class DateTimeWheelPickerState(initialDateTime: LocalDateTime) {
       DateItem(date = referenceDate.minusDays(daysAgo.toLong()), daysAgo = daysAgo)
     }
 
-  val hourItems: List<Int> = (1..12).toList()
+  fun hourItems(is24Hour: Boolean): List<Int> = if (is24Hour) (0..23).toList() else (1..12).toList()
+
+  fun hourIndex(is24Hour: Boolean): Int = if (is24Hour) selectedDateTime.hour else selectedHourIndex
+
+  fun selectHour(index: Int, is24Hour: Boolean) {
+    if (is24Hour) {
+      selectedHourIndex = to12HourIndex(index)
+      selectedAmPmIndex = if (index >= 12) 1 else 0
+    } else {
+      selectedHourIndex = index
+    }
+  }
+
   val minuteItems: List<Int> = (0..59).toList()
   val amPmItems: List<AmPm> = listOf(AmPm.AM, AmPm.PM)
 
@@ -84,7 +98,7 @@ class DateTimeWheelPickerState(initialDateTime: LocalDateTime) {
     get() = dateItems[selectedDateIndex].date
 
   val selectedHour: Int
-    get() = hourItems[selectedHourIndex]
+    get() = selectedHourIndex + 1
 
   val selectedMinute: Int
     get() = minuteItems[selectedMinuteIndex]
@@ -145,6 +159,7 @@ private val ITEM_HEIGHT = 48.dp
 @Composable
 fun DateTimeWheelPicker(state: DateTimeWheelPickerState, modifier: Modifier = Modifier) {
   val context = LocalContext.current
+  val is24Hour = LocalClockFormat.current.is24Hour
 
   Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
     // Unified selection indicator (behind)
@@ -176,20 +191,22 @@ fun DateTimeWheelPicker(state: DateTimeWheelPickerState, modifier: Modifier = Mo
         )
       }
 
-      // Hour column
-      WheelPicker(
-        items = state.hourItems,
-        initialIndex = state.selectedHourIndex,
-        onSelectedIndexChange = { state.selectedHourIndex = it },
-        modifier = Modifier.weight(1f),
-        infiniteScroll = true,
-      ) { hour ->
-        Text(
-          text = hour.toString().padStart(2, '0'),
-          style = MaterialTheme.typography.headlineSmall,
-          fontWeight = FontWeight.Medium,
-          textAlign = TextAlign.Center,
-        )
+      // Recreate only the hour wheel when its range changes, preserving the selected time.
+      key(is24Hour) {
+        WheelPicker(
+          items = state.hourItems(is24Hour),
+          initialIndex = state.hourIndex(is24Hour),
+          onSelectedIndexChange = { state.selectHour(it, is24Hour) },
+          modifier = Modifier.weight(1f),
+          infiniteScroll = true,
+        ) { hour ->
+          Text(
+            text = hour.toString().padStart(2, '0'),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
+          )
+        }
       }
 
       // Minute column
@@ -208,20 +225,22 @@ fun DateTimeWheelPicker(state: DateTimeWheelPickerState, modifier: Modifier = Mo
         )
       }
 
-      // AM/PM column
-      WheelPicker(
-        items = state.amPmItems,
-        initialIndex = state.selectedAmPmIndex,
-        onSelectedIndexChange = { state.selectedAmPmIndex = it },
-        modifier = Modifier.weight(0.8f),
-        infiniteScroll = false,
-      ) { amPm ->
-        Text(
-          text = amPm.name,
-          style = MaterialTheme.typography.headlineSmall,
-          fontWeight = FontWeight.Medium,
-          textAlign = TextAlign.Center,
-        )
+      // AM/PM is only meaningful in the 12-hour display.
+      if (!is24Hour) {
+        WheelPicker(
+          items = state.amPmItems,
+          initialIndex = state.selectedAmPmIndex,
+          onSelectedIndexChange = { state.selectedAmPmIndex = it },
+          modifier = Modifier.weight(0.8f),
+          infiniteScroll = false,
+        ) { amPm ->
+          Text(
+            text = amPm.name,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
+          )
+        }
       }
     }
   }

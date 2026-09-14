@@ -20,8 +20,7 @@ import androidx.wear.compose.material3.TextButton
 import com.charliesbot.one.features.dashboard.wear.R
 import com.charliesbot.shared.core.constants.FastGoal
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
-import com.charliesbot.shared.core.utils.TimeFormat
-import com.charliesbot.shared.core.utils.formatDate
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import com.charliesbot.shared.core.utils.getHours
 import java.time.LocalDateTime
 
@@ -30,7 +29,6 @@ private fun TimeInfoDisplay(title: String, date: LocalDateTime, onClick: (() -> 
   val interactionSource = remember { MutableInteractionSource() }
   val verticalSpace = 2.dp
   val textColor = MaterialTheme.colorScheme.onSurface
-  val dateFormat = TimeFormat.TIME
 
   TextButton(
     onClick = onClick,
@@ -49,7 +47,7 @@ private fun TimeInfoDisplay(title: String, date: LocalDateTime, onClick: (() -> 
         color = textColor,
       )
       Text(
-        text = formatDate(date, dateFormat),
+        text = LocalClockFormat.current.time(date.toLocalTime()),
         style = MaterialTheme.typography.bodySmall,
         fontWeight = FontWeight.Bold,
         color = textColor,

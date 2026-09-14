@@ -18,6 +18,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.charliesbot.shared.core.designsystem.common.time.LocalClockFormat
 import com.charliesbot.shared.core.strings.R
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -49,12 +51,15 @@ fun TimePickerDialog(
   onConfirm: (hour: Int, minute: Int) -> Unit,
   onDismiss: () -> Unit,
 ) {
+  val is24Hour = LocalClockFormat.current.is24Hour
   val timePickerState =
     rememberTimePickerState(
       initialHour = initialHour,
       initialMinute = initialMinute,
-      is24Hour = false,
+      is24Hour = is24Hour,
     )
+
+  SideEffect { timePickerState.is24hour = is24Hour }
 
   Dialog(
     onDismissRequest = onDismiss,
