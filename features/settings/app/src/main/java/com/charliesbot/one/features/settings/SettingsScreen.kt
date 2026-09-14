@@ -227,7 +227,7 @@ private fun SettingsScreenContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         SettingsGroup(
-          title = stringResource(R.string.settings_display_title),
+          title = stringResource(R.string.settings_preferences_title),
           items =
             listOf({ TimeFormatSetting(selected = timeFormat, onSelected = { timeFormat = it }) }),
         )
