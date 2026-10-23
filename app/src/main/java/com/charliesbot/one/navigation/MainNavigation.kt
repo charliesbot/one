@@ -3,25 +3,20 @@ package com.charliesbot.one.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShortNavigationBar
-import androidx.compose.material3.ShortNavigationBarArrangement
-import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.WideNavigationRail
-import androidx.compose.material3.WideNavigationRailItem
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entryProvider
@@ -31,7 +26,6 @@ import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.strings.R as SharedR
-import com.charliesbot.shared.core.utils.isWidthAtLeastExpanded
 
 private data class TopLevelDestination(
   val route: NavigationRoute,
@@ -51,8 +45,9 @@ private val topLevelDestinations =
   )
 
 /**
- * Top-level navigation: a bottom bar below 840dp, a side rail from 840dp up. It always opens on
- * Today, which calls [onTodayReady] once its content is composed.
+ * Top-level navigation. The navigation suite picks the Expressive bar for a compact width, a
+ * compact height or tabletop posture, and the collapsed rail otherwise. It always opens on Today,
+ * which calls [onTodayReady] once its content is composed.
  */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -65,62 +60,36 @@ fun MainNavigation(onTodayReady: () -> Unit) {
       backStack.add(route)
     }
   }
-  val useRail = isWidthAtLeastExpanded()
+  val navigationSuiteType =
+    NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfo())
 
-  Scaffold(
-    bottomBar = {
-      if (!useRail) {
-        ShortNavigationBar(arrangement = ShortNavigationBarArrangement.EqualWeight) {
-          topLevelDestinations.forEach { destination ->
-            ShortNavigationBarItem(
-              selected = currentDestination == destination.route,
-              onClick = { navigateTo(destination.route) },
-              icon = { Icon(painterResource(destination.icon), contentDescription = null) },
-              label = { Text(stringResource(destination.label)) },
-            )
-          }
-        }
-      }
-    }
-  ) { innerPadding ->
-    Row(Modifier.fillMaxSize()) {
-      if (useRail) {
-        WideNavigationRail {
-          topLevelDestinations.forEach { destination ->
-            WideNavigationRailItem(
-              railExpanded = false,
-              selected = currentDestination == destination.route,
-              onClick = { navigateTo(destination.route) },
-              icon = { Icon(painterResource(destination.icon), contentDescription = null) },
-              label = { Text(stringResource(destination.label)) },
-            )
-          }
-        }
-      }
-      // The rail handles the start inset itself, so the content only takes it without a rail.
-      val layoutDirection = LocalLayoutDirection.current
-      val contentPadding =
-        if (useRail) {
-          PaddingValues(
-            top = innerPadding.calculateTopPadding(),
-            end = innerPadding.calculateEndPadding(layoutDirection),
-            bottom = innerPadding.calculateBottomPadding(),
-          )
-        } else {
-          innerPadding
-        }
-      Box(modifier = Modifier.weight(1f).padding(contentPadding)) {
-        NavDisplay(
-          backStack = backStack,
-          onBack = { backStack.removeLastOrNull() },
-          entryProvider =
-            entryProvider {
-              entry<Today> { TodayScreen(onContentReady = onTodayReady) }
-              entry<You> { YouScreen() }
-              entry<Settings> { SettingsScreen() }
-            },
+  NavigationSuiteScaffold(
+    navigationSuiteType = navigationSuiteType,
+    navigationItems = {
+      topLevelDestinations.forEach { destination ->
+        NavigationSuiteItem(
+          navigationSuiteType = navigationSuiteType,
+          selected = currentDestination == destination.route,
+          onClick = { navigateTo(destination.route) },
+          icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+          label = { Text(stringResource(destination.label)) },
         )
       }
+    },
+  ) {
+    // The suite consumes the insets its bar or rail covers; this pads the rest (status bar, and
+    // the bottom when the rail is showing).
+    Box(Modifier.windowInsetsPadding(WindowInsets.systemBars)) {
+      NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryProvider =
+          entryProvider {
+            entry<Today> { TodayScreen(onContentReady = onTodayReady) }
+            entry<You> { YouScreen() }
+            entry<Settings> { SettingsScreen() }
+          },
+      )
     }
   }
 }

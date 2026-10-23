@@ -85,6 +85,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiTooling" }
 # TODO - charliesbot: Remove material3 version override when it reaches stable
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Expressive" }
+androidx-material3-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "material3Expressive" }
 # End TODO
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
