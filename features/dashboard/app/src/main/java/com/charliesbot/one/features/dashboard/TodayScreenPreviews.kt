@@ -17,16 +17,18 @@ import java.util.concurrent.TimeUnit
 private const val PREVIEW_NOW = 1_761_255_900_000L // Thu, Oct 23 2025, 3:45 PM PDT
 
 // Two hours and a quarter after the preview's "now", in whatever zone renders the preview.
-private val previewSuggestion =
-  (PREVIEW_NOW + TimeUnit.MINUTES.toMillis(135)).let { startMillis ->
-    val time = Instant.ofEpochMilli(startMillis).atZone(ZoneId.systemDefault()).toLocalTime()
-    SuggestedFastingTime(
-      suggestedTimeMillis = startMillis,
-      suggestedTimeMinutes = time.hour * 60 + time.minute,
-      reasoning = "",
-      source = SuggestionSource.BEDTIME_BASED,
-    )
-  }
+private val previewSuggestion = suggestionAfterNow(minutes = 135)
+
+private fun suggestionAfterNow(minutes: Long): SuggestedFastingTime {
+  val startMillis = PREVIEW_NOW + TimeUnit.MINUTES.toMillis(minutes)
+  val time = Instant.ofEpochMilli(startMillis).atZone(ZoneId.systemDefault()).toLocalTime()
+  return SuggestedFastingTime(
+    suggestedTimeMillis = startMillis,
+    suggestedTimeMinutes = time.hour * 60 + time.minute,
+    reasoning = "",
+    source = SuggestionSource.BEDTIME_BASED,
+  )
+}
 
 @Composable
 private fun PreviewContent(
@@ -66,6 +68,20 @@ private fun PreviewContent(
 private fun TodayIdlePreview() {
   MaterialTheme {
     PreviewContent(isFasting = false, suggestion = previewSuggestion, isWide = false)
+  }
+}
+
+// A late start on a short goal puts bedtime close to the start time, where their labels could meet.
+@Preview(showBackground = true, widthDp = 411, heightDp = 923)
+@Composable
+private fun TodayIdleLateStartPreview() {
+  MaterialTheme {
+    PreviewContent(
+      isFasting = false,
+      suggestion = suggestionAfterNow(minutes = 221),
+      isWide = false,
+      goalId = PredefinedFastingGoals.CIRCADIAN.id,
+    )
   }
 }
 

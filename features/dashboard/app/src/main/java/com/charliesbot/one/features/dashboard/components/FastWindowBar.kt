@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
+import kotlin.math.roundToInt
 
 /** One end of the fast window: a small day name over the time. */
 internal data class WindowEdge(val day: String, val time: String)
@@ -44,9 +46,8 @@ internal data class FastWindowTimelineState(
 private val TrackHeight = 16.dp
 private val MarkerSize = 8.dp
 
-// The bedtime label is centered on its marker and hidden near the ends, where it would collide
-// with the start and end labels.
-private val BedtimeLabelRange = 0.18f..0.82f
+// The least room kept between the bedtime label and the start and end labels.
+private val LabelGap = 12.dp
 
 /**
  * The idle card's fast window: one solid bar from start to goal with bedtime marked on it, so the
@@ -77,26 +78,84 @@ internal fun FastWindowTimeline(state: FastWindowTimelineState, modifier: Modifi
         )
       }
     }
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-      EdgeLabel(state.start, TextAlign.Start, Modifier.align(Alignment.TopStart))
-      EdgeLabel(state.end, TextAlign.End, Modifier.align(Alignment.TopEnd))
-      if (bedtimeFraction != null && bedtimeLabel != null && bedtimeFraction in BedtimeLabelRange) {
-        val labelWidth = 96.dp
-        Row(
-          modifier =
-            Modifier.width(labelWidth).offset(x = maxWidth * bedtimeFraction - labelWidth / 2),
-          horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Icon(
-            painter = painterResource(DesignSystemR.drawable.bedtime_filled_24px),
-            contentDescription = null,
-            modifier = Modifier.size(18.dp),
-          )
-          Text(text = bedtimeLabel, style = MaterialTheme.typography.labelMediumEmphasized)
-        }
+    WindowLabels(state)
+  }
+}
+
+/**
+ * The start and end under the bar, with the bedtime label under its marker. The bedtime label is
+ * measured against the edge labels, so a long time like "10:30 PM" never runs into it.
+ */
+@Composable
+private fun WindowLabels(state: FastWindowTimelineState, modifier: Modifier = Modifier) {
+  val bedtimeFraction = state.bedtimeFraction
+  val bedtimeLabel = state.bedtimeLabel
+  Layout(
+    content = {
+      EdgeLabel(state.start, TextAlign.Start)
+      EdgeLabel(state.end, TextAlign.End)
+      if (bedtimeFraction != null && bedtimeLabel != null) BedtimeLabel(bedtimeLabel)
+    },
+    modifier = modifier.fillMaxWidth(),
+  ) { measurables, constraints ->
+    val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0)) }
+    val start = placeables[0]
+    val end = placeables[1]
+    val bedtime = placeables.getOrNull(2)
+    val width = constraints.maxWidth
+    val bedtimeX =
+      if (bedtime != null && bedtimeFraction != null) {
+        bedtimeLabelX(
+          markerX = (width * bedtimeFraction).roundToInt(),
+          labelWidth = bedtime.width,
+          startWidth = start.width,
+          endWidth = end.width,
+          totalWidth = width,
+          gap = LabelGap.roundToPx(),
+        )
+      } else {
+        null
       }
+    layout(width, maxOf(start.height, end.height)) {
+      start.placeRelative(0, 0)
+      end.placeRelative(width - end.width, 0)
+      if (bedtime != null && bedtimeX != null) bedtime.placeRelative(bedtimeX, 0)
     }
+  }
+}
+
+/**
+ * Where the bedtime label starts: centered on its marker, slid just enough to keep [gap] from the
+ * start and end labels. Null when it doesn't fit between them, or when sliding would move it off
+ * its marker.
+ */
+internal fun bedtimeLabelX(
+  markerX: Int,
+  labelWidth: Int,
+  startWidth: Int,
+  endWidth: Int,
+  totalWidth: Int,
+  gap: Int,
+): Int? {
+  val min = startWidth + gap
+  val max = totalWidth - endWidth - gap - labelWidth
+  if (min > max) return null
+  val x = (markerX - labelWidth / 2).coerceIn(min, max)
+  return x.takeIf { markerX in x..(x + labelWidth) }
+}
+
+@Composable
+private fun BedtimeLabel(time: String) {
+  Row(
+    horizontalArrangement = Arrangement.spacedBy(4.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Icon(
+      painter = painterResource(DesignSystemR.drawable.bedtime_filled_24px),
+      contentDescription = null,
+      modifier = Modifier.size(18.dp),
+    )
+    Text(text = time, style = MaterialTheme.typography.labelMediumEmphasized)
   }
 }
 
@@ -184,7 +243,7 @@ private fun BedtimeMarker(color: Color, x: Dp, modifier: Modifier) {
 }
 
 @Composable
-private fun EdgeLabel(edge: WindowEdge, align: TextAlign, modifier: Modifier) {
+private fun EdgeLabel(edge: WindowEdge, align: TextAlign, modifier: Modifier = Modifier) {
   Column(
     modifier = modifier,
     horizontalAlignment = if (align == TextAlign.End) Alignment.End else Alignment.Start,
