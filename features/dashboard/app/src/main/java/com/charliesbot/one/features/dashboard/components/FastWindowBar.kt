@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -46,12 +47,10 @@ internal data class FastWindowTimelineState(
 private val TrackHeight = 16.dp
 private val MarkerSize = 8.dp
 
-// The least room kept between the bedtime label and the start and end labels.
-private val LabelGap = 12.dp
-
 /**
  * The idle card's fast window: one solid bar from start to goal with bedtime marked on it, so the
- * user sees how much of the fast happens while asleep.
+ * user sees how much of the fast happens while asleep. The bedtime label sits above the bar, where
+ * nothing else competes for room, and the start and end times sit below it.
  */
 @Composable
 internal fun FastWindowTimeline(state: FastWindowTimelineState, modifier: Modifier = Modifier) {
@@ -61,8 +60,11 @@ internal fun FastWindowTimeline(state: FastWindowTimelineState, modifier: Modifi
   Column(
     modifier =
       modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = state.description },
-    verticalArrangement = Arrangement.spacedBy(12.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
   ) {
+    if (bedtimeFraction != null && bedtimeLabel != null) {
+      BedtimeAboveMarker(bedtimeLabel, bedtimeFraction)
+    }
     BoxWithConstraints(Modifier.fillMaxWidth().height(TrackHeight)) {
       // The card's own pair: onPrimaryContainer on primaryContainer, with the marker cut back out.
       Box(
@@ -78,71 +80,30 @@ internal fun FastWindowTimeline(state: FastWindowTimelineState, modifier: Modifi
         )
       }
     }
-    WindowLabels(state)
-  }
-}
-
-/**
- * The start and end under the bar, with the bedtime label under its marker. The bedtime label is
- * measured against the edge labels, so a long time like "10:30 PM" never runs into it.
- */
-@Composable
-private fun WindowLabels(state: FastWindowTimelineState, modifier: Modifier = Modifier) {
-  val bedtimeFraction = state.bedtimeFraction
-  val bedtimeLabel = state.bedtimeLabel
-  Layout(
-    content = {
-      EdgeLabel(state.start, TextAlign.Start)
-      EdgeLabel(state.end, TextAlign.End)
-      if (bedtimeFraction != null && bedtimeLabel != null) BedtimeLabel(bedtimeLabel)
-    },
-    modifier = modifier.fillMaxWidth(),
-  ) { measurables, constraints ->
-    val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0)) }
-    val start = placeables[0]
-    val end = placeables[1]
-    val bedtime = placeables.getOrNull(2)
-    val width = constraints.maxWidth
-    val bedtimeX =
-      if (bedtime != null && bedtimeFraction != null) {
-        bedtimeLabelX(
-          markerX = (width * bedtimeFraction).roundToInt(),
-          labelWidth = bedtime.width,
-          startWidth = start.width,
-          endWidth = end.width,
-          totalWidth = width,
-          gap = LabelGap.roundToPx(),
-        )
-      } else {
-        null
-      }
-    layout(width, maxOf(start.height, end.height)) {
-      start.placeRelative(0, 0)
-      end.placeRelative(width - end.width, 0)
-      if (bedtime != null && bedtimeX != null) bedtime.placeRelative(bedtimeX, 0)
+    Box(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+      EdgeLabel(state.start, TextAlign.Start, Modifier.align(Alignment.TopStart))
+      EdgeLabel(state.end, TextAlign.End, Modifier.align(Alignment.TopEnd))
     }
   }
 }
 
-/**
- * Where the bedtime label starts: centered on its marker, slid just enough to keep [gap] from the
- * start and end labels. Null when it doesn't fit between them, or when sliding would move it off
- * its marker.
- */
-internal fun bedtimeLabelX(
-  markerX: Int,
-  labelWidth: Int,
-  startWidth: Int,
-  endWidth: Int,
-  totalWidth: Int,
-  gap: Int,
-): Int? {
-  val min = startWidth + gap
-  val max = totalWidth - endWidth - gap - labelWidth
-  if (min > max) return null
-  val x = (markerX - labelWidth / 2).coerceIn(min, max)
-  return x.takeIf { markerX in x..(x + labelWidth) }
+/** The bedtime label centered over its marker, kept inside the bar's width. */
+@Composable
+private fun BedtimeAboveMarker(time: String, fraction: Float) {
+  Layout(content = { BedtimeLabel(time) }, modifier = Modifier.fillMaxWidth()) {
+    measurables,
+    constraints ->
+    val label = measurables.single().measure(constraints.copy(minWidth = 0))
+    val width = constraints.maxWidth
+    val x = bedtimeLabelX((width * fraction).roundToInt(), label.width, width)
+    // Relative placement mirrors in right-to-left layouts, like the marker's start alignment.
+    layout(width, label.height) { label.placeRelative(x, 0) }
+  }
 }
+
+/** Where the bedtime label starts: centered on its marker, but never past either end of the bar. */
+internal fun bedtimeLabelX(markerX: Int, labelWidth: Int, totalWidth: Int): Int =
+  (markerX - labelWidth / 2).coerceIn(0, (totalWidth - labelWidth).coerceAtLeast(0))
 
 @Composable
 private fun BedtimeLabel(time: String) {
