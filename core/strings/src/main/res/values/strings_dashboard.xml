@@ -51,6 +51,7 @@
     <string name="goal_hours_label">%1$sh goal</string>
     <string name="this_week">This week</string>
     <string name="fast_window">Fast window</string>
+    <string name="fast_window_description">Fast window, %1$d%% done, %2$s to %3$s</string>
     <string name="asleep_since">Asleep since %1$s</string>
     <string name="bedtime_at">Bedtime at %1$s</string>
     <string name="fasting_goal">Fasting goal</string>

@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.charliesbot.one.features.dashboard.model.ClockText
@@ -34,11 +32,7 @@ internal data class IdleHeroState(
   @param:DrawableRes val eyebrowIcon: Int,
   val clock: ClockText,
   val detail: String,
-  val windowStart: WindowEdge,
-  val windowEnd: WindowEdge,
-  val bedtimeFraction: Float?,
-  val bedtimeLabel: String?,
-  val windowDescription: String,
+  val window: FastWindowTimelineState,
   val goalLabel: String,
 )
 
@@ -56,44 +50,27 @@ internal fun IdleHeroContent(
   onStartFasting: () -> Unit,
   onChangeGoal: () -> Unit,
 ) {
-  val window: @Composable (Modifier) -> Unit = { windowModifier ->
-    FastWindowTimeline(
-      start = state.windowStart,
-      end = state.windowEnd,
-      bedtimeFraction = state.bedtimeFraction,
-      bedtimeLabel = state.bedtimeLabel,
-      description = state.windowDescription,
-      modifier = windowModifier,
-    )
-  }
-  val startButton: @Composable (Modifier) -> Unit = { buttonModifier ->
-    SizedButton(
-      text = stringResource(R.string.start_fasting),
-      icon = DesignSystemR.drawable.play_arrow_24px,
-      height = ButtonDefaults.LargeContainerHeight,
-      onClick = onStartFasting,
-      modifier = buttonModifier.then(motion.action),
-    )
-  }
-
   if (wide) {
     Column(Modifier.padding(horizontal = 40.dp, vertical = 24.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          Eyebrow(state, motion.support)
+          Eyebrow(state.eyebrow, state.eyebrowIcon, motion.support)
           Clock(state.clock, motion.number)
           Text(state.detail, style = MaterialTheme.typography.bodyLarge, modifier = motion.support)
         }
         Spacer(Modifier.size(48.dp))
-        startButton(Modifier.weight(1f).widthIn(max = 320.dp))
+        StartFastingButton(
+          onClick = onStartFasting,
+          modifier = Modifier.weight(1f).widthIn(max = 320.dp).then(motion.action),
+        )
       }
       Spacer(Modifier.height(16.dp))
-      window(motion.support)
+      FastWindowTimeline(state.window, motion.support)
     }
   } else {
     Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
-        Eyebrow(state, Modifier.weight(1f).then(motion.support))
+        Eyebrow(state.eyebrow, state.eyebrowIcon, Modifier.weight(1f).then(motion.support))
         SizedElevatedButton(
           text = state.goalLabel,
           icon = DesignSystemR.drawable.timer_24px,
@@ -103,28 +80,22 @@ internal fun IdleHeroContent(
       }
       Clock(state.clock, Modifier.padding(top = 8.dp).then(motion.number))
       Text(state.detail, style = MaterialTheme.typography.bodyLarge, modifier = motion.support)
-      window(Modifier.padding(top = 16.dp).then(motion.support))
+      FastWindowTimeline(state.window, Modifier.padding(top = 16.dp).then(motion.support))
       Spacer(Modifier.height(16.dp))
-      startButton(Modifier.fillMaxWidth())
+      StartFastingButton(onStartFasting, Modifier.fillMaxWidth().then(motion.action))
     }
   }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun Eyebrow(state: IdleHeroState, modifier: Modifier = Modifier) {
-  Row(
+private fun StartFastingButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+  SizedButton(
+    text = stringResource(R.string.start_fasting),
+    icon = DesignSystemR.drawable.play_arrow_24px,
+    height = ButtonDefaults.LargeContainerHeight,
+    onClick = onClick,
     modifier = modifier,
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Icon(
-      painter = painterResource(state.eyebrowIcon),
-      contentDescription = null,
-      modifier = Modifier.size(20.dp),
-    )
-    Text(state.eyebrow, style = MaterialTheme.typography.labelLargeEmphasized)
-  }
+  )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

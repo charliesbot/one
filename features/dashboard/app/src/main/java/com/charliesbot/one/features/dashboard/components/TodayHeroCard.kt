@@ -1,7 +1,9 @@
 package com.charliesbot.one.features.dashboard.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -14,28 +16,41 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 
 private const val PrimaryActionKey = "today-primary-action"
 private const val HeroNumberKey = "today-hero-number"
+
+/** What the card shows while fasting: the dial's state and the editable details. */
+internal data class ActiveHero(val dial: ActiveHeroState, val details: FastDetailsState)
 
 /**
  * Modifiers that tie one hero content's pieces into the start/end transition. Contents apply them
@@ -52,11 +67,7 @@ internal class HeroMotion(
   val support: Modifier,
   /** True when this content arrives through a start or end, false when it is shown on load. */
   val isEntering: Boolean,
-) {
-  companion object {
-    val None = HeroMotion(Modifier, Modifier, Modifier, Modifier, isEntering = false)
-  }
-}
+)
 
 /**
  * The Today hero: one card that stays on screen when a fast starts or ends, and changes state with
@@ -68,16 +79,13 @@ internal class HeroMotion(
  * 5. supporting text settles in last. Ending a fast plays the same choreography in reverse. On load
  *    the current state just appears.
  *
- * [active] is the last known active content; it stays set briefly after a fast ends so the outgoing
- * content can animate out.
+ * [active] is null when no fast is running.
  */
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun TodayHeroCard(
-  isFasting: Boolean,
   idle: IdleHeroState,
-  active: ActiveHeroState?,
-  details: FastDetailsState?,
+  active: ActiveHero?,
   wide: Boolean,
   dialSize: Dp,
   onStartFasting: () -> Unit,
@@ -89,7 +97,7 @@ internal fun TodayHeroCard(
   val motion = MaterialTheme.motionScheme
   val colors = MaterialTheme.colorScheme
   val haptics = LocalHapticFeedback.current
-  val dip = rememberStateChangeDip(isFasting, motion)
+  val dip = rememberStateChangeDip(isFasting = active != null, motion)
 
   Card(
     modifier =
@@ -105,8 +113,11 @@ internal fun TodayHeroCard(
       ),
   ) {
     SharedTransitionLayout {
+      // Keyed on whether a fast is running: clock ticks update the content in place, and the
+      // outgoing content keeps its last state while it animates out.
       AnimatedContent(
-        targetState = isFasting && active != null && details != null,
+        targetState = active,
+        contentKey = { it != null },
         transitionSpec = {
           // The pieces carry the motion; the content as a whole only fades, quickly.
           (fadeIn(motion.fastEffectsSpec()) togetherWith fadeOut(motion.fastEffectsSpec())).using(
@@ -114,12 +125,11 @@ internal fun TodayHeroCard(
           )
         },
         label = "today-hero",
-      ) { showActive ->
+      ) { shown ->
         val heroMotion = rememberHeroMotion(this@SharedTransitionLayout, this, motion)
-        if (showActive && active != null && details != null) {
+        if (shown != null) {
           ActiveHeroContent(
-            state = active,
-            details = details,
+            active = shown,
             wide = wide,
             dialSize = dialSize,
             motion = heroMotion,
@@ -147,6 +157,24 @@ internal fun TodayHeroCard(
   }
 }
 
+/** A small label with its icon, such as "Next fast" on the idle card or "Fasting" in the dial. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun Eyebrow(text: String, @DrawableRes icon: Int, modifier: Modifier = Modifier) {
+  Row(
+    modifier = modifier,
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Icon(
+      painter = painterResource(icon),
+      contentDescription = null,
+      modifier = Modifier.size(20.dp),
+    )
+    Text(text, style = MaterialTheme.typography.labelLargeEmphasized)
+  }
+}
+
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun rememberHeroMotion(
@@ -156,25 +184,27 @@ private fun rememberHeroMotion(
 ): HeroMotion {
   // Content composed mid-transition starts in PreEnter; content shown on load starts Visible.
   val isEntering = remember { visibility.transition.currentState == EnterExitState.PreEnter }
+  val sharedEnter = fadeIn(motion.defaultEffectsSpec())
+  val sharedExit = fadeOut(motion.fastEffectsSpec())
+  val boundsTransform = BoundsTransform { _, _ -> motion.defaultSpatialSpec() }
   with(shared) {
     with(visibility) {
-      val sharedFade = fadeIn(motion.defaultEffectsSpec()) to fadeOut(motion.fastEffectsSpec())
       return HeroMotion(
         action =
           Modifier.sharedBounds(
             sharedContentState = rememberSharedContentState(PrimaryActionKey),
             animatedVisibilityScope = visibility,
-            enter = sharedFade.first,
-            exit = sharedFade.second,
-            boundsTransform = { _: Rect, _: Rect -> motion.defaultSpatialSpec() },
+            enter = sharedEnter,
+            exit = sharedExit,
+            boundsTransform = boundsTransform,
           ),
         number =
           Modifier.sharedBounds(
             sharedContentState = rememberSharedContentState(HeroNumberKey),
             animatedVisibilityScope = visibility,
-            enter = sharedFade.first,
-            exit = sharedFade.second,
-            boundsTransform = { _: Rect, _: Rect -> motion.defaultSpatialSpec() },
+            enter = sharedEnter,
+            exit = sharedExit,
+            boundsTransform = boundsTransform,
             // Text scales between the two sizes; re-measuring it would rewrap mid-morph.
             resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
           ),
@@ -205,15 +235,15 @@ private fun rememberHeroMotion(
 @Composable
 private fun rememberStateChangeDip(isFasting: Boolean, motion: MotionScheme): Animatable<Float, *> {
   val dip = remember { Animatable(1f) }
-  val lastState = remember { BooleanHolder(isFasting) }
-  LaunchedEffect(isFasting) {
-    if (lastState.value != isFasting) {
-      lastState.value = isFasting
-      dip.animateTo(0.97f, motion.fastSpatialSpec())
-      dip.animateTo(1f, motion.defaultSpatialSpec())
-    }
+  val current by rememberUpdatedState(isFasting)
+  LaunchedEffect(Unit) {
+    // The first value is the state on load; only later changes dip.
+    snapshotFlow { current }
+      .drop(1)
+      .collectLatest {
+        dip.animateTo(0.97f, motion.fastSpatialSpec())
+        dip.animateTo(1f, motion.defaultSpatialSpec())
+      }
   }
   return dip
 }
-
-private class BooleanHolder(var value: Boolean)

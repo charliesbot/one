@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,13 +35,12 @@ internal data class ActiveHeroState(
 
 /**
  * The active hero's content: the fast dial around the elapsed time, and End fast. [wide] puts the
- * dial on the left with the Started and Goal rows and End fast beside it; on phones those rows sit
- * under the card instead. [motion] ties the dial, timer and End fast into the transition.
+ * dial on the left with the Started and Goal tiles and End fast beside it; on phones those tiles
+ * sit under the card instead. [motion] ties the dial, timer and End fast into the transition.
  */
 @Composable
 internal fun ActiveHeroContent(
-  state: ActiveHeroState,
-  details: FastDetailsState,
+  active: ActiveHero,
   wide: Boolean,
   dialSize: Dp,
   motion: HeroMotion,
@@ -51,37 +48,22 @@ internal fun ActiveHeroContent(
   onEditStart: () -> Unit,
   onEditGoal: () -> Unit,
 ) {
-  val endButton: @Composable (Modifier) -> Unit = { buttonModifier ->
-    SizedButton(
-      text = stringResource(R.string.end_fast),
-      icon = DesignSystemR.drawable.stop_24px,
-      height = ButtonDefaults.MediumContainerHeight,
-      onClick = onEndFast,
-      // Squarer than Start fasting's pill: like Play turning into Pause, the shape marks the state.
-      shapes =
-        ButtonDefaults.shapes(
-          shape = RoundedCornerShape(16.dp),
-          pressedShape = RoundedCornerShape(8.dp),
-        ),
-      modifier = buttonModifier.then(motion.action),
-    )
-  }
   if (wide) {
     Row(
       modifier = Modifier.padding(horizontal = 40.dp, vertical = 20.dp),
       horizontalArrangement = Arrangement.spacedBy(40.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      ActiveFastDial(state, dialSize, motion)
+      ActiveFastDial(active.dial, dialSize, motion)
       Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         FastDetails(
           modifier = motion.support,
-          state = details,
+          state = active.details,
           onEditStart = onEditStart,
           onEditGoal = onEditGoal,
           stacked = true,
         )
-        endButton(Modifier.fillMaxWidth())
+        EndFastButton(onEndFast, Modifier.fillMaxWidth().then(motion.action))
       }
     }
   } else {
@@ -90,8 +72,8 @@ internal fun ActiveHeroContent(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      ActiveFastDial(state, dialSize, motion)
-      endButton(Modifier.fillMaxWidth())
+      ActiveFastDial(active.dial, dialSize, motion)
+      EndFastButton(onEndFast, Modifier.fillMaxWidth().then(motion.action))
     }
   }
 }
@@ -106,21 +88,11 @@ private fun ActiveFastDial(state: ActiveHeroState, size: Dp, motion: HeroMotion)
   LaunchedEffect(state.progress) { progress.animateTo(state.progress, progressSpec) }
   FastDial(progress = { progress.value }, size = size, arcModifier = motion.lead) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-      Row(
+      Eyebrow(
+        text = stringResource(R.string.fasting_now),
+        icon = DesignSystemR.drawable.local_fire_department_filled_24px,
         modifier = motion.support,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Icon(
-          painter = painterResource(DesignSystemR.drawable.local_fire_department_filled_24px),
-          contentDescription = null,
-          modifier = Modifier.size(20.dp),
-        )
-        Text(
-          stringResource(R.string.fasting_now),
-          style = MaterialTheme.typography.labelLargeEmphasized,
-        )
-      }
+      )
       // Long fasts ("100:00:00") or large font scales shrink to fit instead of clipping digits.
       Row(motion.number.scaleToFitWidth()) {
         RollingText(
@@ -141,4 +113,21 @@ private fun ActiveFastDial(state: ActiveHeroState, size: Dp, motion: HeroMotion)
       )
     }
   }
+}
+
+/** Squarer than Start fasting's pill: like Play turning into Pause, the shape marks the state. */
+@Composable
+private fun EndFastButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+  SizedButton(
+    text = stringResource(R.string.end_fast),
+    icon = DesignSystemR.drawable.stop_24px,
+    height = ButtonDefaults.MediumContainerHeight,
+    onClick = onClick,
+    shapes =
+      ButtonDefaults.shapes(
+        shape = RoundedCornerShape(16.dp),
+        pressedShape = RoundedCornerShape(8.dp),
+      ),
+    modifier = modifier,
+  )
 }

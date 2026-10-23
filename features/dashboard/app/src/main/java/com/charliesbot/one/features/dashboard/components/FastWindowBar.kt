@@ -31,6 +31,16 @@ import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 /** One end of the fast window: a small day name over the time. */
 internal data class WindowEdge(val day: String, val time: String)
 
+/** The idle card's fast window, from start to goal, with bedtime when it falls inside. */
+internal data class FastWindowTimelineState(
+  val start: WindowEdge,
+  val end: WindowEdge,
+  val bedtimeFraction: Float?,
+  val bedtimeLabel: String?,
+  /** What a screen reader says for the whole timeline. */
+  val description: String,
+)
+
 private val TrackHeight = 16.dp
 private val MarkerSize = 8.dp
 
@@ -43,17 +53,13 @@ private val BedtimeLabelRange = 0.18f..0.82f
  * user sees how much of the fast happens while asleep.
  */
 @Composable
-internal fun FastWindowTimeline(
-  start: WindowEdge,
-  end: WindowEdge,
-  bedtimeFraction: Float?,
-  bedtimeLabel: String?,
-  description: String,
-  modifier: Modifier = Modifier,
-) {
+internal fun FastWindowTimeline(state: FastWindowTimelineState, modifier: Modifier = Modifier) {
   val colors = MaterialTheme.colorScheme
+  val bedtimeFraction = state.bedtimeFraction
+  val bedtimeLabel = state.bedtimeLabel
   Column(
-    modifier = modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = description },
+    modifier =
+      modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = state.description },
     verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(TrackHeight)) {
@@ -72,8 +78,8 @@ internal fun FastWindowTimeline(
       }
     }
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-      EdgeLabel(start, TextAlign.Start, Modifier.align(Alignment.TopStart))
-      EdgeLabel(end, TextAlign.End, Modifier.align(Alignment.TopEnd))
+      EdgeLabel(state.start, TextAlign.Start, Modifier.align(Alignment.TopStart))
+      EdgeLabel(state.end, TextAlign.End, Modifier.align(Alignment.TopEnd))
       if (bedtimeFraction != null && bedtimeLabel != null && bedtimeFraction in BedtimeLabelRange) {
         val labelWidth = 96.dp
         Row(

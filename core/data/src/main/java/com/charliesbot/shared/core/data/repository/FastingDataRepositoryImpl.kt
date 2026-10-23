@@ -238,7 +238,7 @@ class FastingDataRepositoryImpl(context: Context, private val dataStore: DataSto
 
   /**
    * An unreadable store reads as empty, so the flows still emit their defaults and anything waiting
-   * for the first state (like the launch screen) isn't left waiting forever.
+   * for the first state (like the Today screen's hero) isn't left waiting forever.
    */
   private suspend fun FlowCollector<Preferences>.handleDataStoreError(
     exception: Throwable,

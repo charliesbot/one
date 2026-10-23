@@ -73,7 +73,6 @@ internal fun FastDetails(
   }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DetailTile(
   badgeShape: RoundedPolygon,
@@ -94,48 +93,14 @@ private fun DetailTile(
     colors = CardDefaults.cardColors(containerColor = containerColor, contentColor = contentColor),
   ) {
     // A light badge with the icon in the tile's accent (a soft grey in dark mode).
-    val badge: @Composable () -> Unit = {
-      ShapeBadge(
-        shape = badgeShape,
-        icon = badgeIcon,
-        containerColor = MaterialTheme.colorScheme.surfaceBright,
-        contentColor = badgeContentColor,
-      )
-    }
-    val text: @Composable (Modifier) -> Unit = { textModifier ->
-      Column(textModifier) {
-        Text(
-          label,
-          style = MaterialTheme.typography.labelLarge,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-        // At large font scales the time shrinks to fit instead of wrapping.
-        Row(Modifier.scaleToFitWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-          Text(
-            clock.time,
-            style = TodayTextStyles.TileValue,
-            maxLines = 1,
-            modifier = Modifier.alignByBaseline(),
-          )
-          clock.period?.let {
-            Text(
-              it,
-              style = MaterialTheme.typography.labelLargeEmphasized,
-              maxLines = 1,
-              modifier = Modifier.alignByBaseline(),
-            )
-          }
-        }
-      }
-    }
+    val badgeColor = MaterialTheme.colorScheme.surfaceBright
     if (stacked) {
       Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        badge()
-        text(Modifier)
+        ShapeBadge(badgeShape, badgeIcon, badgeColor, badgeContentColor)
+        DetailTileText(label, clock)
       }
     } else {
       Row(
@@ -143,8 +108,38 @@ private fun DetailTile(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        badge()
-        text(Modifier.weight(1f))
+        ShapeBadge(badgeShape, badgeIcon, badgeColor, badgeContentColor)
+        DetailTileText(label, clock, Modifier.weight(1f))
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun DetailTileText(label: String, clock: ClockText, modifier: Modifier = Modifier) {
+  Column(modifier) {
+    Text(
+      label,
+      style = MaterialTheme.typography.labelLarge,
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis,
+    )
+    // At large font scales the time shrinks to fit instead of wrapping.
+    Row(Modifier.scaleToFitWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+      Text(
+        clock.time,
+        style = TodayTextStyles.TileValue,
+        maxLines = 1,
+        modifier = Modifier.alignByBaseline(),
+      )
+      clock.period?.let {
+        Text(
+          it,
+          style = MaterialTheme.typography.labelLargeEmphasized,
+          maxLines = 1,
+          modifier = Modifier.alignByBaseline(),
+        )
       }
     }
   }

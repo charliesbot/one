@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 
+private val BadgeIconSize = 20.dp
+
 /** An icon on a Material library shape, such as the Sunny "goal reached" mark. */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -28,7 +30,6 @@ internal fun ShapeBadge(
   contentColor: Color,
   modifier: Modifier = Modifier,
   size: Dp = 40.dp,
-  iconSize: Dp = 20.dp,
 ) {
   Box(
     modifier = modifier.size(size).clip(shape.toShape()).background(containerColor),
@@ -38,7 +39,7 @@ internal fun ShapeBadge(
       painter = painterResource(icon),
       contentDescription = null,
       tint = contentColor,
-      modifier = Modifier.size(iconSize),
+      modifier = Modifier.size(BadgeIconSize),
     )
   }
 }

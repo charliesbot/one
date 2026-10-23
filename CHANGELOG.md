@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Starting or ending a fast now animates the Today card from one state to the other, with a light haptic tap
 - When no start time is suggested, Today shows when a fast started now would finish
 - The week strip marks completed days with a goal shape and upcoming days with dots
-- On tablets, foldables and desktop windows, navigation moves to a side rail and Today uses a wider layout with the goal picker or fast window beside the week
+- On tablets and foldables, navigation moves to a side rail; on large tablets and desktop windows, Today also uses a wider layout with the goal picker or fast window beside the week
 
 ### Fixed
 

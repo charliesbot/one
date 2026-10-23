@@ -51,6 +51,7 @@
     <string name="goal_hours_label">Meta de %1$s h</string>
     <string name="this_week">Esta semana</string>
     <string name="fast_window">Ventana de ayuno</string>
+    <string name="fast_window_description">Ventana de ayuno, %1$d%% completado, de %2$s a %3$s</string>
     <string name="asleep_since">Dormido desde las %1$s</string>
     <string name="bedtime_at">A dormir a las %1$s</string>
     <string name="fasting_goal">Meta de ayuno</string>

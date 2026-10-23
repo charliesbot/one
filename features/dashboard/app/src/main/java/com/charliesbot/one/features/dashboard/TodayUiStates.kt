@@ -8,6 +8,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.charliesbot.one.features.dashboard.components.ActiveHeroState
 import com.charliesbot.one.features.dashboard.components.FastDetailsState
+import com.charliesbot.one.features.dashboard.components.FastWindowCardState
+import com.charliesbot.one.features.dashboard.components.FastWindowTimelineState
 import com.charliesbot.one.features.dashboard.components.GoalOption
 import com.charliesbot.one.features.dashboard.components.IdleHeroState
 import com.charliesbot.one.features.dashboard.components.WindowEdge
@@ -28,6 +30,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 /** Locale, clock style and zone for turning times into the Today screen's text. */
 internal data class TimeFormatting(val locale: Locale, val is24Hour: Boolean, val zone: ZoneId) {
@@ -86,70 +89,75 @@ internal fun idleHeroState(
   nowMillis: Long,
   format: TimeFormatting,
 ): IdleHeroState {
+  if (suggestion == null) {
+    val window = FastWindow.create(nowMillis, goal.durationMillis, bedtimeMinutes, format.zone)
+    return IdleHeroState(
+      eyebrow = stringResource(R.string.start_now_finish_at),
+      eyebrowIcon = DesignSystemR.drawable.flag_24px,
+      clock = format.clock(window.endMillis),
+      detail =
+        stringResource(
+          R.string.finish_from_now,
+          relativeDay(window.endMillis, nowMillis, format),
+          durationText(goal.durationMillis),
+        ),
+      window = fastWindowTimelineState(window, stringResource(R.string.starts_now), format),
+      goalLabel = goalShortName(goal),
+    )
+  }
   // The suggestion's timestamp is computed once and goes stale; its time of day does not.
-  val startMillis =
-    suggestion?.let { suggestedStartMillis(it.suggestedTimeMinutes, nowMillis, format.zone) }
-      ?: nowMillis
+  val startMillis = suggestedStartMillis(suggestion.suggestedTimeMinutes, nowMillis, format.zone)
   val window = FastWindow.create(startMillis, goal.durationMillis, bedtimeMinutes, format.zone)
-  val startEdgeTime =
-    if (suggestion == null) stringResource(R.string.starts_now)
-    else format.compactClock(window.startMillis)
-  val windowStart = WindowEdge(format.shortDay(window.startMillis), startEdgeTime)
-  val windowEnd =
-    WindowEdge(format.shortDay(window.endMillis), format.compactClock(window.endMillis))
-  val bedtimeLabel = window.bedtimeMillis?.let { format.compactClock(it) }
+  val untilStart = window.startMillis - nowMillis
+  val countdown =
+    if (untilStart < 60_000L) stringResource(R.string.starts_now)
+    else stringResource(R.string.starts_in, durationText(untilStart))
+  return IdleHeroState(
+    eyebrow = stringResource(R.string.next_fast),
+    eyebrowIcon = DesignSystemR.drawable.bedtime_24px,
+    clock = format.clock(window.startMillis),
+    detail = suggestionDetail(suggestion.source, countdown, window, format),
+    window = fastWindowTimelineState(window, format.compactClock(window.startMillis), format),
+    goalLabel = goalShortName(goal),
+  )
+}
 
-  val eyebrow: String
-  val eyebrowIcon: Int
-  val clock: ClockText
-  val detail: String
-  if (suggestion != null) {
-    eyebrow = stringResource(R.string.next_fast)
-    eyebrowIcon = DesignSystemR.drawable.bedtime_24px
-    clock = format.clock(window.startMillis)
-    val untilStart = window.startMillis - nowMillis
-    val countdown =
-      if (untilStart < 60_000L) stringResource(R.string.starts_now)
-      else stringResource(R.string.starts_in, durationText(untilStart))
-    detail =
-      when (suggestion.source) {
-        SuggestionSource.BEDTIME_BASED ->
-          window.bedtimeMillis?.let { bedtime ->
-            stringResource(
-              R.string.next_fast_reason_bedtime,
-              countdown,
-              durationText(bedtime - window.startMillis),
-              format.compactClock(bedtime),
-            )
-          } ?: countdown
-        SuggestionSource.MOVING_AVERAGE ->
-          stringResource(R.string.next_fast_reason_average, countdown)
-        SuggestionSource.FIXED_TIME -> stringResource(R.string.next_fast_reason_fixed, countdown)
-      }
-  } else {
-    eyebrow = stringResource(R.string.start_now_finish_at)
-    eyebrowIcon = DesignSystemR.drawable.flag_24px
-    clock = format.clock(window.endMillis)
-    detail =
-      stringResource(
-        R.string.finish_from_now,
-        relativeDay(window.endMillis, nowMillis, format),
-        durationText(goal.durationMillis),
-      )
+/** Why the suggested time was picked, after the countdown to it. */
+@Composable
+private fun suggestionDetail(
+  source: SuggestionSource,
+  countdown: String,
+  window: FastWindow,
+  format: TimeFormatting,
+): String =
+  when (source) {
+    SuggestionSource.BEDTIME_BASED ->
+      window.bedtimeMillis?.let { bedtime ->
+        stringResource(
+          R.string.next_fast_reason_bedtime,
+          countdown,
+          durationText(bedtime - window.startMillis),
+          format.compactClock(bedtime),
+        )
+      } ?: countdown
+    SuggestionSource.MOVING_AVERAGE -> stringResource(R.string.next_fast_reason_average, countdown)
+    SuggestionSource.FIXED_TIME -> stringResource(R.string.next_fast_reason_fixed, countdown)
   }
 
-  return IdleHeroState(
-    eyebrow = eyebrow,
-    eyebrowIcon = eyebrowIcon,
-    clock = clock,
-    detail = detail,
-    windowStart = windowStart,
-    windowEnd = windowEnd,
+/** The idle timeline for [window]; [startTime] is "Now" or the start's clock time. */
+private fun fastWindowTimelineState(
+  window: FastWindow,
+  startTime: String,
+  format: TimeFormatting,
+): FastWindowTimelineState {
+  val start = WindowEdge(format.shortDay(window.startMillis), startTime)
+  val end = WindowEdge(format.shortDay(window.endMillis), format.compactClock(window.endMillis))
+  return FastWindowTimelineState(
+    start = start,
+    end = end,
     bedtimeFraction = window.bedtimeFraction,
-    bedtimeLabel = bedtimeLabel,
-    windowDescription =
-      "${windowStart.day} ${windowStart.time} – ${windowEnd.day} ${windowEnd.time}",
-    goalLabel = goalShortName(goal),
+    bedtimeLabel = window.bedtimeMillis?.let { format.compactClock(it) },
+    description = "${start.day} ${start.time} – ${end.day} ${end.time}",
   )
 }
 
@@ -225,3 +233,32 @@ internal fun goalOptions(goals: List<FastGoal>): List<GoalOption> =
         "${goalShortName(goal)} · ${stringResource(R.string.duration_hours, TimeUnit.MILLISECONDS.toHours(goal.durationMillis))}",
     )
   }
+
+/** The large-screen fast window card for the fast in progress. */
+@Composable
+internal fun fastWindowCardState(
+  window: FastWindow,
+  nowMillis: Long,
+  format: TimeFormatting,
+): FastWindowCardState {
+  val progress = window.progressAt(nowMillis)
+  val start = "${format.shortDay(window.startMillis)}, ${format.compactClock(window.startMillis)}"
+  val end = "${format.shortDay(window.endMillis)}, ${format.compactClock(window.endMillis)}"
+  return FastWindowCardState(
+    progress = progress,
+    bedtimeFraction = window.bedtimeFraction,
+    start = start,
+    end = end,
+    bedtimeNote = bedtimeNote(window, nowMillis, format),
+    description =
+      stringResource(R.string.fast_window_description, (progress * 100).roundToInt(), start, end),
+  )
+}
+
+@Composable
+private fun bedtimeNote(window: FastWindow, nowMillis: Long, format: TimeFormatting): String? {
+  val bedtime = window.bedtimeMillis ?: return null
+  val time = format.compactClock(bedtime)
+  return if (bedtime <= nowMillis) stringResource(R.string.asleep_since, time)
+  else stringResource(R.string.bedtime_at, time)
+}
