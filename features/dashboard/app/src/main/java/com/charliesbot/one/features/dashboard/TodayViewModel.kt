@@ -40,24 +40,27 @@ class TodayViewModel(
   private val customGoalRepository: CustomGoalRepository,
   goalResolver: GoalResolver,
 ) : ViewModel() {
-  private val currentFasting: StateFlow<FastingDataItem?> =
+  // Null until the store loads, so "not loaded yet" differs from "loaded, nothing stored".
+  private val currentFasting: StateFlow<LoadedFasting?> =
     observeFastingStateUseCase()
+      .map(::LoadedFasting)
       .stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),
         initialValue = null,
       )
-  val isFasting: StateFlow<Boolean> =
+  /** Null until the stored fasting state loads, so the UI doesn't show (or animate from) idle. */
+  val isFasting: StateFlow<Boolean?> =
     currentFasting
-      .map { it?.isFasting ?: false }
-      .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+      .map { loaded -> loaded?.let { it.item?.isFasting ?: false } }
+      .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
   val startTimeInMillis: StateFlow<Long> =
     currentFasting
-      .map { it?.startTimeInMillis ?: -1L }
+      .map { it?.item?.startTimeInMillis ?: -1L }
       .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), -1L)
   val fastingGoalId: StateFlow<String> =
     currentFasting
-      .map { it?.fastingGoalId ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id }
+      .map { it?.item?.fastingGoalId ?: PredefinedFastingGoals.SIXTEEN_EIGHT.id }
       .stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
@@ -88,6 +91,16 @@ class TodayViewModel(
       viewModelScope,
       SharingStarted.WhileSubscribed(5000L),
       false,
+    )
+
+  /**
+   * Bedtime as minutes from midnight; null until settings load. Marks bedtime on the fast window.
+   */
+  val bedtimeMinutes: StateFlow<Int?> =
+    settingsRepository.bedtimeMinutes.stateIn(
+      viewModelScope,
+      SharingStarted.WhileSubscribed(5000L),
+      null,
     )
 
   private val _suggestedFastingTime = MutableStateFlow<SuggestedFastingTime?>(null)
@@ -181,3 +194,5 @@ class TodayViewModel(
     }
   }
 }
+
+private data class LoadedFasting(val item: FastingDataItem?)

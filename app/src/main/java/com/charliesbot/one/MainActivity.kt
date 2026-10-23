@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -32,6 +34,7 @@ import org.koin.android.ext.android.inject
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MainActivity : ComponentActivity() {
   private val phoneWidgetRefreshScheduler: WidgetRefreshScheduler by inject()
+  private var isTodayReady = false
 
   private val requestNotificationPermission =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -49,6 +52,7 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     updateWidgetPreview(this)
+    keepSplashScreenUntilTodayIsReady()
     setContent {
       var showNotificationPermission by remember { mutableStateOf(false) }
       var selectedItem by remember { mutableIntStateOf(0) }
@@ -71,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
       OneTheme {
         Box(modifier = Modifier.fillMaxSize()) {
-          MainNavigation()
+          MainNavigation(onTodayReady = { isTodayReady = true })
 
           if (showNotificationPermission) {
             NotificationPermissionDialog(
@@ -85,5 +89,23 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
+  }
+
+  /**
+   * The system splash screen stays until the first frame is drawn. Holding that frame until Today
+   * has loaded its fasting state means the first thing shown is the whole screen, not a bare header
+   * that fills in a moment later.
+   */
+  private fun keepSplashScreenUntilTodayIsReady() {
+    val content: View = findViewById(android.R.id.content)
+    content.viewTreeObserver.addOnPreDrawListener(
+      object : ViewTreeObserver.OnPreDrawListener {
+        override fun onPreDraw(): Boolean {
+          if (!isTodayReady) return false
+          content.viewTreeObserver.removeOnPreDrawListener(this)
+          return true
+        }
+      }
+    )
   }
 }

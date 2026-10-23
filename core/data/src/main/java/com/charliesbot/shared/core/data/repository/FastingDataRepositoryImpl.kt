@@ -7,6 +7,7 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
@@ -19,6 +20,7 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.PutDataRequest
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -234,11 +236,17 @@ class FastingDataRepositoryImpl(context: Context, private val dataStore: DataSto
     }
   }
 
-  private fun handleDataStoreError(exception: Throwable, flowName: String) {
+  /**
+   * An unreadable store reads as empty, so the flows still emit their defaults and anything waiting
+   * for the first state (like the launch screen) isn't left waiting forever.
+   */
+  private suspend fun FlowCollector<Preferences>.handleDataStoreError(
+    exception: Throwable,
+    flowName: String,
+  ) {
     if (exception is IOException) {
       Log.e(LOG_TAG, "Repo: IOException reading DataStore for $flowName", exception)
-      // Optionally emit a default value or let the flow complete
-      // Depending on the context, re-throwing might be appropriate if it's unexpected
+      emit(emptyPreferences())
     } else {
       // Re-throw other critical exceptions
       Log.e(LOG_TAG, "Repo: Unexpected error reading DataStore for $flowName", exception)

@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Redesigned the Today screen in Material 3 Expressive: the next fast now shows its start time, a fast window with your bedtime, and one large Start button; an active fast shows a progress dial with tappable Started and Goal tiles
+- Starting or ending a fast now animates the Today card from one state to the other, with a light haptic tap
+- When no start time is suggested, Today shows when a fast started now would finish
+- The week strip marks completed days with a goal shape and upcoming days with dots
+- On tablets, foldables and desktop windows, navigation moves to a side rail and Today uses a wider layout with the goal picker or fast window beside the week
+
 ### Fixed
 
 - Home screen widget now refreshes fasting progress approximately hourly without opening the app; Android battery restrictions may delay updates

@@ -15,9 +15,9 @@ fun calculateWindowSizeClass(): WindowSizeClass {
 
 // window is at least 840dp wide
 @Composable
-fun isWidthAtLeastMedium(): Boolean {
+fun isWidthAtLeastExpanded(): Boolean {
   val sizeClass = calculateWindowSizeClass()
-  return sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+  return sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 }
 
 @Composable

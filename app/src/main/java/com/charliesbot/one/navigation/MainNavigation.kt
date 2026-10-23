@@ -1,17 +1,27 @@
 package com.charliesbot.one.navigation
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarArrangement
+import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRail
+import androidx.compose.material3.WideNavigationRailItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entryProvider
@@ -21,78 +31,96 @@ import com.charliesbot.one.features.profile.YouScreen
 import com.charliesbot.one.features.settings.SettingsScreen
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.strings.R as SharedR
+import com.charliesbot.shared.core.utils.isWidthAtLeastExpanded
 
+private data class TopLevelDestination(
+  val route: NavigationRoute,
+  @param:DrawableRes val icon: Int,
+  @param:StringRes val label: Int,
+)
+
+private val topLevelDestinations =
+  listOf(
+    TopLevelDestination(Today, DesignSystemR.drawable.today_24px, SharedR.string.nav_today),
+    TopLevelDestination(You, DesignSystemR.drawable.person_24px, SharedR.string.nav_you),
+    TopLevelDestination(
+      Settings,
+      DesignSystemR.drawable.settings_24px,
+      SharedR.string.settings_title,
+    ),
+  )
+
+/**
+ * Top-level navigation: a bottom bar below 840dp, a side rail from 840dp up. It always opens on
+ * Today, which calls [onTodayReady] once its content is composed.
+ */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun MainNavigation() {
-  val backStack = remember { mutableStateListOf<Any>(Today) }
+fun MainNavigation(onTodayReady: () -> Unit) {
+  val backStack = remember { mutableStateListOf<NavigationRoute>(Today) }
   val currentDestination = backStack.lastOrNull() ?: Today
+  val navigateTo: (NavigationRoute) -> Unit = { route ->
+    if (currentDestination != route) {
+      backStack.clear()
+      backStack.add(route)
+    }
+  }
+  val useRail = isWidthAtLeastExpanded()
 
   Scaffold(
     bottomBar = {
-      NavigationBar {
-        NavigationBarItem(
-          icon = {
-            Icon(
-              painter = painterResource(DesignSystemR.drawable.today_24px),
-              contentDescription = stringResource(SharedR.string.nav_today),
+      if (!useRail) {
+        ShortNavigationBar(arrangement = ShortNavigationBarArrangement.EqualWeight) {
+          topLevelDestinations.forEach { destination ->
+            ShortNavigationBarItem(
+              selected = currentDestination == destination.route,
+              onClick = { navigateTo(destination.route) },
+              icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+              label = { Text(stringResource(destination.label)) },
             )
-          },
-          label = { Text(stringResource(SharedR.string.nav_today)) },
-          selected = currentDestination == Today,
-          onClick = {
-            if (currentDestination != Today) {
-              backStack.clear()
-              backStack.add(Today)
-            }
-          },
-        )
-        NavigationBarItem(
-          icon = {
-            Icon(
-              painterResource(DesignSystemR.drawable.person_24px),
-              contentDescription = stringResource(SharedR.string.nav_you),
-            )
-          },
-          label = { Text(stringResource(SharedR.string.nav_you)) },
-          selected = currentDestination == You,
-          onClick = {
-            if (currentDestination != You) {
-              backStack.clear()
-              backStack.add(You)
-            }
-          },
-        )
-        NavigationBarItem(
-          icon = {
-            Icon(
-              painterResource(DesignSystemR.drawable.settings_24px),
-              contentDescription = stringResource(SharedR.string.settings_title),
-            )
-          },
-          label = { Text(stringResource(SharedR.string.settings_title)) },
-          selected = currentDestination == Settings,
-          onClick = {
-            if (currentDestination != Settings) {
-              backStack.clear()
-              backStack.add(Settings)
-            }
-          },
-        )
+          }
+        }
       }
     }
   ) { innerPadding ->
-    Box(modifier = Modifier.padding(innerPadding)) {
-      NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryProvider =
-          entryProvider {
-            entry<Today> { TodayScreen() }
-            entry<You> { YouScreen() }
-            entry<Settings> { SettingsScreen() }
-          },
-      )
+    Row(Modifier.fillMaxSize()) {
+      if (useRail) {
+        WideNavigationRail {
+          topLevelDestinations.forEach { destination ->
+            WideNavigationRailItem(
+              railExpanded = false,
+              selected = currentDestination == destination.route,
+              onClick = { navigateTo(destination.route) },
+              icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+              label = { Text(stringResource(destination.label)) },
+            )
+          }
+        }
+      }
+      // The rail handles the start inset itself, so the content only takes it without a rail.
+      val layoutDirection = LocalLayoutDirection.current
+      val contentPadding =
+        if (useRail) {
+          PaddingValues(
+            top = innerPadding.calculateTopPadding(),
+            end = innerPadding.calculateEndPadding(layoutDirection),
+            bottom = innerPadding.calculateBottomPadding(),
+          )
+        } else {
+          innerPadding
+        }
+      Box(modifier = Modifier.weight(1f).padding(contentPadding)) {
+        NavDisplay(
+          backStack = backStack,
+          onBack = { backStack.removeLastOrNull() },
+          entryProvider =
+            entryProvider {
+              entry<Today> { TodayScreen(onContentReady = onTodayReady) }
+              entry<You> { YouScreen() }
+              entry<Settings> { SettingsScreen() }
+            },
+        )
+      }
     }
   }
 }
