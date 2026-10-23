@@ -46,12 +46,11 @@ private val topLevelDestinations =
 
 /**
  * Top-level navigation. The navigation suite picks the Expressive bar for a compact width, a
- * compact height or tabletop posture, and the collapsed rail otherwise. It always opens on Today,
- * which calls [onTodayReady] once its content is composed.
+ * compact height or tabletop posture, and the collapsed rail otherwise.
  */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun MainNavigation(onTodayReady: () -> Unit) {
+fun MainNavigation() {
   val backStack = remember { mutableStateListOf<NavigationRoute>(Today) }
   val currentDestination = backStack.lastOrNull() ?: Today
   val navigateTo: (NavigationRoute) -> Unit = { route ->
@@ -85,7 +84,7 @@ fun MainNavigation(onTodayReady: () -> Unit) {
         onBack = { backStack.removeLastOrNull() },
         entryProvider =
           entryProvider {
-            entry<Today> { TodayScreen(onContentReady = onTodayReady) }
+            entry<Today> { TodayScreen() }
             entry<You> { YouScreen() }
             entry<Settings> { SettingsScreen() }
           },

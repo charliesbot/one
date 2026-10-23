@@ -32,7 +32,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -73,12 +72,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-/**
- * [onContentReady] is called once the stored fasting state has loaded and the full screen is
- * composed, so the app can hold its splash screen until then instead of showing a bare header.
- */
 @Composable
-fun TodayScreen(onContentReady: () -> Unit = {}, viewModel: TodayViewModel = koinViewModel()) {
+fun TodayScreen(viewModel: TodayViewModel = koinViewModel()) {
   val isTimePickerDialogOpen by viewModel.isTimePickerDialogOpen.collectAsStateWithLifecycle()
   val isGoalBottomSheetOpen by viewModel.isGoalBottomSheetOpen.collectAsStateWithLifecycle()
   val isFasting by viewModel.isFasting.collectAsStateWithLifecycle()
@@ -111,7 +106,6 @@ fun TodayScreen(onContentReady: () -> Unit = {}, viewModel: TodayViewModel = koi
     allGoals = allGoals,
     nowMillis = nowMillis,
     isWide = isWidthAtLeastExpanded(),
-    onContentReady = onContentReady,
     onStartFasting = viewModel::onStartFasting,
     onStopFasting = viewModel::onStopFasting,
     onOpenTimePickerDialog = viewModel::openTimePickerDialog,
@@ -133,7 +127,7 @@ fun TodayScreen(onContentReady: () -> Unit = {}, viewModel: TodayViewModel = koi
  *
  * [isFasting] is null until the stored state loads; until then only the header (and the week strip
  * on phones) shows, so opening the app mid-fast doesn't flash the idle card and animate into the
- * active one. [onContentReady] fires once the rest is composed.
+ * active one.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -149,7 +143,6 @@ internal fun TodayScreenContent(
   allGoals: List<FastGoal>,
   nowMillis: Long,
   isWide: Boolean,
-  onContentReady: () -> Unit,
   onStartFasting: () -> Unit,
   onStopFasting: () -> Unit,
   onOpenTimePickerDialog: () -> Unit,
@@ -262,7 +255,6 @@ internal fun TodayScreenContent(
         // after loading composes as the initial state instead of animating into it.
         val fasting = isFasting
         if (fasting != null) {
-          SideEffect(onContentReady)
           if (isWide) {
             hero(fasting)
             Row(
@@ -412,7 +404,6 @@ private fun PreviewContent(
     allGoals = PredefinedFastingGoals.allGoals,
     nowMillis = PREVIEW_NOW,
     isWide = isWide,
-    onContentReady = {},
     onStartFasting = {},
     onStopFasting = {},
     onOpenTimePickerDialog = {},

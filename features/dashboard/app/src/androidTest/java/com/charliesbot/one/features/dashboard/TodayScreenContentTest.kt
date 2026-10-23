@@ -13,8 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.charliesbot.shared.core.constants.PredefinedFastingGoals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +23,6 @@ class TodayScreenContentTest {
   @get:Rule val composeRule = createComposeRule()
 
   private var isFasting by mutableStateOf<Boolean?>(null)
-  private var isContentReady = false
 
   private fun setWideContent() {
     composeRule.setContent {
@@ -42,7 +39,6 @@ class TodayScreenContentTest {
           allGoals = emptyList(),
           nowMillis = System.currentTimeMillis(),
           isWide = true,
-          onContentReady = { isContentReady = true },
           onStartFasting = {},
           onStopFasting = {},
           onOpenTimePickerDialog = {},
@@ -68,17 +64,5 @@ class TodayScreenContentTest {
     composeRule.waitForIdle()
 
     assertEquals(loadingLeft, title.getUnclippedBoundsInRoot().left)
-  }
-
-  @Test
-  fun contentIsReadyOnlyOnceTheFastingStateLoads() {
-    setWideContent()
-    composeRule.waitForIdle()
-    assertFalse(isContentReady)
-
-    isFasting = true
-    composeRule.waitForIdle()
-
-    assertTrue(isContentReady)
   }
 }
