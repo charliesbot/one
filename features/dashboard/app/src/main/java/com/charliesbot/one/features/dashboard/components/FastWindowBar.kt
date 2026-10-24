@@ -3,7 +3,7 @@ package com.charliesbot.one.features.dashboard.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import kotlin.math.roundToInt
@@ -65,20 +64,11 @@ internal fun FastWindowTimeline(state: FastWindowTimelineState, modifier: Modifi
     if (bedtimeFraction != null && bedtimeLabel != null) {
       BedtimeAboveMarker(bedtimeLabel, bedtimeFraction)
     }
-    BoxWithConstraints(Modifier.fillMaxWidth().height(TrackHeight)) {
-      // The card's own pair: onPrimaryContainer on primaryContainer, with the marker cut back out.
-      Box(
-        Modifier.fillMaxWidth()
-          .height(TrackHeight)
-          .background(colors.onPrimaryContainer, CircleShape)
-      )
-      bedtimeFraction?.let { fraction ->
-        BedtimeMarker(
-          color = colors.primaryContainer,
-          x = maxWidth * fraction,
-          modifier = Modifier.align(Alignment.CenterStart),
-        )
-      }
+    // The card's own pair: onPrimaryContainer on primaryContainer, with the marker cut back out.
+    Box(
+      Modifier.fillMaxWidth().height(TrackHeight).background(colors.onPrimaryContainer, CircleShape)
+    ) {
+      bedtimeFraction?.let { BedtimeMarker(colors.primaryContainer, fraction = it) }
     }
     Box(Modifier.fillMaxWidth().padding(top = 4.dp)) {
       EdgeLabel(state.start, TextAlign.Start, Modifier.align(Alignment.TopStart))
@@ -121,8 +111,8 @@ private fun BedtimeLabel(time: String) {
 }
 
 /**
- * The active fast window: filled up to now, a slider-style handle at now, the rest as track, and
- * bedtime marked inside the filled part once it has passed.
+ * The active fast window: filled up to now, then a gap and the rest of the track, with bedtime
+ * marked inside the filled part once it has passed.
  */
 @Composable
 internal fun FastWindowProgressBar(
@@ -134,62 +124,20 @@ internal fun FastWindowProgressBar(
   modifier: Modifier = Modifier,
 ) {
   val colors = MaterialTheme.colorScheme
-  val handleGap = 6.dp
   Column(
     modifier = modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = description },
     verticalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    BoxWithConstraints(Modifier.fillMaxWidth().height(32.dp)) {
-      val handleX = maxWidth * progress
-      val fillWidth = (handleX - handleGap).coerceAtLeast(0.dp)
-      val restStart = handleX + handleGap
-      Box(
-        Modifier.align(Alignment.CenterStart)
-          .width(fillWidth)
-          .height(TrackHeight)
-          .background(
-            colors.primary,
-            RoundedCornerShape(
-              topStart = TrackHeight / 2,
-              bottomStart = TrackHeight / 2,
-              topEnd = 4.dp,
-              bottomEnd = 4.dp,
-            ),
-          )
+    Box {
+      // Material's progress bar draws the filled part, the gap at now and the rest of the track.
+      LinearProgressIndicator(
+        progress = { progress },
+        modifier = Modifier.fillMaxWidth().height(TrackHeight),
+        color = colors.primary,
+        trackColor = colors.surfaceContainerHighest,
+        gapSize = 6.dp,
       )
-      if (restStart < maxWidth) {
-        Box(
-          Modifier.align(Alignment.CenterStart)
-            .offset(x = restStart)
-            .width(maxWidth - restStart)
-            .height(TrackHeight)
-            .background(
-              colors.surfaceContainerHighest,
-              RoundedCornerShape(
-                topStart = 4.dp,
-                bottomStart = 4.dp,
-                topEnd = TrackHeight / 2,
-                bottomEnd = TrackHeight / 2,
-              ),
-            )
-        )
-      }
-      Box(
-        Modifier.align(Alignment.CenterStart)
-          .offset(x = handleX - 2.dp)
-          .width(4.dp)
-          .height(32.dp)
-          .background(colors.primary, CircleShape)
-      )
-      bedtimeFraction
-        ?.takeIf { it < progress }
-        ?.let { fraction ->
-          BedtimeMarker(
-            color = colors.onPrimary,
-            x = maxWidth * fraction,
-            modifier = Modifier.align(Alignment.CenterStart),
-          )
-        }
+      bedtimeFraction?.takeIf { it < progress }?.let { BedtimeMarker(colors.onPrimary, it) }
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
       Text(start, style = MaterialTheme.typography.titleSmallEmphasized)
@@ -198,9 +146,22 @@ internal fun FastWindowProgressBar(
   }
 }
 
+/** A dot centered on the bar at [fraction] of its width, from the start. */
 @Composable
-private fun BedtimeMarker(color: Color, x: Dp, modifier: Modifier) {
-  Box(modifier.offset(x = x - MarkerSize / 2).size(MarkerSize).background(color, CircleShape))
+internal fun BoxScope.BedtimeMarker(color: Color, fraction: Float) {
+  Box(
+    Modifier.align(Alignment.CenterStart).fillMaxWidth(fraction),
+    contentAlignment = Alignment.CenterEnd,
+  ) {
+    // Unbounded, so the dot keeps its size when bedtime is at the very start and the box is
+    // narrower than the dot.
+    Box(
+      Modifier.offset(x = MarkerSize / 2)
+        .wrapContentWidth(Alignment.End, unbounded = true)
+        .size(MarkerSize)
+        .background(color, CircleShape)
+    )
+  }
 }
 
 @Composable
