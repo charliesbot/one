@@ -155,7 +155,7 @@ internal fun TodayScreenContent(
     buildWeekDays(
       weekProgress = weeklyProgress,
       today = format.dateTime(nowMillis).dayOfWeek,
-      activeFastProgress = if (isFasting == true) activeWindow.progressAt(nowMillis) else null,
+      activeFastHours = if (isFasting == true) activeWindow.elapsedHoursAt(nowMillis) else null,
     )
 
   val snackbarHostState = remember { SnackbarHostState() }
@@ -204,7 +204,7 @@ internal fun TodayScreenContent(
               .takeIf { isFasting }
               ?.let {
                 ActiveHero(
-                  activeHeroState(it, nowMillis),
+                  activeHeroState(it, nowMillis, format.locale),
                   fastDetailsState(it, goal, nowMillis, format),
                 )
               }

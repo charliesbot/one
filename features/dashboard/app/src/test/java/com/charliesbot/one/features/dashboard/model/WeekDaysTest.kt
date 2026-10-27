@@ -33,7 +33,7 @@ class WeekDaysTest {
 
   @Test
   fun `days map to Monday through Sunday`() {
-    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastProgress = null)
+    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastHours = null)
 
     assertEquals(DayOfWeek.entries.toList(), days.map { it.dayOfWeek })
   }
@@ -41,7 +41,7 @@ class WeekDaysTest {
   @Test
   fun `completed days are done and short fasts show progress toward the minimum`() {
     val days =
-      buildWeekDays(week(16f, 17f, 6.5f), today = DayOfWeek.THURSDAY, activeFastProgress = null)
+      buildWeekDays(week(16f, 17f, 6.5f), today = DayOfWeek.THURSDAY, activeFastHours = null)
 
     assertEquals(WeekDayMark.Done, days[0].mark)
     assertEquals(WeekDayMark.Done, days[1].mark)
@@ -50,7 +50,7 @@ class WeekDaysTest {
 
   @Test
   fun `days after today are upcoming`() {
-    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastProgress = null)
+    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastHours = null)
 
     assertEquals(
       listOf(WeekDayMark.Upcoming, WeekDayMark.Upcoming, WeekDayMark.Upcoming),
@@ -60,30 +60,45 @@ class WeekDaysTest {
 
   @Test
   fun `today without a fast is an empty ring`() {
-    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastProgress = null)
+    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastHours = null)
 
     assertEquals(WeekDayMark.Progress(0f), days[3].mark)
     assertEquals(listOf(DayOfWeek.THURSDAY), days.filter { it.isToday }.map { it.dayOfWeek })
   }
 
   @Test
-  fun `today follows the fast in progress`() {
-    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastProgress = 0.61f)
+  fun `today measures the fast in progress against the minimum, like past days`() {
+    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastHours = 6.5f)
 
-    assertEquals(WeekDayMark.Progress(0.61f), days[3].mark)
+    assertEquals(WeekDayMark.Progress(0.5f), days[3].mark)
   }
 
   @Test
-  fun `today stays done once a fast was completed`() {
-    val days =
-      buildWeekDays(week(0f, 0f, 0f, 14f), today = DayOfWeek.THURSDAY, activeFastProgress = 0.2f)
+  fun `today shows the hours of the fast in progress`() {
+    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastHours = 9f)
+
+    assertEquals(9f, days[3].fastingHours, 0f)
+  }
+
+  @Test
+  fun `today is done once the fast in progress passes the minimum`() {
+    val days = buildWeekDays(week(), today = DayOfWeek.THURSDAY, activeFastHours = 13f)
 
     assertEquals(WeekDayMark.Done, days[3].mark)
   }
 
   @Test
+  fun `today stays done once a fast was completed`() {
+    val days =
+      buildWeekDays(week(0f, 0f, 0f, 14f), today = DayOfWeek.THURSDAY, activeFastHours = 2f)
+
+    assertEquals(WeekDayMark.Done, days[3].mark)
+    assertEquals(14f, days[3].fastingHours, 0f)
+  }
+
+  @Test
   fun `missing history still yields a full week`() {
-    val days = buildWeekDays(emptyList(), today = DayOfWeek.MONDAY, activeFastProgress = null)
+    val days = buildWeekDays(emptyList(), today = DayOfWeek.MONDAY, activeFastHours = null)
 
     assertEquals(7, days.size)
     assertEquals(WeekDayMark.Progress(0f), days[0].mark)

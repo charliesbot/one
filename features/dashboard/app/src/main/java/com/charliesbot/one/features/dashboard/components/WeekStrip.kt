@@ -80,7 +80,7 @@ private fun WeekStripDay(day: WeekDay, showHours: Boolean, modifier: Modifier = 
     if (showHours) {
       val hoursText =
         when {
-          day.isToday && day.mark !is WeekDayMark.Done && day.fastingHours == 0f ->
+          day.isToday && day.mark !is WeekDayMark.Done && day.fastingHours < 1f ->
             stringResource(R.string.day_today)
           day.fastingHours > 0f -> stringResource(R.string.duration_hours, day.fastingHours.toInt())
           else -> "–"

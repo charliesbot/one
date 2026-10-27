@@ -49,6 +49,11 @@
     <string name="goal_reached_over">Goal reached · %1$s over</string>
     <string name="started_on_day">Started %1$s</string>
     <string name="goal_hours_label">%1$sh goal</string>
+    <string name="goal_hours_label_on_day">%1$sh goal · %2$s</string>
+    <string name="fast_window_timeline_description">%1$s fast from %2$s %3$s to %4$s %5$s</string>
+    <string name="fast_window_timeline_description_bedtime">%1$s fast from %2$s %3$s to %4$s %5$s, bedtime at %6$s</string>
+    <string name="day_and_time">%1$s, %2$s</string>
+    <string name="goal_option_label">%1$s · %2$s</string>
     <string name="this_week">This week</string>
     <string name="fast_window">Fast window</string>
     <string name="fast_window_description">Fast window, %1$d%% done, %2$s to %3$s</string>

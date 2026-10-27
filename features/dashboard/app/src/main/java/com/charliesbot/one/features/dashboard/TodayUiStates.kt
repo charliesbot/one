@@ -44,6 +44,13 @@ internal data class TimeFormatting(val locale: Locale, val is24Hour: Boolean, va
 
   fun shortDay(millis: Long): String =
     dateTime(millis).dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
+
+  fun date(millis: Long): LocalDate = dateTime(millis).toLocalDate()
+
+  /** "Thu, 5:03 AM". */
+  @Composable
+  fun dayAndTime(millis: Long): String =
+    stringResource(R.string.day_and_time, shortDay(millis), compactClock(millis))
 }
 
 /** "Thursday, October 23" in the user's locale. */
@@ -101,7 +108,7 @@ internal fun idleHeroState(
           relativeDay(window.endMillis, nowMillis, format),
           durationText(goal.durationMillis),
         ),
-      window = fastWindowTimelineState(window, stringResource(R.string.starts_now), format),
+      window = fastWindowTimelineState(window, stringResource(R.string.starts_now), goal, format),
       goalLabel = goalShortName(goal),
     )
   }
@@ -117,7 +124,7 @@ internal fun idleHeroState(
     eyebrowIcon = DesignSystemR.drawable.bedtime_24px,
     clock = format.clock(window.startMillis),
     detail = suggestionDetail(suggestion.source, countdown, window, format),
-    window = fastWindowTimelineState(window, format.compactClock(window.startMillis), format),
+    window = fastWindowTimelineState(window, format.compactClock(window.startMillis), goal, format),
     goalLabel = goalShortName(goal),
   )
 }
@@ -145,26 +152,50 @@ private fun suggestionDetail(
   }
 
 /** The idle timeline for [window]; [startTime] is "Now" or the start's clock time. */
+@Composable
 private fun fastWindowTimelineState(
   window: FastWindow,
   startTime: String,
+  goal: FastGoal,
   format: TimeFormatting,
 ): FastWindowTimelineState {
   val start = WindowEdge(format.shortDay(window.startMillis), startTime)
   val end = WindowEdge(format.shortDay(window.endMillis), format.compactClock(window.endMillis))
+  val bedtimeLabel = window.bedtimeMillis?.let { format.compactClock(it) }
+  val duration = durationText(goal.durationMillis)
   return FastWindowTimelineState(
     start = start,
     end = end,
     bedtimeFraction = window.bedtimeFraction,
-    bedtimeLabel = window.bedtimeMillis?.let { format.compactClock(it) },
-    description = "${start.day} ${start.time} – ${end.day} ${end.time}",
+    bedtimeLabel = bedtimeLabel,
+    description =
+      if (bedtimeLabel == null) {
+        stringResource(
+          R.string.fast_window_timeline_description,
+          duration,
+          start.day,
+          start.time,
+          end.day,
+          end.time,
+        )
+      } else {
+        stringResource(
+          R.string.fast_window_timeline_description_bedtime,
+          duration,
+          start.day,
+          start.time,
+          end.day,
+          end.time,
+          bedtimeLabel,
+        )
+      },
   )
 }
 
 @Composable
 private fun relativeDay(millis: Long, nowMillis: Long, format: TimeFormatting): String {
-  val day = format.dateTime(millis).toLocalDate()
-  val today: LocalDate = format.dateTime(nowMillis).toLocalDate()
+  val day = format.date(millis)
+  val today = format.date(nowMillis)
   return when (day) {
     today -> stringResource(R.string.day_today)
     today.plusDays(1) -> stringResource(R.string.day_tomorrow)
@@ -173,15 +204,15 @@ private fun relativeDay(millis: Long, nowMillis: Long, format: TimeFormatting): 
 }
 
 @Composable
-internal fun activeHeroState(window: FastWindow, nowMillis: Long): ActiveHeroState {
+internal fun activeHeroState(window: FastWindow, nowMillis: Long, locale: Locale): ActiveHeroState {
   val elapsedSeconds = ((nowMillis - window.startMillis).coerceAtLeast(0L)) / 1000
   val hours = elapsedSeconds / 3600
   val minutes = (elapsedSeconds % 3600) / 60
   val seconds = elapsedSeconds % 60
   return ActiveHeroState(
     progress = window.progressAt(nowMillis),
-    elapsed = "%d:%02d".format(hours, minutes),
-    elapsedSeconds = ":%02d".format(seconds),
+    elapsed = String.format(locale, "%d:%02d", hours, minutes),
+    elapsedSeconds = String.format(locale, ":%02d", seconds),
     goalStatus = goalStatus(window, nowMillis),
   )
 }
@@ -209,18 +240,24 @@ internal fun fastDetailsState(
   format: TimeFormatting,
 ): FastDetailsState =
   FastDetailsState(
-    // The day only matters when the fast began on an earlier day.
+    // A day only matters when the start or the goal falls on a day other than today.
     startedLabel =
-      if (
-        format.dateTime(window.startMillis).toLocalDate() ==
-          format.dateTime(nowMillis).toLocalDate()
-      ) {
+      if (format.date(window.startMillis) == format.date(nowMillis)) {
         stringResource(R.string.started)
       } else {
         stringResource(R.string.started_on_day, format.shortDay(window.startMillis))
       },
     startedClock = format.clock(window.startMillis),
-    goalLabel = stringResource(R.string.goal_hours_label, goal.durationDisplay),
+    goalLabel =
+      if (format.date(window.endMillis) == format.date(nowMillis)) {
+        stringResource(R.string.goal_hours_label, goal.durationDisplay)
+      } else {
+        stringResource(
+          R.string.goal_hours_label_on_day,
+          goal.durationDisplay,
+          format.shortDay(window.endMillis),
+        )
+      },
     goalClock = format.clock(window.endMillis),
   )
 
@@ -230,7 +267,14 @@ internal fun goalOptions(goals: List<FastGoal>): List<GoalOption> =
     GoalOption(
       id = goal.id,
       label =
-        "${goalShortName(goal)} · ${stringResource(R.string.duration_hours, TimeUnit.MILLISECONDS.toHours(goal.durationMillis))}",
+        stringResource(
+          R.string.goal_option_label,
+          goalShortName(goal),
+          stringResource(
+            R.string.duration_hours,
+            TimeUnit.MILLISECONDS.toHours(goal.durationMillis),
+          ),
+        ),
     )
   }
 
@@ -242,8 +286,8 @@ internal fun fastWindowCardState(
   format: TimeFormatting,
 ): FastWindowCardState {
   val progress = window.progressAt(nowMillis)
-  val start = "${format.shortDay(window.startMillis)}, ${format.compactClock(window.startMillis)}"
-  val end = "${format.shortDay(window.endMillis)}, ${format.compactClock(window.endMillis)}"
+  val start = format.dayAndTime(window.startMillis)
+  val end = format.dayAndTime(window.endMillis)
   return FastWindowCardState(
     progress = progress,
     bedtimeFraction = window.bedtimeFraction,

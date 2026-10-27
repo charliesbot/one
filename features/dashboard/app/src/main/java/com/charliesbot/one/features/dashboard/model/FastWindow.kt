@@ -1,6 +1,7 @@
 package com.charliesbot.one.features.dashboard.model
 
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 /**
  * The span of one fast, from its start to the moment its goal is reached, plus where the user's
@@ -23,6 +24,9 @@ internal data class FastWindow(
     ((nowMillis - startMillis).toFloat() / durationMillis).coerceIn(0f, 1f)
 
   fun remainingAt(nowMillis: Long): Long = (endMillis - nowMillis).coerceAtLeast(0L)
+
+  fun elapsedHoursAt(nowMillis: Long): Float =
+    (nowMillis - startMillis).coerceAtLeast(0L).toFloat() / TimeUnit.HOURS.toMillis(1)
 
   /** How far past the goal the fast has run, or 0 before the goal is reached. */
   fun overtimeAt(nowMillis: Long): Long = (nowMillis - endMillis).coerceAtLeast(0L)

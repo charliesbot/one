@@ -102,4 +102,12 @@ class FastWindowTest {
 
     assertEquals(TimeUnit.HOURS.toMillis(4), window.overtimeAt(millis("2026-10-23T18:25")))
   }
+
+  @Test
+  fun `elapsed hours count from the start, never below zero`() {
+    val window = FastWindow.create(millis("2026-10-22T20:30"), sixteenHours, null, zone)
+
+    assertEquals(9.5f, window.elapsedHoursAt(millis("2026-10-23T06:00")), 0.0001f)
+    assertEquals(0f, window.elapsedHoursAt(millis("2026-10-22T19:00")), 0f)
+  }
 }

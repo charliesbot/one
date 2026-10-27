@@ -26,7 +26,7 @@ internal data class FastDetailsState(
   /** "Started", or "Started Wed" when the fast began on an earlier day. */
   val startedLabel: String,
   val startedClock: ClockText,
-  /** "16h goal". */
+  /** "16h goal", or "16h goal · Fri" when the goal falls on another day. */
   val goalLabel: String,
   val goalClock: ClockText,
 )
