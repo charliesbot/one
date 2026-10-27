@@ -1,13 +1,18 @@
 package com.charliesbot.one.navigation
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -22,67 +27,58 @@ import com.charliesbot.one.features.settings.SettingsScreen
 import com.charliesbot.shared.core.designsystem.common.R as DesignSystemR
 import com.charliesbot.shared.core.strings.R as SharedR
 
+private data class TopLevelDestination(
+  val route: NavigationRoute,
+  @param:DrawableRes val icon: Int,
+  @param:StringRes val label: Int,
+)
+
+private val topLevelDestinations =
+  listOf(
+    TopLevelDestination(Today, DesignSystemR.drawable.today_24px, SharedR.string.nav_today),
+    TopLevelDestination(You, DesignSystemR.drawable.person_24px, SharedR.string.nav_you),
+    TopLevelDestination(
+      Settings,
+      DesignSystemR.drawable.settings_24px,
+      SharedR.string.settings_title,
+    ),
+  )
+
+/**
+ * Top-level navigation. The navigation suite picks the Expressive bar for a compact width, a
+ * compact height or tabletop posture, and the collapsed rail otherwise.
+ */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
 fun MainNavigation() {
-  val backStack = remember { mutableStateListOf<Any>(Today) }
+  val backStack = remember { mutableStateListOf<NavigationRoute>(Today) }
   val currentDestination = backStack.lastOrNull() ?: Today
+  val navigateTo: (NavigationRoute) -> Unit = { route ->
+    if (currentDestination != route) {
+      backStack.clear()
+      backStack.add(route)
+    }
+  }
+  val navigationSuiteType =
+    NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfo())
 
-  Scaffold(
-    bottomBar = {
-      NavigationBar {
-        NavigationBarItem(
-          icon = {
-            Icon(
-              painter = painterResource(DesignSystemR.drawable.today_24px),
-              contentDescription = stringResource(SharedR.string.nav_today),
-            )
-          },
-          label = { Text(stringResource(SharedR.string.nav_today)) },
-          selected = currentDestination == Today,
-          onClick = {
-            if (currentDestination != Today) {
-              backStack.clear()
-              backStack.add(Today)
-            }
-          },
-        )
-        NavigationBarItem(
-          icon = {
-            Icon(
-              painterResource(DesignSystemR.drawable.person_24px),
-              contentDescription = stringResource(SharedR.string.nav_you),
-            )
-          },
-          label = { Text(stringResource(SharedR.string.nav_you)) },
-          selected = currentDestination == You,
-          onClick = {
-            if (currentDestination != You) {
-              backStack.clear()
-              backStack.add(You)
-            }
-          },
-        )
-        NavigationBarItem(
-          icon = {
-            Icon(
-              painterResource(DesignSystemR.drawable.settings_24px),
-              contentDescription = stringResource(SharedR.string.settings_title),
-            )
-          },
-          label = { Text(stringResource(SharedR.string.settings_title)) },
-          selected = currentDestination == Settings,
-          onClick = {
-            if (currentDestination != Settings) {
-              backStack.clear()
-              backStack.add(Settings)
-            }
-          },
+  NavigationSuiteScaffold(
+    navigationSuiteType = navigationSuiteType,
+    navigationItems = {
+      topLevelDestinations.forEach { destination ->
+        NavigationSuiteItem(
+          navigationSuiteType = navigationSuiteType,
+          selected = currentDestination == destination.route,
+          onClick = { navigateTo(destination.route) },
+          icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+          label = { Text(stringResource(destination.label)) },
         )
       }
-    }
-  ) { innerPadding ->
-    Box(modifier = Modifier.padding(innerPadding)) {
+    },
+  ) {
+    // The suite consumes the insets its bar or rail covers; this pads the rest (status bar, and
+    // the bottom when the rail is showing).
+    Box(Modifier.windowInsetsPadding(WindowInsets.systemBars)) {
       NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
