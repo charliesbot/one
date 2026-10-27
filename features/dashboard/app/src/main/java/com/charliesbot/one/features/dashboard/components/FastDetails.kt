@@ -92,14 +92,12 @@ private fun DetailTile(
     shape = RoundedCornerShape(28.dp),
     colors = CardDefaults.cardColors(containerColor = containerColor, contentColor = contentColor),
   ) {
-    // A light badge with the icon in the tile's accent (a soft grey in dark mode).
-    val badgeColor = MaterialTheme.colorScheme.surfaceBright
     if (stacked) {
       Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        ShapeBadge(badgeShape, badgeIcon, badgeColor, badgeContentColor)
+        TileBadge(badgeShape, badgeIcon, badgeContentColor)
         DetailTileText(label, clock)
       }
     } else {
@@ -108,11 +106,17 @@ private fun DetailTile(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        ShapeBadge(badgeShape, badgeIcon, badgeColor, badgeContentColor)
+        TileBadge(badgeShape, badgeIcon, badgeContentColor)
         DetailTileText(label, clock, Modifier.weight(1f))
       }
     }
   }
+}
+
+@Composable
+private fun TileBadge(shape: RoundedPolygon, @DrawableRes icon: Int, iconColor: Color) {
+  // A light badge with the icon in the tile's accent (a soft grey in dark mode).
+  ShapeBadge(shape, icon, MaterialTheme.colorScheme.surfaceBright, iconColor)
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
