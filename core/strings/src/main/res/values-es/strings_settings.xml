@@ -20,8 +20,6 @@
     <string name="settings_mode_history">Historial</string>
     <string name="settings_mode_fixed">Fijo</string>
     <string name="settings_using_history">Usando tu historial reciente de ayuno para calcular el mejor horario</string>
-    <string name="smart_suggestion_based_on_average">Basado en promedio reciente</string>
-    <string name="smart_suggestion_based_on_bedtime">Basado en hora de dormir</string>
     <string name="settings_data_title">Gestión de Datos</string>
     <string name="settings_export_history">Exportar Historial (CSV)</string>
     <string name="settings_export_history_desc">Exporta tu historial de ayuno como archivo CSV</string>

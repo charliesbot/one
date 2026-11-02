@@ -9,7 +9,10 @@ android {
   namespace = "com.charliesbot.one.features.dashboard"
   compileSdk = 37
 
-  defaultConfig { minSdk = 31 }
+  defaultConfig {
+    minSdk = 31
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -46,4 +49,7 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.mockk)
   testImplementation(libs.kotlinx.coroutines.test)
+  androidTestImplementation(libs.androidx.junit)
+  androidTestImplementation(libs.androidx.ui.test.junit4)
+  debugImplementation(libs.androidx.ui.test.manifest)
 }

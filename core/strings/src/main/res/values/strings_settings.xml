@@ -20,8 +20,6 @@
     <string name="settings_mode_history">History</string>
     <string name="settings_mode_fixed">Fixed</string>
     <string name="settings_using_history">Using your recent fasting history to calculate the best time</string>
-    <string name="smart_suggestion_based_on_average">Based on recent average</string>
-    <string name="smart_suggestion_based_on_bedtime">Based on bedtime fallback</string>
     <string name="settings_data_title">Data Management</string>
     <string name="settings_export_history">Export History (CSV)</string>
     <string name="settings_export_history_desc">Export your fasting history as a CSV file</string>

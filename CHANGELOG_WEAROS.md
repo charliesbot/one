@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Improved the Wear widget layout so fasting status is centered and easier to scan
+- "Start fasting" and "End fast" buttons now use sentence case, matching the phone
 
 ### Fixed
 

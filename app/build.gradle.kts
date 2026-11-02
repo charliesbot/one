@@ -120,6 +120,7 @@ dependencies {
   implementation(libs.androidx.ui)
   implementation(libs.androidx.ui.graphics)
   implementation(libs.androidx.material3)
+  implementation(libs.androidx.material3.adaptive.navigation.suite)
   implementation(libs.play.services.wearable)
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.nav3.runtime)

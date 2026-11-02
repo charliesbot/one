@@ -32,6 +32,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -96,11 +97,28 @@ class TodayViewModelTest {
   }
 
   @Test
+  fun `fasting state is unknown until it loads`() = runTest {
+    val viewModel = createViewModel()
+
+    assertNull(viewModel.isFasting.value)
+  }
+
+  @Test
   fun `initial state is not fasting`() = runTest {
     val viewModel = createViewModel()
+    backgroundScope.launch { viewModel.isFasting.collect {} }
     advanceUntilIdle()
 
-    assertFalse(viewModel.isFasting.value)
+    assertEquals(false, viewModel.isFasting.value)
+  }
+
+  @Test
+  fun `exposes bedtime from settings`() = runTest {
+    val viewModel = createViewModel()
+    backgroundScope.launch { viewModel.bedtimeMinutes.collect {} }
+    advanceUntilIdle()
+
+    assertEquals(1320, viewModel.bedtimeMinutes.value)
   }
 
   @Test
@@ -139,7 +157,7 @@ class TodayViewModelTest {
     backgroundScope.launch { viewModel.fastingGoalId.collect {} }
     advanceUntilIdle()
 
-    assertTrue(viewModel.isFasting.value)
+    assertEquals(true, viewModel.isFasting.value)
     assertEquals(1000L, viewModel.startTimeInMillis.value)
     assertEquals("16:8", viewModel.fastingGoalId.value)
   }
